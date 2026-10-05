@@ -31,12 +31,13 @@
 | 17 | Preview sub-pages kinda **JavaScript code text ga print avutundi** ("antha galeez ga" screenshot) | ✅ Root-cause fixed at generator — `PAGE_JS` template ki `<script>` wrapper ledu (original upload lone ee bug undi); pages/posts/tools/OFFLINE anni regenerated, **JS-text-leak test: 19 files → 0** | `tools/build_policy_pages.py` + 20 regenerated preview files |
 | 18 | Eenadu Pratibha techniques photos — "ilaaga neat ga cheyu, table best ga, anni posts prakaram update avuthu undali" | ✅ Best-fit items implemented: last-date **amber pill**, category **chip**, table kinda **"మరిన్ని — View all notifications"** footer, slider ki **dot indicators** (Eenadu hero-carousel pattern, posts prakaram automatic). Anni already WP posts + post meta nunchi dynamic ga update avutundi | `inc/jobtable.php`, `inc/slider.php`, `assets/js/studentup-slider.js`, `assets/css/worldclass.css`, `preview/worldclass/index.html` |
 | 19 | Article page kinda **"perfectga suitable related posts — malli advancedga"** chupinchali | ✅ Theme `single.php` related grid **always-on** chesano: old code `tags && category` strict-gate valla tags leni post ki related section **ekke** vachedi kadu. Ippudu 3-step relevance — (1) tag+category exact match, (2) tag-only cross-category, (3) same-category latest fill, (4) rare case lo site latest — **4 cards (phone lo 2×2 neat grid)**, heading Telugu "ఇవి కూడా చూడండి" (Eenadu pattern). Kota post pettina ventane automatic ga related lo vaste untundi. Preview demo lo 3 legacy post pages (`ibps-clerk-2026`, `rrb-ntpc-2026`, `ap-police-constable-2026`) ki grid **assalu ledu** — aa 3 ki category-perfect related cards inject chesano | `wordpress-theme/studentup/single.php`, `preview/posts/ibps-clerk-2026.html`, `preview/posts/rrb-ntpc-2026.html`, `preview/posts/ap-police-constable-2026.html` |
+| 20 | **"Menu perfect ga, phone chala neat, clumsy asalu vundoddu, download app chupisthu undali, push kuda kavali (new notification vachinappudu direct alert), inka inka best, Eenadu Pratibha kante minchi"** | ✅ (a) **Persistent "Download App" mini bar** — phone lo bottom-nav paina clean stack, desktop lo right-bottom card; close chesina ee session matrame, next visit lo malli kanipistundi; app install ayithe auto-hide. Anni install buttons (footer · menu · bar) okate native install flow. (b) **Menu tap-perfection** — prati link/accordionTap 44px+ (finger-friendly), safe-area padding (notch/home-bar), butter scroll (`overscroll-behavior` + momentum), slim scrollbar, focus-visible rings, **"Download App ⬇ FREE"** entry inside menu. (c) **Phone guards** — horizontal slip `overflow-x:clip`, media (`img/video/iframe`) eppudu overflow avvadu, ≤420px density pass. (d) **Push** — already v163 lo full system undi (VAPID real web push: browser closed unna phone ki direct notification velthundi; prati kota post publish ayite subscribers andari ki). Ee release lo app-bar tho clash kakunda push-bar **auto re-position**, native flawless stack. | `inc/pwa.php`, `assets/js/studentup-pwa.js`, `assets/css/worldclass.css`, `header.php`, `footer.php`, `preview/worldclass/index.html` |
 
 **Quality gates (every change tarvata run):** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **99/99 files OK** · critical CSS regenerated clean.
 
 ---
 
-## B) Files changed — inventory (41 source files, +729 / −596 lines)
+## B) Files changed — inventory (45 source files, +1011 / −611 lines)
 
 ```
  +6  -6    preview/posts/engineering-internships-2026.html
@@ -63,6 +64,8 @@
 v208 (screenshot fix) added these to the inventory: `tools/build_policy_pages.py` (+2/−0 wrapper lines) + regenerated `preview/pages/*.html` (16 files), `preview/posts/*.html` (3), `preview/tools/index.html` — combined +56/−18; every change is only the restored `<script>…</script>` wrapper around the page-footer script.
 
 v210 (always-on related posts) added these to the inventory: `wordpress-theme/studentup/single.php` (+70/−16 — the related block is now a 4-step relevance pipeline instead of a strict `tags&&category` gate) + 3 legacy preview post pages `preview/posts/{ibps-clerk-2026, rrb-ntpc-2026, ap-police-constable-2026}.html` (+29/−0 each — "ఇవి కూడా చూడండి" related grid with real sibling-post links).
+
+v211 (phone-perfect dock + app bar + push UX) added these to the inventory: `inc/pwa.php` (+27/−0 — persistent install-bar renderer), `assets/js/studentup-pwa.js` (+45/−14 — all-CTA unified install flow + appbar session logic), `assets/css/worldclass.css` (+66/−0 — §26: app bar, stacked docks, menu 44px taps, phone guards), `header.php` (+1/−0 — menu "Download App FREE" entry), `footer.php` (+1/−1 — footer button into the unified `.su-install-cta` flow), `preview/worldclass/index.html` (+38/−0 — demo parity: bar + menu CTA + demo wiring). Regenerated demo bundle `preview/worldclass/standalone.html` kuda reflect (+147/−31 extra — app bar + menu CTA embedded).
 
 Minified CSS (`*.min.css`), critical CSS (`critical*.css`), offline preview bundle, `.pot` — anni **auto-generated**; source change tarvata tools regenerate chestayi (Section D chudandi). Full exact diff: **`studentup-all-changes.patch`**.
 
@@ -370,6 +373,43 @@ if ( $su_picks ) {
 }
 ```
 **Demo parity:** `preview/posts/{ibps-clerk-2026, rrb-ntpc-2026, ap-police-constable-2026}.html` — ee 3 legacy pages (original upload files, no generator) lo related grid **undede kadu**; ippudu category-perfect cards with **real sibling-post links** inject chesano (prati page lo `sectionhead` + `newsgrid` × 3 cards).
+
+### 18) Persistent app-install bar + phone-perfect docks + menu taps (v211)
+**Files:** `inc/pwa.php`, `assets/js/studentup-pwa.js`, `assets/css/worldclass.css` §26, `header.php`, `footer.php` (+ demo parity in `preview/worldclass/index.html`)
+
+**BEFORE (original):** "App download" existed only as a **footer button** (`#installbtn`, deep at page end — readers never reach it) + an iOS/Chrome steps sheet. No visible "Install app" anywhere on screen. Menu list items were ~38px tall (below the 44px finger-friendly floor), no safe-area padding (notch/home-bar devices lo last items adigi poyevi), no overscroll containment (drawer scroll ended → body scrolls — clumsy). Push bar (v163) + bottom nav + any new dock could overlap.
+
+**AFTER (v211):**
+a) **Always-visible install bar** (renders from `wp_footer`, admin lo skip; standalone-mode lo auto-hide):
+```php
+function studentup_app_bar() { ?>
+  <div class="su-appbar" id="su-appbar" hidden>
+    <div class="su-appbar-in">
+      <span class="su-appbar-mark">SU</span>
+      <div class="su-appbar-tx"><strong>StudentUp App</strong><small>One-tap install · new job alerts direct ga</small></div>
+      <button class="su-appbar-go su-install-cta">Install</button>
+      <button class="su-appbar-x" aria-label="Close install banner">✕</button>
+    </div>
+  </div>
+<?php }
+add_action( 'wp_footer', 'studentup_app_bar', 25 );
+```
+b) **All CTAs one flow** — `querySelectorAll("#installbtn, .su-install-cta")` → `beforeinstallprompt` native prompt when available, else the same device-wise steps sheet. Close = **session-only** (`sessionStorage 'su-appbar-hide'`) — owner ask "chupisthu undali": next visit lo malli kanipistundi; `appinstalled` event lo permanent ga hide.
+```js
+var ctas = [].slice.call(document.querySelectorAll("#installbtn, .su-install-cta"));
+ctas.forEach(function (b) { b.addEventListener("click", function (e) { e.preventDefault(); if (!installNow()) openSheet(); }); });
+function showAppbar() { appbar.hidden = false; document.body.classList.add("su-appbar-on"); }
+```
+c) **Stacked docks, zero overlap** — CSS variable dance:
+```css
+body{ --su-appbar-h:0px } body.su-appbar-on{ --su-appbar-h:64px }
+.su-appbar{ bottom:calc(72px + env(safe-area-inset-bottom,0px)) }       /* bottom-nav paina */
+body.su-appbar-on .su-push-bar{ bottom:calc(72px + var(--su-appbar-h) + env(safe-area-inset-bottom,0px) + 8px) } /* push bar appbar paina */
+@media(min-width:860px){ .su-appbar{ left:auto; right:18px; bottom:18px; max-width:420px } }
+```
+d) **Menu tap-perfection** — `.mpanel a{min-height:44px}` · `.mgroup a{min-height:40px}` · `overscroll-behavior:contain` + `-webkit-overflow-scrolling:touch` · `padding-top/bottom:calc(12px + env(safe-area-inset-*))` · `:focus-visible` rings · menu lo **"Download App ⬇ FREE"** entry (`.su-install-cta`) · dark-mode chip variant.
+e) **Clumsy killers** — `html,body{overflow-x:clip}`, `img/video/iframe{max-width:100%}`, ≤420px density pass (newsgrid gap 10px, section heads 16.5px).
+f) **Push (already v163, now friction-free)** — real VAPID web push no changes needed: subs table + REST subscribe/unsubscribe + bot `run.py --push-send`. v211 makes the push bar **auto-float above the app bar** (`body.su-appbar-on`) so "Download app chupisthu undali" + "new job vachinappudu direct notification" rendu okesari, okadani marugu lekunda.
 
 ### 16) Preview demo parity
 `preview/worldclass/index.html` (and regenerated `standalone.html` / `OFFLINE_PREVIEW.html` / `theme-snapshot.html` / 3 post demos): same removals mirrored (hero pills, Trending/state, pause buttons, poll, captions, chips row + its inline `CHIPS` filter JS), plus the **footer bug** — demo used fictional classes (`su-foot`, `su-foot-grid`, `h4`) that no stylesheet defines → footer rendered unstyled/washed-out. Now uses the real `footer`, `footer-grid`, `footer-bottom`, `h3` classes that the theme's CSS styles (dark navy, readable links).
