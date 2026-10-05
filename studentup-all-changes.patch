@@ -1,15 +1,53 @@
-# ======================================================================
-# StudentUp Theme — ALL OWNER-REQUESTED CHANGES (original upload -> final)
-# Date: 2026-10-06 · Theme v1.9.42 · Branch: arena/01a10d4d-studentup
-# Readable guide (Telugu+English, with BEFORE/AFTER snippets):
-#   STUDENTUP_ALL_CHANGES.md
-# Apply: cd <extracted project root> && patch -p1 < studentup-all-changes.patch
-# Excluded (auto-generated/binaries — regenerate with tools after applying):
-#   *.min.css  critical*.css  OFFLINE_PREVIEW.html  *.pot  *.zip  images
-#   python3 tools/minify_assets.py && python3 tools/build_critical_css.py
-# ======================================================================
+studentup-all-changes.patch — ORIGINAL upload (be14491) vs latest (v210)
+Generated: 2026-10-06 · files changed: 41 · lines +729 / -596
+Excluded (auto-generated/binary): *.zip, images, *.min.css, critical*.css, OFFLINE_PREVIEW.html, *.pot, .DS_Store
+Apply order: files appear in original-repo-path order (a/ = original, b/ = latest).
 
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/about.html b/preview/pages/about.html
+── File inventory (lines +/−):
+ +2    -0    preview/pages/about.html
+ +2    -0    preview/pages/advertise.html
+ +2    -0    preview/pages/contact.html
+ +2    -0    preview/pages/corrections.html
+ +2    -0    preview/pages/daily-quiz.html
+ +2    -0    preview/pages/disclaimer.html
+ +2    -0    preview/pages/editorial-policy.html
+ +2    -0    preview/pages/editorial-team.html
+ +2    -0    preview/pages/exam-calendar.html
+ +2    -0    preview/pages/internet-center.html
+ +2    -0    preview/pages/privacy.html
+ +2    -0    preview/pages/results-hub.html
+ +2    -0    preview/pages/scholarships-hub.html
+ +2    -0    preview/pages/terms.html
+ +2    -0    preview/pages/ts-jobs-hub.html
+ +29   -0    preview/posts/ap-police-constable-2026.html
+ +8    -6    preview/posts/engineering-internships-2026.html
+ +29   -0    preview/posts/ibps-clerk-2026.html
+ +4    -4    preview/posts/post-office-gds-2026.html
+ +29   -0    preview/posts/rrb-ntpc-2026.html
+ +8    -6    preview/posts/upsc-junior-assistant-2026.html
+ +3    -5    preview/theme-snapshot.html
+ +2    -0    preview/tools/index.html
+ +57   -169  preview/worldclass/index.html
+ +167  -198  preview/worldclass/standalone.html
+ +30   -2    tools/build_critical_css.py
+ +4    -2    tools/build_policy_pages.py
+ +15   -4    tools/build_preview_posts.py
+ +3    -1    tools/build_preview_tools.py
+ +102  -21   wordpress-theme/studentup/assets/css/worldclass.css
+ +8    -62   wordpress-theme/studentup/assets/js/studentup-menu.js
+ +46   -14   wordpress-theme/studentup/assets/js/studentup-slider.js
+ +8    -28   wordpress-theme/studentup/assets/js/studentup.js
+ +25   -13   wordpress-theme/studentup/front-page.php
+ +6    -5    wordpress-theme/studentup/inc/breaking.php
+ +4    -2    wordpress-theme/studentup/inc/jobtable.php
+ +6    -22   wordpress-theme/studentup/inc/premium.php
+ +19   -1    wordpress-theme/studentup/inc/slider.php
+ +9    -7    wordpress-theme/studentup/inc/template.php
+ +70   -16   wordpress-theme/studentup/single.php
+ +8    -8    wordpress-theme/studentup/style.css
+──────────────────────────────────────────────────────────────
+
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/about.html b/preview/pages/about.html
 --- a/preview/pages/about.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/about.html	2026-10-05 19:33:50.000000000 +0000
 @@ -163,6 +163,7 @@
@@ -27,7 +65,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/advertise.html b/preview/pages/advertise.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/advertise.html b/preview/pages/advertise.html
 --- a/preview/pages/advertise.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/advertise.html	2026-10-05 19:33:50.000000000 +0000
 @@ -164,6 +164,7 @@
@@ -45,7 +83,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/contact.html b/preview/pages/contact.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/contact.html b/preview/pages/contact.html
 --- a/preview/pages/contact.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/contact.html	2026-10-05 19:33:50.000000000 +0000
 @@ -182,6 +182,7 @@
@@ -63,7 +101,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/corrections.html b/preview/pages/corrections.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/corrections.html b/preview/pages/corrections.html
 --- a/preview/pages/corrections.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/corrections.html	2026-10-05 19:33:50.000000000 +0000
 @@ -137,6 +137,7 @@
@@ -81,7 +119,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/daily-quiz.html b/preview/pages/daily-quiz.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/daily-quiz.html b/preview/pages/daily-quiz.html
 --- a/preview/pages/daily-quiz.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/daily-quiz.html	2026-10-05 19:33:50.000000000 +0000
 @@ -955,6 +955,7 @@
@@ -99,7 +137,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/disclaimer.html b/preview/pages/disclaimer.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/disclaimer.html b/preview/pages/disclaimer.html
 --- a/preview/pages/disclaimer.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/disclaimer.html	2026-10-05 19:33:50.000000000 +0000
 @@ -149,6 +149,7 @@
@@ -117,7 +155,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/editorial-policy.html b/preview/pages/editorial-policy.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/editorial-policy.html b/preview/pages/editorial-policy.html
 --- a/preview/pages/editorial-policy.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/editorial-policy.html	2026-10-05 19:33:50.000000000 +0000
 @@ -155,6 +155,7 @@
@@ -135,7 +173,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/editorial-team.html b/preview/pages/editorial-team.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/editorial-team.html b/preview/pages/editorial-team.html
 --- a/preview/pages/editorial-team.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/editorial-team.html	2026-10-05 19:33:50.000000000 +0000
 @@ -140,6 +140,7 @@
@@ -153,7 +191,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/exam-calendar.html b/preview/pages/exam-calendar.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/exam-calendar.html b/preview/pages/exam-calendar.html
 --- a/preview/pages/exam-calendar.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/exam-calendar.html	2026-10-05 19:33:50.000000000 +0000
 @@ -117,6 +117,7 @@
@@ -171,7 +209,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/internet-center.html b/preview/pages/internet-center.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/internet-center.html b/preview/pages/internet-center.html
 --- a/preview/pages/internet-center.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/internet-center.html	2026-10-05 19:33:50.000000000 +0000
 @@ -150,6 +150,7 @@
@@ -189,7 +227,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/privacy.html b/preview/pages/privacy.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/privacy.html b/preview/pages/privacy.html
 --- a/preview/pages/privacy.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/privacy.html	2026-10-05 19:33:50.000000000 +0000
 @@ -167,6 +167,7 @@
@@ -207,7 +245,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/results-hub.html b/preview/pages/results-hub.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/results-hub.html b/preview/pages/results-hub.html
 --- a/preview/pages/results-hub.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/results-hub.html	2026-10-05 19:33:50.000000000 +0000
 @@ -117,6 +117,7 @@
@@ -225,7 +263,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/scholarships-hub.html b/preview/pages/scholarships-hub.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/scholarships-hub.html b/preview/pages/scholarships-hub.html
 --- a/preview/pages/scholarships-hub.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/scholarships-hub.html	2026-10-05 19:33:50.000000000 +0000
 @@ -117,6 +117,7 @@
@@ -243,7 +281,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/terms.html b/preview/pages/terms.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/terms.html b/preview/pages/terms.html
 --- a/preview/pages/terms.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/terms.html	2026-10-05 19:33:50.000000000 +0000
 @@ -188,6 +188,7 @@
@@ -261,7 +299,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/ts-jobs-hub.html b/preview/pages/ts-jobs-hub.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/pages/ts-jobs-hub.html b/preview/pages/ts-jobs-hub.html
 --- a/preview/pages/ts-jobs-hub.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/pages/ts-jobs-hub.html	2026-10-05 19:33:50.000000000 +0000
 @@ -117,6 +117,7 @@
@@ -279,7 +317,46 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/engineering-internships-2026.html b/preview/posts/engineering-internships-2026.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/ap-police-constable-2026.html b/preview/posts/ap-police-constable-2026.html
+--- a/preview/posts/ap-police-constable-2026.html	2026-10-04 09:30:04.000000000 +0000
++++ b/preview/posts/ap-police-constable-2026.html	2026-10-05 20:10:15.877474561 +0000
+@@ -70,6 +70,35 @@
+           </div>
+ 
+           <div class="su-adbelow" aria-label="Advertisement">Advertisement · end of article</div>
++
++          <div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2><p>Same category · latest updates</p></div>
++            <a class="su-viewall" href="../worldclass/index.html#jobs">All updates →</a></div>
++          <div class="newsgrid" style="margin-bottom:6px">
++<article class="news" data-accent="ts" data-su-card data-cat="ts">
++  <a class="thumb thumb--auto" href="engineering-internships-2026.html" aria-hidden="true" tabindex="-1" data-accent="ts"><span class="su-cov"><b class="su-cov-mono">TG</b><span class="su-cov-cat">TS Jobs</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">TS Jobs</span></div>
++    <h3><a href="engineering-internships-2026.html">TSPSC Group 2 Recruitment 2026 — 783 Vacancies, Degree Pass</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="engineering-internships-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="post-office-gds-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">PO</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="post-office-gds-2026.html">Post Office GDS 2026 Notification — 21,413 Posts, 10th Pass (No Exam)</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="post-office-gds-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">SC</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="upsc-junior-assistant-2026.html">SSC CHSL 2026 Notification — 3,712 Posts, Apply Online</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="upsc-junior-assistant-2026.html">Read more →</a></div>
++  </div>
++</article>
++          </div>
+         </article>
+       </div>
+ 
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/engineering-internships-2026.html b/preview/posts/engineering-internships-2026.html
 --- a/preview/posts/engineering-internships-2026.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/posts/engineering-internships-2026.html	2026-10-05 19:33:50.000000000 +0000
 @@ -121,25 +121,25 @@
@@ -329,7 +406,46 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/post-office-gds-2026.html b/preview/posts/post-office-gds-2026.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/ibps-clerk-2026.html b/preview/posts/ibps-clerk-2026.html
+--- a/preview/posts/ibps-clerk-2026.html	2026-10-04 09:30:04.000000000 +0000
++++ b/preview/posts/ibps-clerk-2026.html	2026-10-05 20:09:32.721256613 +0000
+@@ -124,6 +124,35 @@
+           </div>
+ 
+           <div class="su-adbelow" aria-label="Advertisement">Advertisement · end of article</div>
++
++          <div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2><p>Same category · latest updates</p></div>
++            <a class="su-viewall" href="../worldclass/index.html#jobs">All updates →</a></div>
++          <div class="newsgrid" style="margin-bottom:6px">
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="rrb-ntpc-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">RB</b><span class="su-cov-cat">Rail Jobs</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Rail Jobs</span></div>
++    <h3><a href="rrb-ntpc-2026.html">RRB NTPC 2026 Notification — 11,558 Vacancies, 12th &amp; Graduate Posts</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="rrb-ntpc-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="post-office-gds-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">PO</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="post-office-gds-2026.html">Post Office GDS 2026 Notification — 21,413 Posts, 10th Pass (No Exam)</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="post-office-gds-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">SC</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="upsc-junior-assistant-2026.html">SSC CHSL 2026 Notification — 3,712 Posts, Apply Online</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="upsc-junior-assistant-2026.html">Read more →</a></div>
++  </div>
++</article>
++          </div>
+         </article>
+       </div>
+ 
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/post-office-gds-2026.html b/preview/posts/post-office-gds-2026.html
 --- a/preview/posts/post-office-gds-2026.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/posts/post-office-gds-2026.html	2026-10-05 18:11:16.000000000 +0000
 @@ -168,17 +168,17 @@
@@ -354,7 +470,46 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
                </div>
              </article>
            </div>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/upsc-junior-assistant-2026.html b/preview/posts/upsc-junior-assistant-2026.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/rrb-ntpc-2026.html b/preview/posts/rrb-ntpc-2026.html
+--- a/preview/posts/rrb-ntpc-2026.html	2026-10-04 09:30:04.000000000 +0000
++++ b/preview/posts/rrb-ntpc-2026.html	2026-10-05 20:09:53.997364048 +0000
+@@ -78,6 +78,35 @@
+           </div>
+ 
+           <div class="su-adbelow" aria-label="Advertisement">Advertisement · end of article</div>
++
++          <div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2><p>Same category · latest updates</p></div>
++            <a class="su-viewall" href="../worldclass/index.html#jobs">All updates →</a></div>
++          <div class="newsgrid" style="margin-bottom:6px">
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="ibps-clerk-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">BK</b><span class="su-cov-cat">Bank Jobs</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Bank Jobs</span></div>
++    <h3><a href="ibps-clerk-2026.html">IBPS Clerk 2026 Recruitment — 4,520 Vacancies, Any Degree</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="ibps-clerk-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="post-office-gds-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">PO</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="post-office-gds-2026.html">Post Office GDS 2026 Notification — 21,413 Posts, 10th Pass (No Exam)</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="post-office-gds-2026.html">Read more →</a></div>
++  </div>
++</article>
++<article class="news" data-accent="central" data-su-card data-cat="central">
++  <a class="thumb thumb--auto" href="upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1" data-accent="central"><span class="su-cov"><b class="su-cov-mono">SC</b><span class="su-cov-cat">Central Govt</span><span class="su-cov-brand">StudentUp</span></span></a>
++  <div class="newsbody">
++    <div class="tagrow"><span class="tag">Central Govt</span></div>
++    <h3><a href="upsc-junior-assistant-2026.html">SSC CHSL 2026 Notification — 3,712 Posts, Apply Online</a></h3>
++    <div class="newsfoot"><a class="su-readmore" href="upsc-junior-assistant-2026.html">Read more →</a></div>
++  </div>
++</article>
++          </div>
+         </article>
+       </div>
+ 
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/posts/upsc-junior-assistant-2026.html b/preview/posts/upsc-junior-assistant-2026.html
 --- a/preview/posts/upsc-junior-assistant-2026.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/posts/upsc-junior-assistant-2026.html	2026-10-05 19:33:50.000000000 +0000
 @@ -129,25 +129,25 @@
@@ -404,9 +559,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +</script>
  </body>
  </html>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/theme-snapshot.html b/preview/theme-snapshot.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/theme-snapshot.html b/preview/theme-snapshot.html
 --- a/preview/theme-snapshot.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/theme-snapshot.html	2026-10-05 19:53:23.600505936 +0000
++++ b/preview/theme-snapshot.html	2026-10-05 20:12:35.666180621 +0000
 @@ -31,7 +31,7 @@
  </head>
  <body><div class="wrap">
@@ -438,7 +593,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
    </table>
    <p class="foot">“Kavalsinavi” = aa section render avvadaniki WordPress lo em undali (posts · categories · toggles). Khaali ga unte aa section <b>hide</b> avutundi — fake cards theme eppudu render cheyyadu.</p>
  
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/tools/index.html b/preview/tools/index.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/tools/index.html b/preview/tools/index.html
 --- a/preview/tools/index.html	2026-10-04 09:30:04.000000000 +0000
 +++ b/preview/tools/index.html	2026-10-05 19:33:50.000000000 +0000
 @@ -304,6 +304,7 @@
@@ -457,9 +612,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  <script>
  /* v198 preview calculators — same maths as the theme's tool modules. */
  (function(){
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/index.html b/preview/worldclass/index.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/index.html b/preview/worldclass/index.html
 --- a/preview/worldclass/index.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/worldclass/index.html	2026-10-05 19:53:03.756184857 +0000
++++ b/preview/worldclass/index.html	2026-10-05 19:53:03.000000000 +0000
 @@ -10,6 +10,7 @@
  <link rel="stylesheet" href="../../wordpress-theme/studentup/style.css">
  <link rel="stylesheet" href="../../wordpress-theme/studentup/assets/css/premium.css">
@@ -887,9 +1042,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  
    /* Pre-approval AdSense gate: Anchor ad remains hidden until live AdSense approval */
    var closeBtn=document.querySelector('#su-anchor button');
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/standalone.html b/preview/worldclass/standalone.html
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/standalone.html b/preview/worldclass/standalone.html
 --- a/preview/worldclass/standalone.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/worldclass/standalone.html	2026-10-05 19:53:23.632506455 +0000
++++ b/preview/worldclass/standalone.html	2026-10-05 20:12:35.706180821 +0000
 @@ -124,7 +124,6 @@
  .sectionhead{display:flex;justify-content:space-between;align-items:end;margin:26px 0 14px;gap:14px;flex-wrap:wrap}
  .sectionhead h1,.sectionhead h2{margin:0;font-size:22px;color:var(--navy)}
@@ -1573,7 +1728,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  
    /* Pre-approval AdSense gate: Anchor ad remains hidden until live AdSense approval */
    var closeBtn=document.querySelector('#su-anchor button');
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_critical_css.py b/tools/build_critical_css.py
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_critical_css.py b/tools/build_critical_css.py
 --- a/tools/build_critical_css.py	2026-10-04 09:30:04.000000000 +0000
 +++ b/tools/build_critical_css.py	2026-10-05 15:39:42.000000000 +0000
 @@ -173,6 +173,32 @@
@@ -1622,7 +1777,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
                   if _match(s.strip(), extra, use_exact) and not _dropped(s.strip(), drop)]
              if parts:
                  out.append(",".join(parts) + "{" + body + "}")
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_policy_pages.py b/tools/build_policy_pages.py
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_policy_pages.py b/tools/build_policy_pages.py
 --- a/tools/build_policy_pages.py	2026-10-04 09:30:04.000000000 +0000
 +++ b/tools/build_policy_pages.py	2026-10-05 19:33:29.000000000 +0000
 @@ -142,7 +142,8 @@
@@ -1645,7 +1800,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  
  
  def mega_nav_html(home: str = "../worldclass/index.html", pfx: str = "../") -> str:
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_preview_posts.py b/tools/build_preview_posts.py
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_preview_posts.py b/tools/build_preview_posts.py
 --- a/tools/build_preview_posts.py	2026-10-04 09:30:04.000000000 +0000
 +++ b/tools/build_preview_posts.py	2026-10-05 18:10:42.000000000 +0000
 @@ -8,7 +8,12 @@
@@ -1689,7 +1844,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  def sidebar(top, closing):
      tops = "".join(f'<li><a href="../worldclass/index.html#jobs"><i>{i+1}</i> {t}</a></li>' for i, t in enumerate(top))
      clos = "".join(f'<li><a href="../worldclass/index.html#jobs"><i>⏰</i> {c}</a></li>' for c in closing)
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_preview_tools.py b/tools/build_preview_tools.py
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/tools/build_preview_tools.py b/tools/build_preview_tools.py
 --- a/tools/build_preview_tools.py	2026-10-04 09:30:04.000000000 +0000
 +++ b/tools/build_preview_tools.py	2026-10-05 18:10:52.000000000 +0000
 @@ -16,7 +16,9 @@
@@ -1703,9 +1858,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  sys.path.insert(0, str(ROOT / "tools"))
  import build_policy_pages as B  # noqa: E402
  
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/css/worldclass.css b/wordpress-theme/studentup/assets/css/worldclass.css
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/css/worldclass.css b/wordpress-theme/studentup/assets/css/worldclass.css
 --- a/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-05 19:52:24.371547659 +0000
++++ b/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-05 19:52:24.000000000 +0000
 @@ -53,10 +53,9 @@
  .su-lticker .tmove{ animation:slide 24s linear infinite }
  .su-lticker .tmove a{ font-size:13.5px; letter-spacing:.002em; font-weight:650; color:#f8fafc; text-decoration:none }
@@ -1899,7 +2054,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
 +body.dark .su-sdot{ background:#2c3a55 }
 +body.dark .su-sdot.on{ background:var(--blue) }
 +@media(max-width:600px){ .su-sdots{ margin-top:10px } }
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-menu.js b/wordpress-theme/studentup/assets/js/studentup-menu.js
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-menu.js b/wordpress-theme/studentup/assets/js/studentup-menu.js
 --- a/wordpress-theme/studentup/assets/js/studentup-menu.js	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/assets/js/studentup-menu.js	2026-10-05 18:02:06.000000000 +0000
 @@ -320,68 +320,14 @@
@@ -1979,9 +2134,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  
    function boot() {
      wireDesktop();
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-slider.js b/wordpress-theme/studentup/assets/js/studentup-slider.js
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-slider.js b/wordpress-theme/studentup/assets/js/studentup-slider.js
 --- a/wordpress-theme/studentup/assets/js/studentup-slider.js	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/assets/js/studentup-slider.js	2026-10-05 19:51:52.539032534 +0000
++++ b/wordpress-theme/studentup/assets/js/studentup-slider.js	2026-10-05 19:51:52.000000000 +0000
 @@ -92,22 +92,54 @@
  				slide( -1 );
  			} );
@@ -2051,7 +2206,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  		}
  	}
  
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup.js b/wordpress-theme/studentup/assets/js/studentup.js
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup.js b/wordpress-theme/studentup/assets/js/studentup.js
 --- a/wordpress-theme/studentup/assets/js/studentup.js	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/assets/js/studentup.js	2026-10-05 18:29:54.000000000 +0000
 @@ -1,4 +1,4 @@
@@ -2129,7 +2284,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
    /* ---------- v72.1: sections by qualification (grid nunchi automatic build) ---------- */
    var QUAL_LABELS = { "10th": "SSC · 10th", "inter": "Inter (10+2)", "iti": "ITI",
                        "diploma": "Diploma", "degree": "Degree", "pg": "PG", "btech": "B.Tech" };
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/front-page.php b/wordpress-theme/studentup/front-page.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/front-page.php b/wordpress-theme/studentup/front-page.php
 --- a/wordpress-theme/studentup/front-page.php	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/front-page.php	2026-10-05 18:29:06.000000000 +0000
 @@ -47,7 +47,9 @@
@@ -2212,7 +2367,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  			studentup_ad( 'below-content' ); // slot 3 — finish chesina reader ki
  			?>
  		<?php endif; ?>
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/breaking.php b/wordpress-theme/studentup/inc/breaking.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/breaking.php b/wordpress-theme/studentup/inc/breaking.php
 --- a/wordpress-theme/studentup/inc/breaking.php	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/inc/breaking.php	2026-10-05 18:01:42.000000000 +0000
 @@ -298,11 +298,12 @@
@@ -2233,9 +2388,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  	echo '</div></div>';
  }
  
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/jobtable.php b/wordpress-theme/studentup/inc/jobtable.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/jobtable.php b/wordpress-theme/studentup/inc/jobtable.php
 --- a/wordpress-theme/studentup/inc/jobtable.php	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/inc/jobtable.php	2026-10-05 19:51:09.190330843 +0000
++++ b/wordpress-theme/studentup/inc/jobtable.php	2026-10-05 19:51:09.000000000 +0000
 @@ -68,7 +68,7 @@
  	<section class="su-jobtable" aria-labelledby="su-jobtable-title">
  		<div class="su-jt-head">
@@ -2263,7 +2418,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  	</section>
  	<?php
  }
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/premium.php b/wordpress-theme/studentup/inc/premium.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/premium.php b/wordpress-theme/studentup/inc/premium.php
 --- a/wordpress-theme/studentup/inc/premium.php	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/inc/premium.php	2026-10-05 15:41:04.000000000 +0000
 @@ -21,17 +21,15 @@
@@ -2312,9 +2467,9 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  		</div>
  	</section>
  	<?php
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/slider.php b/wordpress-theme/studentup/inc/slider.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/slider.php b/wordpress-theme/studentup/inc/slider.php
 --- a/wordpress-theme/studentup/inc/slider.php	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/inc/slider.php	2026-10-05 19:51:25.270591175 +0000
++++ b/wordpress-theme/studentup/inc/slider.php	2026-10-05 19:51:25.000000000 +0000
 @@ -160,8 +160,9 @@
  					<h2><?php echo esc_html( $args['heading'] ); ?></h2>
  				</div>
@@ -2350,7 +2505,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  		</section>
  	</div>
  	<?php
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/template.php b/wordpress-theme/studentup/inc/template.php
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/template.php b/wordpress-theme/studentup/inc/template.php
 --- a/wordpress-theme/studentup/inc/template.php	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/inc/template.php	2026-10-05 18:08:26.000000000 +0000
 @@ -174,18 +174,20 @@
@@ -2381,7 +2536,112 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x
  				<?php
  				$su_share_title = rawurlencode( get_the_title() );
  				$su_share_url   = rawurlencode( get_permalink() );
-diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.gif' -x '*.webp' -x '*.ico' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/style.css b/wordpress-theme/studentup/style.css
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/single.php b/wordpress-theme/studentup/single.php
+--- a/wordpress-theme/studentup/single.php	2026-10-04 09:30:04.000000000 +0000
++++ b/wordpress-theme/studentup/single.php	2026-10-05 20:11:31.865858370 +0000
+@@ -174,31 +174,85 @@
+ 			?>
+ 
+ 			<?php
+-			$su_rel = get_the_category();
++			$su_rel  = get_the_category();
++			$su_cat  = $su_rel ? wp_list_pluck( $su_rel, 'term_id' ) : array();
+ 			$su_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
+-			if ( $su_rel && $su_tags ) {
+-				// Topic tags are generated from the focus/secondary keywords. Use
+-				// them first; category-only matching was showing unrelated posts.
+-				$su_q = new WP_Query(
++			// v210: related posts ALWAYS chupinchali — old code `tags && category`
++			// strict-gate valla tags leni bot posts ki empty section vachedi.
++			// Ippudu 3-step relevance: (1) tag+category exact, (2) tag-only
++			// cross-category same-topic, (3) same-category latest fill — 4 cards
++			// (phone lo 2x2 neat grid). Ids-only light queries, count vaddu.
++			$su_picks = array();
++			if ( $su_cat && $su_tags ) {
++				$su_picks = get_posts(
+ 					array(
+-						'category__in'        => wp_list_pluck( $su_rel, 'term_id' ),
++						'fields'              => 'ids',
++						'posts_per_page'      => 4,
++						'category__in'        => $su_cat,
+ 						'tag__in'             => $su_tags,
+ 						'post__not_in'        => array( get_the_ID() ),
+-						'posts_per_page'      => 3,
+ 						'ignore_sticky_posts' => true,
+-						'no_found_rows'       => true,   // v69 perf: related posts — count query vaddu
++						'no_found_rows'       => true, // v69 perf: count query vaddu
+ 					)
+ 				);
+-				if ( $su_q->have_posts() ) {
+-					echo '<div class="sectionhead"><div><h2>Read this too</h2></div></div><div class="newsgrid">';
+-					$su_i = 0;
+-					while ( $su_q->have_posts() ) {
+-						$su_q->the_post();
+-						studentup_card( $su_i );
+-						$su_i++;
++			}
++			if ( count( $su_picks ) < 4 && $su_tags ) {
++				$su_picks = array_merge(
++					$su_picks,
++					get_posts(
++						array(
++							'fields'              => 'ids',
++							'posts_per_page'      => 4 - count( $su_picks ),
++							'tag__in'             => $su_tags,
++							'post__not_in'        => array_merge( array( get_the_ID() ), $su_picks ),
++							'ignore_sticky_posts' => true,
++							'no_found_rows'       => true,
++						)
++					)
++				);
++			}
++			if ( count( $su_picks ) < 4 && $su_cat ) {
++				$su_picks = array_merge(
++					$su_picks,
++					get_posts(
++						array(
++							'fields'              => 'ids',
++							'posts_per_page'      => 4 - count( $su_picks ),
++							'category__in'        => $su_cat,
++							'post__not_in'        => array_merge( array( get_the_ID() ), $su_picks ),
++							'ignore_sticky_posts' => true,
++							'no_found_rows'       => true,
++						)
++					)
++				);
++			}
++			if ( ! $su_picks ) {
++				// Category kuda leni rare post — ikkada kuda empty section
++				// vaddu; site-lo latest updates tho fill.
++				$su_picks = get_posts(
++					array(
++						'fields'              => 'ids',
++						'posts_per_page'      => 4,
++						'post__not_in'        => array( get_the_ID() ),
++						'ignore_sticky_posts' => true,
++						'no_found_rows'       => true,
++					)
++				);
++			}
++			if ( $su_picks ) {
++				echo '<div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2></div></div><div class="newsgrid">';
++				$su_i = 0;
++				foreach ( $su_picks as $su_pid ) {
++					$su_pick = get_post( $su_pid );
++					if ( ! $su_pick ) {
++						continue;
+ 					}
+-					echo '</div>';
++					$GLOBALS['post'] = $su_pick; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
++					setup_postdata( $su_pick );
++					studentup_card( $su_i );
++					$su_i++;
+ 				}
++				echo '</div>';
+ 				wp_reset_postdata();
+ 			}
+ 			?>
+diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/style.css b/wordpress-theme/studentup/style.css
 --- a/wordpress-theme/studentup/style.css	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/style.css	2026-10-05 18:30:35.000000000 +0000
 @@ -114,7 +114,6 @@

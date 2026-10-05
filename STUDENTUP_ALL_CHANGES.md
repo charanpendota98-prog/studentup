@@ -30,12 +30,13 @@
 | 16 | Preview demo footer broken (links kanipinchatledu) | ✅ Demo class names fixed (real theme footer always correct) | `preview/worldclass/index.html` |
 | 17 | Preview sub-pages kinda **JavaScript code text ga print avutundi** ("antha galeez ga" screenshot) | ✅ Root-cause fixed at generator — `PAGE_JS` template ki `<script>` wrapper ledu (original upload lone ee bug undi); pages/posts/tools/OFFLINE anni regenerated, **JS-text-leak test: 19 files → 0** | `tools/build_policy_pages.py` + 20 regenerated preview files |
 | 18 | Eenadu Pratibha techniques photos — "ilaaga neat ga cheyu, table best ga, anni posts prakaram update avuthu undali" | ✅ Best-fit items implemented: last-date **amber pill**, category **chip**, table kinda **"మరిన్ని — View all notifications"** footer, slider ki **dot indicators** (Eenadu hero-carousel pattern, posts prakaram automatic). Anni already WP posts + post meta nunchi dynamic ga update avutundi | `inc/jobtable.php`, `inc/slider.php`, `assets/js/studentup-slider.js`, `assets/css/worldclass.css`, `preview/worldclass/index.html` |
+| 19 | Article page kinda **"perfectga suitable related posts — malli advancedga"** chupinchali | ✅ Theme `single.php` related grid **always-on** chesano: old code `tags && category` strict-gate valla tags leni post ki related section **ekke** vachedi kadu. Ippudu 3-step relevance — (1) tag+category exact match, (2) tag-only cross-category, (3) same-category latest fill, (4) rare case lo site latest — **4 cards (phone lo 2×2 neat grid)**, heading Telugu "ఇవి కూడా చూడండి" (Eenadu pattern). Kota post pettina ventane automatic ga related lo vaste untundi. Preview demo lo 3 legacy post pages (`ibps-clerk-2026`, `rrb-ntpc-2026`, `ap-police-constable-2026`) ki grid **assalu ledu** — aa 3 ki category-perfect related cards inject chesano | `wordpress-theme/studentup/single.php`, `preview/posts/ibps-clerk-2026.html`, `preview/posts/rrb-ntpc-2026.html`, `preview/posts/ap-police-constable-2026.html` |
 
 **Quality gates (every change tarvata run):** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **99/99 files OK** · critical CSS regenerated clean.
 
 ---
 
-## B) Files changed — inventory (37 source files, +572 / −580 lines)
+## B) Files changed — inventory (41 source files, +729 / −596 lines)
 
 ```
  +6  -6    preview/posts/engineering-internships-2026.html
@@ -60,6 +61,8 @@
 ```
 
 v208 (screenshot fix) added these to the inventory: `tools/build_policy_pages.py` (+2/−0 wrapper lines) + regenerated `preview/pages/*.html` (16 files), `preview/posts/*.html` (3), `preview/tools/index.html` — combined +56/−18; every change is only the restored `<script>…</script>` wrapper around the page-footer script.
+
+v210 (always-on related posts) added these to the inventory: `wordpress-theme/studentup/single.php` (+70/−16 — the related block is now a 4-step relevance pipeline instead of a strict `tags&&category` gate) + 3 legacy preview post pages `preview/posts/{ibps-clerk-2026, rrb-ntpc-2026, ap-police-constable-2026}.html` (+29/−0 each — "ఇవి కూడా చూడండి" related grid with real sibling-post links).
 
 Minified CSS (`*.min.css`), critical CSS (`critical*.css`), offline preview bundle, `.pot` — anni **auto-generated**; source change tarvata tools regenerate chestayi (Section D chudandi). Full exact diff: **`studentup-all-changes.patch`**.
 
@@ -317,6 +320,56 @@ d) **Short table header caption** (Eenadu headings are caption-free): 20-word no
 e) **Already present, kept:** section-title accent bar (Eenadu's blue `|` markers — mana theme lo gradient bar), breaking ticker (Eenadu's red టాప్ నోటిఫికేషన్స్ strip — mana `Latest Jobs` marquee), 2-column card grid (Eenadu's విద్యా ఉద్యోగ సమాచారం cards — mana `.newsgrid`).
 
 f) **Intentionally skipped (with reason):** re-adding category tab-chips above the list (owner asked to remove them — v207), right-sidebar layout (kills phone neatness), full Telugu⇄English toggle (Eenadu runs separately-authored dual posts — StudentUp posts are single-language; a fake client-side toggle would mislead readers).
+
+### 17) Always-on, relevance-ranked related posts (v210)
+**File:** `wordpress-theme/studentup/single.php` (+ demo fix in 3 legacy `preview/posts/*.html`)
+
+**BEFORE (original):** strict gate — **tags lekapothe related section render avvakkanne ledu**, and even with tags it demanded tag AND category match, no fill:
+```php
+$su_rel = get_the_category();
+$su_tags = wp_get_post_tags( get_the_ID(), array( 'fields' => 'ids' ) );
+if ( $su_rel && $su_tags ) {            // ← tags leni post ki: related grid assalu undadu
+    $su_q = new WP_Query(
+        array(
+            'category__in'   => wp_list_pluck( $su_rel, 'term_id' ),
+            'tag__in'        => $su_tags,
+            'post__not_in'   => array( get_the_ID() ),
+            'posts_per_page' => 3,
+            ...
+        )
+    );
+```
+
+**AFTER (v210):** ids-only light queries, 4-step relevance pipeline — a) same tag + same category (exact topic), b) same tag anywhere (same topic, different category), c) same-category latest fill, d) final fallback site latest (rare, category-less post). Niku eppudu **4 cards** untayi (phone lo 2×2 neat grid), heading Telugu "ఇవి కూడా చూడండి":
+```php
+// v210: related posts ALWAYS chupinchali — old code `tags && category`
+// strict-gate valla tags leni bot posts ki empty section vachedi.
+// Ippudu 3-step relevance: (1) tag+category exact, (2) tag-only
+// cross-category same-topic, (3) same-category latest fill — 4 cards
+// (phone lo 2x2 neat grid). Ids-only light queries, count vaddu.
+$su_picks = array();
+if ( $su_cat && $su_tags ) {
+    $su_picks = get_posts( array( 'fields' => 'ids', 'posts_per_page' => 4,
+        'category__in' => $su_cat, 'tag__in' => $su_tags, 'post__not_in' => array( get_the_ID() ), ... ) );
+}
+if ( count( $su_picks ) < 4 && $su_tags ) { /* tag-only fill, post__not_in merges prior picks */ }
+if ( count( $su_picks ) < 4 && $su_cat )  { /* same-category fill */ }
+if ( ! $su_picks )                          { /* site-latest fallback */ }
+if ( $su_picks ) {
+    echo '<div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2></div></div><div class="newsgrid">';
+    foreach ( $su_picks as $su_pid ) {
+        $su_pick = get_post( $su_pid );
+        if ( ! $su_pick ) { continue; }
+        $GLOBALS['post'] = $su_pick;
+        setup_postdata( $su_pick );
+        studentup_card( $su_i );
+        $su_i++;
+    }
+    echo '</div>';
+    wp_reset_postdata();
+}
+```
+**Demo parity:** `preview/posts/{ibps-clerk-2026, rrb-ntpc-2026, ap-police-constable-2026}.html` — ee 3 legacy pages (original upload files, no generator) lo related grid **undede kadu**; ippudu category-perfect cards with **real sibling-post links** inject chesano (prati page lo `sectionhead` + `newsgrid` × 3 cards).
 
 ### 16) Preview demo parity
 `preview/worldclass/index.html` (and regenerated `standalone.html` / `OFFLINE_PREVIEW.html` / `theme-snapshot.html` / 3 post demos): same removals mirrored (hero pills, Trending/state, pause buttons, poll, captions, chips row + its inline `CHIPS` filter JS), plus the **footer bug** — demo used fictional classes (`su-foot`, `su-foot-grid`, `h4`) that no stylesheet defines → footer rendered unstyled/washed-out. Now uses the real `footer`, `footer-grid`, `footer-bottom`, `h3` classes that the theme's CSS styles (dark navy, readable links).
