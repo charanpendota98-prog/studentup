@@ -1,5 +1,5 @@
-studentup-all-changes.patch — ORIGINAL upload (be14491) vs latest (v211)
-Generated: 2026-10-06 · files changed: 45 · lines +1011 / -611
+studentup-all-changes.patch — ORIGINAL upload (be14491) vs latest (v212)
+Generated: 2026-10-06 · files changed: 45 · lines +1095 / -611
 Excluded (auto-generated/binary): *.zip, images, *.min.css, critical*.css, OFFLINE_PREVIEW.html, *.pot, .DS_Store
 Apply order: files appear in original-repo-path order (a/ = original, b/ = latest).
 
@@ -28,12 +28,12 @@ Apply order: files appear in original-repo-path order (a/ = original, b/ = lates
  +3    -5    preview/theme-snapshot.html
  +2    -0    preview/tools/index.html
  +95   -169  preview/worldclass/index.html
- +271  -198  preview/worldclass/standalone.html
+ +313  -198  preview/worldclass/standalone.html
  +30   -2    tools/build_critical_css.py
  +4    -2    tools/build_policy_pages.py
  +15   -4    tools/build_preview_posts.py
  +3    -1    tools/build_preview_tools.py
- +168  -21   wordpress-theme/studentup/assets/css/worldclass.css
+ +210  -21   wordpress-theme/studentup/assets/css/worldclass.css
  +8    -62   wordpress-theme/studentup/assets/js/studentup-menu.js
  +45   -14   wordpress-theme/studentup/assets/js/studentup-pwa.js
  +46   -14   wordpress-theme/studentup/assets/js/studentup-slider.js
@@ -565,7 +565,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  </html>
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/theme-snapshot.html b/preview/theme-snapshot.html
 --- a/preview/theme-snapshot.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/theme-snapshot.html	2026-10-05 20:39:43.187115619 +0000
++++ b/preview/theme-snapshot.html	2026-10-05 21:05:02.822967778 +0000
 @@ -31,7 +31,7 @@
  </head>
  <body><div class="wrap">
@@ -618,7 +618,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  (function(){
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/index.html b/preview/worldclass/index.html
 --- a/preview/worldclass/index.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/worldclass/index.html	2026-10-05 20:39:11.542955804 +0000
++++ b/preview/worldclass/index.html	2026-10-05 20:39:11.000000000 +0000
 @@ -10,6 +10,7 @@
  <link rel="stylesheet" href="../../wordpress-theme/studentup/style.css">
  <link rel="stylesheet" href="../../wordpress-theme/studentup/assets/css/premium.css">
@@ -1099,7 +1099,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  </html>
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/preview/worldclass/standalone.html b/preview/worldclass/standalone.html
 --- a/preview/worldclass/standalone.html	2026-10-04 09:30:04.000000000 +0000
-+++ b/preview/worldclass/standalone.html	2026-10-05 20:39:43.215115761 +0000
++++ b/preview/worldclass/standalone.html	2026-10-05 21:05:02.854967939 +0000
 @@ -124,7 +124,6 @@
  .sectionhead{display:flex;justify-content:space-between;align-items:end;margin:26px 0 14px;gap:14px;flex-wrap:wrap}
  .sectionhead h1,.sectionhead h2{margin:0;font-size:22px;color:var(--navy)}
@@ -1293,7 +1293,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  }
  
  /* ==========================================================================
-@@ -4263,7 +4282,136 @@
+@@ -4263,7 +4282,178 @@
  body.dark .mpanel .su-mbrk-t{ color:#e6eefb }
  body.dark .mpanel .su-mbrk-t small{ color:#a9c0dd }
  @media print{ .nav .su-brkdd{ display:none !important } }
@@ -1425,12 +1425,54 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
 +  .newsgrid{ gap:10px }
 +  .sectionhead h2{ font-size:16.5px }
 +}
++
++/* ============================================================
++   27. v212 — Phone Dock Conductor: okka lane = okka bar, zero clash
++   Phone lo mundu 5 floating vishayalu okesari kurchunevi:
++   bottom-nav + sticky-ad(bottom:66px) + app-bar(bottom:72px) +
++   push-bar + floating up-next card (40% screen cover) — "antha
++   clumsy ga" exact kaaranam idi. Ippudu strict lanes:
++   Lane0 = bottom nav (eppudu) · Lane1 = app-bar OR sticky-ad
++   (rendu okasari kaadu — app-bar session close ayithe ad returns)
++   · Lane2 = push bar (temporary) · up-next floating card = phone
++   lo vaddu (article lopala inline related/up-next blocks unnayi,
++   floating card desktop-lo matrame).
++   ============================================================ */
++
++/* --- phone: lane-1 priority — appbar ON unte anchor ad parked --- */
++@media(max-width:899px){
++  body.su-appbar-on .su-anchor{ display:none }
++  body.su-appbar-on{ padding-bottom:calc(78px + 64px + env(safe-area-inset-bottom, 0px)) }
++  /* floating up-next phone lo cover avutundi — vaddu (inline blocks unnayi) */
++  .su-upnext{ display:none !important }
++}
++
++/* --- desktop right-corner stack: appbar ↔ push ↔ upnext clean order --- */
++@media(min-width:900px){
++  body.su-appbar-on .su-upnext{ bottom:calc(18px + var(--su-appbar-h) + 12px) }
++}
++
++/* --- drawer head sticky — pedda menu list lo close+brand eppudu kanipistayi --- */
++.mpanel{ padding-top:0 }
++.mpanel-head{ position:sticky; top:0; z-index:6; background:var(--card);
++  padding-top:calc(12px + env(safe-area-inset-top, 0px));
++  margin:0 -18px; padding-inline:18px; padding-bottom:12px;
++  box-shadow:0 1px 0 var(--line) }
++body.dark .mpanel-head{ background:#0e192c }
++
++/* --- menu press feedback + summary tap height --- */
++.mpanel a:active{ transform:scale(.99); background:var(--soft) }
++.mpanel .mgroup>summary{ min-height:46px }
++
++/* --- fluid section heads — prati phone size ki perfect scale --- */
++.sectionhead h2{ font-size:clamp(15.5px, 4.6vw, 19px); line-height:1.25 }
++.sectionhead p{ font-size:clamp(11px, 3.2vw, 12.5px) }
  </style>
 +<script src="../../wordpress-theme/studentup/assets/js/studentup.js" defer></script>
  <script src="../../wordpress-theme/studentup/assets/js/studentup-menu.js" defer></script>
  <script src="../../wordpress-theme/studentup/assets/js/studentup-slider.js" defer></script>
  <script type="application/ld+json">
-@@ -4449,6 +4597,10 @@
+@@ -4449,6 +4639,10 @@
      <a href="../pages/results-hub.html">Category-wise Cutoff Marks</a>
      <a href="../pages/exam-calendar.html">Upcoming Exam Calendar</a>
    </details>
@@ -1441,7 +1483,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
    <div class="mlabel">Community Alerts</div>
    <a href="https://t.me/studentup_in" target="_blank" rel="noopener" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px">
      <span>✈️</span> Telegram Channel (Instant Alerts)
-@@ -4468,11 +4620,9 @@
+@@ -4468,11 +4662,9 @@
    <div class="wrap trow">
      <span class="tlabel tlabel-blue"><i aria-hidden="true"></i>Latest Jobs</span>
      <div class="tclip"><div class="tmove"><a href="../posts/upsc-junior-assistant-2026.html" title="Open article" aria-label="Open article: UPSC Junior Assistant 2026 — notification out">UPSC Junior Assistant 2026 — notification out <span class="tsrc">yesterday</span></a><a href="../posts/engineering-internships-2026.html" title="Open article" aria-label="Open article: Govt internships for engineering students 2026: చెక్ ది డేట్స్">Govt internships for engineering students 2026: చెక్ ది డేట్స్ <span class="tsrc">yesterday</span></a><a href="../pages/exam-calendar.html" title="Open article" aria-label="Open article: TSPSC Group 2 last date 28 October — హాల్ టికెట్ షెడ్యూల్">TSPSC Group 2 last date 28 October — హాల్ టికెట్ షెడ్యూల్ <span class="tsrc">2 days ago</span></a><a href="../pages/daily-quiz.html" title="Open article" aria-label="Open article: IBPS Clerk online apply — 4,520 posts">IBPS Clerk online apply — 4,520 posts <span class="tsrc">3 days ago</span></a><a href="../pages/results-hub.html" title="Open article" aria-label="Open article: SSC CHSL 2026 నోటిఫికేషన్ విడుదల — 3,712 పోస్టులు">SSC CHSL 2026 నోటిఫికేషన్ విడుదల — 3,712 పోస్టులు <span class="tsrc">4 days ago</span></a><a href="../pages/scholarships-hub.html" title="Open article" aria-label="Open article: పోస్ట్-మెట్రిక్ స్కాలర్‌షిప్ ePASS దరఖాస్తు ప్రారంభం">పోస్ట్-మెట్రిక్ స్కాలర్‌షిప్ ePASS దరఖాస్తు ప్రారంభం <span class="tsrc">5 days ago</span></a><a href="../posts/upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1" aria-label="Open article: UPSC Junior Assistant 2026 — notification out">UPSC Junior Assistant 2026 — notification out <span class="tsrc">yesterday</span></a><a href="../posts/engineering-internships-2026.html" aria-hidden="true" tabindex="-1" aria-label="Open article: Govt internships for engineering students 2026: చెక్ ది డేట్స్">Govt internships for engineering students 2026: చెక్ ది డేట్స్ <span class="tsrc">yesterday</span></a><a href="../pages/exam-calendar.html" aria-hidden="true" tabindex="-1" aria-label="Open article: TSPSC Group 2 last date 28 October — హాల్ టికెట్ షెడ్యూల్">TSPSC Group 2 last date 28 October — హాల్ టికెట్ షెడ్యూల్ <span class="tsrc">2 days ago</span></a><a href="../pages/daily-quiz.html" aria-hidden="true" tabindex="-1" aria-label="Open article: IBPS Clerk online apply — 4,520 posts">IBPS Clerk online apply — 4,520 posts <span class="tsrc">3 days ago</span></a><a href="../pages/results-hub.html" aria-hidden="true" tabindex="-1" aria-label="Open article: SSC CHSL 2026 నోటిఫికేషన్ విడుదల — 3,712 పోస్టులు">SSC CHSL 2026 నోటిఫికేషన్ విడుదల — 3,712 పోస్టులు <span class="tsrc">4 days ago</span></a><a href="../pages/scholarships-hub.html" aria-hidden="true" tabindex="-1" aria-label="Open article: పోస్ట్-మెట్రిక్ స్కాలర్‌షిప్ ePASS దరఖాస్తు ప్రారంభం">పోస్ట్-మెట్రిక్ స్కాలర్‌షిప్ ePASS దరఖాస్తు ప్రారంభం <span class="tsrc">5 days ago</span></a></div></div>
@@ -1456,7 +1498,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
    </div>
  </div>
  
-@@ -4495,33 +4645,12 @@
+@@ -4495,33 +4687,12 @@
      <div class="su-hero-acts">
        <a class="su-hact su-hact--breaking" href="#jobs"><svg class="su-uicon su-uicon-bolt" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-bolt"/></svg> Breaking News</a>
        <a class="su-hact" href="#jobs"><svg class="su-uicon su-uicon-bolt" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-bolt"/></svg> Latest Jobs</a>
@@ -1494,7 +1536,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
    </div>
  </section>
  
-@@ -4536,7 +4665,6 @@
+@@ -4536,7 +4707,6 @@
        </div>
        <div class="su-slider-ctrls">
          <button type="button" class="su-sbtn" id="su-track-prev" aria-label="Slide Left">‹</button>
@@ -1502,7 +1544,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
          <button type="button" class="su-sbtn" id="su-track-next" aria-label="Slide Right">›</button>
        </div>
      </div>
-@@ -4722,6 +4850,18 @@
+@@ -4722,6 +4892,18 @@
  
        </div>
      </div>
@@ -1521,7 +1563,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
    </section>
  
    <!-- ======================= most searched ======================= -->
-@@ -4729,7 +4869,7 @@
+@@ -4729,7 +4911,7 @@
      <div class="sectionhead" style="margin-top:20px">
        <div>
          <h2>Most searched by students</h2>
@@ -1530,7 +1572,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
        </div>
        <div style="display:flex;gap:8px;align-items:center">
          <a class="callbtn" href="#jobs" style="background:#b91c1c;padding:6px 14px;font-size:12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;text-decoration:none">
-@@ -4767,19 +4907,13 @@
+@@ -4767,19 +4949,13 @@
    <div class="su-layout" style="margin-top:6px">
      <main id="main">
        <div class="sectionhead" id="jobs">
@@ -1554,7 +1596,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  
        <!-- Quick Qualification & Urgency Filter Row -->
        <div class="su-qual-bar" aria-label="Qualification and urgency filters">
-@@ -4813,12 +4947,10 @@
+@@ -4813,12 +4989,10 @@
          <article class="news news--lead" data-accent="central" data-su-card data-cat="central" data-qual="10th inter" data-urgent="true">
            <a class="thumb thumb-img" href="../posts/upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-ssc.webp" width="800" height="446" alt="SSC CHSL 2026 Notification — 3,712 Posts" loading="eager" fetchpriority="high"></a>
            <div class="newsbody">
@@ -1568,7 +1610,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/upsc-junior-assistant-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="ssc-chsl-2026" data-post-title="SSC CHSL 2026 Notification — 3,712 Posts" data-post-url="../posts/upsc-junior-assistant-2026.html" data-post-cat="Central" data-post-date="28 Oct">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4833,12 +4965,10 @@
+@@ -4833,12 +5007,10 @@
          <article class="news" data-accent="ts" data-su-card data-cat="ts" data-qual="degree" data-urgent="true">
            <a class="thumb thumb-img t2" href="../posts/engineering-internships-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-tspsc.webp" width="800" height="446" alt="TSPSC Group 2 Recruitment 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1582,7 +1624,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/engineering-internships-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="tspsc-group-2-2026" data-post-title="TSPSC Group 2 Recruitment 2026 — 783 Vacancies" data-post-url="../posts/engineering-internships-2026.html" data-post-cat="TS Jobs" data-post-date="05 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4858,12 +4988,10 @@
+@@ -4858,12 +5030,10 @@
          <article class="news" data-accent="central" data-su-card data-cat="central" data-qual="degree" data-urgent="true">
            <a class="thumb thumb-img t3" href="../posts/ibps-clerk-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-ibps.webp" width="800" height="446" alt="IBPS Clerk 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1596,7 +1638,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/ibps-clerk-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="ibps-clerk-2026" data-post-title="IBPS Clerk 2026 — 4,520 Posts" data-post-url="../posts/ibps-clerk-2026.html" data-post-cat="Central" data-post-date="05 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4878,12 +5006,10 @@
+@@ -4878,12 +5048,10 @@
          <article class="news" data-accent="central" data-su-card data-cat="central" data-qual="degree inter 10th">
            <a class="thumb thumb-img" href="../posts/rrb-ntpc-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-rrb.webp" width="800" height="446" alt="RRB NTPC 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1610,7 +1652,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/rrb-ntpc-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="rrb-ntpc-2026" data-post-title="RRB NTPC 2026 — 11,558 Posts" data-post-url="../posts/rrb-ntpc-2026.html" data-post-cat="Central" data-post-date="18 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4898,12 +5024,10 @@
+@@ -4898,12 +5066,10 @@
          <article class="news" data-accent="ap" data-su-card data-cat="ap" data-qual="inter">
            <a class="thumb thumb-img t2" href="../posts/ap-police-constable-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-police.webp" width="800" height="446" alt="AP Police Constable 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1624,7 +1666,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/ap-police-constable-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="ap-police-constable-2026" data-post-title="AP Police Constable 2026 — 6,100 Posts" data-post-url="../posts/ap-police-constable-2026.html" data-post-cat="AP Jobs" data-post-date="22 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4918,11 +5042,10 @@
+@@ -4918,11 +5084,10 @@
          <article class="news" data-accent="result" data-su-card data-cat="result" data-qual="inter degree">
            <a class="thumb thumb-img t3" href="../posts/upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-results.webp" width="800" height="446" alt="TS EAMCET 2026 Counselling" loading="lazy"></a>
            <div class="newsbody">
@@ -1637,7 +1679,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/upsc-junior-assistant-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="ts-eamcet-2026" data-post-title="TS EAMCET 2026 Counselling Schedule" data-post-url="../posts/upsc-junior-assistant-2026.html" data-post-cat="Results" data-post-date="12 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4945,12 +5068,10 @@
+@@ -4945,12 +5110,10 @@
          <article class="news" data-accent="ts" data-su-card data-cat="ts" data-qual="10th">
            <a class="thumb thumb-img" href="../posts/post-office-gds-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-postoffice.webp" width="800" height="446" alt="Post Office GDS 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1651,7 +1693,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/post-office-gds-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="post-office-gds-2026" data-post-title="Post Office GDS 2026 — 21,413 Posts" data-post-url="../posts/post-office-gds-2026.html" data-post-cat="TS Jobs" data-post-date="30 Nov">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4965,12 +5086,10 @@
+@@ -4965,12 +5128,10 @@
          <article class="news" data-accent="central" data-su-card data-cat="central" data-qual="10th">
            <a class="thumb thumb-img t2" href="../posts/upsc-junior-assistant-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-defence.webp" width="800" height="446" alt="SSC GD Constable 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1665,7 +1707,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/upsc-junior-assistant-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="ssc-gd-constable-2026" data-post-title="SSC GD Constable 2026 — 39,481 Posts" data-post-url="../posts/upsc-junior-assistant-2026.html" data-post-cat="Central" data-post-date="12 Dec">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -4985,12 +5104,10 @@
+@@ -4985,12 +5146,10 @@
          <article class="news" data-accent="ap" data-su-card data-cat="ap" data-qual="degree">
            <a class="thumb thumb-img t3" href="../posts/engineering-internships-2026.html" aria-hidden="true" tabindex="-1"><img src="../assets/img/card-walkin.webp" width="800" height="446" alt="APPSC Group 1 2026" loading="lazy"></a>
            <div class="newsbody">
@@ -1679,7 +1721,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                <a class="su-readmore" href="../posts/engineering-internships-2026.html">Read more →</a>
                <button type="button" class="su-card-bm" aria-label="Save notification" title="Save for later" data-post-id="appsc-group-1-2026" data-post-title="APPSC Group 1 2026 — 92 Posts" data-post-url="../posts/engineering-internships-2026.html" data-post-cat="AP Jobs" data-post-date="20 Dec">
                  <svg class="su-uicon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#su-i-bookmark"/></svg> <span>Save</span>
-@@ -5079,25 +5196,9 @@
+@@ -5079,25 +5238,9 @@
      </div>
    </form>
  
@@ -1708,7 +1750,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  
        <!-- ============================ Community Alert Hub ============================ -->
        <section class="su-railed su-alert-card" id="alerts" aria-label="Alerts" style="margin-top:24px">
-@@ -5235,19 +5336,26 @@
+@@ -5235,19 +5378,26 @@
  </div>
  
  <!-- ============================ footer ============================ -->
@@ -1742,7 +1784,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
      <p style="margin:0 0 6px"><b>Disclaimer:</b> StudentUp.in is an independent educational news portal. We are NOT associated with TSPSC, APPSC, UPSC, SSC, or any government recruitment board. All notifications are curated strictly from official gazettes and portals. Always verify details in official notifications before applying.</p>
      <div>© 2026 StudentUp.in · All rights reserved · Sources: Official notifications only · <a href="../pages/privacy.html">Privacy</a> · <a href="../pages/disclaimer.html">Disclaimer</a> · <a href="../pages/contact.html">Contact</a></div>
    </div>
-@@ -5320,20 +5428,18 @@
+@@ -5320,20 +5470,18 @@
      paint();
    });
  
@@ -1766,7 +1808,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
        var qualMatch = true;
        if(activeQual === 'urgent'){
          qualMatch = el.getAttribute('data-urgent') === 'true';
-@@ -5341,7 +5447,7 @@
+@@ -5341,7 +5489,7 @@
          var q = el.getAttribute('data-qual') || '';
          qualMatch = q.indexOf(activeQual) !== -1;
        }
@@ -1775,7 +1817,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
        el.hidden = !ok;
        if(ok){ shown++; }
      });
-@@ -5349,15 +5455,6 @@
+@@ -5349,15 +5497,6 @@
      if(matchCount){ matchCount.textContent = shown; }
    }
  
@@ -1791,7 +1833,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
    document.querySelectorAll('.su-qp').forEach(function(qp){
      qp.addEventListener('click',function(){
        document.querySelectorAll('.su-qp').forEach(function(x){x.classList.remove('active');});
-@@ -5530,66 +5627,8 @@
+@@ -5530,66 +5669,8 @@
  
    /* v202: purathana duplicate nav/drawer JS teesesa — ippudu okkate source: theme menu JS (head lo enqueue). */
  
@@ -1860,7 +1902,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  
    /* Pre-approval AdSense gate: Anchor ad remains hidden until live AdSense approval */
    var closeBtn=document.querySelector('#su-anchor button');
-@@ -5866,5 +5905,39 @@
+@@ -5866,5 +5947,39 @@
    });
  })();
  </script>
@@ -2032,7 +2074,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/css/worldclass.css b/wordpress-theme/studentup/assets/css/worldclass.css
 --- a/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-05 20:38:20.214696564 +0000
++++ b/wordpress-theme/studentup/assets/css/worldclass.css	2026-10-05 21:04:43.158868493 +0000
 @@ -53,10 +53,9 @@
  .su-lticker .tmove{ animation:slide 24s linear infinite }
  .su-lticker .tmove a{ font-size:13.5px; letter-spacing:.002em; font-weight:650; color:#f8fafc; text-decoration:none }
@@ -2160,7 +2202,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  }
  
  /* ==========================================================================
-@@ -1555,3 +1574,131 @@
+@@ -1555,3 +1574,173 @@
  body.dark .mpanel .su-mbrk-t{ color:#e6eefb }
  body.dark .mpanel .su-mbrk-t small{ color:#a9c0dd }
  @media print{ .nav .su-brkdd{ display:none !important } }
@@ -2292,6 +2334,48 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
 +  .newsgrid{ gap:10px }
 +  .sectionhead h2{ font-size:16.5px }
 +}
++
++/* ============================================================
++   27. v212 — Phone Dock Conductor: okka lane = okka bar, zero clash
++   Phone lo mundu 5 floating vishayalu okesari kurchunevi:
++   bottom-nav + sticky-ad(bottom:66px) + app-bar(bottom:72px) +
++   push-bar + floating up-next card (40% screen cover) — "antha
++   clumsy ga" exact kaaranam idi. Ippudu strict lanes:
++   Lane0 = bottom nav (eppudu) · Lane1 = app-bar OR sticky-ad
++   (rendu okasari kaadu — app-bar session close ayithe ad returns)
++   · Lane2 = push bar (temporary) · up-next floating card = phone
++   lo vaddu (article lopala inline related/up-next blocks unnayi,
++   floating card desktop-lo matrame).
++   ============================================================ */
++
++/* --- phone: lane-1 priority — appbar ON unte anchor ad parked --- */
++@media(max-width:899px){
++  body.su-appbar-on .su-anchor{ display:none }
++  body.su-appbar-on{ padding-bottom:calc(78px + 64px + env(safe-area-inset-bottom, 0px)) }
++  /* floating up-next phone lo cover avutundi — vaddu (inline blocks unnayi) */
++  .su-upnext{ display:none !important }
++}
++
++/* --- desktop right-corner stack: appbar ↔ push ↔ upnext clean order --- */
++@media(min-width:900px){
++  body.su-appbar-on .su-upnext{ bottom:calc(18px + var(--su-appbar-h) + 12px) }
++}
++
++/* --- drawer head sticky — pedda menu list lo close+brand eppudu kanipistayi --- */
++.mpanel{ padding-top:0 }
++.mpanel-head{ position:sticky; top:0; z-index:6; background:var(--card);
++  padding-top:calc(12px + env(safe-area-inset-top, 0px));
++  margin:0 -18px; padding-inline:18px; padding-bottom:12px;
++  box-shadow:0 1px 0 var(--line) }
++body.dark .mpanel-head{ background:#0e192c }
++
++/* --- menu press feedback + summary tap height --- */
++.mpanel a:active{ transform:scale(.99); background:var(--soft) }
++.mpanel .mgroup>summary{ min-height:46px }
++
++/* --- fluid section heads — prati phone size ki perfect scale --- */
++.sectionhead h2{ font-size:clamp(15.5px, 4.6vw, 19px); line-height:1.25 }
++.sectionhead p{ font-size:clamp(11px, 3.2vw, 12.5px) }
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-menu.js b/wordpress-theme/studentup/assets/js/studentup-menu.js
 --- a/wordpress-theme/studentup/assets/js/studentup-menu.js	2026-10-04 09:30:04.000000000 +0000
 +++ b/wordpress-theme/studentup/assets/js/studentup-menu.js	2026-10-05 18:02:06.000000000 +0000
@@ -2374,7 +2458,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
      wireDesktop();
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/assets/js/studentup-pwa.js b/wordpress-theme/studentup/assets/js/studentup-pwa.js
 --- a/wordpress-theme/studentup/assets/js/studentup-pwa.js	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/assets/js/studentup-pwa.js	2026-10-05 20:37:15.170368005 +0000
++++ b/wordpress-theme/studentup/assets/js/studentup-pwa.js	2026-10-05 20:37:15.000000000 +0000
 @@ -1,10 +1,14 @@
 -/* StudentUp PWA / App download (v72.1)
 +/* StudentUp PWA / App download (v72.1 → v211 upgrade)
@@ -2634,7 +2718,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
                        "diploma": "Diploma", "degree": "Degree", "pg": "PG", "btech": "B.Tech" };
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/footer.php b/wordpress-theme/studentup/footer.php
 --- a/wordpress-theme/studentup/footer.php	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/footer.php	2026-10-05 20:37:25.690421141 +0000
++++ b/wordpress-theme/studentup/footer.php	2026-10-05 20:37:25.000000000 +0000
 @@ -121,7 +121,7 @@
  // Click: Android/Chrome lo install prompt, iPhone/desktop lo device-wise steps.
  if ( studentup_opt( 'pwa', '1' ) && studentup_opt( 'install_prompt', '1' ) ) :
@@ -2729,7 +2813,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  		<?php endif; ?>
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/header.php b/wordpress-theme/studentup/header.php
 --- a/wordpress-theme/studentup/header.php	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/header.php	2026-10-05 20:37:34.710466717 +0000
++++ b/wordpress-theme/studentup/header.php	2026-10-05 20:37:34.000000000 +0000
 @@ -131,6 +131,7 @@
  	<a href="<?php echo esc_url( home_url( '/#syllabus-tracker' ) ); ?>"><?php echo studentup_ui_icon( 'book' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Syllabus Tracker</a>
  	<a href="<?php echo esc_url( home_url( '/#salary-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Salary Calculator</a>
@@ -2840,7 +2924,7 @@ diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css
  	<?php
 diff -ruN -x '*.zip' -x '*.png' -x '*.jpg' -x '*.jpeg' -x '*.webp' -x '*.min.css' -x 'critical*.css' -x OFFLINE_PREVIEW.html -x '*.pot' -x __pycache__ -x '*.pyc' -x .DS_Store a/wordpress-theme/studentup/inc/pwa.php b/wordpress-theme/studentup/inc/pwa.php
 --- a/wordpress-theme/studentup/inc/pwa.php	2026-10-04 09:30:04.000000000 +0000
-+++ b/wordpress-theme/studentup/inc/pwa.php	2026-10-05 20:36:40.870194751 +0000
++++ b/wordpress-theme/studentup/inc/pwa.php	2026-10-05 20:36:40.000000000 +0000
 @@ -277,6 +277,33 @@
  add_action( 'wp_enqueue_scripts', 'studentup_pwa_data', 20 );
  

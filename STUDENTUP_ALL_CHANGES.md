@@ -32,12 +32,14 @@
 | 18 | Eenadu Pratibha techniques photos — "ilaaga neat ga cheyu, table best ga, anni posts prakaram update avuthu undali" | ✅ Best-fit items implemented: last-date **amber pill**, category **chip**, table kinda **"మరిన్ని — View all notifications"** footer, slider ki **dot indicators** (Eenadu hero-carousel pattern, posts prakaram automatic). Anni already WP posts + post meta nunchi dynamic ga update avutundi | `inc/jobtable.php`, `inc/slider.php`, `assets/js/studentup-slider.js`, `assets/css/worldclass.css`, `preview/worldclass/index.html` |
 | 19 | Article page kinda **"perfectga suitable related posts — malli advancedga"** chupinchali | ✅ Theme `single.php` related grid **always-on** chesano: old code `tags && category` strict-gate valla tags leni post ki related section **ekke** vachedi kadu. Ippudu 3-step relevance — (1) tag+category exact match, (2) tag-only cross-category, (3) same-category latest fill, (4) rare case lo site latest — **4 cards (phone lo 2×2 neat grid)**, heading Telugu "ఇవి కూడా చూడండి" (Eenadu pattern). Kota post pettina ventane automatic ga related lo vaste untundi. Preview demo lo 3 legacy post pages (`ibps-clerk-2026`, `rrb-ntpc-2026`, `ap-police-constable-2026`) ki grid **assalu ledu** — aa 3 ki category-perfect related cards inject chesano | `wordpress-theme/studentup/single.php`, `preview/posts/ibps-clerk-2026.html`, `preview/posts/rrb-ntpc-2026.html`, `preview/posts/ap-police-constable-2026.html` |
 | 20 | **"Menu perfect ga, phone chala neat, clumsy asalu vundoddu, download app chupisthu undali, push kuda kavali (new notification vachinappudu direct alert), inka inka best, Eenadu Pratibha kante minchi"** | ✅ (a) **Persistent "Download App" mini bar** — phone lo bottom-nav paina clean stack, desktop lo right-bottom card; close chesina ee session matrame, next visit lo malli kanipistundi; app install ayithe auto-hide. Anni install buttons (footer · menu · bar) okate native install flow. (b) **Menu tap-perfection** — prati link/accordionTap 44px+ (finger-friendly), safe-area padding (notch/home-bar), butter scroll (`overscroll-behavior` + momentum), slim scrollbar, focus-visible rings, **"Download App ⬇ FREE"** entry inside menu. (c) **Phone guards** — horizontal slip `overflow-x:clip`, media (`img/video/iframe`) eppudu overflow avvadu, ≤420px density pass. (d) **Push** — already v163 lo full system undi (VAPID real web push: browser closed unna phone ki direct notification velthundi; prati kota post publish ayite subscribers andari ki). Ee release lo app-bar tho clash kakunda push-bar **auto re-position**, native flawless stack. | `inc/pwa.php`, `assets/js/studentup-pwa.js`, `assets/css/worldclass.css`, `header.php`, `footer.php`, `preview/worldclass/index.html` |
+| 21 | **"Phone lo neat ga, phone size thaggattuga, menu perfect ga, anni perfect ga"** | ✅ Root-cause kottinanu: phone lo **5 floating bars okesari** stack ayi clumsy ga kurchunevi — bottom-nav + sticky-ad (`bottom:66px`) + app-bar (`bottom:72px`) **okate lane lo overlap** + push-bar + floating up-next card (~40% screen cover). Ippudu **Phone Dock Conductor**: Lane0 = bottom-nav eppudu · Lane1 = app-bar **OR** sticky-ad (rendu okasari kaadu — app-bar priority; close tarvata ad returns) · Lane2 = push-bar · **floating up-next card phone lo vaddu** (article lopala inline blocks already unnayi — desktop-lo matrame floating). Plus: **menu drawer head sticky** (pedda list scroll chesina close button always visible), press feedback, summary 46px, **fluid section headings** (`clamp` — prati phone width ki perfect scale). | `assets/css/worldclass.css` §27 (source) |
+
 
 **Quality gates (every change tarvata run):** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **99/99 files OK** · critical CSS regenerated clean.
 
 ---
 
-## B) Files changed — inventory (45 source files, +1011 / −611 lines)
+## B) Files changed — inventory (45 source files, +1095 / −611 lines)
 
 ```
  +6  -6    preview/posts/engineering-internships-2026.html
@@ -66,6 +68,8 @@ v208 (screenshot fix) added these to the inventory: `tools/build_policy_pages.py
 v210 (always-on related posts) added these to the inventory: `wordpress-theme/studentup/single.php` (+70/−16 — the related block is now a 4-step relevance pipeline instead of a strict `tags&&category` gate) + 3 legacy preview post pages `preview/posts/{ibps-clerk-2026, rrb-ntpc-2026, ap-police-constable-2026}.html` (+29/−0 each — "ఇవి కూడా చూడండి" related grid with real sibling-post links).
 
 v211 (phone-perfect dock + app bar + push UX) added these to the inventory: `inc/pwa.php` (+27/−0 — persistent install-bar renderer), `assets/js/studentup-pwa.js` (+45/−14 — all-CTA unified install flow + appbar session logic), `assets/css/worldclass.css` (+66/−0 — §26: app bar, stacked docks, menu 44px taps, phone guards), `header.php` (+1/−0 — menu "Download App FREE" entry), `footer.php` (+1/−1 — footer button into the unified `.su-install-cta` flow), `preview/worldclass/index.html` (+38/−0 — demo parity: bar + menu CTA + demo wiring). Regenerated demo bundle `preview/worldclass/standalone.html` kuda reflect (+147/−31 extra — app bar + menu CTA embedded).
+
+v212 (phone dock conductor) added: `assets/css/worldclass.css` §27 (+42/−0 source — lane rules, sticky drawer head, fluid heads) + regenerated `standalone.html` (+42/−0 mirror).
 
 Minified CSS (`*.min.css`), critical CSS (`critical*.css`), offline preview bundle, `.pot` — anni **auto-generated**; source change tarvata tools regenerate chestayi (Section D chudandi). Full exact diff: **`studentup-all-changes.patch`**.
 
@@ -410,6 +414,30 @@ body.su-appbar-on .su-push-bar{ bottom:calc(72px + var(--su-appbar-h) + env(safe
 d) **Menu tap-perfection** — `.mpanel a{min-height:44px}` · `.mgroup a{min-height:40px}` · `overscroll-behavior:contain` + `-webkit-overflow-scrolling:touch` · `padding-top/bottom:calc(12px + env(safe-area-inset-*))` · `:focus-visible` rings · menu lo **"Download App ⬇ FREE"** entry (`.su-install-cta`) · dark-mode chip variant.
 e) **Clumsy killers** — `html,body{overflow-x:clip}`, `img/video/iframe{max-width:100%}`, ≤420px density pass (newsgrid gap 10px, section heads 16.5px).
 f) **Push (already v163, now friction-free)** — real VAPID web push no changes needed: subs table + REST subscribe/unsubscribe + bot `run.py --push-send`. v211 makes the push bar **auto-float above the app bar** (`body.su-appbar-on`) so "Download app chupisthu undali" + "new job vachinappudu direct notification" rendu okesari, okadani marugu lekunda.
+
+### 19) Phone Dock Conductor — one lane, one bar (v212)
+**File:** `assets/css/worldclass.css` §27 (+ demo mirror in `standalone.html`)
+
+**BEFORE:** phone lo 5 floating elements okesari stack ayevi — bottom-nav pill + `.su-anchor` sticky ad (`bottom:66px`) + v211 app-bar (`bottom:72px`) **same lane lo overlap** + `.su-push-bar` + `.su-upnext` floating card (340px wide, ~40% phone screen cover). Result: "antha clumsy ga".
+
+**AFTER (v212):** strict lane system —
+```css
+/* Lane0 = bottom nav (always) · Lane1 = app-bar OR sticky-ad, never both */
+@media(max-width:899px){
+  body.su-appbar-on .su-anchor{ display:none }          /* appbar priority; close → ad returns */
+  body.su-appbar-on{ padding-bottom:calc(78px + 64px + env(safe-area-inset-bottom,0px)) }
+  .su-upnext{ display:none !important }                  /* phone lo cover avutundi — inline blocks unnayi */
+}
+@media(min-width:900px){
+  body.su-appbar-on .su-upnext{ bottom:calc(18px + var(--su-appbar-h) + 12px) }  /* desktop right-corner stack */
+}
+/* drawer head sticky — pedda menu list lo close eppudu charity */
+.mpanel{ padding-top:0 }
+.mpanel-head{ position:sticky; top:0; padding-top:calc(12px + env(safe-area-inset-top,0px)); ... }
+/* press feedback + fluid heads */
+.mpanel a:active{ transform:scale(.99) }
+.sectionhead h2{ font-size:clamp(15.5px, 4.6vw, 19px) }
+```
 
 ### 16) Preview demo parity
 `preview/worldclass/index.html` (and regenerated `standalone.html` / `OFFLINE_PREVIEW.html` / `theme-snapshot.html` / 3 post demos): same removals mirrored (hero pills, Trending/state, pause buttons, poll, captions, chips row + its inline `CHIPS` filter JS), plus the **footer bug** — demo used fictional classes (`su-foot`, `su-foot-grid`, `h4`) that no stylesheet defines → footer rendered unstyled/washed-out. Now uses the real `footer`, `footer-grid`, `footer-bottom`, `h3` classes that the theme's CSS styles (dark navy, readable links).
