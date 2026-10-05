@@ -28,12 +28,13 @@
 | 14 | "Latest opportunities" kinda All/TS Jobs/AP Jobs/Central/Results/Hall Tickets/Scholarships chips row delete | ✅ Removed + JS + dead CSS cleaned | `front-page.php`, `assets/js/studentup.js`, `style.css`, `assets/css/worldclass.css` |
 | 15 | Phone lo hero spacing tight ga undi (laptop ok) | ✅ Mobile-only breathing room (desktop untouched) | `assets/css/worldclass.css` |
 | 16 | Preview demo footer broken (links kanipinchatledu) | ✅ Demo class names fixed (real theme footer always correct) | `preview/worldclass/index.html` |
+| 17 | Preview sub-pages kinda **JavaScript code text ga print avutundi** ("antha galeez ga" screenshot) | ✅ Root-cause fixed at generator — `PAGE_JS` template ki `<script>` wrapper ledu (original upload lone ee bug undi); pages/posts/tools/OFFLINE anni regenerated, **JS-text-leak test: 19 files → 0** | `tools/build_policy_pages.py` + 20 regenerated preview files |
 
 **Quality gates (every change tarvata run):** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **99/99 files OK** · critical CSS regenerated clean.
 
 ---
 
-## B) Files changed — inventory (19 source files, +391 / −548 lines)
+## B) Files changed — inventory (36 source files, +441 / −581 lines)
 
 ```
  +6  -6    preview/posts/engineering-internships-2026.html
@@ -56,6 +57,8 @@
  +9  -7    wordpress-theme/studentup/inc/template.php
  +8  -8    wordpress-theme/studentup/style.css
 ```
+
+v208 (screenshot fix) added these to the inventory: `tools/build_policy_pages.py` (+2/−0 wrapper lines) + regenerated `preview/pages/*.html` (16 files), `preview/posts/*.html` (3), `preview/tools/index.html` — combined +56/−18; every change is only the restored `<script>…</script>` wrapper around the page-footer script.
 
 Minified CSS (`*.min.css`), critical CSS (`critical*.css`), offline preview bundle, `.pot` — anni **auto-generated**; source change tarvata tools regenerate chestayi (Section D chudandi). Full exact diff: **`studentup-all-changes.patch`**.
 
@@ -254,7 +257,30 @@ echo '</div>';
 ### 13) Root-cause fix: permanent outline ring on buttons
 **File:** `tools/build_critical_css.py` — the critical-CSS builder split selector lists on **every** comma, shredding `:where(a,button,input,select,textarea):focus-visible{outline:…}` into bare `button,input,select` rules that applied **always** (visible as an orange highlight ring around every button/icon). Added a paren-aware `_split_selector_list()`; both call sites now use it. Result: the focus outline renders **only on real keyboard focus**, everywhere (critical + non-critical CSS).
 
-### 14) Preview demo parity
+### 14) Preview sub-pages — JavaScript printed as text (screenshot bug)
+**File:** `tools/build_policy_pages.py` (the shared generator `PAGE_JS`, imported by the posts/tools builders too)
+
+**BEFORE (broken):**
+```python
+PAGE_JS = """(function(){
+  var b=document.body, btn=document.getElementById('su-theme');
+  ...
+})();"""
+```
+`{pagejs}` ante ee raw JS **`<script>` wrapper lekunda** `</body>` ki mundu paste ayyedi — so 16 policy pages + 3 post previews + tools page + OFFLINE bundle (72 leaked fragments) anni chivari lo JS ni **plain text ga print** chesayyi. (Bug original upload lone undi — mana visual changes valla raaledu; verified via original↔final file diff: `build_policy_pages.py` was untouched until now.)
+
+**AFTER (fixed):**
+```python
+PAGE_JS = """<script>
+(function(){
+  var b=document.body, btn=document.getElementById('su-theme');
+  ...
+})();
+</script>"""
+```
+Anni builders re-run chesamu → HTML-parser-based leak test: **19 files with visible JS → 0**. WordPress theme (PHP) ki ee bug asalu undedu — preview static pages matrame.
+
+### 15) Preview demo parity
 `preview/worldclass/index.html` (and regenerated `standalone.html` / `OFFLINE_PREVIEW.html` / `theme-snapshot.html` / 3 post demos): same removals mirrored (hero pills, Trending/state, pause buttons, poll, captions, chips row + its inline `CHIPS` filter JS), plus the **footer bug** — demo used fictional classes (`su-foot`, `su-foot-grid`, `h4`) that no stylesheet defines → footer rendered unstyled/washed-out. Now uses the real `footer`, `footer-grid`, `footer-bottom`, `h3` classes that the theme's CSS styles (dark navy, readable links).
 
 ---
