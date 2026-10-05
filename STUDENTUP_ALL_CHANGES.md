@@ -29,12 +29,13 @@
 | 15 | Phone lo hero spacing tight ga undi (laptop ok) | ✅ Mobile-only breathing room (desktop untouched) | `assets/css/worldclass.css` |
 | 16 | Preview demo footer broken (links kanipinchatledu) | ✅ Demo class names fixed (real theme footer always correct) | `preview/worldclass/index.html` |
 | 17 | Preview sub-pages kinda **JavaScript code text ga print avutundi** ("antha galeez ga" screenshot) | ✅ Root-cause fixed at generator — `PAGE_JS` template ki `<script>` wrapper ledu (original upload lone ee bug undi); pages/posts/tools/OFFLINE anni regenerated, **JS-text-leak test: 19 files → 0** | `tools/build_policy_pages.py` + 20 regenerated preview files |
+| 18 | Eenadu Pratibha techniques photos — "ilaaga neat ga cheyu, table best ga, anni posts prakaram update avuthu undali" | ✅ Best-fit items implemented: last-date **amber pill**, category **chip**, table kinda **"మరిన్ని — View all notifications"** footer, slider ki **dot indicators** (Eenadu hero-carousel pattern, posts prakaram automatic). Anni already WP posts + post meta nunchi dynamic ga update avutundi | `inc/jobtable.php`, `inc/slider.php`, `assets/js/studentup-slider.js`, `assets/css/worldclass.css`, `preview/worldclass/index.html` |
 
 **Quality gates (every change tarvata run):** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **99/99 files OK** · critical CSS regenerated clean.
 
 ---
 
-## B) Files changed — inventory (36 source files, +441 / −581 lines)
+## B) Files changed — inventory (37 source files, +572 / −580 lines)
 
 ```
  +6  -6    preview/posts/engineering-internships-2026.html
@@ -280,7 +281,44 @@ PAGE_JS = """<script>
 ```
 Anni builders re-run chesamu → HTML-parser-based leak test: **19 files with visible JS → 0**. WordPress theme (PHP) ki ee bug asalu undedu — preview static pages matrame.
 
-### 15) Preview demo parity
+### 15) Eenadu Pratibha-inspired polish (owner shared Eenadu screenshots)
+**Files:** `inc/jobtable.php`, `inc/slider.php`, `assets/js/studentup-slider.js`, `assets/css/worldclass.css`, `preview/worldclass/index.html`
+
+a) **Last-date amber pill** (Eenadu notification rows lo date emphasis):
+```php
+<?php if ( $r['last'] ) : ?>
+    <span class="su-jt-date"><?php echo esc_html( wp_date( 'd M Y', ... ) ); ?></span>
+<?php else : ?>
+    <span class="su-jt-na">Not announced</span>
+```
++CSS: `.su-jt-date{ ... background:#fff4d6; border:1px solid #f3dc9a; border-radius:99px; font-weight:800 }` (+dark-mode variant), `.su-jt-cat` category chip pill.
+
+b) **"మరిన్ని" footer row** under the jobs table (Eenadu section footers):
+```php
+<div class="su-jt-foot"><a class="su-jt-all" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>">
+    మరిన్ని — View all notifications →</a></div>
+```
+
+c) **Slider dot indicators** (Eenadu hero-carousel dots) — PHP renders one dot **per published post** (automatic), JS keeps active dot in sync with auto-slide/prev/next/swipe and tapping a dot scrolls to that card:
+```php
+<div class="su-sdots" role="tablist">
+  <?php foreach ( $posts as $su_dot_post ) : ?>
+    <button type="button" class="su-sdot<?php echo 0 === $su_dot_i ? ' on' : ''; ?>" ... ></button>
+  <?php endforeach; ?>
+</div>
+```
+```js
+track.addEventListener('scroll', …requestAnimationFrame… paintDots()…, { passive: true });
+// click → track.scrollTo({ left: i * cardStep(), behavior: behavior() })
+```
+
+d) **Short table header caption** (Eenadu headings are caption-free): 20-word note → `"Every last date from official notifications — never guessed."`
+
+e) **Already present, kept:** section-title accent bar (Eenadu's blue `|` markers — mana theme lo gradient bar), breaking ticker (Eenadu's red టాప్ నోటిఫికేషన్స్ strip — mana `Latest Jobs` marquee), 2-column card grid (Eenadu's విద్యా ఉద్యోగ సమాచారం cards — mana `.newsgrid`).
+
+f) **Intentionally skipped (with reason):** re-adding category tab-chips above the list (owner asked to remove them — v207), right-sidebar layout (kills phone neatness), full Telugu⇄English toggle (Eenadu runs separately-authored dual posts — StudentUp posts are single-language; a fake client-side toggle would mislead readers).
+
+### 16) Preview demo parity
 `preview/worldclass/index.html` (and regenerated `standalone.html` / `OFFLINE_PREVIEW.html` / `theme-snapshot.html` / 3 post demos): same removals mirrored (hero pills, Trending/state, pause buttons, poll, captions, chips row + its inline `CHIPS` filter JS), plus the **footer bug** — demo used fictional classes (`su-foot`, `su-foot-grid`, `h4`) that no stylesheet defines → footer rendered unstyled/washed-out. Now uses the real `footer`, `footer-grid`, `footer-bottom`, `h3` classes that the theme's CSS styles (dark navy, readable links).
 
 ---
