@@ -651,3 +651,11 @@ Failover: ఒక key 429/401 → అదే provider లో next key → అన�
 **4. కొత్త test suite `tests/v220_test.py`** (5 checks) — clustering, primary choice, retry+merge+queue, ai_status masking, docs wiring.
 
 Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP lint 100/100 · theme zip 139 files / 960 KB (theme 1.9.48 unchanged — ఈ round bot-only).
+
+## v220.1 — Bot deploy package ready
+
+- `--deploy-check` → **8 ok · 4 warn · 0 fail** (warnings = server లో `.env`/WP creds/Telegram పెట్టాక పోతాయి).
+- `milesweb-kit/studentup-bot-cron.zip` **v220 code తో rebuild** (380 files · 4.68 MB · `ai_status.py`, upgraded `link_intake.py`, AI-first `daily_quiz.py` కలిపి). sha256 `2d6502a4537e3d78…`. Repo root కి కూడా copy చేశాం (`studentup-bot-cron.zip`).
+- `crontab.example` కి రెండు కొత్త lines: **daily quiz 7 AM** (`--daily-quiz`), **link-queue continue 9 PM** (`--links-file log/link-queue.txt`).
+- కొత్త guide **`DEPLOY_BOT_NOW.md`** — Oracle free VM దారి (install-vps.sh one command, systemd timer) + MilesWeb cPanel cron దారి, `.env` minimum set, 4 verify commands, sha256 verify, రోజువారీ schedule table, fail అయితే ఏ command run చేయాలో.
+- Tests **149/149 green** (v76/v92 కి jsdom dependency sandbox లో install చేశాక pass — అది ship అయ్యే code కాదు).
