@@ -502,3 +502,21 @@ be14491  ← ORIGINAL upload (BEFORE state — patch baseline)
 **Quality gates:** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **100/100 OK** · minify + critical CSS regenerated · theme zip **139 files · 947 KB**.
 
 **Deliverables:** `studentup-theme.zip` (repo root — WP Admin → Appearance → Themes → Upload → Activate) · project zip updated.
+
+---
+
+## v214 (theme 1.9.44) — "anni fix cheyu · chala chala neat ga best ga undali"
+
+**Asalu problem em ani kanukkunano:** okka page lo **8 vere designs** unnayi — prathi block ki vere radius (10/12/16/18px), vere padding, vere loud gradient (violet · pink · amber · green · blue), vere title size. Content manchide, kaani kalisi chuste "clumsy / text ichinattu" ga kanipinchedi. Ippudu **okate design system**:
+
+| Layer | Mundu | Ippudu |
+|---|---|---|
+| Card shell | 4 vere radius · 3 vere shadow | **okate**: radius 16 · 1px line · soft shadow · left 4px colour accent (block identity aa accent tho matrame) |
+| Background | multi-colour gradients (violet→pink, amber→orange…) | calm **card surface** + accent bar — Eenadu/pro news feel; dark mode parity |
+| Rhythm | 14/18/20/22/24/26px random margins | **18px phone · 24px laptop** — prathi block madhya okate gap |
+| Titles | 15/17/18/19/20px hard sizes | **`clamp()` fluid** — 360px phone nunchi 1440px laptop varaku perfect |
+| Buttons | 32–40px, kontha chinnavi | **44–48px tap** everywhere · phone lo full-width · laptop lo auto |
+
+**Block-by-block neat pass:** Internet Center (steps ippudu **numbered cards**, perks **chips**, CTA grid — phone 1 column · laptop WhatsApp+Call+Email okate row, equal height) · Join/WhatsApp-Telegram card (equal 48px CTAs, laptop lo copy↔CTA clean split) · Community card · Quick Summary · FAQ (46px rows) · Key Facts tiles (equal height) · Related posts (**phone 1 col → tablet 2×2 → laptop 4**) · prev/next post nav (2-col laptop) · helpful box · **print stylesheet** (print chesinappudu ads/CTAs/menu raavu — article + syllabus matrame).
+
+**Quality gates:** theme audit `0 errors · 0 warnings` · deep audit **31/31** · PHP lint **100/100** · visual check (phone 390px + laptop 1440px) **score 100/100 · 0 warn · 0 fail** (tap targets ≥44px · contrast AA · single H1 · CLS-safe · ad density policy-safe) · critical CSS + min CSS regenerated · zip **139 files · 950 KB**.
