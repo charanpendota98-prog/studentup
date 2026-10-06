@@ -629,3 +629,25 @@ Tests: 136/148 (v92 jsdom dep sandbox లో లేదు; మిగతావి
 **3. Test suite 138 → 148/148 ALL GREEN.** Stale assertions ని నిజమైన current contract కి update చేశాం (poll removal, chips removal, trending/state bar removal, pause button removal, PWA copy footer కి move, Telugu comments vs UI text, EXPECTED_CHECKS 236), `deploy_verify.THEME_MIN` 1.9.48, preview stamps ఇక auto-sync (`build_policy_pages.PREVIEW_BUILD` ఇప్పుడు functions.php నుంచి చదువుతుంది — ప్రతి bump కి ఇక manual edit అవసరం లేదు).
 
 Gates: theme audit 0/0 · deep audit 31/31 · php-lint 100/100 · visual_check 100/100 · CWV audit clean · code audit clean · zip 139 files / 960 KB.
+
+## v220 — BOT ADVANCED: link clustering, pacing, retries, queue + multi-provider AI status
+
+**సమస్య (owner):** "bot ki enni links ichina perfect ga draft cheyyali, neat ga time thiskoni, anni sources lo vethiki, multiple API keys support cheyali."
+
+**1. Multi-link intake ఇప్పుడు advanced (`autoblog/link_intake.py`):**
+- **Topic clustering** — ఒకే recruitment కి ఇచ్చిన links (careers page + notification PDF + news story) ఇప్పుడు **ఒకే cluster**. ఒకే draft తయారవుతుంది, మిగిలిన URLs ఆ post కి **supporting sources** గా merge అవుతాయి (`pipeline.update_post`). ఇక duplicate posts రావు.
+- **Primary source ఎంపిక** — tier-1 official (gov/nic/ac) ముందు, ఆ తర్వాత PDF కన్నా HTML page, చివరగా చిన్న canonical URL.
+- **Pacing** — రెండు drafts మధ్య `LINK_INTAKE_DELAY` (default **20s**) pause. Provider rate-limit (429) వల్ల అరకొర draft రావడం ఆగుతుంది. "Neat ga time thiskoni" = ఇదే.
+- **Retries** — transient fetch/API error కి 2 attempts (5s, 10s backoff). ఒక్క hiccup కి link పోదు.
+- **Overflow queue** — limit దాటిన links ఇక **skip కావు**; `log/link-queue.txt` లో queue అవుతాయి → `python run.py --links-file log/link-queue.txt` తో కొనసాగించవచ్చు.
+- Report లో cluster count + ఒక్కో draft కి ఎన్ని sources వాడిందో కనిపిస్తుంది.
+
+**2. Multi API key / multi provider — verify చేసే command:**
+`python run.py --ai-status` (మరియు `--ai-status-live`) → gemini · groq · openrouter · cerebras · together · mistral · openai · custom — ఏ provider కి ఎన్ని keys ఉన్నాయో, ఏ model, failover order ఏమిటో చూపిస్తుంది. Key విలువలు ఎప్పుడూ print కావు (tag మాత్రమే: `AIza…23`). Keys లేకపోతే ఖచ్చితమైన `.env` snippet చూపిస్తుంది.
+Failover: ఒక key 429/401 → అదే provider లో next key → అన్నీ అయిపోతే next provider. Draft ఆగదు.
+
+**3. కొత్త knobs** (`.env.example` + README documented): `LINK_INTAKE_DELAY=20`, `LINK_INTAKE_QUEUE=log/link-queue.txt`.
+
+**4. కొత్త test suite `tests/v220_test.py`** (5 checks) — clustering, primary choice, retry+merge+queue, ai_status masking, docs wiring.
+
+Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP lint 100/100 · theme zip 139 files / 960 KB (theme 1.9.48 unchanged — ఈ round bot-only).
