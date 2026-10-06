@@ -520,3 +520,33 @@ be14491  ← ORIGINAL upload (BEFORE state — patch baseline)
 **Block-by-block neat pass:** Internet Center (steps ippudu **numbered cards**, perks **chips**, CTA grid — phone 1 column · laptop WhatsApp+Call+Email okate row, equal height) · Join/WhatsApp-Telegram card (equal 48px CTAs, laptop lo copy↔CTA clean split) · Community card · Quick Summary · FAQ (46px rows) · Key Facts tiles (equal height) · Related posts (**phone 1 col → tablet 2×2 → laptop 4**) · prev/next post nav (2-col laptop) · helpful box · **print stylesheet** (print chesinappudu ads/CTAs/menu raavu — article + syllabus matrame).
 
 **Quality gates:** theme audit `0 errors · 0 warnings` · deep audit **31/31** · PHP lint **100/100** · visual check (phone 390px + laptop 1440px) **score 100/100 · 0 warn · 0 fail** (tap targets ≥44px · contrast AA · single H1 · CLS-safe · ad density policy-safe) · critical CSS + min CSS regenerated · zip **139 files · 950 KB**.
+
+---
+
+## v215 (theme 1.9.45) — "inka chala mistakes · clear text · top blogger website · Google love cheyali"
+
+### 1) Blog kinda unna **CTA chaos** — asalu pedda clumsiness
+Mundu article mugisaka **4 WhatsApp CTAs vరుసగా** vachevi: Community card (WA+TG) → Status card (WA) → Share row (WA/TG/X) → footer Join block (WA+TG). Reader ki "spam" feel, Google ki "content kanna CTA ekkuva" signal.
+
+**Ippudu top-blogger reading order:** content → **Share** → **Tags** → related internal links (recirculation) → **okka** community CTA → status card → author → trust → prev/next → related grid (ఇవి కూడా చూడండి) → comments. Single posts lo duplicate footer Join block **auto-skip** (home/archive/pages lo mamulu ga untundi).
+
+### 2) **CLEAR TEXT engine** (§30 — reading experience ki okate authority)
+| | Mundu | Ippudu |
+|---|---|---|
+| Body | 14.5–18px mixed, 1.75 | **16.75px phone · 18px laptop · 1.85 leading** |
+| Measure | full width (line చాలా podugu — kallu line miss ayyevi) | **72ch max** — top blogger standard |
+| Telugu | English line-height ne (glyphs taller → gummi) | **1.95 leading** Telugu paragraphs ki |
+| H2/H3 | flat sizes, weak hierarchy | fluid `clamp()` + 800/750 weight + **sanna blue accent bar** H2 paina (section breaks clear) |
+| Lists | tight | .42em spacing, 1.8 leading, **coloured markers** |
+| Links | plain underline | 1.5px underline, 3px offset, hover lo darker — visible kaani loud kaadu |
+| Tables | plain borders, phone lo padutundi | **rounded card · uppercase header · zebra rows · phone lo smooth scroll** |
+| Quotes / images / captions | inconsistent | accent quote, 12px radius images, centered 12.5px captions |
+| Phone | cramped edges | 14px edge padding, H1 `clamp(21→27px)`, meta 11.5px — breathing room |
+
+### 3) **Google / Core Web Vitals**
+* Below-fold blocks (CTA · FAQ · syllabus · related · author · comments) ippudu **inline critical CSS nunchi bayata** → single page inline CSS **60.2 KB (cap fail) → 55.9 KB**, LCP paint ki takkuva bytes.
+* `content-visibility:auto` + `contain-intrinsic-size` heavy below-fold sections ki — scroll ki mundu render cost zero, CLS ledu.
+* `text-wrap:pretty` (orphan words), print stylesheet, image/table overflow guards.
+* Schema · sitemaps · breadcrumbs · author profile · FAQ rich results — anni alage pani chestunnayi (deep audit 31/31).
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check phone 390 + laptop 1440 **100/100 (0 warn · 0 fail)** · CWV audit: **no CLS/a11y blockers** · critical CSS cap pass · zip **139 files · 955 KB**.
