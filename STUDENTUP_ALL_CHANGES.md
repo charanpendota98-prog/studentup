@@ -485,3 +485,20 @@ a88bde2  .gitignore for scratch folders
 d9ebc87  Social rail fix, outline bug fix, hero simplify, breaking block remove, jobs table
 be14491  ← ORIGINAL upload (BEFORE state — patch baseline)
 ```
+
+---
+
+## v213 (theme 1.9.43) — "phone lo menu ravatledu · icons ravatledu · ivi vaddu · neat ga undali"
+
+| # | Mee feedback | Em chesano | File(s) |
+|---|---|---|---|
+| 22 | **Phone lo icons ravatledu** | Root cause: icons `<svg><use href="#su-i-x">` ga sprite reference tho render ayyevi (v180 byte-saving). Aa sprite `wp_body_open` lo inject avutundi — old Android WebView / in-app browsers (FB · Insta · kontha caching+optimizer plugins) lo `<use>` resolve avvadu → **khali boxes**. Ippudu prathi icon **self-contained inline SVG** (`viewBox` + `path`) — sprite lekapoyina, hook aagipoyina, fragment cache nunchi vachina icon **eppudu** kanipistundi. UI icons + social icons rendu. | `inc/icons.php`, `inc/options.php` |
+| 23 | **Phone lo menu ravatledu** | Rendu guards: (a) **JS isolation** — mundu `wireDesktop()` lo error vaste `wireMobile()` (drawer wiring) assalu run ayyedi kaadu; ippudu prathi block `safe()` lo, okati fail ayina menu pani chestundi. (b) **Open-time hardening** — drawer open ayinappudu panel + backdrop ni `document.body` ki direct child ga move chesi inline `position:fixed · z-index:2147483000 · transform:none · visibility:visible` set chestunnam → ఏ plugin/ad/dock z-index war ayina drawer paina ne untundi. CSS lo kuda `.mpanel/.mbackdrop` z-index + `.menubtn{display:grid!important;min 42px}` phone lo lock chesano. | `assets/js/studentup-menu.js`, `assets/css/worldclass.css` §28.1 |
+| 24 | **Save · Compare · Print/PDF ivi ravoddu** | Article headline kinda unna 3-button utility row **full ga teesesam** (phone lo clutter). Saved rail, compare page, browser print — anni inka pani chestunnayi, article lo matrame kanipinchavu. Legacy CSS ki `display:none` guard kuda. | `single.php`, `assets/css/worldclass.css` §28.2 |
+| 25 | **"Blocksy: Search Block" text ravoddu** | Content lo migilipoyina inactive-plugin block placeholder. Kotha render-time hygiene filter: blocksy/ct-search wrappers + `"… Blocksy: … Block"` placeholder text + aa tarvata migiలే **empty `<p>`/heading shells** strip. DB content ni touch cheyyadu. | `inc/contentclean.php` (kotha), `functions.php` |
+| 26 | **"SPONSORED MEDIA ▶ … available soon" — space waste** | Real AdSense video slot configure cheyyakapothe ippudu **emi render avvadu** (khali 200px box + CLS pothundi). Slot unte matrame ad vastundi. | `inc/videoplayer.php` |
+| 27 | **Article blocks chala neat ga undali (phone + laptop)** | Sponsor box · Age calculator · Fee calculator · Syllabus tracker — **okate design rhythm**: 16px margins, 14px radius, compact padding, fluid `clamp()` titles/desc, **≤620px lo single-column fields**, anni inputs/buttons **44–46px tap height**, full-width CTA phone lo · auto-width laptop lo. Share row · tags · status-card buttons kuda neat wrap grid. Article typography fluid (`h2/h3/p` clamp), tables/images/iframes eppudu overflow avvavu, `overflow-x:clip` tho horizontal slip zero. | `assets/css/worldclass.css` §28.3–28.5 |
+
+**Quality gates:** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **100/100 OK** · minify + critical CSS regenerated · theme zip **139 files · 947 KB**.
+
+**Deliverables:** `studentup-theme.zip` (repo root — WP Admin → Appearance → Themes → Upload → Activate) · project zip updated.
