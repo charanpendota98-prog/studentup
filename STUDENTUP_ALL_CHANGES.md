@@ -659,3 +659,27 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 - `crontab.example` కి రెండు కొత్త lines: **daily quiz 7 AM** (`--daily-quiz`), **link-queue continue 9 PM** (`--links-file log/link-queue.txt`).
 - కొత్త guide **`DEPLOY_BOT_NOW.md`** — Oracle free VM దారి (install-vps.sh one command, systemd timer) + MilesWeb cPanel cron దారి, `.env` minimum set, 4 verify commands, sha256 verify, రోజువారీ schedule table, fail అయితే ఏ command run చేయాలో.
 - Tests **149/149 green** (v76/v92 కి jsdom dependency sandbox లో install చేశాక pass — అది ship అయ్యే code కాదు).
+
+## v221 — VIRAL STREAMS: Govt Schemes + TS/AP District News (theme 1.9.49)
+
+**Owner brief:** "viral ayyevi — schemes, state, TS/AP districts news, breaking news — ivi anni sarina category ki vellali."
+
+**1. కొత్త module `autoblog/regions.py`** — ఒకే source of truth:
+- **TS 33 + AP 26 districts** (English + తెలుగు రెండూ).
+- **Scheme vocabulary** — Rythu Bharosa, Dalit Bandhu, Kalyana Lakshmi, Indiramma, Gruha Jyothi, Cheyutha, Amma Vodi, Vidya Deevena, Talliki Vandanam, PM Kisan, Ayushman, ration, pension, beneficiary list…
+- **Job-override guard** — "Rythu Bharosa **data entry operator recruitment**" scheme కాదు, job. (`recruitment / vacancy / posts / నియామకం / ఖాళీలు` ఉంటే scheme routing ఆగుతుంది.)
+- **District news guard** — district పేరు ఉన్నంత మాత్రాన district news కాదు; collector/mandal/holiday/rain-alert లాంటి local-news signal కూడా ఉండాలి. "Hyderabad software vacancy" job గానే ఉంటుంది.
+
+**2. రెండు కొత్త categories** (config `CATEGORIES` 18 → **20**): `Govt Schemes` (priority 4), `District News` (priority 3). `topic_engine.SEASONAL_CATEGORIES` లో కూడా rotate అవుతాయి (Feb budget = schemes, May/Oct = district).
+
+**3. Routing:**
+- `pipeline.classify_category()` → scheme/district detection jobs కన్నా ముందు, కానీ job-override తర్వాత.
+- `breaking.classify_tag()` → కొత్త `schemes` + `district` tags, state job tags కన్నా ముందు (లేకపోతే "Khammam Indiramma illu" ts-jobs అయ్యేది). రెండూ `regions` guards ద్వారానే పాస్ అవుతాయి.
+
+**4. Theme (1.9.49):** mega menu → Scholarships group లో కొత్త column **"Schemes & local"** (Govt Schemes · District News) + category alias map (`govt-schemes`, `district-news` → live slugs). **Home "most searched" strip 10 cards గానే** ఉంచాం — owner "neat ga" brief ప్రకారం clutter పెంచలేదు.
+
+**5. Guardian counts lock** 18 → **20 pillars** (+ docs అన్నిటిలో sync).
+
+**6. Version drift ఇక automatic** — `deploy_verify.THEME_MIN` ఇప్పుడు `functions.php` నుంచి చదువుతుంది (ప్రతి bump కి manual edit అవసరం లేదు).
+
+కొత్త suite `tests/v221_test.py` (5 checks). Gates: **150/150 suites green** · theme audit 0/0 · deep 31/31 · PHP lint 100/100 · visual 100/100 · code audit clean · parity PIN-TO-PIN · `--deploy-check` 8 ok / 0 fail · theme zip 139 files / 960 KB (`5e2cbd46…`) · bot zip (`c09191922…`).
