@@ -610,3 +610,22 @@ Migilina 11: owner adigi **teesesina** UI items ni purathana tests inka expect c
 **Unchanged safety:** live publish ముందు originality ≥ 72%, QA ≥ 80, Google people-first flags, content-quality, source-audit, v217 deep-source gates — అన్నీ అలానే enforce అవుతున్నాయి.
 
 Tests: 136/148 (v92 jsdom dep sandbox లో లేదు; మిగతావి పాత stale assertions). Theme version unchanged (1.9.47) — ఈ round బాట్-only.
+
+## v219 — PHONE PERFECT UI + menu bug fix + 148/148 suites green (theme 1.9.48)
+
+**1. Mobile menu nijam ga pani cheyyatledu — asalu bug దొరికింది.**
+`studentup.js` మరియు `studentup-menu.js` **రెండూ** `#menubtn` click కి listener add చేస్తున్నాయి. ఒక tap → రెండు toggles → drawer open అయ్యి వెంటనే close. ఇప్పుడు `studentup-menu.js` ఒక్కటే owner (`window.SU_MENU_ADV` flag); `studentup.js` తన duplicate handlers (button, backdrop, close, link-click, Escape) ని skip చేస్తుంది. Menu JS load కాకపోతే పాత fallback అలానే పని చేస్తుంది.
+
+**2. Mobile perfection CSS layer** (`worldclass.css` చివర, `<=899px` లో మాత్రమే):
+- Fluid type scale — `h1` clamp(21→27px), h2/h3 proportional, body 16.5px / 1.66 leading.
+- **Telugu text కి negative letter-spacing తీసేశాం** (matras కలిసిపోయే problem) + 1.72 leading.
+- Article body 16.8px / 1.78, paragraph & heading margins unified.
+- Section rhythm: అన్ని sections కి ఒకటే 26px gap, cards కి ఒకటే radius (14px) & padding.
+- **44px tap targets** అన్ని buttons/chips/pagination/drawer rows కి.
+- Overflow guards: long English words break అవుతాయి, tables scroll అవుతాయి, images/iframes 100% width.
+- Drawer: 44px rows, sticky head, uppercase labels, safe-area bottom padding.
+- Inputs 16px (iOS auto-zoom ఆగుతుంది) · <=380px phones కి density ఇంకో step తగ్గింపు.
+
+**3. Test suite 138 → 148/148 ALL GREEN.** Stale assertions ని నిజమైన current contract కి update చేశాం (poll removal, chips removal, trending/state bar removal, pause button removal, PWA copy footer కి move, Telugu comments vs UI text, EXPECTED_CHECKS 236), `deploy_verify.THEME_MIN` 1.9.48, preview stamps ఇక auto-sync (`build_policy_pages.PREVIEW_BUILD` ఇప్పుడు functions.php నుంచి చదువుతుంది — ప్రతి bump కి ఇక manual edit అవసరం లేదు).
+
+Gates: theme audit 0/0 · deep audit 31/31 · php-lint 100/100 · visual_check 100/100 · CWV audit clean · code audit clean · zip 139 files / 960 KB.
