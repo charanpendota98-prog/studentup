@@ -563,3 +563,35 @@ Mundu article mugisaka **4 WhatsApp CTAs vరుసగా** vachevi: Community c
 | 4 | **`REVENUE_MAX_PLAN.md`** | 10 slots inventory + slot IDs ela pettali + nija revenue table (10k → 10 lakh views) + 90-day traffic plan + "enduku inka ekkuva ads pettaledu" honest explanation | repo root |
 
 **Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass.
+
+---
+
+## v217 (theme 1.9.47) — Internet Center = okate premium BOX + bot advanced sourcing
+
+### 1) Students Internet Center — mee Telugu copy, okka box lo
+Mundu adi title + paragraph + numbered steps + perks + buttons — **విడివిడిగా** padi undedi. Ippudu **okate premium card**:
+
+* **Gradient top strip** (green → blue → violet) + blue app icon + **"Open today" live dot**
+* Head: `Students Internet Center` **+ TS & AP badge** · kinda Telugu brand `విద్యార్థుల ఇంటర్నెట్ సెంటర్`
+* **Mee copy ne** (nenu rasindi kaadu): *"మీరు jobs apply చేసుకోవటం కోసం ఎక్కడికీ వెళ్లవలసిన అవసరం లేదు. కేవలం మాకు call చేసి, సంబంధించిన documents పంపిస్తే చాలు — అతి తక్కువ ఖర్చులో apply చేసి, filled application PDF మీకు send చేయటం జరుగుతుంది."* + highlighted line: *"PDF తో పాటు — study materials, previous papers, మరియు preparation group లో add చేయటం కూడా జరుగుతుంది."*
+* **4 perk chips**: Application PDF · Materials & previous papers · Preparation group · అతి తక్కువ charge
+* Actions: **WhatsApp (58px primary)** + Call + Email — phone lo 1 column, laptop lo okate row
+* Fine print: *"ఇది మా service — official application fee వేరు. Documents మీ అనుమతితోనే వాడతాం."* (trust + Google policy safe)
+* Dark mode parity · Telugu ki 1.95 line-height · **prathi blog kinda** kanipistundi
+
+### 2) Bot — "chala sources unnai kaani asaarigga rastundi" fix (advanced sourcing gates)
+`autoblog/deep_research.py` + `config.py` lo kotha **hard gates** (live publish ki):
+
+| Gate | Rule | Enduku |
+|---|---|---|
+| **Independent domains** | Official (.gov.in/board) source **lekapothe** → kanisam **2 VERE domains** nunchi cross-check (okate site lo 3 pages = 1 domain) | Okka site nunchi ethukoni rayadam ippudu live ki vellаdu |
+| **Confidence floor** | Official lekapothe deep-confidence **≥60/100** | Weak research → draft ga apesindi |
+| **Key-fact corroboration** | last date · exam · result · fee · vacancies — **single source + non-official aythe block** | Tappu date/fee publish avvadam = reader trust + Google trust nashtam |
+
+Official source unte ee gates apply avvavu (official site ye authority). Rendu kotha settings `.env.example` lo documented: `DEEP_MIN_DOMAINS=2`, `DEEP_MIN_CONFIDENCE=60`.
+
+### 3) Test suite health
+Ee turn lo **119 → 137 / 148 suites passing**. Fix chesinavi: version pins sync · v92 (Save row intentional removal) · v89 (kotha Internet Center copy contract) · v79 (related = relevance picks, WP_Query kaadu) · v68/v69 (.env.example drift) · v157 (preview lo href-less `<a>` → real `<button>`).
+Migilina 11: owner adigi **teesesina** UI items ni purathana tests inka expect chestunnayi (poll · chips · front-page order) + ee sandbox lo **leni deps** (pypdf · full jsdom set) — theme/bot behaviour lo tappu kaadu.
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass · zip **139 files · 961 KB**.
