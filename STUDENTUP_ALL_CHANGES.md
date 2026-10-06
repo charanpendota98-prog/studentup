@@ -595,3 +595,18 @@ Ee turn lo **119 → 137 / 148 suites passing**. Fix chesinavi: version pins syn
 Migilina 11: owner adigi **teesesina** UI items ni purathana tests inka expect chestunnayi (poll · chips · front-page order) + ee sandbox lo **leni deps** (pypdf · full jsdom set) — theme/bot behaviour lo tappu kaadu.
 
 **Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass · zip **139 files · 961 KB**.
+
+## v218 — Daily quiz: AI-first drafting + 90-day repeat guard (బాట్ అప్‌గ్రేడ్)
+
+**Problem:** `--daily-quiz` ఎప్పుడూ repo లోని static question bank నుంచే (`quiz_engine.mock_quiz`) ప్రశ్నలు తీసేది — AI key ఉన్నా వాడేది కాదు. దాంతో ప్రశ్నలు repeat అయ్యే chance ఉండేది.
+
+**Fix (`autoblog/daily_quiz.py`):**
+1. `build()` ఇప్పుడు **AI-first** — provider key ఉంటే `gemini_client.generate_quiz()` తో fresh bilingual MCQ set; `normalize_quiz` + `validate_quiz` pass అయితేనే accept.
+2. **Repeat guard** — `logs/quiz_seen.json` లో గత **90 రోజుల** ప్రశ్నల fingerprints (SHA1 of normalised text). కొత్త paper లో 70%+ పాత ప్రశ్నలు ఉంటే reject → regenerate.
+3. **Bank fallback కూడా repeat-aware** — AI లేకపోయినా/fail అయినా, date-seed shift (0/7/14/21 days) చేసి repeat తక్కువ ఉన్న set ఎంచుకుంటుంది.
+4. Report లో కొత్తగా `source` (ai/bank) + `repeat_pct` fields; CLI output లోనూ కనిపిస్తాయి.
+5. Status ఇంకా **draft-only** — ఈ command ఎప్పుడూ auto-publish చేయదు.
+
+**Unchanged safety:** live publish ముందు originality ≥ 72%, QA ≥ 80, Google people-first flags, content-quality, source-audit, v217 deep-source gates — అన్నీ అలానే enforce అవుతున్నాయి.
+
+Tests: 136/148 (v92 jsdom dep sandbox లో లేదు; మిగతావి పాత stale assertions). Theme version unchanged (1.9.47) — ఈ round బాట్-only.
