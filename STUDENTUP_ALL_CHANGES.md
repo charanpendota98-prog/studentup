@@ -550,3 +550,16 @@ Mundu article mugisaka **4 WhatsApp CTAs vరుసగా** vachevi: Community c
 * Schema · sitemaps · breadcrumbs · author profile · FAQ rich results — anni alage pani chestunnayi (deep audit 31/31).
 
 **Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check phone 390 + laptop 1440 **100/100 (0 warn · 0 fail)** · CWV audit: **no CLS/a11y blockers** · critical CSS cap pass · zip **139 files · 955 KB**.
+
+---
+
+## v216 (theme 1.9.46) — REVENUE MAX pass
+
+| # | Em chesano | Enduku | File(s) |
+|---|---|---|---|
+| 1 | **Multiplex / related-ads unit** (`autorelaxed`) — related posts **kinda** | Content sites lo in-article tarvata **highest-RPM** unit idi. Editorial content modata → ad tarvata = policy safe. Slot ID pettakapothe **emi render avvadu** (khali box ledu) | `inc/ads.php`, `single.php`, `inc/options.php`, `worldclass.css` §31 |
+| 2 | **Adaptive density cap** (word-count based) | Mundu anni pages ki flat 5 ads: chinna post lo adi "ad-heavy" (RPM penalty risk), pedda guide lo adi waste. Ippudu **<600 words → 3 · 600–1500 → 5 · 1500+ → 6** | `inc/ads.php` |
+| 3 | **App-bar auto-release (15s)** | "Download App" bar phone bottom lane ni పట్టుకుని **anchor ad ni block chesedi** (mobile lo ekkuva impressions ichhe unit). Ippudu 15 sec tarvata bar tappukuntundi → ad malli vastundi | `assets/js/studentup-pwa.js` |
+| 4 | **`REVENUE_MAX_PLAN.md`** | 10 slots inventory + slot IDs ela pettali + nija revenue table (10k → 10 lakh views) + 90-day traffic plan + "enduku inka ekkuva ads pettaledu" honest explanation | repo root |
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass.
