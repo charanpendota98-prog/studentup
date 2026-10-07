@@ -769,3 +769,24 @@ Audit లో **4 నిజమైన bugs** దొరికాయి — అన�
 - **`tests/v226_test.py` (new, suite #155)** — 30 checks: 4 fixes verify, guards, 42 items exactly, numbers 1–42 unique, 0 missing, OWNER items honest, CLI + go_live + docs wiring.
 - Report: `LAUNCH_42_CHECK.md` (repo root) + `output/launch-42-check.md`.
 - Gates: **155/155 suites** · php_lint 101/101 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 0 fail.
+
+## v227 — trust + leads: owner items 8 → 2 (theme 1.9.52)
+
+v226 audit లో 8 items "owner పని" అని వదిలేశాను. మళ్ళీ చూస్తే అది సోమరితనం — **system** ని code కట్టగలదు, content మాత్రమే owner ఇవ్వాలి. ఇప్పుడు ఆ systems అన్నీ ready (`inc/trust.php` new):
+
+| # | ఏం కట్టాను | మీరు ఇవ్వాల్సింది |
+|---|---|---|
+| **23** | `[studentup_reviews]` + Review/AggregateRating schema | Options → `reviews_json` (**నిజమైన** students వి మాత్రమే) |
+| **24** | `[studentup_case_studies]` — Problem → Solution → Result | `cases_json` |
+| **26** | `[studentup_team]` — photo + role + bio | `team_json` |
+| **27** | `[studentup_map]` — **address నుంచే** Google Map + Get Directions | `ic_address` (embed code copy అక్కర్లేదు) |
+| **31** | `/thank-you/` page — auto-create + noindex + GA4 `generate_lead` | **ఏమీ అక్కర్లేదు** |
+| **33** | `[studentup_response_time]` — contact block కింద automatic | `response_time` line |
+
+**Golden rule — ప్రతి దానికి test ఉంది: data లేకపోతే ఏమీ render కాదు.** ఖాళీ star box · fake `aggregateRating` · dummy map · నిలబెట్టలేని promise — ఇవి trust ని చంపుతాయి, పెంచవు. Google కి fake review schema = penalty.
+
+- Thank-you page **noindex** — lead confirm page Google లో rank అవ్వకూడదు.
+- Trust blocks CSS అంతా v225 fluid scale వాడుతుంది — hard-coded px ఒక్కటీ లేదు (test enforce చేస్తుంది).
+- **`tests/v227_test.py` (new, suite #156)** — 35 checks: 5 shortcodes, ప్రతి దానికి empty-data guard, schema honesty (stars clamp, half-filled row skip), map lazy-load, thank-you auto-create + noindex + event, options registered, CSS fluid-only, auditor counts.
+- **42-item status ఇప్పుడు: 28 code · 12 `.env` key · 2 owner · 0 missing.**
+- Gates: **156/156 suites** · php_lint 103/103 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.

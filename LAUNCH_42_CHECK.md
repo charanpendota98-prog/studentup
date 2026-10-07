@@ -1,6 +1,6 @@
 # 42-item launch checklist — StudentUp
 
-**27 done in code · 7 need a key in .env · 8 only you can do · 0 missing**
+**28 done in code · 12 need a key in .env · 2 only you can do · 0 missing**
 
 
 ## Part 1. Get found (Google + Bing)
@@ -39,20 +39,20 @@
 
 - ✅ **21. Social share image (Open Graph)** — 1200×630 auto-generated per post (inc/ogimage.php)
 - ✅ **22. Favicon** — favicon + apple touch icon + PWA manifest
-- 👤 **23. Real reviews** — nijamaina students nunchi matrame — bot fake reviews rayadu
-- 👤 **24. Case studies** — success stories intake undi (--success-stories) kaani content meede
+- 🔑 **23. Real reviews** — v227: [studentup_reviews] + Review schema ready — Options lo reviews_json pettandi (NIJAMAINA vi matrame; khali unte render kaadu)
+- 🔑 **24. Case studies** — v227: [studentup_case_studies] Problem→Solution→Result block ready — Options lo cases_json
 - ✅ **25. FAQ section** — bot prathi post ki FAQ + FAQPage schema rastundi
-- 👤 **26. Real team photo** — mee photo — code cheyyaledu
-- 👤 **27. Map + directions** — Google Maps embed — address Options lo pettaka add cheyandi
+- 🔑 **26. Real team photo** — v227: [studentup_team] block ready — Options lo team_json (mee nijamaina photo)
+- 🔑 **27. Map + directions** — v227: address pedithe map + Get Directions automatic — embed code copy avasaram ledu
 - ✅ **28. Privacy policy page** — privacy · terms · disclaimer · contact auto-create (firstrun) + footer menu
 
 ## Part 6. Visitors → leads
 
 - ✅ **29. Clear CTA above the fold** — hero + search + 8 chips
 - ✅ **30. Sticky mobile CTA** — mobile bottom bar
-- 👤 **31. Thank-you page** — lead form unte thank-you page + event — ippatiki site lead-gen kaadu, content site. Internet Center enquiry ki kavali ante cheptara?
+- ✅ **31. Thank-you page** — v227: /thank-you/ auto-create + noindex + GA4 generate_lead event
 - ✅ **32. Form success/error messages** — quiz, poll, search forms lo feedback undi
-- 👤 **33. Promise a response time** — Internet Center box lo mee response time line add cheyandi
+- 🔑 **33. Promise a response time** — v227: Options lo response_time pettandi — contact block kinda automatic
 - ✅ **34. Clickable phone, email, logo** — tel: · mailto: · wa.me — anni clickable, v226 lo track kooda avutai
 
 ## Part 7. Clean up before launch
