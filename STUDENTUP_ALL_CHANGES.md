@@ -709,3 +709,18 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 - `.env.example` లో 20+ కొత్త keys; `SETUP_PERFECT.md` లో STEP 5.5.
 - **`tests/v223_test.py` (new, suite #152)** — 16 checks: option mapping, auto-ads-off rule, approval gate, "ఖాళీ .env → ఏదీ invent చేయదు", preview vs apply, owner-list shrink, go_live wiring, docs.
 - Gates: **152/152 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 4 warn / 0 fail.
+
+## v224 — money autopilot: revenue పని కూడా bot దే (2026-10-08)
+
+"అన్నీ నువ్వే చేసుకో, highest money" — revenue modules ఇప్పటికే ఉన్నాయి కానీ అన్నీ **manual CSV export** అడిగేవి. అదే ఆగిపోయే చోటు. ఇప్పుడు bot డేటా తనే లాగుతుంది.
+
+- **`autoblog/money_autopilot.py` (new)** — GSC API నుంచి query × page data auto-pull → `output/gsc-latest.csv` (ఉన్న revenue modules చదివే format లోనే).
+- **CTR money gap** — position-CTR curve తో "రావాల్సిన CTR vs వస్తున్న CTR" → నెలకు extra clicks + ₹ range.
+- **Striking distance** (pos 4–20) — చిన్న update తో page 1.
+- **Internal links auto-fix** (`link_graph`, `--apply` తో నిజంగా apply) · refresh queue · cannibalization · RPM by page · ad slot lab (`REVENUE_CSV` ఉంటే).
+- Priority action list + `output/money-autopilot.md` + Telegram broadcast.
+- **ప్రతి ఆదివారం `--daily` లో తనే run** (`MONEY_AUTOPILOT=0` తో off). Step isolation — fail అయినా daily flow ఆగదు.
+- CLI: `--money-autopilot` · `--apply` · `--money-days` · `--money-csv` · `--money-notify`.
+- **`tests/v224_test.py` (new, suite #153)** — 18 checks: CSV format + ctr_boost compatibility, CTR maths, "good CTR → fake opportunity లేదు", striking window, ₹ range, step isolation, preview ఏదీ apply చేయదు, data లేకపోతే crash కాదు, CLI + weekly hook + docs.
+- Honest: ₹ అంకె estimate (promise కాదు); titles bot తనే rewrite చేయదు — suggestions మాత్రమే.
+- Gates: **153/153 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 0 fail.

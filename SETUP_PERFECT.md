@@ -139,6 +139,29 @@ CLOUDFLARE_ZONE_ID=...              # deploy తర్వాత cache auto purge
 
 ---
 
+## STEP 5.6 — 💰 Money autopilot (v224) — ఇది తనంతట తానే run అవుతుంది
+
+```bash
+python run.py --money-autopilot            # preview
+python run.py --money-autopilot --apply    # safe fixes auto
+```
+
+**ప్రతి ఆదివారం `--daily` లో తనే run అవుతుంది** (`MONEY_AUTOPILOT=0` తో off).
+
+ఏం చేస్తుంది — Search Console data **తనే లాగి** (CSV download అక్కర్లేదు):
+
+1. **CTR money gap** — "ఈ position కి ఇంత CTR రావాలి, వస్తున్నది ఇంత" → నెలకు ఎన్ని clicks పోతున్నాయో లెక్క
+2. **Striking distance** (position 4–20) — చిన్న update తో page 1 కి వచ్చే keywords
+3. Title/description fix suggestions (bot తనే మార్చదు — మీ approval)
+4. **Internal links auto-fix** — orphan pages కి money links (`--apply` తో నిజంగా)
+5. Refresh queue · keyword cannibalization · RPM by page · ad slot lab
+
+చివర్లో **priority action list + ₹ range** + `output/money-autopilot.md` + Telegram.
+
+> నిజం: ₹ అంకె **estimate** (published CTR curve నుంచి), promise కాదు. Titles bot తనే rewrite చేయదు.
+
+---
+
 ## STEP 6 — Google + డబ్బు (వరుస ముఖ్యం)
 
 1. **Search Console** verify → `sitemap.xml` submit.
