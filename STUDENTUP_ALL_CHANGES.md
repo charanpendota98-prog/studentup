@@ -683,3 +683,14 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 **6. Version drift ఇక automatic** — `deploy_verify.THEME_MIN` ఇప్పుడు `functions.php` నుంచి చదువుతుంది (ప్రతి bump కి manual edit అవసరం లేదు).
 
 కొత్త suite `tests/v221_test.py` (5 checks). Gates: **150/150 suites green** · theme audit 0/0 · deep 31/31 · PHP lint 100/100 · visual 100/100 · code audit clean · parity PIN-TO-PIN · `--deploy-check` 8 ok / 0 fail · theme zip 139 files / 960 KB (`5e2cbd46…`) · bot zip (`c09191922…`).
+
+## v222 — `--go-live`: ఒకే command తో full setup (2026-10-08)
+
+- **`autoblog/go_live.py` (new)** — 8-step orchestrator, ప్రతి step isolated (ఒకటి fail అయినా మిగతావి run అవుతాయి):
+  deploy-check · AI providers+keys · WP connection · 20 pillar categories · site setup (settings/footer menu/category SEO/robots/sitemap) · IndexNow key · AdSense readiness · production safety+revenue audit.
+- **CLI**: `python run.py --go-live` (preview, ఏమీ మార్చదు) · `python run.py --go-live --apply` (నిజంగా apply).
+- చివర scorecard + **OWNER_TODO (8 code-impossible items)** + `output/go-live-report.md`.
+- **`SETUP_PERFECT.md` (new)** — Telugu లో ఒకే page, Step 0→6 (keys → theme → bot → go-live → content → automation → Google/AdSense).
+- `DEPLOY_BOT_NOW.md` + `README.md` లో v222 section.
+- **`tests/v222_test.py` (new, suite #151)** — step shape, failure isolation, preview-mode skip, CLI+docs wiring.
+- Gates: **151/151 suites** · php_lint 100/100 · theme_audit 0/0 · parity PIN-TO-PIN · code_audit CLEAN.

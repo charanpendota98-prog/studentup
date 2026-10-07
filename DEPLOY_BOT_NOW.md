@@ -148,3 +148,13 @@ python run.py --check-wp          # WordPress సమస్యా?
 tail -50 log/cron.log             # చివరి run లో ఏమైంది
 ```
 ఈ commands output ని నాకు paste చేయండి — సరిగ్గా అదే సరిచేస్తాను.
+
+## ⭐ ఒకే command తో full setup (v222)
+
+```bash
+python run.py --go-live          # preview, ఏమీ మార్చదు
+python run.py --go-live --apply  # నిజంగా setup
+```
+
+8 steps: deploy-check · AI keys · WP connection · 20 categories · site settings/menus/SEO · IndexNow · AdSense readiness · production audit.
+Report: `output/go-live-report.md`. పూర్తి వరుస కోసం `SETUP_PERFECT.md`.
