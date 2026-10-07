@@ -67,7 +67,7 @@ python run.py --go-live            # ముందు preview — ఏమీ మ�
 python run.py --go-live --apply    # ఇప్పుడు నిజంగా setup
 ```
 
-ఇది 8 పనులు ఒకేసారి చేస్తుంది:
+ఇది **10 పనులు** ఒకేసారి చేస్తుంది:
 
 | # | Step | ఏమి చేస్తుంది |
 |---|---|---|
@@ -77,8 +77,10 @@ python run.py --go-live --apply    # ఇప్పుడు నిజంగా se
 | 4 | Categories | **20 pillars** create (TS/AP/Central jobs, Results, Hall Tickets, Scholarships, **Govt Schemes**, **District News** …) |
 | 5 | Site setup | search-engine visibility, permalinks, sitemap, **footer policy menu**, category SEO |
 | 6 | IndexNow | instant indexing key |
-| 7 | AdSense readiness | 29-point technical checklist |
-| 8 | Production audit | safety + revenue gates |
+| 7 | **Theme options auto-config** | `.env` లోని GA4 ID · GSC/Bing verify · AdSense client+slots · consent CMP — అన్నీ site లోకి **automatic push** |
+| 8 | **Search Console sitemaps** | service account ఉంటే sitemap **auto submit** |
+| 9 | AdSense readiness | 29-point technical checklist |
+| 10 | Production audit | safety + revenue gates |
 
 చివరగా scorecard + **"మీరు చేయాల్సినవి"** list + `output/go-live-report.md`.
 
@@ -111,6 +113,29 @@ sudo systemctl enable --now studentup-bot.timer
 | 9 PM | link-queue continue |
 | ప్రతి 5 ని. | Telegram approvals |
 | ఆదివారం 3 AM | site audit · media prune · dead-link scan |
+
+---
+
+## STEP 5.5 — ⭐ `.env` నింపితే మిగతావి కూడా automatic (v223)
+
+ఈ keys `.env` లో పెట్టి మళ్ళీ `python run.py --go-live --apply` అంటే చాలు — WP admin లోకి వెళ్ళక్కర్లేదు:
+
+```bash
+GA4_ENABLED=1
+GA4_MEASUREMENT_ID=G-XXXXXXX        # GA4 → site లో auto
+GSC_VERIFY_TOKEN=xxxxx              # Search Console meta tag auto
+BING_VERIFY_TOKEN=xxxxx
+GSC_SERVICE_ACCOUNT_FILE=gsc-sa.json  # sitemap auto submit
+ADSENSE_CLIENT_ID=ca-pub-xxxxxxxx
+ADSENSE_APPROVED=1                  # approve అయ్యాక
+ADSENSE_SLOT_SIDEBAR=1234567890     # 10 slots ఉన్నాయి
+ADSENSE_SLOT_MID=...                # slots పెడితే Auto ads తనే OFF అవుతుంది
+CONSENT_CMP_ID=xxxx                 # EEA/UK consent
+CLOUDFLARE_API_TOKEN=... 
+CLOUDFLARE_ZONE_ID=...              # deploy తర్వాత cache auto purge
+```
+
+`--go-live` చివర్లో వచ్చే "మీరు చేయాల్సినవి" list **dynamic** — ఏ key పెడితే ఆ item list నుంచి పోతుంది. అన్నీ నింపితే **మిగిలేది ఒక్కటే: theme zip upload + Activate** (WordPress core లో theme-install REST endpoint లేదు — అది code చేయలేదు).
 
 ---
 

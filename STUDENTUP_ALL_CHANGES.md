@@ -694,3 +694,18 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 - `DEPLOY_BOT_NOW.md` + `README.md` లో v222 section.
 - **`tests/v222_test.py` (new, suite #151)** — step shape, failure isolation, preview-mode skip, CLI+docs wiring.
 - Gates: **151/151 suites** · php_lint 100/100 · theme_audit 0/0 · parity PIN-TO-PIN · code_audit CLEAN.
+
+## v223 — auto-config: owner పనులు code లోకి (2026-10-08)
+
+"అన్నీ fix చేయలేవు" — సరే, చేసి చూపించాం. v222 లో owner-only అని చెప్పిన 8 items లో **7 ఇప్పుడు automatic**.
+
+- **`autoblog/auto_config.py` (new)** — `.env` → WordPress theme options direct push (theme లో ఇప్పటికే ఉన్న `studentup/v1/theme-data` REST endpoint ద్వారా):
+  `ga4_id` · `gsc_verify` · `bing_verify` · `adsense_client` · `adsense_approved` · 10 × `adsense_slot_*` · `consent_mode/regions/cmp_id` · `indexnow_key` · socials · contact.
+  **Slot IDs ఉంటే Auto ads తనే OFF** (manual slots = better layout + revenue control). Approval లేకపోతే `adsense_approved=0` — ads emit అవ్వవు.
+- **Search Console sitemap auto-submit** — service account RS256 JWT (webmasters write scope, `indexing.py` signer reuse), `sitemap.xml` + `news-sitemap.xml`.
+- **Cloudflare cache auto-purge** after apply.
+- **`--go-live` ఇప్పుడు 10 steps** (7 = auto-config, 8 = sitemaps).
+- **Owner TODO ఇప్పుడు dynamic** — `.env` లో value వస్తే ఆ item list నుంచి పోతుంది. `.env` పూర్తిగా నింపితే **10 → 1** (మిగిలేది theme zip upload, WP core లో REST endpoint లేదు). ప్రతి item కి "ఎందుకు code చేయలేదు" explanation ఉంది.
+- `.env.example` లో 20+ కొత్త keys; `SETUP_PERFECT.md` లో STEP 5.5.
+- **`tests/v223_test.py` (new, suite #152)** — 16 checks: option mapping, auto-ads-off rule, approval gate, "ఖాళీ .env → ఏదీ invent చేయదు", preview vs apply, owner-list shrink, go_live wiring, docs.
+- Gates: **152/152 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 4 warn / 0 fail.
