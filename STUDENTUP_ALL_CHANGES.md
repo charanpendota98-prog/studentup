@@ -747,3 +747,25 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 - Phone ≤600px: **44px tap targets**, font చిన్నది చేసి fit చేయడం లేదు (చదవలేరు) — gaps తగ్గిస్తాం. ≤360px overflow guard.
 - **`tests/v225_test.py` (new, suite #154)** — clamp() maths ని నిజంగా లెక్కిస్తుంది: ప్రతి step phone < laptop, smooth (jump లేదు), phone లో ≥14px, browser font 16→20px పెంచితే text పెరుగుతుంది, core surfaces అన్నీ scale వాడుతున్నాయి, H1 ఇంక 29px కాదు, critical లో inline ఉంది + cap కింద.
 - Gates: **154/154 suites** · php_lint 100/100 · theme_audit 0/0 · deep audit 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v226 — 42-item launch checklist: audit + 4 నిజమైన bugs fix (theme 1.9.51)
+
+Owner ఒక 42-item website launch checklist ఇచ్చారు. ప్రతి item ని theme + config కి **నిజంగా** audit చేశాను (file grep + config value — "ఉంది అనుకుంటా" కాదు).
+
+**Result: 27 code లో done · 7 `.env` లో key పెడితే ON · 8 owner · 0 missing.**
+
+Audit లో **4 నిజమైన bugs** దొరికాయి — అన్నీ fix (`inc/measure.php` new):
+
+| # | ఏం తప్పు ఉండేది | ఇప్పుడు |
+|---|---|---|
+| **6** | `ga4_id` option ఉండేది కానీ **GA4 tag అసలు emit అవ్వలేదు** — కేవలం preconnect hint. Analytics ఎప్పుడూ పని చేయలేదు. | నిజమైన gtag, `G-XXXX` format validate చేసి |
+| **7** | lead events అసలు లేవు | call · WhatsApp · email · telegram · apply · form_submit · site_search · read_75% |
+| **8** | Microsoft Clarity లేదు | `clarity_id` option → heatmaps + session recordings |
+| **19** | LocalBusiness schema లేదు | Internet Center phone/address ఉంటే emit; **లేకపోతే emit కాదు** — Google కి అబద్ధం చెప్పం |
+
+- Guards: GA4/Clarity id లేకపోతే **ఒక్క byte కూడా** emit కాదు (speed). `gtag` లేకపోయినా lead script crash కాదు. ids regex validate (injection impossible).
+- కొత్త options: `clarity_id` · `ic_name/phone/address/city/hours/logo` — `auto_config` ద్వారా `.env` నుంచి auto-push.
+- **`autoblog/launch42.py` (new)** — `python run.py --launch-check`. `--go-live` ఇప్పుడు **11 steps**.
+- **`tests/v226_test.py` (new, suite #155)** — 30 checks: 4 fixes verify, guards, 42 items exactly, numbers 1–42 unique, 0 missing, OWNER items honest, CLI + go_live + docs wiring.
+- Report: `LAUNCH_42_CHECK.md` (repo root) + `output/launch-42-check.md`.
+- Gates: **155/155 suites** · php_lint 101/101 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 0 fail.
