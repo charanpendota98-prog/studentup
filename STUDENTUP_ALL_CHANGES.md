@@ -790,3 +790,24 @@ v226 audit లో 8 items "owner పని" అని వదిలేశాన�
 - **`tests/v227_test.py` (new, suite #156)** — 35 checks: 5 shortcodes, ప్రతి దానికి empty-data guard, schema honesty (stars clamp, half-filled row skip), map lazy-load, thank-you auto-create + noindex + event, options registered, CSS fluid-only, auditor counts.
 - **42-item status ఇప్పుడు: 28 code · 12 `.env` key · 2 owner · 0 missing.**
 - Gates: **156/156 suites** · php_lint 103/103 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v228 — multi-link intake: 4 నిజమైన bugs fix
+
+Owner: *"different different links ఒకేసారి ఇచ్చినా separate గా perfect draft చేయాలి."* ఊహించకుండా **నిజంగా test చేశాను** — 4 bugs దొరికాయి:
+
+| Bug | ఏం జరిగేది |
+|---|---|
+| **1** | `URL \| Label` (ఒకే line) format support లేదు → **label పోయేది**. Owner WhatsApp/Excel నుంచి paste చేసే అత్యంత సహజమైన format ఇదే. |
+| **2** | cluster signature URL **path** ని చూసేది కాదు (host మాత్రమే) → label లేని links అన్నీ separate clusters |
+| **3** | label లో **"2026" (year)** ని vacancy count signal గా తీసుకునేది → సంబంధం లేని notifications తప్పుగా ఒకే draft గా merge |
+| **4** | **"Group 2" vs "Group 4"** రెండింటికీ `group` token share → తప్పు merge |
+
+**ఇప్పుడు:**
+- Label formats: `URL \| Label` · `URL - Label` · `URL — Label` · `Label \| URL` · markdown · ముందు line · label లేకపోతే URL path నుంచి topic.
+- **Page families** — ఒకే recruitment అయినా **వేరు వేరు article** అవ్వాల్సినవి separate: notification + apply online = **1 draft** (duplicate లేదు); **hall ticket · result · answer key · syllabus · counselling** = **వేరు వేరు drafts** (ప్రతిదానికీ separate search demand).
+- Exam series: Group 2 ≠ Group 4, Group D ≠ Group C.
+- Year ఇక merge signal కాదు; నిజమైన vacancy count (310, 783) మాత్రమే.
+
+**`tests/v228_test.py` (new, suite #157)** — 29 checks, ప్రతి bug కి regression lock: 6 label formats, 6 వేరు links → 6 drafts, year/series false-merge guards, correct merge, 8 page-family classifications, raw-URL clustering, "ఒక్క link కూడా పోలేదు", order preserve, dry-run nothing created.
+
+Gates: **157/157 suites** · php_lint 103/103 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN.
