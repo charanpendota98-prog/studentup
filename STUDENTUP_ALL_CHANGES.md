@@ -724,3 +724,26 @@ Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP li
 - **`tests/v224_test.py` (new, suite #153)** — 18 checks: CSV format + ctr_boost compatibility, CTR maths, "good CTR → fake opportunity లేదు", striking window, ₹ range, step isolation, preview ఏదీ apply చేయదు, data లేకపోతే crash కాదు, CLI + weekly hook + docs.
 - Honest: ₹ అంకె estimate (promise కాదు); titles bot తనే rewrite చేయదు — suggestions మాత్రమే.
 - Gates: **153/153 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 0 fail.
+
+## v225 — fluid type system: phone ↔ laptop లో text నిజంగా మారుతుంది (theme 1.9.50)
+
+**Owner:** "text sizes and theme phone and laptop కి తగ్గట్టుగా మారిపోవాలి, అసలు మారట్లేదు."
+
+**Root cause దొరికింది:** `style.css` లో core UI font-size లు **fixed px** — `.nav a` 13px, `.article-head h1` **29px**, `.news h2` 16.5px, `.logo .brand` 20px, cards, chips, meta. worldclass.css లో కొన్ని చోట్ల clamp() ఉంది కానీ **core surfaces లో లేదు**. అందుకే phone లో చూసినా laptop లో చూసినా ఒకటే size.
+
+**Fix — ఒకే fluid scale (source of truth `style.css` `:root`):**
+`clamp(min, rem + vw, max)` — **rem** వల్ల browser/phone font-size setting (accessibility zoom) గౌరవించబడుతుంది, **vw** వల్ల screen width కి మారుతుంది. 8 steps: `--fs-2xs … --fs-2xl` + `--lh-*`.
+
+| element | 360px phone | 1440px laptop |
+|---|---|---|
+| article H1 | 22.0px | **33.0px** |
+| body text | 14.5px | **17.0px** |
+| section head | 19.0px | **26.0px** |
+| card title | 15.0px | **18.0px** |
+| chip / meta | 11.0px | **13.0px** |
+
+- Overrides stack చేయలేదు — **original declarations నే** `var(--fs-*)` కి మార్చాను (22 surfaces). అందుకే critical inline CSS cap (60,000 B) కింద ఉంది: **59,418 B**.
+- Laptop ≥1080px: **74ch reading column** + 1.8 leading. ≥1600px: scale ఇంకా పెద్దది + wrap 1320px.
+- Phone ≤600px: **44px tap targets**, font చిన్నది చేసి fit చేయడం లేదు (చదవలేరు) — gaps తగ్గిస్తాం. ≤360px overflow guard.
+- **`tests/v225_test.py` (new, suite #154)** — clamp() maths ని నిజంగా లెక్కిస్తుంది: ప్రతి step phone < laptop, smooth (jump లేదు), phone లో ≥14px, browser font 16→20px పెంచితే text పెరుగుతుంది, core surfaces అన్నీ scale వాడుతున్నాయి, H1 ఇంక 29px కాదు, critical లో inline ఉంది + cap కింద.
+- Gates: **154/154 suites** · php_lint 100/100 · theme_audit 0/0 · deep audit 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.
