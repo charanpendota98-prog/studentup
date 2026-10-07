@@ -1,0 +1,28 @@
+# Okka command deploy:  docker compose -f deploy/docker-compose.yml up -d
+# Logs: docker compose -f deploy/docker-compose.yml logs -f
+# Update: git pull && docker compose -f deploy/docker-compose.yml up -d --build
+#
+# v74: portal ledu → container lo bot loop matrame (ports levu).
+services:
+  studentup-bot:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: studentup-bot:latest
+    container_name: studentup-bot
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      STATE_PATH: "/data/state.db"
+      TZ: "Asia/Kolkata"
+    volumes:
+      - studentup-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,time,sys; p='/data/state.db'; sys.exit(0 if (os.path.exists(p) and time.time()-os.path.getmtime(p)<10800) else 1)"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+
+volumes:
+  studentup-data:

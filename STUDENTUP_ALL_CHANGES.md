@@ -811,3 +811,18 @@ Owner: *"different different links ఒకేసారి ఇచ్చినా s
 **`tests/v228_test.py` (new, suite #157)** — 29 checks, ప్రతి bug కి regression lock: 6 label formats, 6 వేరు links → 6 drafts, year/series false-merge guards, correct merge, 8 page-family classifications, raw-URL clustering, "ఒక్క link కూడా పోలేదు", order preserve, dry-run nothing created.
 
 Gates: **157/157 suites** · php_lint 103/103 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v229 — ఫోన్ menu: MAIN MENU + overlap bug fix
+
+మీరు పంపిన screenshot లో రెండు సమస్యలు: breaking-news timestamps పక్క headline మీద పడుతున్నాయి, "Explore Categories" కింద **ఖాళీ పట్టీలు**.
+
+**అసలు కారణం (guess కాదు):** `.mpanel` ఒక `display:flex; flex-direction:column` container. Flex items కి default `flex-shrink:1` — content panel కన్నా పెద్దది అయినప్పుడు browser ప్రతి row ని **నొక్కేసింది**. 2-line headline 44px లోకి compress అయ్యి text overflow → **overlap**; `<details>` groups దాదాపు 0px → **ఖాళీ గడ్డలు**. Scroll ఉంది కానీ shrink దాని కన్నా ముందు జరుగుతుంది.
+**Fix:** `.mpanel > *{ flex:0 0 auto }` + `.mpanel a{ height:auto }`.
+
+**కొత్త MAIN MENU** — menu తెరవగానే మొదటి block, మీరు అడిగిన **11 destinations** సరిగ్గా అదే order లో: **Home · TS Govt Jobs · AP Govt Jobs · Central Jobs · Walk-in Jobs · Software Jobs · Private Jobs · Hall Tickets · Results · Breaking News · Daily Quiz**. ప్రతి row కి icon + ఒక line hint (ఉదా. "TSPSC · Police · Gurukul") + chevron, **52px tap target**, dark mode, long hint ఉంటే ellipsis. Breaking headlines ఇప్పుడు దీని కింద.
+
+కొత్త file `inc/mobile-menu.php` → `studentup_mobile_main_menu()`. **Golden rule:** ఆ category site లో లేకపోతే ఆ row render కాదు — ఖాళీ archive కి link ఇవ్వం. Home / Breaking News / Daily Quiz ఎప్పుడూ ఉంటాయి.
+
+`tests/v229_test.py` (suite #158) — 33 checks: shrink fix, 11 items + order, breaking కన్నా ముందు ఉందా, escape, hard-px లేదు, dark mode, preview parity.
+
+Theme **1.9.53** · Gates: **158/158 suites** · php_lint 104/104 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · visual 100/100.

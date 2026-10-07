@@ -1,0 +1,34 @@
+
+# python
+# secrets & local data
+# v39 exam portal (runtime data + auto-generated admin key)
+*.pyc
+.env
+.venv/
+__pycache__/
+adsense_kit.json
+design_kit.json
+images/
+log/
+logs/
+logs
+output/
+output
+quiz_kit.json
+service_center.db
+service_center.db-journal
+service_center.json
+sources_queue.txt
+state.db
+state.db-journal
+tests/runtime/node_modules/
+venv/
+ads/rotation.json
+
+# v57: ad advisor runtime state (traffic + milestones)
+logs/
+
+# v91: root-level npm install (jsdom/php-parser for tests) — runtime only
+/node_modules/
+# v163: VAPID private key — eppudu commit cheyyakudadu
+push_keys.json

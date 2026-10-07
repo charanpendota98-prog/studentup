@@ -1,0 +1,34 @@
+# Caddy = automatic HTTPS (Let's Encrypt) — StudentUp static site ki simplest + safest.
+# Install: sudo apt install caddy && sudo cp deploy/Caddyfile /etc/caddy/Caddyfile
+#          (domain ni mee domain ki marchandi) && sudo systemctl reload caddy
+#
+# v74: portal ledu → reverse proxy ledu. Ee file `preview/` static site ni
+# serve chestundi (WordPress vadithe Caddy avasaram ledu — host WP ni point cheyandi).
+# Privacy: HSTS + nosniff + no-referrer.
+#
+# Static root: /opt/studentup/preview  (git pull tarvata auto-update avutundi)
+
+studentup.in {
+	encode gzip zstd
+
+	root * /opt/studentup/preview
+
+	# Versioned/static assets can be cached aggressively; HTML stays fresh so
+	# new jobs/results appear immediately after a deploy.
+	@static_assets path *.css *.js *.webp *.avif *.jpg *.jpeg *.png *.svg *.ico *.woff2
+	header @static_assets Cache-Control "public, max-age=604800"
+	file_server
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+
+	log {
+		output file /var/log/caddy/studentup.log
+		format json
+	}
+}
