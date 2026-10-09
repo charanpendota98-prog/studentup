@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="StudentUp home page — laptop and phone views side by side (v236 build).">
+<title>StudentUp home — laptop + phone view</title>
+<style>
+  :root{--bg:#0b1324;--card:#111c33;--line:rgba(255,255,255,.12);--ink:#e8eefc;--muted:#9fb0cc;--blue:#60a5fa}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 500px at 10% -10%,rgba(99,102,241,.25),transparent 60%),var(--bg);
+    color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:22px 16px 60px}
+  header{max-width:1400px;margin:0 auto 18px}
+  h1{font-size:19px;margin:0 0 4px;letter-spacing:-.3px}
+  p.sub{margin:0;color:var(--muted);font-size:13.5px}
+  .grid{max-width:1400px;margin:0 auto;display:grid;gap:22px;grid-template-columns:1fr}
+  @media (min-width:1150px){.grid{grid-template-columns:minmax(0,1fr) 430px}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .panel h2{font-size:13px;margin:0 0 10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+  /* ---- laptop frame ---- */
+  .laptop{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#000}
+  .bar{display:flex;gap:6px;align-items:center;padding:8px 12px;background:#1b2740}
+  .bar i{width:10px;height:10px;border-radius:50%;background:#ef4444;display:block}
+  .bar i:nth-child(2){background:#f59e0b}.bar i:nth-child(3){background:#22c55e}
+  .bar span{margin-left:10px;font-size:11.5px;color:var(--muted)}
+  .laptop .vp{height:660px;overflow:hidden;background:#fff}
+  .laptop iframe{width:1440px;height:1320px;border:0;transform:scale(.5);transform-origin:0 0}
+  /* ---- phone frame ---- */
+  .phone{width:392px;max-width:100%;margin:0 auto;border:11px solid #0f1b30;border-radius:40px;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);overflow:hidden;background:#fff;position:relative}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:20px;
+    background:#0f1b30;border-radius:0 0 14px 14px;z-index:3}
+  .phone iframe{width:370px;height:760px;border:0;display:block}
+  .note{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .legend{max-width:1400px;margin:22px auto 0;display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .legend div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:13px}
+  .legend b{display:block;color:var(--blue);font-size:12px;margin-bottom:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>StudentUp home — laptop &amp; phone, side by side</h1>
+  <p class="sub">v236 build · rendu views okkesari. Phone frame lo rail ni pakkaki swipe cheyyandi; laptop lo arrows kanipistayi.</p>
+</header>
+
+<div class="grid">
+  <section class="panel">
+    <h2>Laptop · 1440px</h2>
+    <div class="laptop">
+      <div class="bar"><i></i><i></i><i></i><span>studentup.in</span></div>
+      <div class="vp"><iframe src="home-preview.html" title="StudentUp home on laptop" loading="lazy"></iframe></div>
+    </div>
+    <p class="note">50% scale lo chupistunnam — nijam laptop lo rendu rethulu pedda ga untundi.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Phone · 370px</h2>
+    <div class="phone">
+      <span class="notch"></span>
+      <iframe src="home-preview.html" title="StudentUp home on phone" loading="lazy"></iframe>
+    </div>
+    <p class="note">Actual phone width — scroll + swipe pani chestayi.</p>
+  </section>
+</div>
+
+<div class="legend">
+  <div><b>Hero</b> Pedda H1 teesesaam — search + icons mొదటి screen lo ne.</div>
+  <div><b>Icon rail</b> 10 sections, prathi dani ki veru icon + rangu, swipe/drag scroll.</div>
+  <div><b>Counts</b> Prathi card meeda post count + top 3 ki live dot — clicks penchutundi.</div>
+  <div><b>Laptop</b> 5-column grid + arrows, scroll avasaram ledu.</div>
+</div>
+</body>
+</html>

@@ -2772,10 +2772,10 @@ body.dark .su-cat .su-cat-ic{background:rgba(255,255,255,.08)!important;color:#9
 /* v234: hero lopala rail — cards eppudu tella (white) ga, hero navy meeda
    naukri la pop avvali; icons kotha dedicated set (city · badge · award ·
    code · globe) tho prathi section veru ga kanipistundi. */
-.su-hero .su-catwrap{color:inherit}
-.su-hero .su-catrail>a{background:#fff;border-color:rgba(15,23,42,.08);box-shadow:0 2px 10px rgba(7,26,54,.10)}
-.su-hero .su-catrail>a b{color:#0f2547}
-.su-hero .su-catrail>a small{color:#64748b}
+.su-catwrap{color:inherit}
+.su-catwrap .su-catrail>a{background:#fff;border-color:rgba(15,23,42,.08);box-shadow:0 2px 10px rgba(7,26,54,.10)}
+.su-catwrap .su-catrail>a b{color:#0f2547}
+.su-catwrap .su-catrail>a small{color:#64748b}
 .su-cat-ic svg{width:22px;height:22px;display:block}
 @media (max-width:360px){.su-catrail>a{width:92px;min-height:104px;padding:11px 6px 9px}
   .su-cat-ic{width:42px;height:42px}}
@@ -2821,7 +2821,7 @@ body.dark .su-cat .su-cat-ic{background:rgba(255,255,255,.08)!important;color:#9
 /* count pill — "ee section lo enni unnayo" oka chupulo */
 .su-cat-n{margin-top:5px;font-size:10px;font-weight:800;line-height:1;padding:3px 7px;border-radius:99px;
   background:rgba(15,23,42,.06);color:#475569;letter-spacing:.2px}
-.su-hero .su-cat:hover .su-cat-n{background:rgba(37,99,235,.12);color:#1d4ed8}
+.su-catwrap .su-cat:hover .su-cat-n{background:rgba(37,99,235,.12);color:#1d4ed8}
 body.dark .su-cat-n{background:rgba(255,255,255,.1);color:#cbd5e1}
 /* entry animation — rail okkasari light ga slide ai vastundi */
 @media (prefers-reduced-motion:no-preference){
@@ -2834,9 +2834,33 @@ body.dark .su-cat-n{background:rgba(255,255,255,.1);color:#cbd5e1}
   .su-catrail>a:nth-child(n+6){animation-delay:.17s}
 }
 @keyframes su-cat-in{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
-.su-hero .su-catrail>a:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(7,26,54,.22)}
+.su-catwrap .su-catrail>a:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(7,26,54,.22)}
 .su-catrail>a:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
 .su-catrail:focus-visible{outline:2px dashed rgba(147,197,253,.8);outline-offset:4px;border-radius:14px}
+
+/* ===================== v236 — clicks + revenue polish =====================
+   Owner: "high clicks ravali, highest revenue vachelaga, anni perfect ga."
+   · mొదటి 3 cards (TS · AP · Central = highest RPM sections) konchem pedda +
+     bold border → kallu akkade padatayi.
+   · "Today" live dot — kotha updates unnayi ani cheppe social proof.
+   · prathi card 100% tappable, 44px+ target, active feedback.
+   · laptop lo 5-column grid (10 okesari kakunda rendu rows — scan easy). */
+.su-cat.c1,.su-cat.c2,.su-cat.c3{width:112px}
+.su-cat.c1 b,.su-cat.c2 b,.su-cat.c3 b{font-size:13px}
+.su-catwrap .su-cat.c1,.su-catwrap .su-cat.c2,.su-catwrap .su-cat.c3{
+  border-color:rgba(37,99,235,.35);box-shadow:0 6px 18px rgba(37,99,235,.18)}
+.su-cat-n{position:relative}
+.su-cat.c1 .su-cat-n::before,.su-cat.c2 .su-cat-n::before,.su-cat.c3 .su-cat-n::before{
+  content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:#16a34a;
+  margin-right:5px;vertical-align:1px;animation:su-cat-live 1.8s ease-in-out infinite}
+@keyframes su-cat-live{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.su-cat .su-cat-n::before{animation:none}}
+.su-catrail>a{-webkit-tap-highlight-color:transparent}
+@media (min-width:1024px){
+  .su-catrail{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+  .su-cat.c1,.su-cat.c2,.su-cat.c3{width:auto}
+  .su-catrail>a{min-height:118px}
+}
 </style>
 <style>
 /* ==========================================================================
@@ -5417,7 +5441,7 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
 <div class="mbackdrop" id="mbackdrop" aria-hidden="true"></div>
 <div class="mpanel" id="mpanel" role="dialog" aria-label="Site navigation" aria-modal="true" aria-hidden="true">
   <div class="mpanel-head">
-    <div class="su-mbrand"><span class="mark">SU</span><span><strong>StudentUp</strong><small>Jobs · Results · Scholarships</small></span></div>
+    <div class="su-mbrand"><span class="mark">SU</span><span><strong>StudentUp</strong></span></div>
     <button type="button" id="mpanelclose" aria-label="Close menu"><svg class="su-uicon su-uicon-close" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-close"/></svg></button>
   </div>
   <form class="su-msearch" role="search" method="get" action="index.html">
@@ -5499,6 +5523,8 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
       </form>
       <div class="su-suggest-box" id="su-suggest-box" role="listbox" aria-label="Search suggestions" hidden></div>
     </div>
+
+
 
 
 
