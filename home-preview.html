@@ -2779,6 +2779,64 @@ body.dark .su-cat .su-cat-ic{background:rgba(255,255,255,.08)!important;color:#9
 .su-cat-ic svg{width:22px;height:22px;display:block}
 @media (max-width:360px){.su-catrail>a{width:92px;min-height:104px;padding:11px 6px 9px}
   .su-cat-ic{width:42px;height:42px}}
+
+/* ===================== v235 — rail ADVANCED pass ======================
+   Owner: "inka advanced ga vundali, 100% more". Add ayyinavi:
+   railbox (arrows + edge fade) · gradient icon chips + ring · count pill ·
+   scroll progress bar · drag cursor · staggered entry animation. */
+.su-railbox{position:relative}
+/* edge lo fade — "inka undi, laagandi" ani telustundi */
+.su-railbox::before,.su-railbox::after{content:"";position:absolute;top:0;bottom:10px;width:28px;
+  pointer-events:none;z-index:2;opacity:1;transition:opacity .18s ease}
+.su-railbox::before{left:-2px;background:linear-gradient(90deg,var(--hero-fade,#0b2447),transparent)}
+.su-railbox::after{right:-2px;background:linear-gradient(270deg,var(--hero-fade,#0b2447),transparent)}
+.su-catwrap.is-start .su-railbox::before,
+.su-catwrap.is-end .su-railbox::after,
+.su-catwrap.is-static .su-railbox::before,
+.su-catwrap.is-static .su-railbox::after{opacity:0}
+/* desktop arrows — phone lo avasaram ledu (swipe chalu) */
+.su-railnav{position:absolute;top:calc(50% - 12px);transform:translateY(-50%);z-index:3;display:none;
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:#0f2547;
+  cursor:pointer;place-items:center;box-shadow:0 6px 18px rgba(7,26,54,.18);transition:opacity .15s,transform .12s}
+.su-railnav--l{left:-8px}
+.su-railnav--r{right:-8px}
+.su-railnav--l svg{transform:rotate(180deg)}
+.su-railnav:hover{transform:translateY(-50%) scale(1.06)}
+.su-railnav[disabled]{opacity:0;pointer-events:none}
+@media (min-width:1024px) and (hover:hover){.su-railnav{display:grid}}
+/* progress bar — ekkada unnamo chinna line */
+.su-railbar{position:relative;height:3px;border-radius:99px;background:rgba(148,163,184,.3);overflow:hidden;margin:2px 2px 0}
+.su-railbar i{position:absolute;inset:0 auto 0 0;width:34%;border-radius:99px;
+  background:linear-gradient(90deg,#60a5fa,#6366f1);transition:transform .12s linear}
+.su-catwrap.is-static .su-railbar{display:none}
+/* drag cursor */
+.su-catrail{cursor:grab}
+.su-catrail.is-drag{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.su-catrail.is-drag a{pointer-events:none}
+/* icon chip — flat badulu soft gradient + ring (premium feel) */
+.su-cat-ic{position:relative;box-shadow:inset 0 0 0 1px rgba(15,23,42,.05)}
+.su-cat-ic::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.65),transparent 65%)}
+.su-cat-ic svg{position:relative;z-index:1}
+/* count pill — "ee section lo enni unnayo" oka chupulo */
+.su-cat-n{margin-top:5px;font-size:10px;font-weight:800;line-height:1;padding:3px 7px;border-radius:99px;
+  background:rgba(15,23,42,.06);color:#475569;letter-spacing:.2px}
+.su-hero .su-cat:hover .su-cat-n{background:rgba(37,99,235,.12);color:#1d4ed8}
+body.dark .su-cat-n{background:rgba(255,255,255,.1);color:#cbd5e1}
+/* entry animation — rail okkasari light ga slide ai vastundi */
+@media (prefers-reduced-motion:no-preference){
+  .su-catrail>a{animation:su-cat-in .38s cubic-bezier(.22,.9,.3,1) backwards}
+  .su-catrail>a:nth-child(1){animation-delay:.02s}
+  .su-catrail>a:nth-child(2){animation-delay:.05s}
+  .su-catrail>a:nth-child(3){animation-delay:.08s}
+  .su-catrail>a:nth-child(4){animation-delay:.11s}
+  .su-catrail>a:nth-child(5){animation-delay:.14s}
+  .su-catrail>a:nth-child(n+6){animation-delay:.17s}
+}
+@keyframes su-cat-in{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.su-hero .su-catrail>a:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(7,26,54,.22)}
+.su-catrail>a:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.su-catrail:focus-visible{outline:2px dashed rgba(147,197,253,.8);outline-offset:4px;border-radius:14px}
 </style>
 <style>
 /* ==========================================================================
@@ -5442,20 +5500,28 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
       <div class="su-suggest-box" id="su-suggest-box" role="listbox" aria-label="Search suggestions" hidden></div>
     </div>
 
-    <section class="su-catwrap" aria-label="Browse by section">
+
+
+
+    <section class="su-catwrap is-start" aria-label="Browse by section">
       <div class="su-cathead"><b>Browse by section</b><a class="su-viewall" href="index.html#jobs">All sections →</a></div>
-      <div class="su-catrail" role="list">
-        <a role="listitem" class="su-cat c1" href="../pages/ts-jobs-hub.html"><span class="su-cat-ic"><svg class="su-uicon su-uicon-bank" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-bank"/></svg></span><b>TS Govt Jobs</b><small>TSPSC · Police</small></a>
-        <a role="listitem" class="su-cat c2" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-city" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-city"/></svg></span><b>AP Govt Jobs</b><small>APPSC · DSC</small></a>
-        <a role="listitem" class="su-cat c3" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-flag" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-flag"/></svg></span><b>Central Jobs</b><small>SSC · UPSC · RRB</small></a>
-        <a role="listitem" class="su-cat c4" href="../pages/results-hub.html"><span class="su-cat-ic"><svg class="su-uicon su-uicon-badge" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-badge"/></svg></span><b>Hall Tickets</b><small>Admit cards</small></a>
-        <a role="listitem" class="su-cat c5" href="../pages/results-hub.html"><span class="su-cat-ic"><svg class="su-uicon su-uicon-award" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-award"/></svg></span><b>Results</b><small>Marks · cutoff</small></a>
-        <a role="listitem" class="su-cat c6" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-walk" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-walk"/></svg></span><b>Walk-in Jobs</b><small>This week</small></a>
-        <a role="listitem" class="su-cat c7" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-code" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-code"/></svg></span><b>Software Jobs</b><small>IT · fresher</small></a>
-        <a role="listitem" class="su-cat c8" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-trophy" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-trophy"/></svg></span><b>Success Stories</b><small>Verified journeys</small></a>
-        <a role="listitem" class="su-cat c9" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-work" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-work"/></svg></span><b>Private Jobs</b><small>Off-campus</small></a>
-        <a role="listitem" class="su-cat c10" href="index.html#jobs"><span class="su-cat-ic"><svg class="su-uicon su-uicon-globe" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-globe"/></svg></span><b>Current Affairs</b><small>Daily GK</small></a>
+      <div class="su-railbox">
+        <button class="su-railnav su-railnav--l" type="button" aria-label="Scroll left" tabindex="-1"><svg class="su-uicon su-uicon-chevron" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-chevron"/></svg></button>
+        <div class="su-catrail" role="list" tabindex="0" aria-label="Category shortcuts">
+          <a role="listitem" class="su-cat c1" href="../pages/ts-jobs-hub.html"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-bank" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-bank"/></svg></span><b>TS Govt Jobs</b><small>TSPSC · Police</small><span class="su-cat-n">128</span></a>
+          <a role="listitem" class="su-cat c2" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-city" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-city"/></svg></span><b>AP Govt Jobs</b><small>APPSC · DSC</small><span class="su-cat-n">96</span></a>
+          <a role="listitem" class="su-cat c3" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-flag" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-flag"/></svg></span><b>Central Jobs</b><small>SSC · UPSC · RRB</small><span class="su-cat-n">154</span></a>
+          <a role="listitem" class="su-cat c4" href="../pages/results-hub.html"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-badge" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-badge"/></svg></span><b>Hall Tickets</b><small>Admit cards</small><span class="su-cat-n">42</span></a>
+          <a role="listitem" class="su-cat c5" href="../pages/results-hub.html"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-award" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-award"/></svg></span><b>Results</b><small>Marks · cutoff</small><span class="su-cat-n">73</span></a>
+          <a role="listitem" class="su-cat c6" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-walk" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-walk"/></svg></span><b>Walk-in Jobs</b><small>This week</small><span class="su-cat-n">18</span></a>
+          <a role="listitem" class="su-cat c7" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-code" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-code"/></svg></span><b>Software Jobs</b><small>IT · fresher</small><span class="su-cat-n">61</span></a>
+          <a role="listitem" class="su-cat c8" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-trophy" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-trophy"/></svg></span><b>Success Stories</b><small>Verified journeys</small><span class="su-cat-n">24</span></a>
+          <a role="listitem" class="su-cat c9" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-work" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-work"/></svg></span><b>Private Jobs</b><small>Off-campus</small><span class="su-cat-n">87</span></a>
+          <a role="listitem" class="su-cat c10" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-globe" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-globe"/></svg></span><b>Current Affairs</b><small>Daily GK</small><span class="su-cat-n">210</span></a>
+        </div>
+        <button class="su-railnav su-railnav--r" type="button" aria-label="Scroll right" tabindex="-1"><svg class="su-uicon su-uicon-chevron" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-chevron"/></svg></button>
       </div>
+      <div class="su-railbar" aria-hidden="true"><i></i></div>
     </section>
 
     <div class="su-hero-acts">
@@ -6755,6 +6821,38 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
     });
   });
 })();
+</script>
+<script>/* v235 category rail — drag · arrows · progress */
+(function(){function initRail(box){var rail=box.querySelector(".su-catrail");
+if(!rail||rail.dataset.suRail==="1"){return;}rail.dataset.suRail="1";
+var prev=box.querySelector(".su-railnav--l"),next=box.querySelector(".su-railnav--r"),
+bar=box.querySelector(".su-railbar i"),soft=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function step(){return Math.max(160,Math.round(rail.clientWidth*0.8));}
+function go(d){rail.scrollBy({left:d*step(),behavior:soft?"smooth":"auto"});}
+function sync(){var max=rail.scrollWidth-rail.clientWidth,x=rail.scrollLeft,p=max>4?x/max:0;
+box.classList.toggle("is-start",x<=2);box.classList.toggle("is-end",x>=max-2);
+box.classList.toggle("is-static",max<=4);if(bar){bar.style.transform="translateX("+(p*100)+"%)";}
+if(prev){prev.disabled=x<=2;}if(next){next.disabled=x>=max-2;}}
+if(prev){prev.addEventListener("click",function(){go(-1);});}
+if(next){next.addEventListener("click",function(){go(1);});}
+rail.addEventListener("scroll",function(){window.requestAnimationFrame(sync);},{passive:true});
+window.addEventListener("resize",sync);
+rail.addEventListener("wheel",function(e){if(e.shiftKey&&e.deltaY){rail.scrollLeft+=e.deltaY;e.preventDefault();}},{passive:false});
+var down=false,sx=0,sl=0,moved=0;
+rail.addEventListener("pointerdown",function(e){if(e.pointerType==="touch"){return;}
+down=true;moved=0;sx=e.clientX;sl=rail.scrollLeft;rail.classList.add("is-drag");});
+rail.addEventListener("pointermove",function(e){if(!down){return;}var d=e.clientX-sx;
+moved=Math.max(moved,Math.abs(d));rail.scrollLeft=sl-d;if(moved>4){e.preventDefault();}});
+function up(){down=false;rail.classList.remove("is-drag");}
+rail.addEventListener("pointerup",up);rail.addEventListener("pointercancel",up);rail.addEventListener("pointerleave",up);
+rail.addEventListener("click",function(e){if(moved>6){e.preventDefault();e.stopPropagation();moved=0;}},true);
+rail.addEventListener("keydown",function(e){if(e.key==="ArrowRight"){go(1);e.preventDefault();}
+else if(e.key==="ArrowLeft"){go(-1);e.preventDefault();}
+else if(e.key==="Home"){rail.scrollTo({left:0,behavior:"smooth"});e.preventDefault();}
+else if(e.key==="End"){rail.scrollTo({left:rail.scrollWidth,behavior:"smooth"});e.preventDefault();}});
+sync();}
+function boot(){var l=document.querySelectorAll(".su-catwrap");for(var i=0;i<l.length;i++){initRail(l[i]);}}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",boot);}else{boot();}})();
 </script>
 </body>
 </html>
