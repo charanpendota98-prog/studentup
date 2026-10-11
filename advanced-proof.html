@@ -72,7 +72,15 @@ td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
   <li class="ok">API keys anni server-side .env lo; frontend lo oka key kuda ledu.</li>
 </ul>
 
-<h2>4. UI — laptop + phone</h2>
+<h2>4. Article enrichment — v247 (kotha)</h2>
+<ul>
+  <li class="ok">Prathi pedda article lo <b>rendu in-article images</b> — rendo di chivari section lo, vere alt tho, lazy + width/height (CLS 0). Chinna article ki add cheyyadu (spam vaddu).</li>
+  <li class="ok"><b>Summary table</b> — Organization · Notification no · Posts · Vacancies · Qualification · Age · Fee · Apply start/last date · Exam date · Official link. Mobile lo scroll chese table, dark mode support.</li>
+  <li class="ok"><b>Honesty guard:</b> facts 2 kanna takkuva unte table ne raayadu; "TBA / N/A / -" skip; date parse avvakapothe aa row ravadu; apply link http kaakapothe skip; anni values escape (XSS 0).</li>
+  <li class="ok">Rendu publish pipeline lo try/except tho — fail ayina post publish aagadu. Idempotent: re-run lo duplicate image/table raadu.</li>
+</ul>
+
+<h2>5. UI — laptop + phone</h2>
 <table>
   <tr><th>Item</th><th>Status</th></tr>
   <tr><td>Hero + "Search StudentUp" box, kinda category rail (horizontal scroll, prathi section ki separate icon)</td><td>✅</td></tr>
@@ -86,7 +94,7 @@ td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
 </table>
 <p class="mut">Laptop + phone rendu okkasaari choodali ante → <a href="devices-preview.html">Device lab</a>.</p>
 
-<h2>5. Inka migilindi (honest)</h2>
+<h2>6. Inka migilindi (honest)</h2>
 <ul>
   <li>🔑 38 items — mee keys/settings: theme upload + Run setup, GA4/Clarity ID, SSL, www redirect, Search Console + Bing verify, sitemap submit.</li>
   <li>👤 27 items — nijamaina phone lo test, backup restore drill, live PageSpeed (ee sandbox ki internet ledu).</li>
