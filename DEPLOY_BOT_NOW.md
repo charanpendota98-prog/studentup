@@ -63,7 +63,7 @@ v255 లో ఏమి ఫిక్స్ అయింది:
 Preview: Arena live-preview లో `/preview/v255/index.html` — **phone + laptop రెండింటిలో** open చేసి
 360px → 1440px వరకు చూడండి.
 
-sha256: `ecc1add5332136b4f1fe5b11a8c98519b7a56a7cf460823173b6e1d88fde5c14  studentup-theme-1.9.55.zip`
+sha256: `8a69070b1803b1c273ebe537e3e90819a2fd4388100891159e5e9d1913b9ef06  studentup-theme-1.9.55.zip`
 
 ---
 
@@ -174,7 +174,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-5d75018945f28618c0c44efaa38b1335a7ecdbf25bc926379bd2c27cc6ae35f7  studentup-bot-cron.zip
+76be399b81974b5214b7e2d7f2abb1ae751abe45b1446c707569ec801158bbaf  studentup-bot-cron.zip
 ```
 
 ---
