@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="StudentUp preview hub — home page, device lab and phone menu previews for theme 1.9.54.">
+<title>StudentUp — preview hub</title>
+<style>
+  :root{--bg:#070f1f;--panel:#101b31;--line:rgba(255,255,255,.12);--ink:#e9f0ff;--muted:#9db0cf;--blue:#60a5fa;--ok:#34d399}
+  *{box-sizing:border-box}
+  html,body{margin:0;max-width:100%;overflow-x:hidden}
+  body{background:radial-gradient(1100px 460px at 8% -12%,rgba(99,102,241,.3),transparent 60%),var(--bg);
+    color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    padding:26px 14px calc(40px + env(safe-area-inset-bottom))}
+  .wrap{max-width:900px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-weight:800;
+    background:linear-gradient(135deg,#60a5fa,#6366f1);color:#061227}
+  h1{font-size:20px;margin:0;letter-spacing:-.3px}
+  .sub{margin:2px 0 20px;color:var(--muted);font-size:13.5px}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;color:var(--ok);
+    background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);padding:3px 9px;border-radius:999px}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr}
+  @media (min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
+    border:1px solid var(--line);border-radius:16px;padding:16px 17px;transition:.15s}
+  a.card:hover{border-color:var(--blue);transform:translateY(-2px)}
+  a.card b{display:block;font-size:15.5px;margin-bottom:4px}
+  a.card small{color:var(--muted);font-size:12.5px;display:block;line-height:1.45}
+  a.card .go{margin-top:9px;display:inline-block;font-size:12.5px;font-weight:700;color:var(--blue)}
+  .full{grid-column:1/-1}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin:24px 0 9px}
+  ul.docs{list-style:none;margin:0;padding:0;display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  ul.docs a{display:block;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:11px;
+    padding:10px 12px;color:var(--ink);text-decoration:none;font-size:13px}
+  ul.docs a:hover{border-color:var(--blue)}
+  ul.docs span{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  footer{margin-top:26px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="mark">SU</span><h1>StudentUp — preview hub</h1></div>
+  <p class="sub"><span class="pill">theme 1.9.54 · 168/168 tests green · readiness 100/100</span><br>Ekkada nunchi start cheyyalo ikkade — file list kaadu. <b>Ivi anni mana internal preview matrame — live site lo (studentup.in) ivi raavu.</b></p>
+
+  <div class="grid">
+    <a class="card full" href="go-live-today.html">
+      <b>🚀 GO LIVE TODAY — ikkada nunchi start cheyandi</b>
+      <span>9 steps · theme upload → options → bot .env → 5 drafts review → GSC → cron. Tick pettukuntu vellandi.</span>
+      <span class="go">Open runbook →</span>
+    </a>
+    <a class="card full" href="devices-preview.html">
+      <b>📱💻 Device lab — phone + laptop okkesari</b>
+      <small>360 · 390 · 768 · 1280 · 1440 widths lo home page. Button nokkithe aa screen size ki marutundi.</small>
+      <span class="go">Open device lab →</span>
+    </a>
+
+    <a class="card" href="home-preview.html">
+      <b>🏠 Home page</b>
+      <small>Hero + search kinda icon rail (10 sections + Daily Quiz), swipe scroll, counts, Breaking News.</small>
+      <span class="go">Open home →</span>
+    </a>
+
+    <a class="card" href="menu-preview.html">
+      <b>☰ Phone menu (drawer)</b>
+      <small>Mobile navigation drawer — sections, breaking news, search, social rows.</small>
+      <span class="go">Open menu →</span>
+    </a>
+  </div>
+
+  <h2>Documents</h2>
+  <ul class="docs">
+    <li><a href="DEPLOY_NOW.md">🚀 DEPLOY_NOW.md<span>Zip upload → activate → verify steps</span></a></li>
+    <li><a href="LAUNCH_42.md">✅ LAUNCH_42.md<span>42-item launch checklist status</span></a></li>
+    <li><a href="advanced-proof.html">🚀 advanced-proof.html<span>Advanced proof — thumbnails, bot sources, UI evidence</span></a></li>
+    <li><a href="source-health.html">📡 source-health.html<span>326 bot sources — tier, category, live hits</span></a></li>
+    <li><a href="MASTER_265.md">🧾 MASTER_265.md<span>265-item master checklist — 187 ✅ · 38 🔑 · 27 👤 · 13 ➖ · 0 ❌</span></a></li>
+    <li><a href="LAUNCH_42_PROOF.md">🔍 LAUNCH_42_PROOF.md<span>Prathi claim ki audit output</span></a></li>
+    <li><a href="BUILD_REPORT.md">🏗️ BUILD_REPORT.md<span>Clean build + anni gates</span></a></li>
+  </ul>
+
+  <footer>Preview server turn madhyalo aagipothundi — malli kavalante "run the server" ani cheppandi.</footer>
+</div>
+</body>
+</html>

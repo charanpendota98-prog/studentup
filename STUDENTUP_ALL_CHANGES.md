@@ -485,3 +485,344 @@ a88bde2  .gitignore for scratch folders
 d9ebc87  Social rail fix, outline bug fix, hero simplify, breaking block remove, jobs table
 be14491  ← ORIGINAL upload (BEFORE state — patch baseline)
 ```
+
+---
+
+## v213 (theme 1.9.43) — "phone lo menu ravatledu · icons ravatledu · ivi vaddu · neat ga undali"
+
+| # | Mee feedback | Em chesano | File(s) |
+|---|---|---|---|
+| 22 | **Phone lo icons ravatledu** | Root cause: icons `<svg><use href="#su-i-x">` ga sprite reference tho render ayyevi (v180 byte-saving). Aa sprite `wp_body_open` lo inject avutundi — old Android WebView / in-app browsers (FB · Insta · kontha caching+optimizer plugins) lo `<use>` resolve avvadu → **khali boxes**. Ippudu prathi icon **self-contained inline SVG** (`viewBox` + `path`) — sprite lekapoyina, hook aagipoyina, fragment cache nunchi vachina icon **eppudu** kanipistundi. UI icons + social icons rendu. | `inc/icons.php`, `inc/options.php` |
+| 23 | **Phone lo menu ravatledu** | Rendu guards: (a) **JS isolation** — mundu `wireDesktop()` lo error vaste `wireMobile()` (drawer wiring) assalu run ayyedi kaadu; ippudu prathi block `safe()` lo, okati fail ayina menu pani chestundi. (b) **Open-time hardening** — drawer open ayinappudu panel + backdrop ni `document.body` ki direct child ga move chesi inline `position:fixed · z-index:2147483000 · transform:none · visibility:visible` set chestunnam → ఏ plugin/ad/dock z-index war ayina drawer paina ne untundi. CSS lo kuda `.mpanel/.mbackdrop` z-index + `.menubtn{display:grid!important;min 42px}` phone lo lock chesano. | `assets/js/studentup-menu.js`, `assets/css/worldclass.css` §28.1 |
+| 24 | **Save · Compare · Print/PDF ivi ravoddu** | Article headline kinda unna 3-button utility row **full ga teesesam** (phone lo clutter). Saved rail, compare page, browser print — anni inka pani chestunnayi, article lo matrame kanipinchavu. Legacy CSS ki `display:none` guard kuda. | `single.php`, `assets/css/worldclass.css` §28.2 |
+| 25 | **"Blocksy: Search Block" text ravoddu** | Content lo migilipoyina inactive-plugin block placeholder. Kotha render-time hygiene filter: blocksy/ct-search wrappers + `"… Blocksy: … Block"` placeholder text + aa tarvata migiలే **empty `<p>`/heading shells** strip. DB content ni touch cheyyadu. | `inc/contentclean.php` (kotha), `functions.php` |
+| 26 | **"SPONSORED MEDIA ▶ … available soon" — space waste** | Real AdSense video slot configure cheyyakapothe ippudu **emi render avvadu** (khali 200px box + CLS pothundi). Slot unte matrame ad vastundi. | `inc/videoplayer.php` |
+| 27 | **Article blocks chala neat ga undali (phone + laptop)** | Sponsor box · Age calculator · Fee calculator · Syllabus tracker — **okate design rhythm**: 16px margins, 14px radius, compact padding, fluid `clamp()` titles/desc, **≤620px lo single-column fields**, anni inputs/buttons **44–46px tap height**, full-width CTA phone lo · auto-width laptop lo. Share row · tags · status-card buttons kuda neat wrap grid. Article typography fluid (`h2/h3/p` clamp), tables/images/iframes eppudu overflow avvavu, `overflow-x:clip` tho horizontal slip zero. | `assets/css/worldclass.css` §28.3–28.5 |
+
+**Quality gates:** theme audit `errors 0 · warnings 0` · deep audit **31/31 pass** · PHP lint **100/100 OK** · minify + critical CSS regenerated · theme zip **139 files · 947 KB**.
+
+**Deliverables:** `studentup-theme.zip` (repo root — WP Admin → Appearance → Themes → Upload → Activate) · project zip updated.
+
+---
+
+## v214 (theme 1.9.44) — "anni fix cheyu · chala chala neat ga best ga undali"
+
+**Asalu problem em ani kanukkunano:** okka page lo **8 vere designs** unnayi — prathi block ki vere radius (10/12/16/18px), vere padding, vere loud gradient (violet · pink · amber · green · blue), vere title size. Content manchide, kaani kalisi chuste "clumsy / text ichinattu" ga kanipinchedi. Ippudu **okate design system**:
+
+| Layer | Mundu | Ippudu |
+|---|---|---|
+| Card shell | 4 vere radius · 3 vere shadow | **okate**: radius 16 · 1px line · soft shadow · left 4px colour accent (block identity aa accent tho matrame) |
+| Background | multi-colour gradients (violet→pink, amber→orange…) | calm **card surface** + accent bar — Eenadu/pro news feel; dark mode parity |
+| Rhythm | 14/18/20/22/24/26px random margins | **18px phone · 24px laptop** — prathi block madhya okate gap |
+| Titles | 15/17/18/19/20px hard sizes | **`clamp()` fluid** — 360px phone nunchi 1440px laptop varaku perfect |
+| Buttons | 32–40px, kontha chinnavi | **44–48px tap** everywhere · phone lo full-width · laptop lo auto |
+
+**Block-by-block neat pass:** Internet Center (steps ippudu **numbered cards**, perks **chips**, CTA grid — phone 1 column · laptop WhatsApp+Call+Email okate row, equal height) · Join/WhatsApp-Telegram card (equal 48px CTAs, laptop lo copy↔CTA clean split) · Community card · Quick Summary · FAQ (46px rows) · Key Facts tiles (equal height) · Related posts (**phone 1 col → tablet 2×2 → laptop 4**) · prev/next post nav (2-col laptop) · helpful box · **print stylesheet** (print chesinappudu ads/CTAs/menu raavu — article + syllabus matrame).
+
+**Quality gates:** theme audit `0 errors · 0 warnings` · deep audit **31/31** · PHP lint **100/100** · visual check (phone 390px + laptop 1440px) **score 100/100 · 0 warn · 0 fail** (tap targets ≥44px · contrast AA · single H1 · CLS-safe · ad density policy-safe) · critical CSS + min CSS regenerated · zip **139 files · 950 KB**.
+
+---
+
+## v215 (theme 1.9.45) — "inka chala mistakes · clear text · top blogger website · Google love cheyali"
+
+### 1) Blog kinda unna **CTA chaos** — asalu pedda clumsiness
+Mundu article mugisaka **4 WhatsApp CTAs vరుసగా** vachevi: Community card (WA+TG) → Status card (WA) → Share row (WA/TG/X) → footer Join block (WA+TG). Reader ki "spam" feel, Google ki "content kanna CTA ekkuva" signal.
+
+**Ippudu top-blogger reading order:** content → **Share** → **Tags** → related internal links (recirculation) → **okka** community CTA → status card → author → trust → prev/next → related grid (ఇవి కూడా చూడండి) → comments. Single posts lo duplicate footer Join block **auto-skip** (home/archive/pages lo mamulu ga untundi).
+
+### 2) **CLEAR TEXT engine** (§30 — reading experience ki okate authority)
+| | Mundu | Ippudu |
+|---|---|---|
+| Body | 14.5–18px mixed, 1.75 | **16.75px phone · 18px laptop · 1.85 leading** |
+| Measure | full width (line చాలా podugu — kallu line miss ayyevi) | **72ch max** — top blogger standard |
+| Telugu | English line-height ne (glyphs taller → gummi) | **1.95 leading** Telugu paragraphs ki |
+| H2/H3 | flat sizes, weak hierarchy | fluid `clamp()` + 800/750 weight + **sanna blue accent bar** H2 paina (section breaks clear) |
+| Lists | tight | .42em spacing, 1.8 leading, **coloured markers** |
+| Links | plain underline | 1.5px underline, 3px offset, hover lo darker — visible kaani loud kaadu |
+| Tables | plain borders, phone lo padutundi | **rounded card · uppercase header · zebra rows · phone lo smooth scroll** |
+| Quotes / images / captions | inconsistent | accent quote, 12px radius images, centered 12.5px captions |
+| Phone | cramped edges | 14px edge padding, H1 `clamp(21→27px)`, meta 11.5px — breathing room |
+
+### 3) **Google / Core Web Vitals**
+* Below-fold blocks (CTA · FAQ · syllabus · related · author · comments) ippudu **inline critical CSS nunchi bayata** → single page inline CSS **60.2 KB (cap fail) → 55.9 KB**, LCP paint ki takkuva bytes.
+* `content-visibility:auto` + `contain-intrinsic-size` heavy below-fold sections ki — scroll ki mundu render cost zero, CLS ledu.
+* `text-wrap:pretty` (orphan words), print stylesheet, image/table overflow guards.
+* Schema · sitemaps · breadcrumbs · author profile · FAQ rich results — anni alage pani chestunnayi (deep audit 31/31).
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check phone 390 + laptop 1440 **100/100 (0 warn · 0 fail)** · CWV audit: **no CLS/a11y blockers** · critical CSS cap pass · zip **139 files · 955 KB**.
+
+---
+
+## v216 (theme 1.9.46) — REVENUE MAX pass
+
+| # | Em chesano | Enduku | File(s) |
+|---|---|---|---|
+| 1 | **Multiplex / related-ads unit** (`autorelaxed`) — related posts **kinda** | Content sites lo in-article tarvata **highest-RPM** unit idi. Editorial content modata → ad tarvata = policy safe. Slot ID pettakapothe **emi render avvadu** (khali box ledu) | `inc/ads.php`, `single.php`, `inc/options.php`, `worldclass.css` §31 |
+| 2 | **Adaptive density cap** (word-count based) | Mundu anni pages ki flat 5 ads: chinna post lo adi "ad-heavy" (RPM penalty risk), pedda guide lo adi waste. Ippudu **<600 words → 3 · 600–1500 → 5 · 1500+ → 6** | `inc/ads.php` |
+| 3 | **App-bar auto-release (15s)** | "Download App" bar phone bottom lane ni పట్టుకుని **anchor ad ni block chesedi** (mobile lo ekkuva impressions ichhe unit). Ippudu 15 sec tarvata bar tappukuntundi → ad malli vastundi | `assets/js/studentup-pwa.js` |
+| 4 | **`REVENUE_MAX_PLAN.md`** | 10 slots inventory + slot IDs ela pettali + nija revenue table (10k → 10 lakh views) + 90-day traffic plan + "enduku inka ekkuva ads pettaledu" honest explanation | repo root |
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass.
+
+---
+
+## v217 (theme 1.9.47) — Internet Center = okate premium BOX + bot advanced sourcing
+
+### 1) Students Internet Center — mee Telugu copy, okka box lo
+Mundu adi title + paragraph + numbered steps + perks + buttons — **విడివిడిగా** padi undedi. Ippudu **okate premium card**:
+
+* **Gradient top strip** (green → blue → violet) + blue app icon + **"Open today" live dot**
+* Head: `Students Internet Center` **+ TS & AP badge** · kinda Telugu brand `విద్యార్థుల ఇంటర్నెట్ సెంటర్`
+* **Mee copy ne** (nenu rasindi kaadu): *"మీరు jobs apply చేసుకోవటం కోసం ఎక్కడికీ వెళ్లవలసిన అవసరం లేదు. కేవలం మాకు call చేసి, సంబంధించిన documents పంపిస్తే చాలు — అతి తక్కువ ఖర్చులో apply చేసి, filled application PDF మీకు send చేయటం జరుగుతుంది."* + highlighted line: *"PDF తో పాటు — study materials, previous papers, మరియు preparation group లో add చేయటం కూడా జరుగుతుంది."*
+* **4 perk chips**: Application PDF · Materials & previous papers · Preparation group · అతి తక్కువ charge
+* Actions: **WhatsApp (58px primary)** + Call + Email — phone lo 1 column, laptop lo okate row
+* Fine print: *"ఇది మా service — official application fee వేరు. Documents మీ అనుమతితోనే వాడతాం."* (trust + Google policy safe)
+* Dark mode parity · Telugu ki 1.95 line-height · **prathi blog kinda** kanipistundi
+
+### 2) Bot — "chala sources unnai kaani asaarigga rastundi" fix (advanced sourcing gates)
+`autoblog/deep_research.py` + `config.py` lo kotha **hard gates** (live publish ki):
+
+| Gate | Rule | Enduku |
+|---|---|---|
+| **Independent domains** | Official (.gov.in/board) source **lekapothe** → kanisam **2 VERE domains** nunchi cross-check (okate site lo 3 pages = 1 domain) | Okka site nunchi ethukoni rayadam ippudu live ki vellаdu |
+| **Confidence floor** | Official lekapothe deep-confidence **≥60/100** | Weak research → draft ga apesindi |
+| **Key-fact corroboration** | last date · exam · result · fee · vacancies — **single source + non-official aythe block** | Tappu date/fee publish avvadam = reader trust + Google trust nashtam |
+
+Official source unte ee gates apply avvavu (official site ye authority). Rendu kotha settings `.env.example` lo documented: `DEEP_MIN_DOMAINS=2`, `DEEP_MIN_CONFIDENCE=60`.
+
+### 3) Test suite health
+Ee turn lo **119 → 137 / 148 suites passing**. Fix chesinavi: version pins sync · v92 (Save row intentional removal) · v89 (kotha Internet Center copy contract) · v79 (related = relevance picks, WP_Query kaadu) · v68/v69 (.env.example drift) · v157 (preview lo href-less `<a>` → real `<button>`).
+Migilina 11: owner adigi **teesesina** UI items ni purathana tests inka expect chestunnayi (poll · chips · front-page order) + ee sandbox lo **leni deps** (pypdf · full jsdom set) — theme/bot behaviour lo tappu kaadu.
+
+**Quality gates:** theme audit `0/0` · deep audit **31/31** · PHP lint **100/100** · visual check **100/100** · critical CSS cap pass · zip **139 files · 961 KB**.
+
+## v218 — Daily quiz: AI-first drafting + 90-day repeat guard (బాట్ అప్‌గ్రేడ్)
+
+**Problem:** `--daily-quiz` ఎప్పుడూ repo లోని static question bank నుంచే (`quiz_engine.mock_quiz`) ప్రశ్నలు తీసేది — AI key ఉన్నా వాడేది కాదు. దాంతో ప్రశ్నలు repeat అయ్యే chance ఉండేది.
+
+**Fix (`autoblog/daily_quiz.py`):**
+1. `build()` ఇప్పుడు **AI-first** — provider key ఉంటే `gemini_client.generate_quiz()` తో fresh bilingual MCQ set; `normalize_quiz` + `validate_quiz` pass అయితేనే accept.
+2. **Repeat guard** — `logs/quiz_seen.json` లో గత **90 రోజుల** ప్రశ్నల fingerprints (SHA1 of normalised text). కొత్త paper లో 70%+ పాత ప్రశ్నలు ఉంటే reject → regenerate.
+3. **Bank fallback కూడా repeat-aware** — AI లేకపోయినా/fail అయినా, date-seed shift (0/7/14/21 days) చేసి repeat తక్కువ ఉన్న set ఎంచుకుంటుంది.
+4. Report లో కొత్తగా `source` (ai/bank) + `repeat_pct` fields; CLI output లోనూ కనిపిస్తాయి.
+5. Status ఇంకా **draft-only** — ఈ command ఎప్పుడూ auto-publish చేయదు.
+
+**Unchanged safety:** live publish ముందు originality ≥ 72%, QA ≥ 80, Google people-first flags, content-quality, source-audit, v217 deep-source gates — అన్నీ అలానే enforce అవుతున్నాయి.
+
+Tests: 136/148 (v92 jsdom dep sandbox లో లేదు; మిగతావి పాత stale assertions). Theme version unchanged (1.9.47) — ఈ round బాట్-only.
+
+## v219 — PHONE PERFECT UI + menu bug fix + 148/148 suites green (theme 1.9.48)
+
+**1. Mobile menu nijam ga pani cheyyatledu — asalu bug దొరికింది.**
+`studentup.js` మరియు `studentup-menu.js` **రెండూ** `#menubtn` click కి listener add చేస్తున్నాయి. ఒక tap → రెండు toggles → drawer open అయ్యి వెంటనే close. ఇప్పుడు `studentup-menu.js` ఒక్కటే owner (`window.SU_MENU_ADV` flag); `studentup.js` తన duplicate handlers (button, backdrop, close, link-click, Escape) ని skip చేస్తుంది. Menu JS load కాకపోతే పాత fallback అలానే పని చేస్తుంది.
+
+**2. Mobile perfection CSS layer** (`worldclass.css` చివర, `<=899px` లో మాత్రమే):
+- Fluid type scale — `h1` clamp(21→27px), h2/h3 proportional, body 16.5px / 1.66 leading.
+- **Telugu text కి negative letter-spacing తీసేశాం** (matras కలిసిపోయే problem) + 1.72 leading.
+- Article body 16.8px / 1.78, paragraph & heading margins unified.
+- Section rhythm: అన్ని sections కి ఒకటే 26px gap, cards కి ఒకటే radius (14px) & padding.
+- **44px tap targets** అన్ని buttons/chips/pagination/drawer rows కి.
+- Overflow guards: long English words break అవుతాయి, tables scroll అవుతాయి, images/iframes 100% width.
+- Drawer: 44px rows, sticky head, uppercase labels, safe-area bottom padding.
+- Inputs 16px (iOS auto-zoom ఆగుతుంది) · <=380px phones కి density ఇంకో step తగ్గింపు.
+
+**3. Test suite 138 → 148/148 ALL GREEN.** Stale assertions ని నిజమైన current contract కి update చేశాం (poll removal, chips removal, trending/state bar removal, pause button removal, PWA copy footer కి move, Telugu comments vs UI text, EXPECTED_CHECKS 236), `deploy_verify.THEME_MIN` 1.9.48, preview stamps ఇక auto-sync (`build_policy_pages.PREVIEW_BUILD` ఇప్పుడు functions.php నుంచి చదువుతుంది — ప్రతి bump కి ఇక manual edit అవసరం లేదు).
+
+Gates: theme audit 0/0 · deep audit 31/31 · php-lint 100/100 · visual_check 100/100 · CWV audit clean · code audit clean · zip 139 files / 960 KB.
+
+## v220 — BOT ADVANCED: link clustering, pacing, retries, queue + multi-provider AI status
+
+**సమస్య (owner):** "bot ki enni links ichina perfect ga draft cheyyali, neat ga time thiskoni, anni sources lo vethiki, multiple API keys support cheyali."
+
+**1. Multi-link intake ఇప్పుడు advanced (`autoblog/link_intake.py`):**
+- **Topic clustering** — ఒకే recruitment కి ఇచ్చిన links (careers page + notification PDF + news story) ఇప్పుడు **ఒకే cluster**. ఒకే draft తయారవుతుంది, మిగిలిన URLs ఆ post కి **supporting sources** గా merge అవుతాయి (`pipeline.update_post`). ఇక duplicate posts రావు.
+- **Primary source ఎంపిక** — tier-1 official (gov/nic/ac) ముందు, ఆ తర్వాత PDF కన్నా HTML page, చివరగా చిన్న canonical URL.
+- **Pacing** — రెండు drafts మధ్య `LINK_INTAKE_DELAY` (default **20s**) pause. Provider rate-limit (429) వల్ల అరకొర draft రావడం ఆగుతుంది. "Neat ga time thiskoni" = ఇదే.
+- **Retries** — transient fetch/API error కి 2 attempts (5s, 10s backoff). ఒక్క hiccup కి link పోదు.
+- **Overflow queue** — limit దాటిన links ఇక **skip కావు**; `log/link-queue.txt` లో queue అవుతాయి → `python run.py --links-file log/link-queue.txt` తో కొనసాగించవచ్చు.
+- Report లో cluster count + ఒక్కో draft కి ఎన్ని sources వాడిందో కనిపిస్తుంది.
+
+**2. Multi API key / multi provider — verify చేసే command:**
+`python run.py --ai-status` (మరియు `--ai-status-live`) → gemini · groq · openrouter · cerebras · together · mistral · openai · custom — ఏ provider కి ఎన్ని keys ఉన్నాయో, ఏ model, failover order ఏమిటో చూపిస్తుంది. Key విలువలు ఎప్పుడూ print కావు (tag మాత్రమే: `AIza…23`). Keys లేకపోతే ఖచ్చితమైన `.env` snippet చూపిస్తుంది.
+Failover: ఒక key 429/401 → అదే provider లో next key → అన్నీ అయిపోతే next provider. Draft ఆగదు.
+
+**3. కొత్త knobs** (`.env.example` + README documented): `LINK_INTAKE_DELAY=20`, `LINK_INTAKE_QUEUE=log/link-queue.txt`.
+
+**4. కొత్త test suite `tests/v220_test.py`** (5 checks) — clustering, primary choice, retry+merge+queue, ai_status masking, docs wiring.
+
+Gates: **149/149 suites green** · code audit 0/0 · parity PIN-TO-PIN · PHP lint 100/100 · theme zip 139 files / 960 KB (theme 1.9.48 unchanged — ఈ round bot-only).
+
+## v220.1 — Bot deploy package ready
+
+- `--deploy-check` → **8 ok · 4 warn · 0 fail** (warnings = server లో `.env`/WP creds/Telegram పెట్టాక పోతాయి).
+- `milesweb-kit/studentup-bot-cron.zip` **v220 code తో rebuild** (380 files · 4.68 MB · `ai_status.py`, upgraded `link_intake.py`, AI-first `daily_quiz.py` కలిపి). sha256 `2d6502a4537e3d78…`. Repo root కి కూడా copy చేశాం (`studentup-bot-cron.zip`).
+- `crontab.example` కి రెండు కొత్త lines: **daily quiz 7 AM** (`--daily-quiz`), **link-queue continue 9 PM** (`--links-file log/link-queue.txt`).
+- కొత్త guide **`DEPLOY_BOT_NOW.md`** — Oracle free VM దారి (install-vps.sh one command, systemd timer) + MilesWeb cPanel cron దారి, `.env` minimum set, 4 verify commands, sha256 verify, రోజువారీ schedule table, fail అయితే ఏ command run చేయాలో.
+- Tests **149/149 green** (v76/v92 కి jsdom dependency sandbox లో install చేశాక pass — అది ship అయ్యే code కాదు).
+
+## v221 — VIRAL STREAMS: Govt Schemes + TS/AP District News (theme 1.9.49)
+
+**Owner brief:** "viral ayyevi — schemes, state, TS/AP districts news, breaking news — ivi anni sarina category ki vellali."
+
+**1. కొత్త module `autoblog/regions.py`** — ఒకే source of truth:
+- **TS 33 + AP 26 districts** (English + తెలుగు రెండూ).
+- **Scheme vocabulary** — Rythu Bharosa, Dalit Bandhu, Kalyana Lakshmi, Indiramma, Gruha Jyothi, Cheyutha, Amma Vodi, Vidya Deevena, Talliki Vandanam, PM Kisan, Ayushman, ration, pension, beneficiary list…
+- **Job-override guard** — "Rythu Bharosa **data entry operator recruitment**" scheme కాదు, job. (`recruitment / vacancy / posts / నియామకం / ఖాళీలు` ఉంటే scheme routing ఆగుతుంది.)
+- **District news guard** — district పేరు ఉన్నంత మాత్రాన district news కాదు; collector/mandal/holiday/rain-alert లాంటి local-news signal కూడా ఉండాలి. "Hyderabad software vacancy" job గానే ఉంటుంది.
+
+**2. రెండు కొత్త categories** (config `CATEGORIES` 18 → **20**): `Govt Schemes` (priority 4), `District News` (priority 3). `topic_engine.SEASONAL_CATEGORIES` లో కూడా rotate అవుతాయి (Feb budget = schemes, May/Oct = district).
+
+**3. Routing:**
+- `pipeline.classify_category()` → scheme/district detection jobs కన్నా ముందు, కానీ job-override తర్వాత.
+- `breaking.classify_tag()` → కొత్త `schemes` + `district` tags, state job tags కన్నా ముందు (లేకపోతే "Khammam Indiramma illu" ts-jobs అయ్యేది). రెండూ `regions` guards ద్వారానే పాస్ అవుతాయి.
+
+**4. Theme (1.9.49):** mega menu → Scholarships group లో కొత్త column **"Schemes & local"** (Govt Schemes · District News) + category alias map (`govt-schemes`, `district-news` → live slugs). **Home "most searched" strip 10 cards గానే** ఉంచాం — owner "neat ga" brief ప్రకారం clutter పెంచలేదు.
+
+**5. Guardian counts lock** 18 → **20 pillars** (+ docs అన్నిటిలో sync).
+
+**6. Version drift ఇక automatic** — `deploy_verify.THEME_MIN` ఇప్పుడు `functions.php` నుంచి చదువుతుంది (ప్రతి bump కి manual edit అవసరం లేదు).
+
+కొత్త suite `tests/v221_test.py` (5 checks). Gates: **150/150 suites green** · theme audit 0/0 · deep 31/31 · PHP lint 100/100 · visual 100/100 · code audit clean · parity PIN-TO-PIN · `--deploy-check` 8 ok / 0 fail · theme zip 139 files / 960 KB (`5e2cbd46…`) · bot zip (`c09191922…`).
+
+## v222 — `--go-live`: ఒకే command తో full setup (2026-10-08)
+
+- **`autoblog/go_live.py` (new)** — 8-step orchestrator, ప్రతి step isolated (ఒకటి fail అయినా మిగతావి run అవుతాయి):
+  deploy-check · AI providers+keys · WP connection · 20 pillar categories · site setup (settings/footer menu/category SEO/robots/sitemap) · IndexNow key · AdSense readiness · production safety+revenue audit.
+- **CLI**: `python run.py --go-live` (preview, ఏమీ మార్చదు) · `python run.py --go-live --apply` (నిజంగా apply).
+- చివర scorecard + **OWNER_TODO (8 code-impossible items)** + `output/go-live-report.md`.
+- **`SETUP_PERFECT.md` (new)** — Telugu లో ఒకే page, Step 0→6 (keys → theme → bot → go-live → content → automation → Google/AdSense).
+- `DEPLOY_BOT_NOW.md` + `README.md` లో v222 section.
+- **`tests/v222_test.py` (new, suite #151)** — step shape, failure isolation, preview-mode skip, CLI+docs wiring.
+- Gates: **151/151 suites** · php_lint 100/100 · theme_audit 0/0 · parity PIN-TO-PIN · code_audit CLEAN.
+
+## v223 — auto-config: owner పనులు code లోకి (2026-10-08)
+
+"అన్నీ fix చేయలేవు" — సరే, చేసి చూపించాం. v222 లో owner-only అని చెప్పిన 8 items లో **7 ఇప్పుడు automatic**.
+
+- **`autoblog/auto_config.py` (new)** — `.env` → WordPress theme options direct push (theme లో ఇప్పటికే ఉన్న `studentup/v1/theme-data` REST endpoint ద్వారా):
+  `ga4_id` · `gsc_verify` · `bing_verify` · `adsense_client` · `adsense_approved` · 10 × `adsense_slot_*` · `consent_mode/regions/cmp_id` · `indexnow_key` · socials · contact.
+  **Slot IDs ఉంటే Auto ads తనే OFF** (manual slots = better layout + revenue control). Approval లేకపోతే `adsense_approved=0` — ads emit అవ్వవు.
+- **Search Console sitemap auto-submit** — service account RS256 JWT (webmasters write scope, `indexing.py` signer reuse), `sitemap.xml` + `news-sitemap.xml`.
+- **Cloudflare cache auto-purge** after apply.
+- **`--go-live` ఇప్పుడు 10 steps** (7 = auto-config, 8 = sitemaps).
+- **Owner TODO ఇప్పుడు dynamic** — `.env` లో value వస్తే ఆ item list నుంచి పోతుంది. `.env` పూర్తిగా నింపితే **10 → 1** (మిగిలేది theme zip upload, WP core లో REST endpoint లేదు). ప్రతి item కి "ఎందుకు code చేయలేదు" explanation ఉంది.
+- `.env.example` లో 20+ కొత్త keys; `SETUP_PERFECT.md` లో STEP 5.5.
+- **`tests/v223_test.py` (new, suite #152)** — 16 checks: option mapping, auto-ads-off rule, approval gate, "ఖాళీ .env → ఏదీ invent చేయదు", preview vs apply, owner-list shrink, go_live wiring, docs.
+- Gates: **152/152 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 4 warn / 0 fail.
+
+## v224 — money autopilot: revenue పని కూడా bot దే (2026-10-08)
+
+"అన్నీ నువ్వే చేసుకో, highest money" — revenue modules ఇప్పటికే ఉన్నాయి కానీ అన్నీ **manual CSV export** అడిగేవి. అదే ఆగిపోయే చోటు. ఇప్పుడు bot డేటా తనే లాగుతుంది.
+
+- **`autoblog/money_autopilot.py` (new)** — GSC API నుంచి query × page data auto-pull → `output/gsc-latest.csv` (ఉన్న revenue modules చదివే format లోనే).
+- **CTR money gap** — position-CTR curve తో "రావాల్సిన CTR vs వస్తున్న CTR" → నెలకు extra clicks + ₹ range.
+- **Striking distance** (pos 4–20) — చిన్న update తో page 1.
+- **Internal links auto-fix** (`link_graph`, `--apply` తో నిజంగా apply) · refresh queue · cannibalization · RPM by page · ad slot lab (`REVENUE_CSV` ఉంటే).
+- Priority action list + `output/money-autopilot.md` + Telegram broadcast.
+- **ప్రతి ఆదివారం `--daily` లో తనే run** (`MONEY_AUTOPILOT=0` తో off). Step isolation — fail అయినా daily flow ఆగదు.
+- CLI: `--money-autopilot` · `--apply` · `--money-days` · `--money-csv` · `--money-notify`.
+- **`tests/v224_test.py` (new, suite #153)** — 18 checks: CSV format + ctr_boost compatibility, CTR maths, "good CTR → fake opportunity లేదు", striking window, ₹ range, step isolation, preview ఏదీ apply చేయదు, data లేకపోతే crash కాదు, CLI + weekly hook + docs.
+- Honest: ₹ అంకె estimate (promise కాదు); titles bot తనే rewrite చేయదు — suggestions మాత్రమే.
+- Gates: **153/153 suites** · php_lint 100/100 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 8 ok / 0 fail.
+
+## v225 — fluid type system: phone ↔ laptop లో text నిజంగా మారుతుంది (theme 1.9.50)
+
+**Owner:** "text sizes and theme phone and laptop కి తగ్గట్టుగా మారిపోవాలి, అసలు మారట్లేదు."
+
+**Root cause దొరికింది:** `style.css` లో core UI font-size లు **fixed px** — `.nav a` 13px, `.article-head h1` **29px**, `.news h2` 16.5px, `.logo .brand` 20px, cards, chips, meta. worldclass.css లో కొన్ని చోట్ల clamp() ఉంది కానీ **core surfaces లో లేదు**. అందుకే phone లో చూసినా laptop లో చూసినా ఒకటే size.
+
+**Fix — ఒకే fluid scale (source of truth `style.css` `:root`):**
+`clamp(min, rem + vw, max)` — **rem** వల్ల browser/phone font-size setting (accessibility zoom) గౌరవించబడుతుంది, **vw** వల్ల screen width కి మారుతుంది. 8 steps: `--fs-2xs … --fs-2xl` + `--lh-*`.
+
+| element | 360px phone | 1440px laptop |
+|---|---|---|
+| article H1 | 22.0px | **33.0px** |
+| body text | 14.5px | **17.0px** |
+| section head | 19.0px | **26.0px** |
+| card title | 15.0px | **18.0px** |
+| chip / meta | 11.0px | **13.0px** |
+
+- Overrides stack చేయలేదు — **original declarations నే** `var(--fs-*)` కి మార్చాను (22 surfaces). అందుకే critical inline CSS cap (60,000 B) కింద ఉంది: **59,418 B**.
+- Laptop ≥1080px: **74ch reading column** + 1.8 leading. ≥1600px: scale ఇంకా పెద్దది + wrap 1320px.
+- Phone ≤600px: **44px tap targets**, font చిన్నది చేసి fit చేయడం లేదు (చదవలేరు) — gaps తగ్గిస్తాం. ≤360px overflow guard.
+- **`tests/v225_test.py` (new, suite #154)** — clamp() maths ని నిజంగా లెక్కిస్తుంది: ప్రతి step phone < laptop, smooth (jump లేదు), phone లో ≥14px, browser font 16→20px పెంచితే text పెరుగుతుంది, core surfaces అన్నీ scale వాడుతున్నాయి, H1 ఇంక 29px కాదు, critical లో inline ఉంది + cap కింద.
+- Gates: **154/154 suites** · php_lint 100/100 · theme_audit 0/0 · deep audit 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v226 — 42-item launch checklist: audit + 4 నిజమైన bugs fix (theme 1.9.51)
+
+Owner ఒక 42-item website launch checklist ఇచ్చారు. ప్రతి item ని theme + config కి **నిజంగా** audit చేశాను (file grep + config value — "ఉంది అనుకుంటా" కాదు).
+
+**Result: 27 code లో done · 7 `.env` లో key పెడితే ON · 8 owner · 0 missing.**
+
+Audit లో **4 నిజమైన bugs** దొరికాయి — అన్నీ fix (`inc/measure.php` new):
+
+| # | ఏం తప్పు ఉండేది | ఇప్పుడు |
+|---|---|---|
+| **6** | `ga4_id` option ఉండేది కానీ **GA4 tag అసలు emit అవ్వలేదు** — కేవలం preconnect hint. Analytics ఎప్పుడూ పని చేయలేదు. | నిజమైన gtag, `G-XXXX` format validate చేసి |
+| **7** | lead events అసలు లేవు | call · WhatsApp · email · telegram · apply · form_submit · site_search · read_75% |
+| **8** | Microsoft Clarity లేదు | `clarity_id` option → heatmaps + session recordings |
+| **19** | LocalBusiness schema లేదు | Internet Center phone/address ఉంటే emit; **లేకపోతే emit కాదు** — Google కి అబద్ధం చెప్పం |
+
+- Guards: GA4/Clarity id లేకపోతే **ఒక్క byte కూడా** emit కాదు (speed). `gtag` లేకపోయినా lead script crash కాదు. ids regex validate (injection impossible).
+- కొత్త options: `clarity_id` · `ic_name/phone/address/city/hours/logo` — `auto_config` ద్వారా `.env` నుంచి auto-push.
+- **`autoblog/launch42.py` (new)** — `python run.py --launch-check`. `--go-live` ఇప్పుడు **11 steps**.
+- **`tests/v226_test.py` (new, suite #155)** — 30 checks: 4 fixes verify, guards, 42 items exactly, numbers 1–42 unique, 0 missing, OWNER items honest, CLI + go_live + docs wiring.
+- Report: `LAUNCH_42_CHECK.md` (repo root) + `output/launch-42-check.md`.
+- Gates: **155/155 suites** · php_lint 101/101 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN · deploy-check 0 fail.
+
+## v227 — trust + leads: owner items 8 → 2 (theme 1.9.52)
+
+v226 audit లో 8 items "owner పని" అని వదిలేశాను. మళ్ళీ చూస్తే అది సోమరితనం — **system** ని code కట్టగలదు, content మాత్రమే owner ఇవ్వాలి. ఇప్పుడు ఆ systems అన్నీ ready (`inc/trust.php` new):
+
+| # | ఏం కట్టాను | మీరు ఇవ్వాల్సింది |
+|---|---|---|
+| **23** | `[studentup_reviews]` + Review/AggregateRating schema | Options → `reviews_json` (**నిజమైన** students వి మాత్రమే) |
+| **24** | `[studentup_case_studies]` — Problem → Solution → Result | `cases_json` |
+| **26** | `[studentup_team]` — photo + role + bio | `team_json` |
+| **27** | `[studentup_map]` — **address నుంచే** Google Map + Get Directions | `ic_address` (embed code copy అక్కర్లేదు) |
+| **31** | `/thank-you/` page — auto-create + noindex + GA4 `generate_lead` | **ఏమీ అక్కర్లేదు** |
+| **33** | `[studentup_response_time]` — contact block కింద automatic | `response_time` line |
+
+**Golden rule — ప్రతి దానికి test ఉంది: data లేకపోతే ఏమీ render కాదు.** ఖాళీ star box · fake `aggregateRating` · dummy map · నిలబెట్టలేని promise — ఇవి trust ని చంపుతాయి, పెంచవు. Google కి fake review schema = penalty.
+
+- Thank-you page **noindex** — lead confirm page Google లో rank అవ్వకూడదు.
+- Trust blocks CSS అంతా v225 fluid scale వాడుతుంది — hard-coded px ఒక్కటీ లేదు (test enforce చేస్తుంది).
+- **`tests/v227_test.py` (new, suite #156)** — 35 checks: 5 shortcodes, ప్రతి దానికి empty-data guard, schema honesty (stars clamp, half-filled row skip), map lazy-load, thank-you auto-create + noindex + event, options registered, CSS fluid-only, auditor counts.
+- **42-item status ఇప్పుడు: 28 code · 12 `.env` key · 2 owner · 0 missing.**
+- Gates: **156/156 suites** · php_lint 103/103 · theme_audit 0/0 · deep 0/0 · visual 100/100 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v228 — multi-link intake: 4 నిజమైన bugs fix
+
+Owner: *"different different links ఒకేసారి ఇచ్చినా separate గా perfect draft చేయాలి."* ఊహించకుండా **నిజంగా test చేశాను** — 4 bugs దొరికాయి:
+
+| Bug | ఏం జరిగేది |
+|---|---|
+| **1** | `URL \| Label` (ఒకే line) format support లేదు → **label పోయేది**. Owner WhatsApp/Excel నుంచి paste చేసే అత్యంత సహజమైన format ఇదే. |
+| **2** | cluster signature URL **path** ని చూసేది కాదు (host మాత్రమే) → label లేని links అన్నీ separate clusters |
+| **3** | label లో **"2026" (year)** ని vacancy count signal గా తీసుకునేది → సంబంధం లేని notifications తప్పుగా ఒకే draft గా merge |
+| **4** | **"Group 2" vs "Group 4"** రెండింటికీ `group` token share → తప్పు merge |
+
+**ఇప్పుడు:**
+- Label formats: `URL \| Label` · `URL - Label` · `URL — Label` · `Label \| URL` · markdown · ముందు line · label లేకపోతే URL path నుంచి topic.
+- **Page families** — ఒకే recruitment అయినా **వేరు వేరు article** అవ్వాల్సినవి separate: notification + apply online = **1 draft** (duplicate లేదు); **hall ticket · result · answer key · syllabus · counselling** = **వేరు వేరు drafts** (ప్రతిదానికీ separate search demand).
+- Exam series: Group 2 ≠ Group 4, Group D ≠ Group C.
+- Year ఇక merge signal కాదు; నిజమైన vacancy count (310, 783) మాత్రమే.
+
+**`tests/v228_test.py` (new, suite #157)** — 29 checks, ప్రతి bug కి regression lock: 6 label formats, 6 వేరు links → 6 drafts, year/series false-merge guards, correct merge, 8 page-family classifications, raw-URL clustering, "ఒక్క link కూడా పోలేదు", order preserve, dry-run nothing created.
+
+Gates: **157/157 suites** · php_lint 103/103 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN.
+
+## v229 — ఫోన్ menu: MAIN MENU + overlap bug fix
+
+మీరు పంపిన screenshot లో రెండు సమస్యలు: breaking-news timestamps పక్క headline మీద పడుతున్నాయి, "Explore Categories" కింద **ఖాళీ పట్టీలు**.
+
+**అసలు కారణం (guess కాదు):** `.mpanel` ఒక `display:flex; flex-direction:column` container. Flex items కి default `flex-shrink:1` — content panel కన్నా పెద్దది అయినప్పుడు browser ప్రతి row ని **నొక్కేసింది**. 2-line headline 44px లోకి compress అయ్యి text overflow → **overlap**; `<details>` groups దాదాపు 0px → **ఖాళీ గడ్డలు**. Scroll ఉంది కానీ shrink దాని కన్నా ముందు జరుగుతుంది.
+**Fix:** `.mpanel > *{ flex:0 0 auto }` + `.mpanel a{ height:auto }`.
+
+**కొత్త MAIN MENU** — menu తెరవగానే మొదటి block, మీరు అడిగిన **11 destinations** సరిగ్గా అదే order లో: **Home · TS Govt Jobs · AP Govt Jobs · Central Jobs · Walk-in Jobs · Software Jobs · Private Jobs · Hall Tickets · Results · Breaking News · Daily Quiz**. ప్రతి row కి icon + ఒక line hint (ఉదా. "TSPSC · Police · Gurukul") + chevron, **52px tap target**, dark mode, long hint ఉంటే ellipsis. Breaking headlines ఇప్పుడు దీని కింద.
+
+కొత్త file `inc/mobile-menu.php` → `studentup_mobile_main_menu()`. **Golden rule:** ఆ category site లో లేకపోతే ఆ row render కాదు — ఖాళీ archive కి link ఇవ్వం. Home / Breaking News / Daily Quiz ఎప్పుడూ ఉంటాయి.
+
+`tests/v229_test.py` (suite #158) — 33 checks: shrink fix, 11 items + order, breaking కన్నా ముందు ఉందా, escape, hard-px లేదు, dark mode, preview parity.
+
+Theme **1.9.53** · Gates: **158/158 suites** · php_lint 104/104 · theme_audit 0/0 · code_audit CLEAN · parity PIN-TO-PIN · visual 100/100.

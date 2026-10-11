@@ -1,0 +1,160 @@
+# బాట్ deploy — step by step (v220)
+
+మీకు రెండు దారులు ఉన్నాయి. **ఒకటే ఎంచుకోండి.**
+
+| | దారి A — Oracle Cloud free VM | దారి B — MilesWeb cPanel cron |
+|---|---|---|
+| ఖర్చు | ₹0 (always-free tier) | ఇప్పటికే ఉన్న hosting |
+| 24×7 | ✅ అవును | ⚠️ cron వచ్చినప్పుడే |
+| వేగం | ఎక్కువ | తక్కువ |
+| సిఫార్సు | **ఇదే వాడండి** | VM కుదరకపోతే |
+
+Deploy readiness ఇప్పుడు: `--deploy-check` → **8 ok · 4 warn · 0 fail**. Warnings అన్నీ server లో `.env` పెట్టాక పోతాయి.
+
+---
+
+## దారి A — Oracle Cloud free VM (సిఫార్సు · 30 నిమిషాలు)
+
+### A1. VM create
+1. cloud.oracle.com → Sign up (free tier, card verify మాత్రమే, charge లేదు).
+2. **Compute → Instances → Create Instance**
+   - Image: **Ubuntu 22.04**
+   - Shape: **VM.Standard.A1.Flex** (Ampere) — 1 OCPU / 6 GB (always free)
+   - SSH key: Generate → private key download చేసి దాచుకోండి.
+3. Create → Public IP note చేసుకోండి.
+
+### A2. Login
+```bash
+ssh -i mykey.key ubuntu@<PUBLIC_IP>
+```
+
+### A3. Code పెట్టడం
+`studentup-bot-cron.zip` ని VM కి పంపండి (మీ laptop నుంచి):
+```bash
+scp -i mykey.key studentup-bot-cron.zip ubuntu@<PUBLIC_IP>:~
+```
+VM లో:
+```bash
+sudo mkdir -p /opt/studentup && sudo chown -R $USER:$USER /opt/studentup
+unzip -o ~/studentup-bot-cron.zip -d /opt/studentup
+cd /opt/studentup
+```
+
+### A4. One-command install
+```bash
+sudo bash deploy/install-vps.sh
+```
+ఇది చేసేది: python3 + venv + deps install · `studentup` user · log folders · **systemd timer (గంటకొకసారి)** + watchdog · చివరగా `--deploy-check` run చేసి proof చూపిస్తుంది.
+
+### A5. `.env` (ఇదే అసలు switch)
+```bash
+cp .env.example .env
+nano .env
+```
+కనీసం ఇవి:
+```bash
+WP_URL=https://studentup.in
+WP_USERNAME=మీ-wp-username
+WP_APP_PASSWORD=WP → Users → Profile → Application Passwords లో generate చేసింది
+
+AI_PROVIDER=gemini
+AI_FALLBACK_PROVIDERS=groq,openrouter,cerebras,together,mistral
+GEMINI_API_KEYS=key1,key2,key3
+GROQ_API_KEYS=key1,key2
+
+AUTO_PUBLISH_DAILY=0          # మొదట draft మాత్రమే
+TELEGRAM_BOT_TOKEN=           # optional కానీ బాగా ఉపయోగం
+TELEGRAM_CHAT_ID=
+```
+
+### A6. Verify (ఈ 4 commands తప్పక)
+```bash
+cd /opt/studentup && source .venv/bin/activate
+python run.py --ai-status       # ఏ providers/keys live లో ఉన్నాయో
+python run.py --check-wp        # WordPress connection
+python run.py --deploy-check    # 0 fail రావాలి
+python run.py --radar           # ఈరోజు ఏ notifications వచ్చాయి
+```
+
+### A7. మొదటి draft
+```bash
+python run.py --run                       # articles draft
+python run.py --daily-quiz-dry            # quiz preview
+python run.py --links-file links.txt      # మీ link list నుంచి (cluster + pace)
+```
+WP Admin → Posts → Drafts లో చూసి, నచ్చితే Publish.
+
+### A8. Automation ON
+```bash
+sudo systemctl enable --now studentup-bot.timer
+systemctl list-timers | grep studentup      # తర్వాత run ఎప్పుడో చూపిస్తుంది
+```
+లేదా cron కావాలంటే: `crontab -e` → `crontab.example` లోని lines paste (ఇప్పుడు **daily quiz 7 AM** + **link-queue 9 PM** కూడా ఉన్నాయి).
+
+---
+
+## దారి B — MilesWeb cPanel cron
+
+1. cPanel → **File Manager** → `~/bot` folder create → `studentup-bot-cron.zip` upload → **Extract**.
+2. cPanel → **Terminal** (లేదా SSH):
+```bash
+cd ~/bot
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env && nano .env     # పైన A5 లోని values
+python run.py --deploy-check
+```
+3. cPanel → **Cron Jobs** → ఈ 3 lines (path మీది పెట్టండి):
+```
+0 * * * *  cd /home/USER/bot && /home/USER/bot/.venv/bin/python run.py >> log/cron.log 2>&1
+0 7 * * *  cd /home/USER/bot && /home/USER/bot/.venv/bin/python run.py --daily-quiz >> log/quiz.log 2>&1
+*/5 * * * * cd /home/USER/bot && /home/USER/bot/.venv/bin/python run.py --approval-poll >> log/approval.log 2>&1
+```
+
+---
+
+## Upload verify (zip సరిగ్గా వెళ్ళిందా)
+
+```bash
+sha256sum studentup-bot-cron.zip
+```
+`milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
+```
+2d6502a4537e3d78ad76954700eefe90f81024d27d063e46e43e058e18792661  studentup-bot-cron.zip
+```
+
+---
+
+## Deploy అయ్యాక రోజువారీ
+
+| ఎప్పుడు | ఏమి జరుగుతుంది |
+|---|---|
+| ప్రతి గంట | `run.py` → radar + drafts |
+| ఉదయం 7 | daily quiz draft (AI-first, 90-రోజుల repeat guard) |
+| రాత్రి 9 | link-queue లో మిగిలిన links continue |
+| ప్రతి 5 నిమిషాలు | Telegram approvals (✅ Publish / 🗑️ Delete) |
+| ఆదివారం 3 AM | site audit + media prune + dead-link scan |
+
+మీరు చేయాల్సింది: **drafts చూసి publish నొక్కడం.** `AUTO_PUBLISH_DAILY=1` పెట్టేది — 2 వారాలు drafts quality చూసిన తర్వాతే.
+
+---
+
+## ఏదైనా fail అయితే
+
+```bash
+python run.py --deploy-check      # ఏ step తప్పిందో ఖచ్చితంగా చెబుతుంది
+python run.py --ai-status         # keys సమస్యా?
+python run.py --check-wp          # WordPress సమస్యా?
+tail -50 log/cron.log             # చివరి run లో ఏమైంది
+```
+ఈ commands output ని నాకు paste చేయండి — సరిగ్గా అదే సరిచేస్తాను.
+
+## ⭐ ఒకే command తో full setup (v222)
+
+```bash
+python run.py --go-live          # preview, ఏమీ మార్చదు
+python run.py --go-live --apply  # నిజంగా setup
+```
+
+8 steps: deploy-check · AI keys · WP connection · 20 categories · site settings/menus/SEO · IndexNow · AdSense readiness · production audit.
+Report: `output/go-live-report.md`. పూర్తి వరుస కోసం `SETUP_PERFECT.md`.

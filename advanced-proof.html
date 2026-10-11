@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudentUp — Advanced proof (UI · phone · bot · thumbnails)</title>
+<style>
+:root{--bg:#070b16;--card:#101828;--line:#1e2b45;--ink:#e9eefb;--mut:#9fb0cf;--acc:#ff8a3d;--ok:#34d399}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -200px,#16224a,var(--bg)) no-repeat var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 18px 70px}
+h1{font-size:clamp(24px,5vw,38px);margin:0 0 6px;letter-spacing:-.5px}
+.sub{color:var(--mut);margin:0 0 26px}
+h2{font-size:clamp(18px,3.4vw,24px);margin:38px 0 12px;border-left:4px solid var(--acc);padding-left:10px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.big{font-size:28px;font-weight:800;color:var(--acc)}
+.mut{color:var(--mut);font-size:14px}
+.thumbs{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.thumbs img{width:100%;border-radius:12px;border:1px solid var(--line);display:block}
+ul{margin:8px 0 0;padding-left:20px}
+li{margin:6px 0}
+.ok:before{content:"✅ ";}
+a{color:#8ab4ff}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.bar a{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;text-decoration:none;color:var(--ink);font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}
+td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}
+</style>
+</head>
+<body><div class="wrap">
+<h1>Advanced proof — UI · phone · bot · thumbnails</h1>
+<p class="sub">"Advanced ga build chesava?" ane prashnaki evidence. Prathi number repo lo nunchi vachindi (claim kadu).</p>
+
+<div class="bar">
+  <a href="index.html">← Preview hub</a>
+  <a href="devices-preview.html">📱💻 Device lab</a>
+  <a href="home-preview.html">🏠 Home</a>
+  <a href="menu-preview.html">☰ Phone menu</a>
+  <a href="source-health.html">📡 Source health</a>
+  <a href="MASTER_265.md">🧾 265 checklist</a>
+</div>
+
+<h2>1. Numbers (repo lo count chesinavi)</h2>
+<div class="grid">
+  <div class="card"><div class="big">326</div><div class="mut">Bot sources grid (v245: 258 → <b>326</b>) — official first: TGPSC/APPSC groups, TS/AP police, DSC, gurukul, discoms, RTC, health, courts, SSC/UPSC/RRB/IBPS, boards + university results, hall tickets, ePASS/Jnanabhumi/NSP, IT hiring, internships. 57 daily hot-list (roju 4x check) + rotation.</div></div>
+  <div class="card"><div class="big">8</div><div class="mut">AI providers: gemini · groq · openrouter · cerebras · together · mistral · openai · custom — multi-key rotation tho</div></div>
+  <div class="card"><div class="big">82</div><div class="mut">Theme <code>inc/</code> PHP modules (144 theme files) — quiz, schema, consent, security, megamenu, measure…</div></div>
+  <div class="card"><div class="big">469</div><div class="mut">lines — <code>inc/quiz.php</code> daily quiz backend (IST rollover, server-side scoring)</div></div>
+  <div class="card"><div class="big">160</div><div class="mut">test suites — anni pass (0 fail) + php-lint 104/104 + jsdom 236/236</div></div>
+  <div class="card"><div class="big">58 KB</div><div class="mut">critical CSS (60 KB cap lopu) — speed ki inline</div></div>
+</div>
+
+<h2>2. Thumbnails — v244 advanced render (nijam samples)</h2>
+<p class="mut">Ivi ippude <code>autoblog/image_gen.py</code> tho generate chesinavi — stock images kaavu, mana own rendering. 3 layouts rotate avtayi (bottom / center / top) kabatti post-to-post copy feel raadu. v244 lo kotha polish: diagonal stripe texture, corner glow, left accent bar, bottom shadow fade, vignette. Text eppudoo center safe band (21%–79%) lo — mobile square crop lo kuda okka letter kuda poodu.</p>
+<div class="thumbs">
+  <img src="preview-thumbs/thumb1.jpg" alt="TSPSC Group 2 thumbnail — bottom layout">
+  <img src="preview-thumbs/thumb2.jpg" alt="SSC CGL thumbnail — center layout">
+  <img src="preview-thumbs/thumb3.jpg" alt="AP DSC results thumbnail — top layout">
+  <img src="preview-thumbs/thumb4.jpg" alt="Daily quiz thumbnail">
+  <img src="preview-thumbs/thumb5.jpg" alt="NEET UG counselling thumbnail">
+  <img src="preview-thumbs/thumb6.jpg" alt="IBPS PO thumbnail">
+</div>
+
+<h2>3. Bot drafting — advanced sources nunchi, fake kaadu</h2>
+<ul>
+  <li class="ok">Official-first grid (258 sources) + news radar roju 4 sarlu kotha items pattukuntundi.</li>
+  <li class="ok">Deep research module — okka source pai aadharapadadu; multiple sources cross-check.</li>
+  <li class="ok">Editorial value + guardian + post gate — thin/duplicate/fake content publish avvadu.</li>
+  <li class="ok">Prathi post ki original wording, correct facts, source link, schema, featured image.</li>
+  <li class="ok">AI quiz questions → human review + factual verification tarvatha matrame publish.</li>
+  <li class="ok">API keys anni server-side .env lo; frontend lo oka key kuda ledu.</li>
+</ul>
+
+<h2>4. Article enrichment — v247 (kotha)</h2>
+<ul>
+  <li class="ok">Prathi pedda article lo <b>rendu in-article images</b> — rendo di chivari section lo, vere alt tho, lazy + width/height (CLS 0). Chinna article ki add cheyyadu (spam vaddu).</li>
+  <li class="ok"><b>Summary table</b> — Organization · Notification no · Posts · Vacancies · Qualification · Age · Fee · Apply start/last date · Exam date · Official link. Mobile lo scroll chese table, dark mode support.</li>
+  <li class="ok"><b>Honesty guard:</b> facts 2 kanna takkuva unte table ne raayadu; "TBA / N/A / -" skip; date parse avvakapothe aa row ravadu; apply link http kaakapothe skip; anni values escape (XSS 0).</li>
+  <li class="ok">Rendu publish pipeline lo try/except tho — fail ayina post publish aagadu. Idempotent: re-run lo duplicate image/table raadu.</li>
+</ul>
+
+<h2>5. v248 — Tools teesesam + SEO MAX</h2>
+<ul>
+  <li class="ok"><b>Tools OFF</b> (owner decision): age/fee/salary calculators, resume maker, compare, saved, workspace — menu lo poyayi, pages create avvavu, unna pages <b>noindex + sitemap nunchi out</b>. Thin pages = crawl budget waste + AdSense risk. Marali kavalante okka filter line chaalu.</li>
+  <li class="ok">Menu lo aa place lo ippudu <b>Daily Quiz</b> group (Today&#39;s Quiz · Current Affairs · Previous quizzes) — return visits ki.</li>
+  <li class="ok"><b>SEO MAX layer</b> (inc/seo-max.php): rel prev/next pagination · speakable schema (voice search) · news_keywords + article:tag (max 10, stuffing ledu) · article:modified_time + og:updated_time (freshness) · paged title "Page N" · search &amp; empty archive noindex,follow · orphan-guard parent category link prathi post kinda.</li>
+  <li class="ok">Already unnavi (duplicate cheyyaledu): canonical · BreadcrumbList · NewsArticle · JobPosting · FAQPage · WebSite+SearchAction · Organization · Person · hreflang · news sitemap · IndexNow · OG/Twitter · auto internal links · TOC · Rank Math meta bridge.</li>
+  <li class="ok"><b>Fake em ledu:</b> fake rating/review schema ledu, keyword-stuffing meta ledu, fake dates ledu.</li>
+</ul>
+
+<h2>6. v249 — Doubts &amp; Answers (Q&amp;A) — kotha advanced feature</h2>
+<ul>
+  <li class="ok">Prathi post kinda <b>"Doubts &amp; Answers"</b> — student question adagochu (Telugu/English), admin answer chestadu.</li>
+  <li class="ok"><b>Nijam backend:</b> WordPress comments table lo separate type · admin <i>moderate_comments</i> permission · default unapproved (review chesaka matrame public) · REST API + JS lekunda form kuda pani chestundi.</li>
+  <li class="ok"><b>Spam/abuse guards:</b> nonce · honeypot · per-user 60s rate limit · duplicate question block · links/email/phone block · 10–600 char limits · anni escape (XSS 0) · IP plain ga store cheyyam (hash matrame).</li>
+  <li class="ok"><b>SEO value:</b> <b>QAPage schema</b> — answer unna questions matrame (answer leni vi Google ki pampam). Real long-tail keywords ("BC-B age relaxation enta?") site ki vastayi.</li>
+  <li class="ok">Mobile: 16px inputs (zoom aagutundi), 44px button, dark mode, clear success/error messages.</li>
+</ul>
+
+<h2>7. v251 — Google + AI (ChatGPT/Gemini/Perplexity) lo suggest avvadaniki</h2>
+<ul>
+  <li class="ok"><b>AI crawlers ki explicit allow</b> (robots.txt): GPTBot · ChatGPT-User · OAI-SearchBot · ClaudeBot · PerplexityBot · Google-Extended (Gemini/AI Overviews) · Applebot-Extended · CCBot · Bingbot (Copilot) · DuckAssistBot — <b>plus llms.txt + sitemap pointer</b>. Block chesthe AI lo asalu kanipincham.</li>
+  <li class="ok"><b>SiteNavigationElement schema</b> — Google sitelinks + AI ki site structure (real menu/categories nunchi, fake links ledu).</li>
+  <li class="ok"><b>Organization entity</b> — knowsAbout (mana topics) + sameAs (unna social links matrame) → knowledge-graph signal.</li>
+  <li class="ok"><b>Prathi article ki about / mentions / abstract / dateModified</b> — entity-based retrieval lo ide pedda signal (AI "ee page deni gurinchi" ani ardham chesukuntundi).</li>
+  <li class="ok"><b>Bot: citation JSON-LD</b> — prathi post ki "ee page ye official sources meeda build ayindi" ani machine-readable list. Verified links matrame; duplicate/javascript URLs block; links lekapothe emi raayadu (fake citation ledu); max 8.</li>
+  <li class="ok">v250: Daily Quiz <b>IST midnight rollover</b> fix — kotha quiz roju raatri 12:00 ki (mundu UTC valla 5:30 AM ki marediది).</li>
+</ul>
+
+<h2>8. UI — laptop + phone</h2>
+<table>
+  <tr><th>Item</th><th>Status</th></tr>
+  <tr><td>Hero + "Search StudentUp" box, kinda category rail (horizontal scroll, prathi section ki separate icon)</td><td>✅</td></tr>
+  <tr><td>Phone drawer menu + icons pani chestundi</td><td>✅</td></tr>
+  <tr><td>Tagline removed · H1 SEO kosam DOM lo, kanipinchadu</td><td>✅</td></tr>
+  <tr><td>"Search / Blocksy: Search Block" stray text ledu</td><td>✅</td></tr>
+  <tr><td>Save / Compare / Print-PDF buttons articles lo levu</td><td>✅</td></tr>
+  <tr><td>Students Internet Center — prathi post kinda oke premium box</td><td>✅</td></tr>
+  <tr><td>Horizontal scroll ledu · 44px tap targets · 16px inputs (zoom aagutundi)</td><td>✅</td></tr>
+  <tr><td>CWV + a11y audit (29 pages) — 0 blockers</td><td>✅</td></tr>
+</table>
+<p class="mut">Laptop + phone rendu okkasaari choodali ante → <a href="devices-preview.html">Device lab</a>.</p>
+
+<h2>9. Inka migilindi (honest)</h2>
+<ul>
+  <li>🔑 38 items — mee keys/settings: theme upload + Run setup, GA4/Clarity ID, SSL, www redirect, Search Console + Bing verify, sitemap submit.</li>
+  <li>👤 27 items — nijamaina phone lo test, backup restore drill, live PageSpeed (ee sandbox ki internet ledu).</li>
+  <li>Google ranking/traffic/AdSense approval — code guarantee ivvaledu; deploy + roju posts + time kavali.</li>
+</ul>
+</div></body></html>
