@@ -57,7 +57,7 @@ Activate + purge తర్వాత ఫోన్‌లో ఇవి కనిప
 ```bash
 AI_PROVIDER=gemini
 GEMINI_API_KEYS=మీ_key
-WP_URL=https://మీ-site.in
+WP_SITE=https://మీ-site.in
 WP_USER=admin-username
 WP_APP_PASSWORD=WP → Users → Profile → Application Passwords లో generate
 AUTO_PUBLISH_DAILY=0        # మొదట draft మాత్రమే — మీరు చూసి publish చేయండి
@@ -69,12 +69,12 @@ AUTO_PUBLISH_DAILY=0        # మొదట draft మాత్రమే — మ�
 python3 run.py --check-wp           # connection ok అవుతుందా
 python3 run.py --radar              # ఈరోజు ఏ notifications వచ్చాయో
 python3 run.py --daily-quiz-dry     # quiz draft preview
-python3 run.py --run                # articles draft
+python3 run.py --force              # ventane okka draft (--run ane flag ledu)
 ```
 
 Cron (Oracle VM / hosting):
 ```
-30 6 * * *  cd /path/to/project && python3 run.py --run
+30 6 * * *  cd /path/to/project && python3 run.py --daily
 0  7 * * *  cd /path/to/project && python3 run.py --daily-quiz
 ```
 
