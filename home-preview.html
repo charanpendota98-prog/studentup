@@ -2861,6 +2861,13 @@ body.dark .su-cat-n{background:rgba(255,255,255,.1);color:#cbd5e1}
   .su-cat.c1,.su-cat.c2,.su-cat.c3{width:auto}
   .su-catrail>a{min-height:118px}
 }
+
+/* v237: Daily Quiz card (rail lo 11th) — engagement + repeat visits ki. */
+.su-cat.c11 .su-cat-ic{background:#fff7ed;color:#c2410c}
+.su-catwrap .su-cat.c11{border-color:rgba(234,88,12,.3)}
+.su-cat.c11 .su-cat-n::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:#f97316;margin-right:5px;vertical-align:1px;animation:su-cat-live 1.8s ease-in-out infinite}
+@media (min-width:1024px){.su-catrail{grid-template-columns:repeat(6,minmax(0,1fr))}}
 </style>
 <style>
 /* ==========================================================================
@@ -5529,6 +5536,8 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
 
 
 
+
+
     <section class="su-catwrap is-start" aria-label="Browse by section">
       <div class="su-cathead"><b>Browse by section</b><a class="su-viewall" href="index.html#jobs">All sections →</a></div>
       <div class="su-railbox">
@@ -5544,6 +5553,7 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
           <a role="listitem" class="su-cat c8" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-trophy" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-trophy"/></svg></span><b>Success Stories</b><small>Verified journeys</small><span class="su-cat-n">24</span></a>
           <a role="listitem" class="su-cat c9" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-work" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-work"/></svg></span><b>Private Jobs</b><small>Off-campus</small><span class="su-cat-n">87</span></a>
           <a role="listitem" class="su-cat c10" href="index.html#jobs"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-globe" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-globe"/></svg></span><b>Current Affairs</b><small>Daily GK</small><span class="su-cat-n">210</span></a>
+          <a role="listitem" class="su-cat c11" href="../pages/daily-quiz.html"><span class="su-cat-ic" aria-hidden="true"><svg class="su-uicon su-uicon-school" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-school"/></svg></span><b>Daily Quiz</b><small>5 Q · roju</small><span class="su-cat-n">5</span></a>
         </div>
         <button class="su-railnav su-railnav--r" type="button" aria-label="Scroll right" tabindex="-1"><svg class="su-uicon su-uicon-chevron" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><use href="#su-i-chevron"/></svg></button>
       </div>
