@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="te">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GO LIVE TODAY — StudentUp (ఒక్కటే runbook)</title>
+<style>
+:root{--bg:#0b1020;--card:#141b31;--line:#263252;--ink:#e9eefb;--mut:#9fb0d4;--ok:#22c55e;--warn:#f59e0b;--acc:#4f8cff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,"Noto Sans Telugu",Segoe UI,Roboto,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:22px 16px 80px}
+h1{font-size:clamp(22px,5vw,32px);margin:0 0 6px}
+.sub{color:var(--mut);margin:0 0 18px}
+.bar{position:sticky;top:0;z-index:5;background:#0b1020ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:18px}
+.prog{height:10px;background:#1d2743;border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4f8cff,#22c55e);transition:.3s}
+.progtxt{font-size:13px;color:var(--mut);margin-top:6px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+.step h2{font-size:18px;margin:0 0 4px;display:flex;gap:9px;align-items:baseline}
+.step h2 span.n{background:var(--acc);color:#fff;border-radius:8px;font-size:13px;padding:2px 9px;flex:0 0 auto}
+.t{font-size:12px;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:1px 8px;margin-left:auto;flex:0 0 auto}
+ul{margin:10px 0 0;padding-left:20px}li{margin:5px 0}
+label.ck{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding-top:11px;border-top:1px dashed var(--line);cursor:pointer;color:var(--ok);font-weight:600}
+label.ck input{width:20px;height:20px;margin-top:2px;accent-color:#22c55e}
+.step.done{opacity:.55;border-color:#22c55e55}
+pre{position:relative;background:#0a0f1f;border:1px solid var(--line);border-radius:10px;padding:12px 12px;overflow:auto;font-size:13px;margin:10px 0}
+button.cp{position:absolute;top:7px;right:7px;background:#1d2743;color:var(--ink);border:1px solid var(--line);border-radius:7px;font-size:11px;padding:3px 9px;cursor:pointer}
+code{background:#0a0f1f;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:13px}
+.w{background:#f59e0b18;border-left:3px solid var(--warn);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:14px}
+.g{background:#22c55e14;border-left:3px solid var(--ok);padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;font-size:14px}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+td,th{border:1px solid var(--line);padding:7px 9px;text-align:left}th{background:#1a2340}
+.gates{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 20px}
+.gates b{background:#22c55e18;border:1px solid #22c55e44;color:#9ff0bd;border-radius:99px;padding:4px 11px;font-size:13px;font-weight:600}
+.reset{background:none;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🚀 GO LIVE TODAY</h1>
+<p class="sub">ఇదే <b>ఒక్కటే</b> runbook. మిగతా 13 markdown files ఇక చూడక్కర్లేదు. పైనుంచి కిందకి వరుసగా చేయండి — ఒక్కో step అయ్యాక tick పెట్టండి (progress save అవుతుంది).</p>
+
+<div class="gates">
+  <b>168/168 tests</b><b>PHP lint 108/108</b><b>readiness 100/100</b><b>master-265: 0 gaps</b><b>deploy-check 0 fail</b>
+</div>
+
+<div class="bar"><div class="prog"><i id="pb"></i></div><div class="progtxt" id="pt">0 / 9</div></div>
+
+<div class="step" data-k="s0">
+<h2><span class="n">0</span> Hosting + domain <span class="t">~60 నిమిషాలు · మీరు మాత్రమే చేయగలరు</span></h2>
+<ul>
+<li>MilesWeb (లేదా ఏ shared host అయినా) plan + domain కొనండి.</li>
+<li>cPanel → <b>Softaculous → WordPress install</b> (domain root లో, subfolder కాదు).</li>
+<li>cPanel → <b>SSL/TLS Status → Run AutoSSL</b> + <b>Force HTTPS</b> ON.</li>
+</ul>
+<div class="w">⚠️ ఇది పూర్తి అయ్యేవరకు కింది ఏ step కూడా పని చేయదు. ఇదే ఇప్పుడున్న <b>ఒకే ఒక్క blocker</b>.</div>
+<label class="ck"><input type="checkbox"> WordPress live, HTTPS పని చేస్తోంది</label>
+</div>
+
+<div class="step" data-k="s1">
+<h2><span class="n">1</span> Theme upload <span class="t">~10 నిమిషాలు</span></h2>
+<ul>
+<li>File: <code>milesweb-kit/studentup-theme-1.9.54.zip</code> (1,023,201 B · sha256 <code>fee4d8469a9826e289bf…</code>)</li>
+<li>WP Admin → <b>Appearance → Themes → Add New → Upload Theme</b> → Install → "Replace current with uploaded" → <b>Activate</b>.</li>
+<li>WP Admin → <b>StudentUp → Run setup now</b> (categories, pages, menus auto create).</li>
+<li>Cache purge: LiteSpeed / cPanel cache + Cloudflare ఉంటే "Purge Everything".</li>
+</ul>
+<div class="g">✅ Check: ఫోన్‌లో home open → search box కింద icon rail swipe అవ్వాలి · పెద్ద H1 కనిపించకూడదు · "Search StudentUp" placeholder.</div>
+<label class="ck"><input type="checkbox"> Theme activate అయింది, ఫోన్‌లో సరిగ్గా కనిపిస్తోంది</label>
+</div>
+
+<div class="step" data-k="s2">
+<h2><span class="n">2</span> Options నింపండి <span class="t">~10 నిమిషాలు</span></h2>
+<p>WP Admin → <b>StudentUp → Options</b>:</p>
+<table>
+<tr><th>Field</th><th>ఎందుకు</th></tr>
+<tr><td>Internet Center phone + address</td><td>LocalBusiness schema + Google Map — <b>మీ అసలు ఆదాయం ఇక్కడే</b></td></tr>
+<tr><td>Response time ("1 గంటలో reply")</td><td>trust → calls పెరుగుతాయి</td></tr>
+<tr><td>WhatsApp / Telegram channel link</td><td>మొదటి 30 రోజుల్లో Google కన్నా ఎక్కువ clicks ఇవే</td></tr>
+<tr><td>GA4 ID (<code>G-…</code>) + Clarity ID</td><td>ఏ page పని చేస్తోందో తెలియాలంటే</td></tr>
+</table>
+<label class="ck"><input type="checkbox"> Options అన్నీ నింపాను</label>
+</div>
+
+<div class="step" data-k="s3">
+<h2><span class="n">3</span> Bot server + .env <span class="t">~30 నిమిషాలు</span></h2>
+<p>Oracle Cloud always-free VM (Ubuntu 22.04, ₹0) సిఫార్సు. VM కుదరకపోతే cPanel cron.</p>
+<pre><button class="cp">copy</button>unzip studentup-bot-cron.zip -d ~/studentup-bot && cd ~/studentup-bot
+python3 -m pip install -r requirements.txt
+cp .env.example .env && nano .env</pre>
+<pre><button class="cp">copy</button>AI_PROVIDER=gemini
+GEMINI_API_KEYS=key1,key2,key3
+GROQ_API_KEYS=key1,key2
+WP_URL=https://మీ-domain.in
+WP_USERNAME=admin-username
+WP_APP_PASSWORD=xxxx xxxx xxxx xxxx
+AUTO_PUBLISH_DAILY=0</pre>
+<ul>
+<li>App password: WP Admin → <b>Users → Profile → Application Passwords</b>.</li>
+<li>Gemini key: <code>aistudio.google.com/apikey</code> · Groq key: <code>console.groq.com/keys</code> (రెండూ free).</li>
+<li><b>AUTO_PUBLISH_DAILY=0</b> గానే ఉంచండి — మొదట మీరు చూసి publish చేస్తారు.</li>
+</ul>
+<pre><button class="cp">copy</button>python3 run.py --deploy-check
+python3 run.py --check-wp</pre>
+<label class="ck"><input type="checkbox"> deploy-check + check-wp రెండూ green</label>
+</div>
+
+<div class="step" data-k="s4">
+<h2><span class="n">4</span> మొదటి 5 posts — చేతితో review <span class="t">~60 నిమిషాలు · skip చేయకండి</span></h2>
+<pre><button class="cp">copy</button>python3 run.py --radar      # ఈరోజు ఏ notifications వచ్చాయి
+python3 run.py --run        # drafts create
+python3 run.py --daily-quiz # quiz draft</pre>
+<ul>
+<li>WP → Posts → Drafts లో <b>5 drafts</b> ఒక్కొక్కటి చదవండి: తేదీలు, fee, last date, official link — అన్నీ నిజమేనా?</li>
+<li>సరిగ్గా ఉంటే publish. తప్పు ఉంటే ఆ screenshot నాకు పంపండి → bot prompt సరిచేస్తాను.</li>
+</ul>
+<div class="w">⚠️ ఈ step end-to-end నిజంగా పని చేస్తుందా అని నిరూపించే ఒకే ఒక్క test. ఇదే అసలు "launch".</div>
+<label class="ck"><input type="checkbox"> 5 posts చదివి publish చేశాను</label>
+</div>
+
+<div class="step" data-k="s5">
+<h2><span class="n">5</span> Google కి చెప్పండి <span class="t">~20 నిమిషాలు</span></h2>
+<ul>
+<li><b>Search Console</b> → domain verify (DNS TXT) → <code>sitemap.xml</code> + <code>news-sitemap.xml</code> submit.</li>
+<li><b>Bing Webmaster</b> → GSC నుంచి import (1 click) — Copilot/ChatGPT search ఇక్కడ నుంచే వస్తుంది.</li>
+<li>IndexNow: <code>python3 run.py --index-key-gen</code> → key ని <code>.env</code> లో <code>INDEXNOW_KEY=</code>.</li>
+</ul>
+<pre><button class="cp">copy</button>python3 run.py --go-live --apply
+python3 run.py --verify-deploy</pre>
+<div class="g">✅ v251 AI layer దీని తర్వాతే పని మొదలుపెడుతుంది: robots.txt లో GPTBot/ClaudeBot/PerplexityBot/Google-Extended allow + llms.txt + citation schema.</div>
+<label class="ck"><input type="checkbox"> GSC + Bing + IndexNow అయ్యాయి</label>
+</div>
+
+<div class="step" data-k="s6">
+<h2><span class="n">6</span> Cron ON — రోజుకి 3–5 posts <span class="t">~5 నిమిషాలు</span></h2>
+<pre><button class="cp">copy</button>crontab -e
+30 6 * * * cd ~/studentup-bot && python3 run.py --run
+0  7 * * * cd ~/studentup-bot && python3 run.py --daily-quiz</pre>
+<ul>
+<li>మొదటి వారం రోజూ drafts చూసి publish చేయండి. నాణ్యత స్థిరం అయ్యాక <code>AUTO_PUBLISH_DAILY=1</code>.</li>
+<li>ప్రతి post వెంటనే WhatsApp/Telegram channel లో share.</li>
+</ul>
+<label class="ck"><input type="checkbox"> Cron పెట్టాను, రోజూ posts వస్తున్నాయి</label>
+</div>
+
+<div class="step" data-k="s7">
+<h2><span class="n">7</span> 30 రోజులు — ఓపిక <span class="t">traffic ఇక్కడే వస్తుంది</span></h2>
+<ul>
+<li>రోజుకి 3–5 posts × 30 రోజులు = <b>100+ posts</b>. ఇది negotiable కాదు.</li>
+<li>వారానికి ఒకసారి: <code>python3 run.py --live-audit</code> (dead links + SEO) · <code>--launch-check</code>.</li>
+<li>GSC లో చూడండి: impressions మొదట, clicks తర్వాత. Week 3 వరకు దాదాపు సున్నా — normal.</li>
+</ul>
+<label class="ck"><input type="checkbox"> 30 రోజులు · 100+ posts పూర్తి</label>
+</div>
+
+<div class="step" data-k="s8">
+<h2><span class="n">8</span> AdSense <span class="t">20+ posts తర్వాత మాత్రమే</span></h2>
+<pre><button class="cp">copy</button>python3 run.py --adsense-ready</pre>
+<ul>
+<li>Verdict <b>READY</b> వచ్చాకే apply. ముందే apply చేస్తే reject → 30 రోజులు wait.</li>
+<li>Approve అయ్యాక: StudentUp → Ads → <code>ca-pub-…</code> + slot IDs → APPROVED tick. <b>Auto ads OFF</b>.</li>
+<li>AdSense → Privacy & messaging → <b>CMP ON</b>.</li>
+</ul>
+<div class="w">💰 నిజం: మొదటి ఆదాయం AdSense కాదు — <b>Internet Center</b> (applications, printouts). అది step 2 లోనే live.</div>
+<label class="ck"><input type="checkbox"> AdSense approved</label>
+</div>
+
+<button class="reset" id="rs">Progress reset</button>
+</div>
+<script>
+const steps=[...document.querySelectorAll('.step')];
+function save(){localStorage.setItem('su-golive',JSON.stringify(steps.map(s=>s.querySelector('input').checked)))}
+function paint(){const d=steps.filter(s=>s.querySelector('input').checked).length;
+steps.forEach(s=>s.classList.toggle('done',s.querySelector('input').checked));
+pb.style.width=(d/steps.length*100)+'%';pt.textContent=d+' / '+steps.length+(d===steps.length?' — LIVE 🎉':'')}
+try{const v=JSON.parse(localStorage.getItem('su-golive')||'[]');v.forEach((c,i)=>{if(steps[i])steps[i].querySelector('input').checked=c})}catch(e){}
+steps.forEach(s=>s.querySelector('input').addEventListener('change',()=>{save();paint()}));
+document.getElementById('rs').onclick=()=>{steps.forEach(s=>s.querySelector('input').checked=false);save();paint()};
+document.querySelectorAll('button.cp').forEach(b=>b.onclick=()=>{const t=b.parentNode.innerText.replace(/^copy\n?/,'');navigator.clipboard.writeText(t.trim());b.textContent='copied';setTimeout(()=>b.textContent='copy',1200)});
+paint();
+</script>
+</body>
+</html>
