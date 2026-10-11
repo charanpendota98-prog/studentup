@@ -42,6 +42,31 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
+## 📱 Site design fix — `studentup-theme-1.9.55.zip` (v255)
+
+Phone screenshots లోని bugs కి fix ఇదే — **WordPress లో theme upload చేయాలి**:
+
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** →
+   `studentup-theme-1.9.55.zip` → **Install Now → Activate**.
+2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
+
+v255 లో ఏమి ఫిక్స్ అయింది:
+
+| Bug (screenshot) | Fix |
+|---|---|
+| "Browse by section" tiles plain links లా scatter | Section grid ఇప్పుడు **critical (first-paint) CSS** లో — phone లో **3 icons per row**, tablet 4, laptop 6; tap targets ≥96px |
+| Sections list లో internships/scholarships/breaking లేవు | 13 tiles: TS · AP · Central · Software · Private · Hall Tickets · Results · **Breaking** · Walk-in · **Internships** · **Scholarships** · Success Stories · Current Affairs |
+| Social rail లో ఖాళీ తెల్ల circles (icons కనపడలేదు) | Brand colors (WhatsApp green · Telegram blue · IG gradient · YT red) first-paint CSS లోకి; white glyphs |
+| Drawer "More" menu letters ఒక్కొక్కటిగా scatter | `.mpanel .menu a` neat 44px rows (style.css + critical) |
+| Rail arrows (› ‹) grey boxes లా తేలుతున్నాయి | Grid layout కి arrows/progress bar అవసరం లేదు — hidden |
+
+Preview: Arena live-preview లో `/preview/v255/index.html` — **phone + laptop రెండింటిలో** open చేసి
+360px → 1440px వరకు చూడండి.
+
+sha256: `ecc1add5332136b4f1fe5b11a8c98519b7a56a7cf460823173b6e1d88fde5c14  studentup-theme-1.9.55.zip`
+
+---
+
 ## దారి A — Oracle Cloud free VM (సిఫార్సు · 30 నిమిషాలు)
 
 ### A1. VM create
@@ -149,7 +174,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-697bb9e846bb34b33ec83bd167e9e576c0e662732898978b2bd48885e22be278  studentup-bot-cron.zip
+5d75018945f28618c0c44efaa38b1335a7ecdbf25bc926379bd2c27cc6ae35f7  studentup-bot-cron.zip
 ```
 
 ---
