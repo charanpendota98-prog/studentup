@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Site design fix — `studentup-theme-1.9.64.zip` (v255)
+## 📱 Site design fix — `studentup-theme-1.9.65.zip` (v255)
 
 Phone screenshots లోని bugs కి fix ఇదే — **WordPress లో theme upload చేయాలి**:
 
 1. WP Admin → **Appearance → Themes → Add New → Upload Theme** →
-   `studentup-theme-1.9.64.zip` → **Install Now → Activate**.
+   `studentup-theme-1.9.65.zip` → **Install Now → Activate**.
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
 v255 లో ఏమి ఫిక్స్ అయింది:
@@ -63,7 +63,7 @@ v255 లో ఏమి ఫిక్స్ అయింది:
 Preview: Arena live-preview లో `/preview/v255/index.html` — **phone + laptop రెండింటిలో** open చేసి
 360px → 1440px వరకు చూడండి.
 
-sha256: `a11e5097a869984722fc946e5833359374614e67b01eb8c6be0b4a7c60128980  studentup-theme-1.9.64.zip`
+sha256: `e27cd347e6e70da1786d332a56bf6e0358a34d0b3e356be80b31955d4fa533cc  studentup-theme-1.9.65.zip`
 
 ---
 
@@ -174,7 +174,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-b5f6074a87d82b55ae7e92ec9a20d68cd06cd72abe208f8ea561e1bfec8f30e4  studentup-bot-cron.zip
+81f173322e809276f86e9540bda8dcfab26995b4e353ba24a91b0fc5e93c6245  studentup-bot-cron.zip
 ```
 
 ---
