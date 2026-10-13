@@ -82,7 +82,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `18681da437007259f2efbf88212a5555242070be7aeaaeb59cd9d0b0a8cf23f9  studentup-theme-1.9.89.zip`
+sha256: `d3e1ba25aff212507fb981bc2c13b90916411d5f0c8aed9001929f234ab19252  studentup-theme-1.9.89.zip`
 
 ---
 
@@ -193,7 +193,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-acd190bd239f65c19ad03a23edb008c94c5f756d210322baae2c0a5527900071  studentup-bot-cron.zip
+9aee3039e49c0dfcff4cf1f27a5b6f703e4ad57bef5e1bdfad125e84ced05d2e  studentup-bot-cron.zip
 ```
 
 ---
