@@ -42,28 +42,26 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Site design fix — `studentup-theme-1.9.77.zip` (v255)
+## 📱 Site design fix — `studentup-theme-1.9.78.zip` (v280)
 
 Phone screenshots లోని bugs కి fix ఇదే — **WordPress లో theme upload చేయాలి**:
 
 1. WP Admin → **Appearance → Themes → Add New → Upload Theme** →
-   `studentup-theme-1.9.77.zip` → **Install Now → Activate**.
+   `studentup-theme-1.9.78.zip` → **Install Now → Activate**.
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
-v255 లో ఏమి ఫిక్స్ అయింది:
+v280 లో ఏమి మారింది:
 
-| Bug (screenshot) | Fix |
+| Change | Detail |
 |---|---|
-| "Browse by section" tiles plain links లా scatter | Section grid ఇప్పుడు **critical (first-paint) CSS** లో — phone లో **3 icons per row**, tablet 4, laptop 6; tap targets ≥96px |
-| Sections list లో internships/scholarships/breaking లేవు | 13 tiles: TS · AP · Central · Software · Private · Hall Tickets · Results · **Breaking** · Walk-in · **Internships** · **Scholarships** · Success Stories · Current Affairs |
-| Social rail లో ఖాళీ తెల్ల circles (icons కనపడలేదు) | Brand colors (WhatsApp green · Telegram blue · IG gradient · YT red) first-paint CSS లోకి; white glyphs |
-| Drawer "More" menu letters ఒక్కొక్కటిగా scatter | `.mpanel .menu a` neat 44px rows (style.css + critical) |
-| Rail arrows (› ‹) grey boxes లా తేలుతున్నాయి | Grid layout కి arrows/progress bar అవసరం లేదు — hidden |
+| "Remind me" buttons 2 సార్లు వచ్చాయి | Remind me పూర్తిగా తీసేశాము (owner: avasram ledu) — cards మీద **ఒక్క Save + Read more** మాత్రమే |
+| Card పక్కన clumsy pill columns (Save · Remind · Save · Remind) | duplicate script tail + extra save pills తీసేశాము — card neat & compact, no wasted space |
+| Reminder strip · "Add reminder" · calendar (.ics) buttons | theme లో కూడా తీసేశాము — belt CSS తో ఎప్పటికీ కనపడవు |
 
 Preview: Arena live-preview లో `/preview/v255/index.html` — **phone + laptop రెండింటిలో** open చేసి
 360px → 1440px వరకు చూడండి.
 
-sha256: `267cf8156e188c609985c72458be154f0b4710df445011af613f1d9f52683cd6  studentup-theme-1.9.77.zip`
+sha256: `e6f5a24d2469ded181811e5961c3c1a80dcd12139bf42a634720ae4d8b69e8c0  studentup-theme-1.9.78.zip`
 
 ---
 
@@ -174,7 +172,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-1b4ff784305384e97feb013572857741c476aa80c8e0a7eb5a3400c078d823f0  studentup-bot-cron.zip
+d41571914c2da1da529e1b9f53db3b1ba3601c677bfbb0b8d849aaaf6d149301  studentup-bot-cron.zip
 ```
 
 ---
