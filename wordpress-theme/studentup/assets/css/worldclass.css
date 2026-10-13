@@ -2591,3 +2591,20 @@ html, body{ overflow-x:hidden; }
   .su-top5-list li{ padding:12px 14px; }
 }
 
+
+/* v299 — PIXEL AUDIT (real Chromium 390px): "Most searched" tile names were breaking mid-word
+   ("Governme / nt Jobs"). Words stay whole; tile gets the room it needs on narrow phones. */
+.usedcard b{ overflow-wrap:normal; word-break:keep-all; hyphens:manual }
+@media (max-width:480px){
+  .usedcard{ padding:10px 24px 10px 10px; gap:8px }
+  .usedcard .ui{ width:34px; height:34px; border-radius:10px }
+  .usedcard b{ font-size:12.5px; line-height:1.25 }
+  .usedcard .ucount{ right:6px }
+}
+/* v299 — post tables on phone: 2-column key/value tables were forced to side-scroll (nowrap)
+   and the 2nd column got cut ("Customer S…"). Now text wraps; wide tables (4+ cols) still scroll. */
+@media(max-width:700px){
+  .article-content table{ white-space:normal }
+  .article-content th, .article-content td{ min-width:120px; overflow-wrap:anywhere }
+  .article-content table thead th{ white-space:nowrap }
+}
