@@ -185,7 +185,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-5725e3dd11ce0528b7a11d01d628d5aeb11cb2a131df386055d6a3b9dd61d362  studentup-bot-cron.zip
+0842bc2115689772d906a4696f1c1e07f9a7e6e6fb79eaa3a20c4de2979c5512  studentup-bot-cron.zip
 ```
 
 ---
