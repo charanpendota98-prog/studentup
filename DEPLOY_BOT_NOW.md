@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.92.zip` (v294 · social rail BACK + Post Your News + Breaking section)
+## 📱 Theme upload — `studentup-theme-1.9.93.zip` (v295 · Post Your News section + Breaking News TS/AP → districts)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.92 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.93 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.92.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.93.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v295** — "Post your news section quiz pakkana; Google Form tho name/number/photo/story; approve → edit → manual post; Breaking News open → Telangana News / Andhra News → alphabetical districts; district-wise posts; home lo chupinchoddu" | (1) **Post your news** ippudu proper **section card** Daily Quiz kinda (heading + 3 tiles Success story / Photo-Video / District update + "Send now") → `/post-your-news/`. Flow: reader Google Form (meeru create: Name · Phone · District · Story · Photo/Video upload · Consent) fill chestadu → mee Google Sheet/Drive lo vastundi → meeru chusi WP Admin lo **manual ga edit chesi post** chestaru (Success Stories category) → page lo Approved stories wall lo automatic ga kanipistundi. Auto-publish ledu. (2) **Breaking News tree** auto-create (admin load lo okasari): `Breaking News` → `Telangana News` (33 districts, A→Z) + `Andhra Pradesh News` (26 districts, A→Z) — anni categories. Breaking page open → 2 state cards; state click → **alphabetical district grid (anni districts)**; district click → aa district posts. Post cheyadam: Posts → Add New → Categories lo district tick (e.g. Telangana News › Warangal). (3) Home exclusion ippudu **root + states + anni districts** cover chestundi (home/Top5/slider/latest/other cats lo ravu). Demo: `pages/breaking-news.html` (TS/AP toggle + district grid), home card `?v=295` |
 | **v294** — "Social icons vundali — ✕ chesthe 5 min ki malli vasthundi OK; Daily Quiz pakkana Post your news; Breaking News separate section, home lo chupinchoddu" | (1) **Floating social rail తిరిగి పెట్టాము** (v293 removal reverted) — ✕ cheste 5 min tarvata malli vastundi (studentup.js SU_CYCLE 300000). (2) **Post Your News** — Daily Quiz కింద CTA card (Success story · Photo/Video · District update) → `/post-your-news/` page (`page-post-news.php`, firstrun auto-create): WhatsApp · Telegram · Email send buttons + **Google Form embed** (Settings → *Verified Success Story Google Form URL* set cheste iframe + "Open form"; lekapote render kaadu) + **Approved stories wall** (published `success-stories` posts, motivational cards; lekapote render kaadu). Submissions auto-publish kaavu — meeru approve chesi post chestaru. (3) **Breaking News section** — `breaking-news` category (firstrun create chestundi); header/mobile "Breaking News" + home LIVE FLASH card → category page. `pre_get_posts` guard: breaking posts **home / Top 5 / slider / latest / other lists lo kanipinchavu** — only category page + single post + search. District news akkada post cheyandi. GA4: `postnews_open/whatsapp/telegram/email/form`. Demo: `pages/post-your-news.html`. **v294b**: page lo 3-step strip (You send → We verify → We post with your name) + **Latest story** featured hero (excerpt+photo); Breaking News category page lo **district chips** (breaking posts ki pettina tags nunchi — e.g. tag "Warangal" → chip; `?tag=warangal` filter; 10-min cache; tags lekapote render kaadu) |
 | **v293** — Social icons కోసం side లో space waste / overlap (screenshot) | Right-edge **floating social rail** (✕ · ‹ tab · 2 min కి మళ్ళీ వచ్చేది) theme footer + previews నుంచి పూర్తిగా తీసేశాము — overlap లేదు, space waste లేదు. Social links footer + Browse-by-section belt లో in-flow గా ఉన్నాయి (చాలు). Bonus: demo లో 3 category icons తప్పు (Hall Tickets / Software / Current Affairs briefcase గా) → correct outline icons (ticket / laptop / news), Private Jobs → building |
 | **v292** — "Chala miss chesav" → top job-site signature elements compare | **Miss అయింది: "Important Links" box** (Sarkari Result / FreeJobAlert లో #1 click element) — ప్రతి post లో article కింద: **Apply Online** (green, last date తర్వాత hide + "closed" line) · **Official Notification (PDF)** · **Official Website · ssc.gov.in** · **More <Category>** · **Job alerts on Telegram**. Real data ఉన్న rows మాత్రమే (apply/source meta — bot ఇప్పటికే fill చేస్తుంది); GA4 `important_link` event per row. Plus: previews లో ఇంకా fake "Advertisement" placeholders (post sidebar 300×250, tools below-ad, phone 6-sec sticky anchor) ఉన్నాయి → తీసేశాము (approval వరకు ad slots వద్దు rule). Runtime audit 8 pages: 0 errors, dead links 0, visible ads 0 |
@@ -85,7 +86,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `229bb81d8b8b4375ec3d0e6fd58db722af1f81921929d32111fa6775cea3b251  studentup-theme-1.9.92.zip`
+sha256: `8edc0c12f30a7f2533ace1247bf7f7db913524b301cf0edc0753e92c76e12fed  studentup-theme-1.9.93.zip`
 
 ---
 
@@ -196,7 +197,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-fa8286564dfe1d3ae49ca50bcae7b3dd528f3f060292611243dbbd3539f1bb76  studentup-bot-cron.zip
+e3889b708e29afb065dbbc78b534a3458e96c42e961f718461f93f9d8c943d32  studentup-bot-cron.zip
 ```
 
 ---
