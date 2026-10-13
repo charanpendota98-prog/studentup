@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.87.zip` (v289 · DEEP AUDIT fixes)
+## 📱 Theme upload — `studentup-theme-1.9.88.zip` (v290 · SMART SEARCH RESULTS)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.87 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.88 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.87.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.88.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v290** — "Theme లో ఇంకా ఏమైనా miss అయ్యాయా — top website level" | Gap analysis (PWA, web-push, schema, TOC, related, bottom-nav, author box, breadcrumbs, OG image, calendar, saved, dark mode — అన్నీ ఉన్నాయి). **Miss అయింది: Search results page** (highest-intent visitors). WP default = అన్ని words match అవ్వాలి → long queries కి 0 results → visitor వెళ్ళిపోతాడు. కొత్త `inc/search-smart.php`: "Results for “police” · 14 results", **related category chips**, **Did you mean** (typo → nearest category/tag, close match ఉంటేనే), 0 results అయితే **Closest matches** (any-word match, ఎక్కువ words match అయినవి ముందు) → లేకపోతే Latest 6; posts only, 12/page. Plus: header.php లో dead GSC-verification duplicate తీసేశాము (real one `gsc_verify` option → consent.php), readme Stable tag sync. Deep audit 31/31 pass |
 | **v289** — "Chala mistakes unnayi — deep audit strict ga" | కొత్త **runtime audit** (jsdom లో 8 preview pages load చేసి JS run, quiz flow, status card, search, icons, links check): **0 runtime errors**. దొరికి fix చేసినవి: (1) v255 demo లో **66 dead links** (`href="#"` — menu, footer, social, cards) → real site URLs; (2) Exam-calendar లో ఇంకా **.ics reminder button + hint** (theme + preview) ఉంది — owner rule ప్రకారం తీసేశాము; "+ .ics export" copy కూడా; (3) Status card: canvas block అయిన phone లో crash → ఇప్పుడు text share fallback; (4) bot `--doctor` key లేనప్పుడు "list index" crash → clear message. Verified: social icons 4/4 అన్ని home surfaces, category tiles 11/13 outline icons, rail arrows 0, hint texts 0, **ad slots 0** (AdSense client ID పెట్టేవరకు theme ఏ ad markup render చేయదు — approval వచ్చాక Settings లో ID పెట్టండి చాలు), bot 105/105 modules import OK, ci tests pass, `--daily-quiz-dry` / `--quiz-push-dry` OK |
 | **v288** — Status లో card తో పాటు link కింద వెళ్ళాలి, click అవ్వాలి | (1) Link ఇప్పుడు caption లో **3వ line** లోనే (`👉 Join me, play today's quiz: studentup.in/quiz`) — status caption truncate అయినా link కనపడుతుంది, tap అవుతుంది. (2) "Post to Status" నొక్కగానే caption+link **clipboard కి copy** (iOS / కొన్ని WhatsApp builds image share లో text drop చేస్తాయి → paste చేస్తే చాలు; toast చెబుతుంది). (3) కొత్త **"Copy link + caption"** button. Card image లో కూడా "▶ Play now · studentup.in/quiz" ఉంది |
 | **v287** — Share link clean గా, click చేస్తే వెళ్ళాలి | కొత్త short link **`https://studentup.in/quiz`** (theme `/quiz` లేదా `/play` → auto redirect: daily-quiz page ఉంటే అక్కడికి, లేకపోతే home quiz కి; `?ref=status/telegram/whatsapp` carry అవుతుంది, rewrite flush అవసరం లేదు). Status card లో "▶ Play now · studentup.in/quiz", message లో link సొంత line లో → WhatsApp/Telegram లో clickable. Bot push/teaser కూడా ఇదే link. ⚠️ WP లో `quiz` slug తో page పెట్టొద్దు (short link దాన్ని intercept చేస్తుంది) — quiz page కావాలంటే slug `daily-quiz` |
@@ -80,7 +81,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `fe187a6270974c42881308287db975bb730ffc345191714518f36e16b69f5fba  studentup-theme-1.9.87.zip`
+sha256: `18681da437007259f2efbf88212a5555242070be7aeaaeb59cd9d0b0a8cf23f9  studentup-theme-1.9.88.zip`
 
 ---
 
@@ -191,7 +192,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-35ba3595516dbd1e085c844a8f1716c4dff3ee13611378f380a3de59fb2c454e  studentup-bot-cron.zip
+625fa695ad7ddc23dbc33c6c6cbc19d45ef4127e316406da1392936354ec2dc3  studentup-bot-cron.zip
 ```
 
 ---
