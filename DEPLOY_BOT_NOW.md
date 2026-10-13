@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.80.zip` (v282 · QUIZ STATUS GAME + fixes)
+## 📱 Theme upload — `studentup-theme-1.9.81.zip` (v283 · QUIZ STATUS GAME + fixes)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.80 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.81 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.80.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.81.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -61,12 +61,16 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | Quiz link add — friends click చేసి ఆడాలి | Card లోనూ, message లోనూ quiz link ఉంది. Phone లో **"Post to Status"** → WhatsApp → My status (image తో). Fallback: "Send on WhatsApp" text + "Download card" |
 | Social media icons రావట్లేదు (ఖాళీ తెల్ల circles) | Root cause: demo rail లో class mismatch → white icon on white. Fix + belt CSS — phone & laptop రెండింటిలో brand colours తో కనపడతాయి |
 | Categories కింద "TSPSC · Police" text + 128/96 counts వద్దు | Theme + అన్ని previews లో తీసేశాము — **icon + name మాత్రమే** |
+| Social icons ఇంకా blank (WA, IG) | Real bug: preview లో WA/IG icon path తప్పుగా `https://wa.me/` అని వచ్చింది (build regex bug) — fix; నాలుగు icons brand colours తో |
+| "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
+| Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
+| Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
 | v281 (ముందు round) | Urgency pills · Closing Soon band · highlight-to-share · laptop elevation — అలాగే ఉన్నాయి |
 
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `24c17cb3ed97bb5b17dfa0744fd21bc75114f2e1c44648fe7b320a4cc34226f4  studentup-theme-1.9.80.zip`
+sha256: `f13c594bc24e7d7176ac24b4ab6d9254af9214de887ab2f47e94ea536c5879eb  studentup-theme-1.9.81.zip`
 
 ---
 
@@ -177,7 +181,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-f06cb2fe608b8403a4b6270fa890e15e89c16b430ccab4b8dd8504967dc55d42  studentup-bot-cron.zip
+7f016aa6d44bf52da802c489c6132af1c7c060f84f9a68f2fef6dcfe8b7455e0  studentup-bot-cron.zip
 ```
 
 ---
