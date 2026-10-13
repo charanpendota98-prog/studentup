@@ -1,0 +1,559 @@
+<?php
+/**
+ * v64: StudentUp Settings — anni website options okka chota (admin page + REST).
+ *
+ * Enduku: ads, socials, author info, house ads — ivi WordPress
+ * option ga already untunnayi kaani admin lo edit cheyyadaniki page ledu.
+ * Ippudu: WP Admin → "StudentUp" menu → tabs (Ads · Socials · Content · Advanced).
+ * Bot kuda idi REST tho chaduvutundi/rasutundi (/wp-json/studentup/v1/options).
+ *
+ * @package studentup
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Option helper — 'studentup_' prefix tho.
+ */
+function studentup_opt( $key, $default = '' ) {
+	return get_option( 'studentup_' . $key, $default );
+}
+
+/**
+ * Editable fields (key => [label, type, default, help]).
+ */
+function studentup_option_fields() {
+	return array(
+		'ads' => array(
+			'title'  => 'Ads & monetisation',
+			'fields' => array(
+				'ads_enabled'    => array( 'Ads ON (site) — master switch', 'check', '1', 'OFF chesthe e pages lo ads render avvavu' ),
+				'adsense_client' => array( 'AdSense Client ID', 'text', '', 'ca-pub-XXXXXXXXXXXXXXXX (approve ayyaka)' ),
+				'adsense_approved' => array( 'AdSense APPROVED (email vachaka ON)', 'check', '0', 'v84: OFF unte AdSense code eppudu render kaadu — house ads matrame (blank-box/policy risk zero)' ),
+				'adsense_auto'   => array( 'AdSense Auto ads (head code)', 'check', '0', 'AdSense auto ads script ni head lo add chestundi' ),
+				'adsense_slot_top_leaderboard' => array( 'Slot: top-leaderboard', 'text', '', 'AdSense → Ads → By ad unit → code lo data-ad-slot' ),
+				'adsense_slot_sidebar'         => array( 'Slot: sidebar', 'text', '', '' ),
+				'adsense_slot_anchor'          => array( 'Slot: anchor/sticky (mobile)', 'text', '', '' ),
+				'adsense_slot_mid'      => array( 'Slot: mid (in-article, ₹ highest)', 'text', '', 'Article madhya lo — highest RPM slot' ),
+				'adsense_slot_mid_b'    => array( 'Slot: mid — variant B (A/B test)', 'text', '', 'v162: B unit id pettithe ne A/B test nadustundi' ),
+				'adsense_slot_below_content_b' => array( 'Slot: below-content — variant B', 'text', '', 'v162: khaali unte test ledu' ),
+				'adsense_slot_in_feed'  => array( 'Slot: in-feed (grid madhya)', 'text', '', 'Between the cards in the home grid' ),
+				'adsense_slot_video'    => array( 'Slot: video/outstream (₹ highest CPM)', 'text', '', 'High-CPM video & outstream ad unit slot ID' ),
+				'adsense_slot_multiplex' => array( 'Slot: multiplex / related-ads (autorelaxed)', 'text', '', 'v216: article kinda native "related content" grid — in-article tarvata highest RPM unit. AdSense → Ads → Display ads → Multiplex.' ),
+				'adsense_slot_below_content' => array( 'Slot: below-content (article tarvata)', 'text', '', 'After the article — the 2nd highest RPM slot' ),
+				'ads_txt'        => array( 'ads.txt content', 'textarea', '', 'Site root /ads.txt ga serve avutundi (AdSense approval tarvata publisher id line)' ),
+				'deep_ad'       => array( 'Second in-article ad (long posts only)', 'check', '1', 'v134: 10+ paragraphs unna posts lo 70% mark daggara 2nd slot — density cap + 4 para gap tho policy-safe' ),
+				'in_article_ad'  => array( 'In-article ad (content 3rd para tarvata)', 'check', '1', 'Highest-CTR placement — AdSense/ house ad (density cap + lazy tho)' ),
+				'news_schema' => array( 'NewsArticle schema (Discover / Google News)', 'check', '1', 'v141: SEO plugin unte or bot Article schema unte auto-skip — duplicate vaddu' ),
+				'updated_stamp' => array( 'Show "Updated on" line', 'check', '1', 'v144: publish tarvata nijam ga edit chesthene chuputundi (fake freshness ledu)' ),
+				'saved_reminders' => array( 'Saved job reminders', 'check', '1', 'v151: save chesina job last date daggarapadithe reminder strip (localStorage only)' ),
+				'remind_days' => array( 'Reminder window (days)', 'text', '3', 'v151: enni rojula mundu reminder chupinchali (1-14)' ),
+				'pdf_button' => array( 'Save as PDF button (posts)', 'check', '1', 'v151: browser print-to-PDF — server ki emi pampadu' ),
+				'personal_picks' => array( 'Your 5 today (personalised strip)', 'check', '1', 'v156: qualification+state profile browser lo ne — login ledu, server call ledu' ),
+				'webpush' => array( 'Web push notifications', 'check', '1', 'v163: VAPID public key pettaka ne pani chestundi (python run.py --push-keys)' ),
+				'push_public_key' => array( 'Web push: VAPID public key', 'text', '', 'v163: --push-keys output lo public key' ),
+				'age_calc' => array( 'Age & eligibility calculator (posts & tools)', 'check', '1', 'v165: interactive Telugu age and reservation relaxation calculator' ),
+				'audio_reader' => array( 'Telugu text-to-speech audio reader (posts)', 'check', '1', 'v165: Web Speech API voice synthesis bar — increases dwell time' ),
+				'faq_schema' => array( 'FAQ accordion & FAQPage schema (posts)', 'check', '1', 'v165: rich snippet FAQ schema for Google SERP expandable snippets' ),
+				'quick_summary' => array( '1-Minute Key Highlights box (posts)', 'check', '1', 'v166: TL;DR bullet takeaways — reduces bounce rate' ),
+				'reader_toolbar' => array( 'Reader toolbar (font sizer & reading time)', 'check', '1', 'v166: accessibility font adjuster and reading time' ),
+				'community_pulse' => array( 'Community Pulse WhatsApp/Telegram card', 'check', '1', 'v166: 50k+ student community conversion box' ),
+				'fee_calc' => array( 'Application fee & concession calculator', 'check', '1', 'v167: interactive fee calculator with category exemptions' ),
+				'syllabus_tracker' => array( 'Syllabus & study progress tracker', 'check', '1', 'v167: interactive syllabus checkbox checklist with percentage' ),
+				'status_card' => array( '1-Click WhatsApp status card generator', 'check', '1', 'v167: HTML5 canvas viral status image generator' ),
+				'admit_card_helper' => array( 'Hall ticket & admit card helper', 'check', '1', 'v168: direct portal lookup and guidelines' ),
+				'score_calc' => array( 'Exam negative marks score calculator', 'check', '1', 'v168: preliminary key net score estimator' ),
+				'resume_maker' => array( 'Instant fresher resume & bio-data maker', 'check', '1', 'v168: 1-click professional PDF CV generator' ),
+				'sponsor_hub' => array( 'Contextual sponsor & study partner box', 'check', '1', 'v169: high-RPM affiliate & study partner lead generator' ),
+				'video_ad_enabled' => array( 'High-CPM video & outstream ad unit', 'check', '1', 'v169: 3x-5x higher CPM video ad slot container' ),
+				'smart_recirc' => array( 'Smart recirculation trending jobs unit', 'check', '1', 'v169: 2x pages/session scroll-depth recommendations' ),
+				'slot_lab' => array( 'Slot lab: ad slot A/B test', 'check', '0', 'v162: B slot id set chesaka ne ON cheyandi — python run.py --slot-lab tho report' ),
+				'collapse_unfilled' => array( 'Collapse unfilled ad slots', 'check', '1', 'v159: AdSense fill cheyakapote blank gap teesestundi (CLS safe)' ),
+				'keyfacts' => array( 'Key facts strip + HowTo schema', 'check', '1', 'v158: meta unte ne — 2 kanna thakkuva facts unte block raadu' ),
+				'calendar_button' => array( 'Add last date to calendar (.ics)', 'check', '1', 'v156: last date meta unte ne button vastundi; 1 roju mundu alarm' ),
+				'autolink' => array( 'Auto internal links in posts', 'check', '1', 'v154: article lopala related posts ki links — max 3, first mention only, headings/links lo touch cheyyadu' ),
+				'autolink_max' => array( 'Max auto links per post', 'text', '3', 'v154: 0-6 (ekkuva pedithe spam signal)' ),
+				'static_search' => array( 'Instant search index', 'check', '1', 'v153: /?su_index=1 lo chinna JSON index — search instant + offline, server load zero' ),
+				'index_limit' => array( 'Search index size (posts)', 'text', '300', 'v153: entha recent posts index lo undali (20-1000)' ),
+				'up_next' => array( 'Up next card (after 70% read)', 'check', '1', 'v148: dismissible next-post card — pages/session penchutundi, pop-up kaadu' ),
+				'helpful_box' => array( '"Was this helpful?" box', 'check', '1', 'v144: vote reader browser lo ne — public counter ledu, fake numbers ledu' ),
+				'jobs_table' => array( 'Latest jobs table (homepage)', 'check', '1', 'v142: scannable rows — post, qualification, last date, apply link (meta nunchi, invent cheyyadu)' ),
+				'closing_week' => array( 'Deadline radar (closing this week)', 'check', '1', 'v146: su_last_date meta nunchi next 7 days lo close ayye posts — live days-left pills' ),
+				'popular_searches' => array( 'Popular searches strip (homepage)', 'check', '1', 'v140: long-tail internal links — category archives + real on-site searches' ),
+				'max_ads'        => array( 'Page ki max ads (density cap)', 'text', '5', '4-5 safe (AdSense + UX). Ekkuva = policy risk' ),
+				'lazy_ads'       => array( 'Lazy ads (below-fold) ON', 'check', '1', 'Viewability + CLS — AdSense RPM ki manchi' ),
+				'ads_on_policy'  => array( 'Legal pages lo ads (privacy/about)', 'check', '0', 'Default OFF (AdSense policy safe)' ),
+				'sticky_ad'      => array( 'Sticky bottom ad ON', 'check', '0', 'Mobile lo kindha fixed ad (house/AdSense anchor)' ),
+				'house_ads'      => array( 'House ads (JSON)', 'textarea', '', 'Filled by the bot (ads/house.json → here). Format: [{"title":"..","text":"..","url":".."}]' ),
+				'partner_ad_enabled' => array( 'Featured college partner ad ON', 'check', '0', 'ON chesthe homepage mid sponsored slot lo mee partner photo + copy + link render avutayi' ),
+				'partner_ad_name'    => array( 'Partner name', 'text', '', 'College/institute/business name — image kinda small label ga kanipistundi' ),
+				'partner_ad_title'   => array( 'Partner ad headline', 'text', '', 'Example: Admissions open for B.Tech, MBA & skill courses' ),
+				'partner_ad_description' => array( 'Partner ad description', 'textarea', '', 'Short, factual student-useful description. Claims ni partner tho verify cheyyandi.' ),
+				'partner_ad_image_url' => array( 'Partner photo URL', 'text', '', 'WordPress Media Library lo image upload chesi full https:// URL ikkada paste cheyyandi (1200×630 or similar)' ),
+				'partner_ad_link'    => array( 'Partner destination URL', 'text', '', 'Full https:// admissions/course page URL. Sponsored link ga rel=sponsored nofollow tho render avutundi.' ),
+				'partner_ad_cta'     => array( 'Partner button text', 'text', 'View details →', 'Example: Apply now → / View courses →' ),
+			),
+		),
+		'socials' => array(
+			'title'  => 'Social media',
+			'fields' => array(
+				'social_whatsapp'  => array( 'WhatsApp number', 'text', '9182739312', '10-digit mobile — +91 avasaram ledu (example: 9182739312)' ),
+				'whatsapp_channel_url' => array( 'WhatsApp Channel URL (Follow link)', 'text', '', 'Example: https://whatsapp.com/channel/... (WhatsApp channel link marithe ikkada update cheyandi)' ),
+				'social_telegram'  => array( 'Telegram', 'text', 'studentup_in', 't.me/<idi> — channel username' ),
+				'telegram_channel_url' => array( 'Telegram channel URL override (v91)', 'text', '', 'PRIVATE channel aithe full invite link (https://t.me/+AbCd…); khali unte username t.me link use avutundi' ),
+				'social_instagram' => array( 'Instagram', 'text', 'studentup.in', 'instagram.com/<idi>' ),
+				'social_linkedin'  => array( 'LinkedIn editorial profile', 'text', '', 'Full https://www.linkedin.com/in/... URL or profile username' ),
+				'social_youtube'   => array( 'YouTube', 'text', '@studentupin', 'youtube.com/<idi>' ),
+				'social_facebook'  => array( 'Facebook Page', 'text', '', 'Full https://www.facebook.com/... page URL or username' ),
+				'social_x'         => array( 'X (Twitter)', 'text', '', 'Full https://x.com/... profile URL or username' ),
+				'social_pinterest' => array( 'Pinterest', 'text', '', 'Full https://www.pinterest.com/... profile URL or username' ),
+				'social_reddit'    => array( 'Reddit profile/community', 'text', '', 'Full https://www.reddit.com/... URL; do not automate posting' ),
+				'social_quora'     => array( 'Quora profile', 'text', '', 'Full https://www.quora.com/profile/... URL; do not automate posting' ),
+			),
+		),
+		'content' => array(
+			'title'  => 'Content & site',
+			'fields' => array(
+				'contact_email' => array( 'Contact email', 'text', '', 'Errors/suggestions — falls back to the admin email if empty' ),
+				'success_story_form_url' => array( 'Verified Success Story Google Form URL', 'text', '', 'Public intake link. Collect consent + evidence only; never ask for Aadhaar, PAN, bank details, OTPs or passwords.' ),
+				'author_name'   => array( 'Author name', 'text', 'Charan Pendota', 'Shown in the byline and E-E-A-T box under the post' ),
+				'author_role'   => array( 'Author role (v195, E-E-A-T)', 'text', 'Founder & Content Writer', 'editorial-team page + Person schema lo kanipistundi' ),
+				'author_expertise' => array( 'Author expertise (v195)', 'text', 'Telangana & AP government jobs, exam patterns, scholarships, eligibility rules', 'Comma separated — Person schema knowsAbout + profile chips' ),
+				'author_since'  => array( 'Publishing since (v195)', 'text', '', 'Example: 2026 — profile card lo "Publishing since 2026" ani vastundi' ),
+				'author_reviewer' => array( 'Reviewer name (v195)', 'text', '', 'Draft review chesina nijamaina vyakti peru. Khali unte theme "sources verified" line chupistundi — fake review claim cheyyadu' ),
+				'ic_price_basic' => array( 'Internet Center: single form price (₹) (v196)', 'text', '50', 'Transparent pricing page — hidden price = AdSense/trust risk (audit #12)' ),
+				'ic_price_form'  => array( 'Internet Center: form + photo/signature price (₹) (v196)', 'text', '100', 'Same price list, second row' ),
+				'ic_price_combo' => array( 'Internet Center: application + document pack price (₹) (v196)', 'text', '150', 'Same price list, third row' ),
+				'author_experience' => array( 'Author Experience / Title', 'text', 'Senior Education Editor · 5+ Years of Experience', 'Shown under author name in the E-E-A-T box' ),
+				'author_avatar_url' => array( 'Author Photo URL', 'text', '', 'WordPress Media Library lo author photo upload chesi full URL paste cheyandi (optional)' ),
+				'author_bio'    => array( 'Author bio', 'textarea', 'Charan Pendota is a senior content editor and digital career researcher with 5+ years of experience in Telugu job notifications, exam patterns, and career guidance. At StudentUp, he leads the fact-checking desk, ensuring 100% source-verified information for Telangana and Andhra Pradesh students.', 'Keep this factual and update it when the author profile changes.' ),
+				'breaking_json' => array( 'Breaking feed (JSON)', 'textarea', '', 'Bot nimpustundi (--push-theme-data). Format: {"items":[{"title":"..","link":"..","time":"..","tag":".."}]}' ),
+				'breaking_enabled' => array( 'Breaking news section ON (verified feed only)', 'check', '0', 'Shows the restrained Breaking News surface; empty or stale feeds show an honest no-update state, never a fabricated headline.' ),
+				'qual_filter' => array( 'Qualification filter (SSC/10th · SSC +2 · Degree · PG)', 'check', '1', 'Chips on home/archive — the tag is set automatically when a post is saved' ),
+				'latest_ticker' => array( 'Latest jobs scrolling ticker (homepage)', 'check', '1', 'v127: compact homepage strip with links to the latest published posts; hover pauses it and reduced-motion users get a still list' ),
+				'notify_banner' => array( 'Critical alerts public banner (v90 notify)', 'check', '1', 'CRITICAL severity alerts site-wide banner ga chupistundi (readers dismiss cheste localStorage lo; admin notices ki impact ledu)' ),
+				'notify_queue' => array( 'Notify alert queue (JSON)', 'textarea', '', 'v90: bot/--tg-alert nimpustundi (REST studentup/v1/notify). Format: [{"code":"..","message":"..","severity":"info|warn|critical","ts":123}] — manual ga clear cheyyadaniki edit cheyyochu' ),
+				'join_cta_inline' => array( 'Mid-article join strip (WhatsApp/Telegram)', 'check', '1', '2nd para tarvata compact join box — same social options (owner number/username)' ),
+				'share_inline' => array( 'In-content share bar (v98 viral reach)', 'check', '1', 'v98: modati H2 tarvata WhatsApp/Telegram share row — post chivara varaku scroll cheyyani readers ki kuda share option kanipistundi (free reach). Mobile lo native share sheet kuda vastundi.' ),
+				'upnext' => array( 'Up Next block (article chivara — session depth)', 'check', '1', 'v96: ade category lo kotha posts 3 — reader tap cheste NIJAMAINA kotha pageview (ad refresh policy-safe; timer/auto-reload KAADU)' ),
+				'upnext_bar' => array( 'Mobile sticky “next article” bar', 'check', '1', 'v96: scroll 60% tarvata kindha okka link bar — sticky AD tho collide avvadu (adi ON unte bar paiki jarugutundi)' ),
+					'saved_enabled' => array( 'Saved / bookmarks (reader save-for-later)', 'check', '1', 'v92: readers cards/posts meeda save button cheyyagalaru (localStorage — DB/cookie ledu, privacy-safe). OFF chesthe button + panel render avvavu' ),
+					'saved_max' => array( 'Saved posts limit (per browser)', 'text', '60', 'v92: localStorage cap (5–200). Limit dhatithe purani vi FIFO ga drop avutayi — browser storage bloat avvadu' ),
+					'workspace' => array( 'My Workspace command center (v172)', 'check', '1', 'v172: [studentup_workspace] page — profile (qual · age · state) → eligible jobs · application pipeline · deadline radar. Browser-only (account ledu). Page create: First-run setup leda page lo shortcode pettandi' ),
+			),
+		),
+		'homepage' => array(
+			'title'  => 'Homepage (v123 premium)',
+			'fields' => array(
+				'hero_premium'  => array( 'Premium hero (search + quick actions)', 'check', '1', 'v123: LOGO · search bar · Latest Govt Jobs · Scholarships · Results · Hall Tickets' ),
+				'hot_jobs'      => array( 'TOP 10 hot jobs today (card rail)', 'check', '1', 'v123: image + last date + salary + apply — Netflix style swipe rail' ),
+				'daily_quiz'    => array( 'Daily Quiz block (colorful ring)', 'check', '1', 'v123: roju 5 questions, instant score, date-wise rotation' ),
+				'polls'         => array( 'Reader polls block', 'check', '1', 'v197: one daily poll, real votes, no personal data stored' ),
+				'poll_question' => array( 'Poll question (optional — bot daily push chestundi)', 'text', '', 'v197: khaali unte built-in daily poll rotation' ),
+				'poll_opts'     => array( 'Poll options (one per line, 2-5)', 'textarea', '', 'v197: prathi line okka option' ),
+				'poll_note'     => array( 'Poll note (optional)', 'text', '', 'v197: e.g. "This decides tomorrow\'s guide"' ),
+				'poll_id'       => array( 'Poll id (optional, bot sets)', 'text', '', 'v197: same question ki same id — votes continue' ),
+				'mega_menu'     => array( 'Advanced mega menu', 'check', '1', 'v197: grouped mega panel + mobile accordion; OFF = v93 simple dropdown' ),
+				'scholar_strip' => array( 'Scholarships spotlight strip', 'check', '1', 'v123: Scholarships category lo latest 4 + "see all" link' ),
+				'alerts_card'   => array( 'Instant alerts card (browser notifications)', 'check', '1', 'v123: reader permission ichaka kotha post ki notification vastundi (WhatsApp/Telegram buttons kuda)' ),
+				'job_finder'    => array( 'AI Job Match + Eligibility checker', 'check', '1', 'v124: qualification · state · age select cheste instant eligible jobs (browser lo filter — server load ledu)' ),
+				'salary_calc'   => array( 'In-hand salary calculator', 'check', '1', 'v124: basic + DA + HRA + TA − deductions, open formula' ),
+				'job_calendar'  => array( 'Job calendar (last dates)', 'check', '1', 'v124: next 12 deadlines with days-left chips' ),
+				'trending_today'=> array( 'Trending today strip (hero)', 'check', '1', 'v124: latest 6 headlines, hero kinda scrolling strip' ),
+				'breaking_nav'  => array( 'Breaking News item in the header', 'check', '1', 'v202: verified radar items unte avi, lekapote latest posts — panel click/hover tho open avutundi. Real data lekunda item inject avvadu.' ),
+				'state_first'   => array( 'State-first dynamic homepage', 'check', '1', 'v124: reader TS/AP/All-India select cheste aa state sections mundu vastayi (localStorage, cache-safe)' ),
+				'auto_og'       => array( 'Auto branded social card (featured image lenappudu)', 'check', '1', 'v129: 1200×630 gradient card automatic — WhatsApp/Telegram/Discover share lo khali card raakoodadu. Server lo GD + font unte matrame; lekapote silently OFF.' ),
+				'apply_bar'     => array( 'Sticky apply bar on job posts', 'check', '1', 'v131: single job posts lo bottom apply CTA + deadline countdown + JobPosting schema' ),
+				'stories'       => array( 'Quick story cards (swipe)', 'check', '1', 'v129: Web-Stories laga full-screen swipe cards, CSS-only — mobile engagement + Discover surface' ),
+				'instant_nav'   => array( 'Instant navigation (Speculation Rules + View Transitions)', 'check', '1', 'v127: browser-native prerender on hover + smooth cross-page transitions. Admin/login/external links eppudu prerender kaavu.' ),
+				'command_palette'=> array( 'Command palette (Ctrl / ⌘ + K search)', 'check', '1', 'v127: power-user quick search + jump to jobs, scholarships, quiz, calculator' ),
+				'for_you'       => array( '"Picked for you" rail (reader history)', 'check', '1', 'v127: reader browser lo chusina posts batti — localStorage matrame, server ki data ledu' ),
+				'bottom_nav'    => array( 'Mobile floating bottom navigation', 'check', '1', 'v123: Home · Jobs · Scholarships · Alerts · Search' ),
+			),
+		),
+		'advanced' => array(
+			'title'  => 'Advanced',
+			'fields' => array(
+				'progress_bar' => array( 'Reading progress bar', 'check', '1', 'Reading progress bar at the top' ),
+				'toc'          => array( 'Table of contents (auto TOC)', 'check', '1', 'Automatic jump links from H2/H3' ),
+				'pwa'          => array( 'PWA (mobile install + app icon)', 'check', '1', 'On phones "Add to Home screen"' ),
+				'install_prompt' => array( 'Web app install button (Android/iPhone)', 'check', '1', 'Browser install prompt on Android/Chrome, Share hint on iPhone; no native APK' ),
+				'schema'       => array( 'JSON-LD schema (Organization/WebSite)', 'check', '1', 'Google ki site identity' ),
+				'consent_mode'    => array( 'Google Consent Mode v2', 'check', '1', 'EEA/UK/CH ki consent varaku ads hold (Google rule) — India ki impact ledu' ),
+				'consent_regions' => array( 'Consent regions', 'text', 'EEA,GB,CH', 'AdSense CMP lo mee regions (default EEA+UK+Switzerland)' ),
+				'consent_cmp_id'  => array( 'CMP script / snippet', 'text', '', 'AdSense → Privacy & messaging → CMP snippet ikkada paste cheyandi' ),
+				'news_sitemap'    => array( 'Google News sitemap (/news-sitemap.xml)', 'check', '1', 'Discover/News ki 48h posts + images' ),
+				'comments_on'  => array( 'Comments ON (engagement + freshness signal)', 'check', '1', 'OFF chesthe post lo comment form render avvadu' ),
+				'security_hardening' => array( 'Security hardening (headers · XML-RPC off · enumeration block)', 'check', '1', 'Default ON — adi 100% safe (REST bot ki impact ledu)' ),
+				'hsts_enforce' => array( 'HSTS enforce (HTTPS only)', 'check', '0', 'v81: SSL live confirm ayyaka matrame ON (HTTP staging lo lock risk)' ),
+				'content_visibility' => array( 'content-visibility (below-fold render skip → fast)', 'check', '1', 'LCP/INP improvement — modern browsers lo mattrame' ),
+				'indexnow_key' => array( 'IndexNow key (hex, 8+ chars)', 'text', '', 'Bot nimpustundi — /<key>.key file automatic ga serve avutundi (Bing/Yandex instant indexing)' ),
+				'quiz_api_key' => array( 'Quiz REST Intake API Key', 'text', '', 'External bots / scripts authentication key for POST /wp-json/studentup/v1/quiz-intake' ),
+				'daily_quiz_store' => array( 'Daily Quiz JSON Store', 'textarea', '', 'Managed automatically by quiz intake engine or external bot REST intake. Leave as is unless manually resetting questions.' ),
+				'redirects_json' => array( '301 redirects (JSON)', 'textarea', '', 'v80: {"/old-url/": "/new-url/"} — slug marina old links 404 kakunda 301 (chain/loop safe, relative paths only)' ),
+				'reviews_json' => array( 'Real reviews (JSON)', 'textarea', '', 'v227 (#23): [{"name":"Ravi","role":"TS Police 2025","text":"...","stars":5}] — NIJAMAINA students vi matrame. Khali unte box render kaadu.' ),
+				'cases_json' => array( 'Case studies (JSON)', 'textarea', '', 'v227 (#24): [{"title":"...","problem":"...","solution":"...","result":"250 students selected"}]' ),
+				'team_json' => array( 'Team / owner (JSON)', 'textarea', '', 'v227 (#26): [{"name":"...","role":"...","photo":"https://...","bio":"..."}] — stock photo vaddu, nijamaina photo.' ),
+				'response_time' => array( 'Response time promise', 'text', '', 'v227 (#33): e.g. "We reply within 2 hours (9 AM - 9 PM)" — nilabettagalige time matrame.' ),
+				'clarity_id' => array( 'Microsoft Clarity project ID', 'text', '', 'v226: clarity.microsoft.com → project ID — free heatmaps + session recordings (#8)' ),
+				'ic_name' => array( 'Internet Center — name', 'text', '', 'v226: LocalBusiness schema (#19) — ivi unte matrame schema emit avutundi' ),
+				'ic_phone' => array( 'Internet Center — phone', 'text', '', 'v226: LocalBusiness telephone' ),
+				'ic_address' => array( 'Internet Center — address', 'text', '', 'v226: LocalBusiness streetAddress' ),
+				'ic_city' => array( 'Internet Center — city', 'text', '', 'v226: LocalBusiness addressLocality' ),
+				'ic_hours' => array( 'Internet Center — hours', 'text', '', 'v226: e.g. Mo-Sa 09:00-20:00' ),
+				'ic_logo' => array( 'Internet Center — image URL', 'text', '', 'v226: LocalBusiness image' ),
+				'ga4_id' => array( 'GA4 Measurement ID', 'text', '', 'v80: G-XXXXXXXXXX — consent-aware analytics (EEA regions lo consent varaku hold, India lo direct)' ),
+				'gsc_verify'  => array( 'Search Console verification', 'text', '', 'v80: GSC → Settings → Ownership verification → HTML tag content value (meta tag auto)' ),
+				'bing_verify' => array( 'Bing Webmaster verification', 'text', '', 'Bing Webmaster Tools → Verification → HTML meta tag content value' ),
+				'category_seed_version' => array( 'Category seed version (managed)', 'text', '', 'Managed automatically when StudentUp creates missing canonical categories; do not edit unless re-seeding is required.' ),
+			),
+		),
+	);
+}
+
+/**
+ * Register settings (sanitize type batti).
+ */
+function studentup_register_settings() {
+	foreach ( studentup_option_fields() as $tab ) {
+		foreach ( $tab['fields'] as $key => $f ) {
+			$type = $f[1];
+			register_setting(
+				'studentup_options',
+				'studentup_' . $key,
+				array(
+					'type'              => 'check' === $type ? 'boolean' : 'string',
+					'sanitize_callback' => 'studentup_sanitize_option',
+					'default'           => $f[2],
+				)
+			);
+		}
+	}
+}
+add_action( 'admin_init', 'studentup_register_settings' );
+
+/**
+ * Sanitize — JSON fields ki json validate, migilinavi text.
+ */
+function studentup_sanitize_option( $value ) {
+	$value = is_string( $value ) ? trim( $value ) : $value;
+	if ( is_string( $value ) && '' !== $value && ( '{' === $value[0] || '[' === $value[0] ) ) {
+		$decoded = json_decode( $value, true );
+		if ( null === $decoded ) {
+			add_settings_error( 'studentup_options', 'studentup_json',
+				'JSON tappu undi — aa field save cheyyaledu.', 'error' );
+			return '';
+		}
+		return wp_json_encode( $decoded, JSON_UNESCAPED_UNICODE );
+	}
+	if ( is_string( $value ) ) {
+		return wp_kses_post( $value );
+	}
+	return $value;
+}
+
+/**
+ * Admin menu + page.
+ */
+function studentup_admin_menu() {
+	add_menu_page(
+		'StudentUp Settings', 'StudentUp', 'manage_options', 'studentup-settings',
+		'studentup_settings_page', 'dashicons-megaphone', 58
+	);
+}
+add_action( 'admin_menu', 'studentup_admin_menu' );
+
+/**
+ * Settings page — tabs (Ads / Socials / Content / Advanced).
+ */
+function studentup_settings_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$all  = studentup_option_fields();
+	$tabs = array_keys( $all );
+	$tab  = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : $tabs[0]; // phpcs:ignore WordPress.Security.NonceVerification
+	if ( ! isset( $all[ $tab ] ) ) {
+		$tab = $tabs[0];
+	}
+	?>
+	<div class="wrap">
+		<h1><?php echo studentup_ui_icon( 'bell', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> StudentUp Settings</h1>
+		<p>Idi mee site options panelu — bot kuda ivi REST tho chaduvutundi
+			(<code>/wp-json/studentup/v1/options</code>). JSON fields ni bot nimpustundi;
+			mirvu kuda edit cheyyachu.</p>
+		<?php settings_errors( 'studentup_options' ); ?>
+		<h2 class="nav-tab-wrapper">
+			<?php foreach ( $all as $slug => $data ) : ?>
+				<a class="nav-tab <?php echo esc_attr( $slug === $tab ? 'nav-tab-active' : '' ); ?>"
+					href="<?php echo esc_url( admin_url( 'admin.php?page=studentup-settings&tab=' . $slug ) ); ?>">
+					<?php echo esc_html( $data['title'] ); ?></a>
+			<?php endforeach; ?>
+		</h2>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'studentup_options' ); ?>
+			<input type="hidden" name="studentup_active_tab" value="<?php echo esc_attr( $tab ); ?>">
+			<table class="form-table" role="presentation">
+			<?php
+			foreach ( $all[ $tab ]['fields'] as $key => $f ) :
+				$name  = 'studentup_' . $key;
+				$value = get_option( $name, $f[2] );
+				?>
+				<tr>
+					<th scope="row"><label for="<?php echo esc_attr( $name ); ?>"><?php echo esc_html( $f[0] ); ?></label></th>
+					<td>
+						<?php if ( 'check' === $f[1] ) : ?>
+							<label><input type="checkbox" id="<?php echo esc_attr( $name ); ?>"
+								name="<?php echo esc_attr( $name ); ?>" value="1"
+								<?php checked( '1', (string) $value ); ?>> ON</label>
+						<?php elseif ( 'textarea' === $f[1] ) : ?>
+							<textarea id="<?php echo esc_attr( $name ); ?>" name="<?php echo esc_attr( $name ); ?>"
+								rows="6" class="large-text code"><?php echo esc_textarea( (string) $value ); ?></textarea>
+						<?php else : ?>
+							<input type="text" id="<?php echo esc_attr( $name ); ?>"
+								name="<?php echo esc_attr( $name ); ?>" class="regular-text"
+								value="<?php echo esc_attr( (string) $value ); ?>">
+						<?php endif; ?>
+						<?php if ( ! empty( $f[3] ) ) : ?>
+							<p class="description"><?php echo esc_html( $f[3] ); ?></p>
+						<?php endif; ?>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</table>
+			<?php submit_button( 'Save changes' ); ?>
+		</form>
+		<hr>
+		<p><strong>Bot commands:</strong>
+			<code>python run.py --push-theme-data</code> — JSON fields (breaking/house/deadline) ni
+			ee options ki sync chestundi.</p>
+	</div>
+	<?php
+}
+
+/**
+ * REST options bridge — bot ki (GET public-safe, POST admin mattrame).
+ */
+function studentup_register_options_route() {
+	register_rest_route(
+		'studentup/v1',
+		'/options',
+		array(
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => '__return_true',
+				'callback'            => 'studentup_rest_get_options',
+			),
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'callback'            => 'studentup_rest_set_options',
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'studentup_register_options_route' );
+
+/**
+ * GET — public info (secrets kaadu: house ads + socials + ads presence).
+ */
+function studentup_rest_get_options() {
+	$house = json_decode( (string) studentup_opt( 'house_ads', '' ), true );
+	return new WP_REST_Response(
+		array(
+			'site'        => home_url( '/' ),
+			'theme'       => 'studentup',
+			'version'     => defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
+			'socials'     => array(
+				'whatsapp'  => studentup_opt( 'social_whatsapp', '9182739312' ),
+				'telegram'  => studentup_opt( 'social_telegram', 'studentup_in' ),
+				'instagram' => studentup_opt( 'social_instagram', 'studentup.in' ),
+				'linkedin'  => studentup_opt( 'social_linkedin', '' ),
+				'youtube'   => studentup_opt( 'social_youtube', '@studentupin' ),
+				'facebook'  => studentup_opt( 'social_facebook', '' ),
+				'x'         => studentup_opt( 'social_x', '' ),
+				'pinterest' => studentup_opt( 'social_pinterest', '' ),
+				'reddit'    => studentup_opt( 'social_reddit', '' ),
+				'quora'     => studentup_opt( 'social_quora', '' ),
+			),
+			'adsense_on'  => (bool) studentup_opt( 'adsense_client', '' ),
+			'sticky_ad'   => (bool) studentup_opt( 'sticky_ad', '0' ),
+			'toc'         => (bool) studentup_opt( 'toc', '1' ),
+			'progress'    => (bool) studentup_opt( 'progress_bar', '1' ),
+			'house_ads'   => is_array( $house ) ? count( $house ) : 0,
+			'posts'       => (int) wp_count_posts()->publish,
+		),
+		200
+	);
+}
+
+/**
+ * POST — bot sync (breaking/house/deadline JSON + slots).
+ */
+function studentup_rest_set_options( WP_REST_Request $request ) {
+	$body    = $request->get_json_params();
+	$allowed = array();
+	foreach ( studentup_option_fields() as $tab ) {
+		foreach ( $tab['fields'] as $key => $f ) {
+			$allowed[ $key ] = $f[1];
+		}
+	}
+	$saved = array();
+	foreach ( (array) $body as $key => $value ) {
+		if ( ! isset( $allowed[ $key ] ) ) {
+			continue;
+		}
+		$name = 'studentup_' . $key;
+		if ( 'check' === $allowed[ $key ] ) {
+			update_option( $name, $value ? '1' : '0' );
+		} else {
+			update_option( $name, studentup_sanitize_option( is_string( $value ) ? $value : wp_json_encode( $value, JSON_UNESCAPED_UNICODE ) ) );
+		}
+		$saved[] = $key;
+	}
+	return new WP_REST_Response( array( 'ok' => true, 'saved' => $saved ), 200 );
+}
+
+/**
+ * WhatsApp number normalizer — owner 10-digit mobile ichina (9182739312),
+ * +91 tho ichina (+919182739312), 0 tho ichina — anni cases lo wa.me ki
+ * panikocche digits (919182739312) vastayi. International numbers ni munchamu.
+ */
+function studentup_wa_number( $raw = '' ) {
+	$d = preg_replace( '/[^0-9]/', '', (string) $raw );
+	$d = ltrim( $d, '0' );
+	if ( 10 === strlen( $d ) && preg_match( '/^[6-9]/', $d ) ) {
+		return '91' . $d;
+	}
+	if ( 12 === strlen( $d ) && 0 === strpos( $d, '91' ) ) {
+		return $d;
+	}
+	return $d;
+}
+
+/**
+ * Call/display number — user ki +91 lekunda 10-digit (9182739312).
+ */
+function studentup_call_number( $raw = '' ) {
+	$d = preg_replace( '/[^0-9]/', '', (string) $raw );
+	$d = ltrim( $d, '0' );
+	if ( 12 === strlen( $d ) && 0 === strpos( $d, '91' ) ) {
+		$d = substr( $d, 2 );
+	}
+	return $d;
+}
+
+/**
+ * Social URLs — options nunchi (footer/header ki).
+ */
+function studentup_social_links() {
+	$wa  = studentup_wa_number( studentup_opt( 'social_whatsapp', '9182739312' ) );
+	$wa_ch = trim( (string) studentup_opt( 'whatsapp_channel_url', '' ) );
+	if ( $wa_ch && ! preg_match( '#^https?://#i', $wa_ch ) ) {
+		$wa_ch = 'https://' . ltrim( $wa_ch, '/' );
+	}
+	$ig  = ltrim( (string) studentup_opt( 'social_instagram', 'studentup.in' ), '@' );
+	$li  = trim( (string) studentup_opt( 'social_linkedin', '' ) );
+	$liu = '';
+	if ( $li ) {
+		$liu = 0 === strpos( $li, 'http' ) ? $li : 'https://www.linkedin.com/in/' . ltrim( $li, '@/' );
+	}
+	$yt  = (string) studentup_opt( 'social_youtube', '@studentupin' );
+	$ytu = 0 === strpos( $yt, 'http' ) ? $yt : 'https://www.youtube.com/' . ( 0 === strpos( $yt, '@' ) ? $yt : '@' . $yt );
+	$profile = static function ( $raw, $base, $prefix = '' ) {
+		$raw = trim( (string) $raw );
+		if ( '' === $raw ) {
+			return '';
+		}
+		if ( preg_match( '#^https?://#i', $raw ) ) {
+			return esc_url_raw( $raw );
+		}
+		return esc_url_raw( $base . $prefix . ltrim( $raw, '@/ ' ) );
+	};
+	$facebook  = $profile( studentup_opt( 'social_facebook', '' ), 'https://www.facebook.com/' );
+	$x_profile = $profile( studentup_opt( 'social_x', '' ), 'https://x.com/' );
+	$pinterest = $profile( studentup_opt( 'social_pinterest', '' ), 'https://www.pinterest.com/' );
+	$reddit    = $profile( studentup_opt( 'social_reddit', '' ), 'https://www.reddit.com/', 'u/' );
+	$quora     = $profile( studentup_opt( 'social_quora', '' ), 'https://www.quora.com/profile/' );
+
+	if ( function_exists( 'studentup_tg_channel_url' ) && studentup_tg_channel_url() ) {
+		$tg_url = studentup_tg_channel_url();
+	} else {
+		$tg_user = ltrim( (string) studentup_opt( 'social_telegram', 'studentup_in' ), '@' );
+		$tg_url  = 'https://t.me/' . $tg_user;
+	}
+
+	return array(
+		'whatsapp'         => 'https://wa.me/' . $wa,
+		'whatsapp_channel' => $wa_ch ? esc_url_raw( $wa_ch ) : '',
+		'telegram'         => $tg_url,
+		'instagram'        => 'https://www.instagram.com/' . $ig . '/',
+		'linkedin'         => $liu,
+		'youtube'          => $ytu,
+		'facebook'         => $facebook,
+		'x'                => $x_profile,
+		'pinterest'        => $pinterest,
+		'reddit'           => $reddit,
+		'quora'            => $quora,
+	);
+}
+
+/**
+ * Contact email — option, lekapote admin email.
+ */
+function studentup_contact_email() {
+	$email = (string) studentup_opt( 'contact_email', '' );
+	return is_email( $email ) ? $email : (string) get_option( 'admin_email', '' );
+}
+
+/**
+ * v89: brand SVG icons (CC0 / Simple Icons paths) — emoji 💬✈️📸▶️ badulu.
+ * Emoji platform batti marutayi (phones lo tappu ga kanipistayi); inline SVG
+ * prathi device lo same, official brand shape/color tho untundi.
+ *
+ * @param string $key whatsapp|telegram|instagram|youtube|x|call|email|link
+ * @param int    $size px size (default 18).
+ * @return string inline SVG markup
+ */
+function studentup_social_icon_paths() {
+	static $paths = null;
+	if ( null !== $paths ) {
+		return $paths;
+	}
+	$paths = array(
+		'whatsapp'  => 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z',
+		'telegram'  => 'M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z',
+		'instagram' => 'M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 1 0 0-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 0 1-2.88 0 1.44 1.44 0 0 1 2.88 0z',
+		'youtube'   => 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z',
+		'x'         => 'M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z',
+		'call'      => 'M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2Z',
+		'email'     => 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z',
+		'link'      => 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
+	);
+	return $paths;
+}
+
+/**
+ * v180 SPRITE version — whatsapp path ~900 B × 5 sarlu etc. repeat avvadam
+ * valla 14 KB waste. Ippudu <use href="#su-s-X"> (symbols icons.php sprite lo).
+ *
+ * @param string $key whatsapp|telegram|instagram|youtube|x|call|email|link
+ * @param int    $size px size (default 18).
+ * @return string inline SVG markup
+ */
+function studentup_social_icon( $key, $size = 18 ) {
+	$size  = max( 10, min( 64, (int) $size ) );
+	$paths = studentup_social_icon_paths();
+	if ( ! isset( $paths[ $key ] ) ) {
+		$key = 'link';
+	}
+	/* v213: self-contained inline SVG (sprite <use> phone lo fail ayye
+	   cases unnayi — icons.php lo same fix). */
+	return '<svg class="su-icn su-icn-' . esc_attr( $key ) . '" width="' . (int) $size
+		. '" height="' . (int) $size . '" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="'
+		. esc_attr( $paths[ $key ] ) . '"></path></svg>';
+}
