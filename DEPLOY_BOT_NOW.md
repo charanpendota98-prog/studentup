@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.84.zip` (v286 · DAILY QUIZ GAME — share, streak, bot push)
+## 📱 Theme upload — `studentup-theme-1.9.85.zip` (v287 · studentup.in/quiz short link)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.84 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.85 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.84.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.85.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v287** — Share link clean గా, click చేస్తే వెళ్ళాలి | కొత్త short link **`https://studentup.in/quiz`** (theme `/quiz` లేదా `/play` → auto redirect: daily-quiz page ఉంటే అక్కడికి, లేకపోతే home quiz కి; `?ref=status/telegram/whatsapp` carry అవుతుంది, rewrite flush అవసరం లేదు). Status card లో "▶ Play now · studentup.in/quiz", message లో link సొంత line లో → WhatsApp/Telegram లో clickable. Bot push/teaser కూడా ఇదే link. ⚠️ WP లో `quiz` slug తో page పెట్టొద్దు (short link దాన్ని intercept చేస్తుంది) — quiz page కావాలంటే slug `daily-quiz` |
 | **v286** — Quiz template ఇంకా best, attractive, link click చేస్తే వాళ్ళు quiz ఆడాలి, daily streak, "join with me & play" | **Message**: `🎯 *StudentUp Daily Quiz* · Day 3 🔥 / Ravi scored *4/5* (80%) — Champion ⭐ / 🟩🟩🟩🟩⬜ / 🏆 Best streak: 5 days / 💡 quote / 👉 Join me & play today's quiz (2 min): link?ref=status / New questions every day · keep your streak 🔥 / #StudentUp · studentup.in`. **Card**: score squares + "Join me & play today's quiz 🎯". **Link click** → page open అవగానే quiz కి auto-scroll + green glow (`?ref=status` / `#daily-quiz`). **Streak**: quiz complete చేసిన రోజులు (consecutive) — theme engage.js + status card ఒకే store (`su_quiz_streak`: today / best), రోజుకి ఒక్కసారే count. Questions date-rotation తో రోజూ మారతాయి (theme bank) |
 | **v286** — Bot daily push | `python run.py --quiz-push` → Telegram channel కి "today's quiz" invite (topic · quote of the day · ▶ Play button · link `?ref=telegram`) + WhatsApp forward text print. Cron: `30 7 * * * cd BOT && .venv/bin/python run.py --quiz-push >> log/quiz.log 2>&1` (server UTC అయితే `0 2 * * *` = 7:30 IST). Dedicated quiz page ఉంటే `.env` లో `QUIZ_PAGE_URL=https://studentup.in/daily-quiz/`; లేకపోతే home `#daily-quiz` కి వెళ్తుంది (eppudu pani chestundi) |
 | **v285** — Category icons Amazon లాగా (clean, pedda, phone+laptop neat, easy click) | కొత్త **outline (stroke) icon set** — 14 category icons (Amazon/Flipkart line-icon style), 30px (laptop 32px), soft pastel tile per category (Pay/Fresh/Bazaar లా), bold label, tile min 92px tap target (laptop 104px). Phone లో hover లేదు — press feedback మాత్రమే; laptop లో soft lift. Theme + v255 + worldclass + OFFLINE అన్నిట్లో ఒకే icons. Daily Quiz tile కి సొంత icon |
@@ -77,7 +78,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `8cca043dcca6be2876baea03fd15303ad1527b4c20ac1bac111d0d3c452c1b40  studentup-theme-1.9.84.zip`
+sha256: `db753d6c27b2255e62de319621ebd68a2008462e40db2e82730f16193d0e1e90  studentup-theme-1.9.85.zip`
 
 ---
 
@@ -188,7 +189,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-254a5f090f78794b446c59a24127ff9ca99cd61c50e7fb0f3a049458a674b42e  studentup-bot-cron.zip
+d2d5f99ce0b21ff7edb71e943642332f191885b4b012ce5f6510eeb4d5735556  studentup-bot-cron.zip
 ```
 
 ---
