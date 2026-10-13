@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.95.zip` (v297 · neat type scale phone+laptop, revenue ad sizing)
+## 📱 Theme upload — `studentup-theme-1.9.96.zip` (v298 · pin-to-pin audit pass)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.95 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.96 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.95.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.96.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v298** — "Anni pin-to-pin check — phone + laptop, all sections" | 32 preview pages jsdom audit (viewport, single H1, img alt, dead `#` links, 404 css/js/links, fixed widths >360px, visible ad placeholders, category subtitles/counts, hint texts) + theme CSS scan (phone overflow patterns: fixed px widths, nowrap, wide minmax). Dorikinavi → fixed: (1) 4 purana preview posts + preview hub lo **"Advertisement · in-article / end of article / sticky slot"** placeholders + demo "SPONSORED · SLOT AVAILABLE / COLLEGE PARTNER" blocks inka unnayi → anni teesesam (ad rule: approval varaku 0). (2) Worldclass demo Breaking card lo hint line ("Latest notifications · hall tickets…") + fake count "12 updates →" → teesi "Flash Updates →" (theme tho parity). (3) Preview hub double H1 → fix. Theme CSS: phone overflow risk 0 (okkate `table.su-jt min-width` — adi scroll wrapper lo, OK). Runtime JS errors 0 (anni pages). Theme audit 0 err, php lint 112/112 |
 | **v297** — "Phone + laptop chala neat ga; highest ads/revenue miss avvakudadu; sizes, fonts anni perfect" | (1) **Neat type scale**: okate rhythm — section H2 `clamp(16→21px)`, body `14→16px`, meta `11→12.5px`, radius 14, 44px tap targets (options, buttons), quiz exam tabs compact wrap, Top 5 rows tight (phone lo category tag hide), Post-your-news / Breaking cards phone paddings. Laptop: wider gaps, roomier quiz/Top 5. (2) **Revenue ad sizing** (AdSense ID + approval tarvata active; ippudu 0 slots render): reserved space = highest-RPM size per device, CLS ledu — phone: top 320×100, in-article/mid/below 300×250 fluid, sidebar hidden; laptop: top 970×90, **sidebar 300×600 sticky** (highest-paying desktop unit), below 336×280. `data-su-place` attr units paina. In-article units already `fluid + data-ad-layout=in-article` (highest RPM), max 3/page rule same |
 | **v296** — Live screenshots (laptop + phone): right-side gap, left edge cut, quiz questions ravatledu, Top5/quiz/Post-your-news pakkaki jaragatledu, "Latest opportunities" kinda raw text/unstyled cards | Root causes dorikayi, anni fix: (1) **Quiz questions hidden bug** — `delight.css` lo `html.su-js .su-q:not(.su-q-run){display:none}` rule preview stepper kosam undi, kaani theme JS `su-q-run` eppudu add cheyyadu → live lo anni 5 questions hide. Ippudu rule stepper (`.su-q-stepper`, preview only) ki matrame; theme lo 5 Qs kanipistayi. (2) **Home grid container ledu** — `.su-home-grid` (Top 5 · Quiz · Post your news) `.wrap` lopala ledu → full viewport width, quiz/post-news right edge varaku, Top 5 left edge cut. Ippudu grid ki `max-width:1180px; margin:auto; padding:0 16px` + `min-width:0` columns + exam tabs wrap. (3) **Right-side gap** — 981–1339px lo `.wrap{padding-right:74px}` (rail kosam) → asymmetric; 16px ki marcham (5 CSS files). (4) **Unstyled lower page** — `style.css`/`premium.css` `media=print → onload` async swap live lo fail (cache/optimizer plugin onload strip) → qual bar, cards, Compare raw. Ippudu default normal load (critical CSS inline already undi); option `css_async` opt-in; + JS safety net (media=print stylesheet dorikithe `all` ki swap). (5) `[hidden]{display:none!important}` global — Check answers + Restart + Share okesari kanipinchadam fix; `html,body{overflow-x:hidden}`. Deploy tarvata: cache plugin Purge All + hard refresh |
 | **v295** — "Post your news section quiz pakkana; Google Form tho name/number/photo/story; approve → edit → manual post; Breaking News open → Telangana News / Andhra News → alphabetical districts; district-wise posts; home lo chupinchoddu" | (1) **Post your news** ippudu proper **section card** Daily Quiz kinda (heading + 3 tiles Success story / Photo-Video / District update + "Send now") → `/post-your-news/`. Flow: reader Google Form (meeru create: Name · Phone · District · Story · Photo/Video upload · Consent) fill chestadu → mee Google Sheet/Drive lo vastundi → meeru chusi WP Admin lo **manual ga edit chesi post** chestaru (Success Stories category) → page lo Approved stories wall lo automatic ga kanipistundi. Auto-publish ledu. (2) **Breaking News tree** auto-create (admin load lo okasari): `Breaking News` → `Telangana News` (33 districts, A→Z) + `Andhra Pradesh News` (26 districts, A→Z) — anni categories. Breaking page open → 2 state cards; state click → **alphabetical district grid (anni districts)**; district click → aa district posts. Post cheyadam: Posts → Add New → Categories lo district tick (e.g. Telangana News › Warangal). (3) Home exclusion ippudu **root + states + anni districts** cover chestundi (home/Top5/slider/latest/other cats lo ravu). Demo: `pages/breaking-news.html` (TS/AP toggle + district grid), home card `?v=295` |
@@ -88,7 +89,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `d9625d4b13d33782e59feaf74839d667f217259e5472f479c8c30fbf5bc9466a  studentup-theme-1.9.95.zip`
+sha256: `df6b779a0aab69d1a44064f5dc63c2e5150b356802fedd6816ed0b5fab0b1a00  studentup-theme-1.9.96.zip`
 
 ---
 
@@ -199,7 +200,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-c174159d7f903ede526f8affa0f50ab0c318a18bebe89997ddefe99fc89d04c2  studentup-bot-cron.zip
+76966ddbe0518322a9fedd6b369833e4963f15733ae2c01238294e76e7a038f2  studentup-bot-cron.zip
 ```
 
 ---
