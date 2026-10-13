@@ -144,7 +144,7 @@ html.su-js .su-reveal.su-on{opacity:1;transform:none}
 .su-q-opt .su-kbd{margin-left:auto;opacity:.75}
 .su-q-opt{display:flex;align-items:center;gap:8px;width:100%;text-align:left}
 .su-q-run{display:block}
-html.su-js .su-q:not(.su-q-run){display:none}
+html.su-js .su-q-stepper .su-q:not(.su-q-run){display:none} /* v296: stepper-only (preview); theme shows all 5 Qs — earlier rule hid every question on live */
 .su-quiz-result{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 4px;
   padding:12px;border:1px solid var(--line,#e5ebf4);border-radius:14px;background:var(--soft,#f5f8fc)}
 .su-quiz-sring{width:66px;height:66px;border-radius:50%;flex:0 0 auto;
@@ -532,7 +532,13 @@ body.dark .usedgrid .usedcard .ui{color:#e7f0ff !important}
 [data-theme="dark"] .su-stats-ic{ color:#9db8ff; }
 
 /* v277 — home perfection: phone neat + laptop advanced band */
-.su-home-grid{ display:grid; gap:14px; margin:14px 0; }
+.su-home-grid{ display:grid; gap:14px; margin:14px auto; max-width:1180px; padding:0 16px; box-sizing:border-box; }
+.su-home-grid .wrap{ max-width:none; padding:0; }
+.su-home-grid > *{ min-width:0; }
+.su-home-grid .su-quiz, .su-home-grid .su-quiz-card, .su-home-grid .su-top5, .su-home-grid .su-postnews{ max-width:100%; box-sizing:border-box; }
+.su-home-grid .su-quiz-exams{ display:flex; flex-wrap:wrap; gap:8px; overflow:visible; }
+.su-home-grid .su-quiz-exams .su-qtab{ white-space:nowrap; }
+@media (max-width:640px){ .su-home-grid{ padding:0 14px; gap:12px; margin:12px auto; } }
 @media (min-width:1080px){
   .su-home-grid{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); align-items:start; gap:16px; }
   .su-home-grid > .hg-t{ grid-area:1/1/2/2; }

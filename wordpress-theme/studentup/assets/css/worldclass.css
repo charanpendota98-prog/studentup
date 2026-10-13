@@ -1333,7 +1333,7 @@ body.dark .usedcard .ucount{ background:#0f2038; color:#a9c1e6; border-color:var
 }
 @media(max-width:1339px) and (min-width:981px){
   /* tablet/small-laptop: rail ki right gutter space (content meeda overlap ledu) */
-  .wrap{ padding-right:74px }
+  .wrap{ padding-right:16px }
 }
 @media(max-width:600px){
   .su-social{ right:8px !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; gap:6px !important; padding:7px 5px !important }
@@ -2533,3 +2533,6 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
 [data-theme="dark"] .su-brk-dist, body.dark .su-brk-dist{ color:#dbe7ff; background:rgba(157,184,255,.12); }
 [data-theme="dark"] .su-brk-dist.is-on, body.dark .su-brk-dist.is-on, [data-theme="dark"] .su-brk-state.is-on, body.dark .su-brk-state.is-on{ background:#9db8ff; color:#0b1a33; border-color:#9db8ff; }
 @media (max-width:640px){ .su-pn-steps li{ font-size:12px; padding:8px; } }
+/* v296 — layout hygiene: [hidden] always wins (Check/Restart/Share buttons were showing together), no horizontal scroll */
+[hidden]{ display:none !important; }
+html, body{ overflow-x:hidden; }

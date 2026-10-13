@@ -104,6 +104,12 @@ function studentup_async_stylesheets( $tag, $handle ) {
 	if ( ! studentup_critical_css_file() ) {
 		return $tag;
 	}
+	// v296 (live screenshot): media=print→onload swap live lo fail ayyi style.css/premium.css
+	// apply avvaledu (qual bar, cards, Compare chips raw ga vachayi). Default = normal blocking
+	// load (critical CSS inline already undi, so CWV loss chinnadi). Opt-in: option css_async = 1.
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'css_async', '0' ) ) {
+		return $tag;
+	}
 	if ( ! in_array( $handle, array( 'studentup', 'studentup-premium' ), true ) ) {
 		return $tag;
 	}

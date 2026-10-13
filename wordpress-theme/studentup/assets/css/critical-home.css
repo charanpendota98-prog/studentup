@@ -870,7 +870,7 @@ body.dark .usedcard .ucount{ background:#0f2038; color:#a9c1e6; border-color:var
   .su-tab{ top:50% !important; bottom:auto !important; transform:translateY(-50%) !important }}
 @media(max-width:1339px) and (min-width:981px){
   
-  .wrap{ padding-right:74px }}
+  .wrap{ padding-right:16px }}
 @media(max-width:600px){
   .su-social{ right:8px !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; gap:6px !important; padding:7px 5px !important }
   .su-social a{ width:33px !important; height:33px !important }

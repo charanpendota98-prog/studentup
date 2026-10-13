@@ -772,3 +772,5 @@
     });
   });
 })();
+/* v296: safety net — if a stylesheet is still media=print after load (onload stripped by a cache/optimizer plugin), swap it. */
+(function(){try{var fix=function(){var ls=document.querySelectorAll('link[rel="stylesheet"][media="print"]');for(var i=0;i<ls.length;i++){if(/studentup/i.test(ls[i].href))ls[i].media='all';}};fix();window.addEventListener('load',fix);setTimeout(fix,1500);}catch(e){}})();
