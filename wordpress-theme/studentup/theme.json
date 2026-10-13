@@ -1,0 +1,68 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 2,
+  "settings": {
+    "appearanceTools": true,
+    "layout": {
+      "contentSize": "760px",
+      "wideSize": "1180px"
+    },
+    "color": {
+      "palette": [
+        {
+          "slug": "navy",
+          "color": "#0b2447",
+          "name": "Navy (brand)"
+        },
+        {
+          "slug": "blue",
+          "color": "#1f5fbf",
+          "name": "Blue (links)"
+        },
+        {
+          "slug": "orange",
+          "color": "#f08a24",
+          "name": "Orange (accent)"
+        },
+        {
+          "slug": "green",
+          "color": "#0f7a4a",
+          "name": "Green (success)"
+        },
+        {
+          "slug": "ink",
+          "color": "#0f1a2b",
+          "name": "Ink (text)"
+        },
+        {
+          "slug": "soft",
+          "color": "#f3f7fd",
+          "name": "Soft (surfaces)"
+        }
+      ]
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "fontFamily": "system-ui,-apple-system,\"Noto Sans Telugu\",\"Segoe UI\",Roboto,sans-serif",
+          "slug": "system",
+          "name": "System + Telugu"
+        }
+      ]
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#f6f9fd",
+      "text": "#0f1a2b"
+    },
+    "elements": {
+      "link": {
+        "color": {
+          "text": "#1f5fbf"
+        }
+      }
+    }
+  }
+}
