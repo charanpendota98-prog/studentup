@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.89.zip` (v291 · REVENUE/TRUST audit)
+## 📱 Theme upload — `studentup-theme-1.9.90.zip` (v292 · IMPORTANT LINKS box)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.89 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.90 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.89.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.90.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v292** — "Chala miss chesav" → top job-site signature elements compare | **Miss అయింది: "Important Links" box** (Sarkari Result / FreeJobAlert లో #1 click element) — ప్రతి post లో article కింద: **Apply Online** (green, last date తర్వాత hide + "closed" line) · **Official Notification (PDF)** · **Official Website · ssc.gov.in** · **More <Category>** · **Job alerts on Telegram**. Real data ఉన్న rows మాత్రమే (apply/source meta — bot ఇప్పటికే fill చేస్తుంది); GA4 `important_link` event per row. Plus: previews లో ఇంకా fake "Advertisement" placeholders (post sidebar 300×250, tools below-ad, phone 6-sec sticky anchor) ఉన్నాయి → తీసేశాము (approval వరకు ad slots వద్దు rule). Runtime audit 8 pages: 0 errors, dead links 0, visible ads 0 |
 | **v291** — "Highest revenue / ads కోసం ఇంకా ఏం miss?" | Ads stack audit: leaderboard · in-article (3 paras తర్వాత) · deep · below-content · sticky sidebar · mobile anchor · in-feed · multiplex · A/B · lazy (300px) · CLS reserve · adaptive density cap (words-based) · consent · house-ads fill · ads.txt · Apply-CTA vs anchor conflict guard — **అన్నీ ఉన్నాయి**, approval వచ్చాక IDs పెడితే చాలు. **దొరికిన problem**: `sponsorhub.php` ప్రతి post లో "SPONSORED · VERIFIED LEARNING PARTNERS — Free Study Kit" box — **real sponsor లేకుండా** hardcoded (WhatsApp కి). Fake "Sponsored" label = trust loss + AdSense approval risk (misleading). Fix: Settings → Featured partner (name/title/link) configure చేస్తేనే ఆ data తో render; లేకపోతే render కాదు |
 | **v290** — "Theme లో ఇంకా ఏమైనా miss అయ్యాయా — top website level" | Gap analysis (PWA, web-push, schema, TOC, related, bottom-nav, author box, breadcrumbs, OG image, calendar, saved, dark mode — అన్నీ ఉన్నాయి). **Miss అయింది: Search results page** (highest-intent visitors). WP default = అన్ని words match అవ్వాలి → long queries కి 0 results → visitor వెళ్ళిపోతాడు. కొత్త `inc/search-smart.php`: "Results for “police” · 14 results", **related category chips**, **Did you mean** (typo → nearest category/tag, close match ఉంటేనే), 0 results అయితే **Closest matches** (any-word match, ఎక్కువ words match అయినవి ముందు) → లేకపోతే Latest 6; posts only, 12/page. Plus: header.php లో dead GSC-verification duplicate తీసేశాము (real one `gsc_verify` option → consent.php), readme Stable tag sync. Deep audit 31/31 pass |
 | **v289** — "Chala mistakes unnayi — deep audit strict ga" | కొత్త **runtime audit** (jsdom లో 8 preview pages load చేసి JS run, quiz flow, status card, search, icons, links check): **0 runtime errors**. దొరికి fix చేసినవి: (1) v255 demo లో **66 dead links** (`href="#"` — menu, footer, social, cards) → real site URLs; (2) Exam-calendar లో ఇంకా **.ics reminder button + hint** (theme + preview) ఉంది — owner rule ప్రకారం తీసేశాము; "+ .ics export" copy కూడా; (3) Status card: canvas block అయిన phone లో crash → ఇప్పుడు text share fallback; (4) bot `--doctor` key లేనప్పుడు "list index" crash → clear message. Verified: social icons 4/4 అన్ని home surfaces, category tiles 11/13 outline icons, rail arrows 0, hint texts 0, **ad slots 0** (AdSense client ID పెట్టేవరకు theme ఏ ad markup render చేయదు — approval వచ్చాక Settings లో ID పెట్టండి చాలు), bot 105/105 modules import OK, ci tests pass, `--daily-quiz-dry` / `--quiz-push-dry` OK |
@@ -82,7 +83,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `d3e1ba25aff212507fb981bc2c13b90916411d5f0c8aed9001929f234ab19252  studentup-theme-1.9.89.zip`
+sha256: `1861d106b2653bbf50e8e88d372e38cb4569e22f40dcfad27b41aae9bfb6a917  studentup-theme-1.9.90.zip`
 
 ---
 
@@ -193,7 +194,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-9aee3039e49c0dfcff4cf1f27a5b6f703e4ad57bef5e1bdfad125e84ced05d2e  studentup-bot-cron.zip
+dc5bdff3cb5a50ee594f07b7948c9d860e335fcb101c01fa5046920f7d8e805a  studentup-bot-cron.zip
 ```
 
 ---
