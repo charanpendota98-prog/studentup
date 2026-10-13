@@ -42,30 +42,31 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.79.zip` (v281 · ADVANCED BEST BUILD)
+## 📱 Theme upload — `studentup-theme-1.9.80.zip` (v282 · QUIZ STATUS GAME + fixes)
 
-> ⚠️ **ముఖ్యం:** పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (లోపల `studentup/studentup/…` అని
-> nested folder + ఇంకో zip ఉండేది) — WordPress "The theme is missing the style.css stylesheet" అని reject చేసేది.
-> **1.9.79 zip సరైన structure** (`studentup/style.css` root లోనే) — ఇదే upload చేయండి.
+> ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
+> **1.9.80 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** →
-   `studentup-theme-1.9.79.zip` → **Install Now → Activate** (పాత 1.9.78 active ఉంటే → Replace active with uploaded).
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.80.zip` → **Install Now → Activate**
+   (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
-v281 లో ఏమి మారింది (అన్నీ roadmap లో owner-approved items, real data మాత్రమే, hint texts లేవు):
+v282 లో ఏమి మారింది (మీ screenshot feedback):
 
-| Change | ఎందుకు (clicks / trust) |
+| మీరు అడిగింది | చేసింది |
 |---|---|
-| **Urgency pills ప్రతి card మీద** — 🔴 ≤2 రోజులు · 🟠 ≤7 · 🟢 ≤14 (`data-last` ఉన్నప్పుడే) | Time pressure = 2–3× CTR (roadmap #1). Slider + grid + Closing Soon అన్నింటిలో ఒకే logic; "1 Days Left" grammar bug fix |
-| **Closing Soon band** (home, Top5/Quiz band కింద) — nearest deadline first, max 6 | Exam-calendar surfacing (roadmap #4). Deadlines లేకపోతే band అసలు render కాదు |
-| **Highlight-to-share** (articles) — text select చేస్తే WhatsApp · Telegram · Copy icon chips | Viral loop from content (roadmap blog #2). Space cost zero; GA4 `share_select` event |
-| **Laptop premium elevation** — card hover lift/glow, gradient rank medallions, section accent bar (≥981px మాత్రమే) | "Advanced" look; phone layout టచ్ చేయలేదు |
-| v280 constraints అలాగే | Remind/ICS/hint texts ఎప్పటికీ రావు (belt CSS) |
+| Quiz ని status లో పెట్టేలా, game లా, easy reasoning/aptitude | **24 easy questions** (number series, odd one out, coding-decoding, directions, blood relations, %, average, clock, SI, ratio…) — రోజూ 4 easy + 1 GK rotation |
+| Score రాగానే "Share your score to WhatsApp Status" | ఉంది — WhatsApp-green button. Click చేస్తే **పేరు అడుగుతుంది (ఒక్కసారే, save అవుతుంది)** |
+| వాళ్ళ పేరుతో "Hey your score" neat & attractive | **Score card image** (status size 9:16): "Hey Ravi! 👋 · 4/5 · 80% · Champion ⭐ · Can you beat my score? · ▶ Play now · studentup.in/daily-quiz" |
+| Quiz link add — friends click చేసి ఆడాలి | Card లోనూ, message లోనూ quiz link ఉంది. Phone లో **"Post to Status"** → WhatsApp → My status (image తో). Fallback: "Send on WhatsApp" text + "Download card" |
+| Social media icons రావట్లేదు (ఖాళీ తెల్ల circles) | Root cause: demo rail లో class mismatch → white icon on white. Fix + belt CSS — phone & laptop రెండింటిలో brand colours తో కనపడతాయి |
+| Categories కింద "TSPSC · Police" text + 128/96 counts వద్దు | Theme + అన్ని previews లో తీసేశాము — **icon + name మాత్రమే** |
+| v281 (ముందు round) | Urgency pills · Closing Soon band · highlight-to-share · laptop elevation — అలాగే ఉన్నాయి |
 
-Preview: Arena live-preview లో `/preview/v255/index.html` (home) + `/preview/posts/upsc-junior-assistant-2026.html`
-(article లో ఏదైనా వాక్యం select చేసి share chips చూడండి) — **phone + laptop** రెండింటిలో 360px → 1440px.
+Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
+`/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `9926f6c0d5ad1d1405b0e3c5d13319908fac86854611339868ddd19bd6609a61  studentup-theme-1.9.79.zip`
+sha256: `24c17cb3ed97bb5b17dfa0744fd21bc75114f2e1c44648fe7b320a4cc34226f4  studentup-theme-1.9.80.zip`
 
 ---
 
@@ -176,7 +177,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-b69711c02b7bd713d539ef74bde96472752390941a517d963816099581179a17  studentup-bot-cron.zip
+f06cb2fe608b8403a4b6270fa890e15e89c16b430ccab4b8dd8504967dc55d42  studentup-bot-cron.zip
 ```
 
 ---
