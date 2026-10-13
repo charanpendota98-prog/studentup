@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.82.zip` (v284 · DAILY GAME SHARE + LIVE SEARCH)
+## 📱 Theme upload — `studentup-theme-1.9.83.zip` (v285 · AMAZON-STYLE CATEGORY ICONS)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.82 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.83 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.82.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.83.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v285** — Category icons Amazon లాగా (clean, pedda, phone+laptop neat, easy click) | కొత్త **outline (stroke) icon set** — 14 category icons (Amazon/Flipkart line-icon style), 30px (laptop 32px), soft pastel tile per category (Pay/Fresh/Bazaar లా), bold label, tile min 92px tap target (laptop 104px). Phone లో hover లేదు — press feedback మాత్రమే; laptop లో soft lift. Theme + v255 + worldclass + OFFLINE అన్నిట్లో ఒకే icons. Daily Quiz tile కి సొంత icon |
 | **v284** — "Browse by section" లో ఇంకా arrows + line కనపడుతున్నాయి (screenshot) | Real root cause: OFFLINE_PREVIEW builder `premium.css`/`delight.css` ని inline చేయలేదు + demo లో పాత rail buttons/script మిగిలాయి. రెండూ fix — ఇప్పుడు OFFLINE లో arrows/line లేవు, wrapping rows మాత్రమే (verified grep) |
 | **v284** — Search type చేస్తే మన posts easy గా suggest అవ్వాలి | Header + hero search రెండింటికీ **live suggestions** (type → మన posts, focus → "Latest on StudentUp"), keyboard ↑↓ Enter, "See all results". Live site లో WP REST నుంచి; previews లో sample posts తో demo (v255) |
 | **v284** — Quiz status share: attractive, direct quiz link, daily game feel, రోజూ మారే quote, StudentUp branding | **Card**: Student**Up** lockup + `studentup.in` + "🔥 Day N" streak + score + రోజువారీ motivational quote (30 quotes, date-rotation) + quiz link. **Message**: `🎯 *StudentUp Daily Quiz* · Day N / Hey, I'm Ravi — 4/5 (80%) Champion ⭐ / 💡 quote / Can you beat my score? Play now 👇 link / #StudentUp studentup.in`. Link → `/daily-quiz/` page (లేకపోతే home#daily-quiz). Result box లో కూడా quote కనపడుతుంది. Daily-quiz preview page కూడా ఇదే flow |
@@ -74,7 +75,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `ef15efdad475047cb065fc6596e50499ca4a1b472574c9ed4f7fd1ecc82a7055  studentup-theme-1.9.82.zip`
+sha256: `299c85e009fcd8820a51a14b8ca07145b0294d809412f6994de7329c5d13e751  studentup-theme-1.9.83.zip`
 
 ---
 
@@ -185,7 +186,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-0842bc2115689772d906a4696f1c1e07f9a7e6e6fb79eaa3a20c4de2979c5512  studentup-bot-cron.zip
+fee72422da7f038e6675db132bb426b500f3a6d58735fe88dac76902f8ea2b29  studentup-bot-cron.zip
 ```
 
 ---
