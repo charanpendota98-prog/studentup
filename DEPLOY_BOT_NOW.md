@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.81.zip` (v283 · QUIZ STATUS GAME + fixes)
+## 📱 Theme upload — `studentup-theme-1.9.82.zip` (v284 · DAILY GAME SHARE + LIVE SEARCH)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.81 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.82 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.81.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.82.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,12 +65,16 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v284** — "Browse by section" లో ఇంకా arrows + line కనపడుతున్నాయి (screenshot) | Real root cause: OFFLINE_PREVIEW builder `premium.css`/`delight.css` ని inline చేయలేదు + demo లో పాత rail buttons/script మిగిలాయి. రెండూ fix — ఇప్పుడు OFFLINE లో arrows/line లేవు, wrapping rows మాత్రమే (verified grep) |
+| **v284** — Search type చేస్తే మన posts easy గా suggest అవ్వాలి | Header + hero search రెండింటికీ **live suggestions** (type → మన posts, focus → "Latest on StudentUp"), keyboard ↑↓ Enter, "See all results". Live site లో WP REST నుంచి; previews లో sample posts తో demo (v255) |
+| **v284** — Quiz status share: attractive, direct quiz link, daily game feel, రోజూ మారే quote, StudentUp branding | **Card**: Student**Up** lockup + `studentup.in` + "🔥 Day N" streak + score + రోజువారీ motivational quote (30 quotes, date-rotation) + quiz link. **Message**: `🎯 *StudentUp Daily Quiz* · Day N / Hey, I'm Ravi — 4/5 (80%) Champion ⭐ / 💡 quote / Can you beat my score? Play now 👇 link / #StudentUp studentup.in`. Link → `/daily-quiz/` page (లేకపోతే home#daily-quiz). Result box లో కూడా quote కనపడుతుంది. Daily-quiz preview page కూడా ఇదే flow |
+| **v284** — Bot తో advanced గా | కొత్త `autoblog/quiz_share.py`: site JS తో **same 30 quotes, same date index** (ఒకే రోజు site+bot ఒకే quote). `--export-quiz-channel whatsapp/telegram` output కి branded header (quote) + quiz link footer; `--daily-quiz --notify` Telegram alert లో groups కి forward చేయడానికి ready WhatsApp teaser text |
 | v281 (ముందు round) | Urgency pills · Closing Soon band · highlight-to-share · laptop elevation — అలాగే ఉన్నాయి |
 
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `f13c594bc24e7d7176ac24b4ab6d9254af9214de887ab2f47e94ea536c5879eb  studentup-theme-1.9.81.zip`
+sha256: `ef15efdad475047cb065fc6596e50499ca4a1b472574c9ed4f7fd1ecc82a7055  studentup-theme-1.9.82.zip`
 
 ---
 
@@ -181,7 +185,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-7f016aa6d44bf52da802c489c6132af1c7c060f84f9a68f2fef6dcfe8b7455e0  studentup-bot-cron.zip
+5725e3dd11ce0528b7a11d01d628d5aeb11cb2a131df386055d6a3b9dd61d362  studentup-bot-cron.zip
 ```
 
 ---
