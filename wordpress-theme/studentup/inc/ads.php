@@ -37,7 +37,7 @@ function studentup_adsense_client() {
  * @param string $slot slot name.
  * @param string $layout display layout (auto|in-article|fluid).
  */
-function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height = 250 ) {
+function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height = 250, $place = '' ) {
 	$client = studentup_adsense_client();
 	if ( ! $client ) {
 		return;
@@ -50,7 +50,7 @@ function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height
 		? ' data-ad-format="fluid" data-ad-layout="' . esc_attr( $layout ) . '"'
 		: ' data-ad-format="auto"';
 	printf(
-		'<div class="adsense-slot su-ad-reserved%1$s" style="min-height:%2$dpx" data-su-lazy="%3$d" data-su-height="%2$d">'
+		'<div class="adsense-slot su-ad-reserved%1$s" style="min-height:%2$dpx" data-su-lazy="%3$d" data-su-height="%2$d" data-su-place="%8$s">'
 		. '<ins class="adsbygoogle" style="display:block;text-align:center" data-ad-client="%4$s" '
 		. 'data-ad-slot="%5$s"%6$s data-full-width-responsive="true"></ins>%7$s</div>',
 		$lazy ? ' su-ad-lazy' : '',
@@ -59,7 +59,8 @@ function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height
 		esc_attr( $client ),
 		esc_attr( $slot ),
 		$attrs,
-		$lazy ? '' : '<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>'
+		$lazy ? '' : '<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>',
+		esc_attr( (string) $place )
 	);
 }
 
@@ -278,7 +279,8 @@ function studentup_ad( $place = 'mid' ) {
 			$slot,
 			'mid' === $place ? 'in-article' : ( 'in-feed' === $place ? 'fluid' : 'auto' ),
 			$lazy,
-			$height
+			$height,
+			$place
 		);
 		return;
 	}

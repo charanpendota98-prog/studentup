@@ -2536,3 +2536,58 @@ body.dark .mpanel .su-mjoin-app{ background:linear-gradient(135deg,#1d4ed8,#2563
 /* v296 — layout hygiene: [hidden] always wins (Check/Restart/Share buttons were showing together), no horizontal scroll */
 [hidden]{ display:none !important; }
 html, body{ overflow-x:hidden; }
+/* v297 — REVENUE SIZING: reserved space matches the highest-RPM responsive sizes per device (no CLS, no empty gaps).
+   phone: top 320×100 · mid/in-article 300×250 (fluid) · below 300×250 · sidebar none
+   laptop: top 970×90/728×90 · sidebar 300×600 sticky (highest paying desktop unit) · below 336×280 */
+.su-ad-reserved{ margin:12px auto; max-width:100%; }
+.su-ad-reserved .adsbygoogle{ width:100%; }
+@media (max-width:640px){
+  .su-ad-reserved[data-su-place="leaderboard"]{ min-height:100px !important; }
+  .su-ad-reserved[data-su-place="mid"], .su-ad-reserved[data-su-place="below-content"], .su-ad-reserved[data-su-place="in-feed"]{ min-height:250px !important; }
+  .su-ad-reserved[data-su-place="sidebar"]{ display:none; }
+}
+@media (min-width:981px){
+  .su-ad-reserved[data-su-place="leaderboard"]{ min-height:90px !important; max-width:970px; }
+  .su-ad-reserved[data-su-place="sidebar"]{ min-height:600px !important; max-width:300px; position:sticky; top:84px; }
+  .su-ad-reserved[data-su-place="below-content"]{ min-height:280px !important; }
+}
+
+/* v297 — NEAT TYPE SCALE (phone first, laptop advanced). One rhythm everywhere. */
+:root{ --su-fs-h2:clamp(16px,1.2vw + 11px,21px); --su-fs-body:clamp(14px,.35vw + 12.5px,16px); --su-fs-meta:clamp(11px,.2vw + 10px,12.5px); --su-r:14px; --su-pad:clamp(12px,1vw + 8px,18px); }
+.sectionhead h2, .su-quiz-head h2, .su-postnews-head h2, .su-top5 h2, .su-cathead b, .su-slider-head h2{ font-size:var(--su-fs-h2); line-height:1.2; letter-spacing:-.01em; }
+.su-quiz-card, .su-top5-list, .su-postnews, .su-pn-send, .su-pn-card, .su-brk-state{ border-radius:var(--su-r); }
+.su-quiz-card{ padding:var(--su-pad); }
+.su-q-title{ font-size:var(--su-fs-body); line-height:1.45; font-weight:700; }
+.su-opt-t{ font-size:var(--su-fs-body); line-height:1.4; }
+.su-opt{ min-height:44px; border-radius:11px; }
+.su-qtab{ font-size:12.5px; padding:8px 12px; min-height:36px; border-radius:999px; }
+.su-quiz-kick, .su-quiz-legend, .su-top5-tag, .su-pn-card time, .su-pn-rules{ font-size:var(--su-fs-meta); }
+.su-quiz-legend{ margin:8px 0 0; }
+.su-top5-list li a{ font-size:var(--su-fs-body); line-height:1.4; }
+.su-quiz-restart, .su-quiz-more, .su-quiz-share, .su-postnews-btn, .su-pn-btn{ min-height:44px; font-size:14px; }
+@media (max-width:640px){
+  .su-quiz-exams{ gap:6px; margin:0 0 8px; }
+  .su-qtab{ font-size:12px; padding:7px 10px; min-height:34px; }
+  .su-q-jump .su-q-chip{ width:30px; height:30px; }
+  .su-quiz-head{ gap:8px; align-items:flex-start; }
+  .su-quiz-score b{ font-size:20px; }
+  .su-top5-list li{ padding:10px 10px; gap:8px; }
+  .su-top5-tag{ display:none; }
+  .su-postnews-tiles a b{ font-size:12px; }
+  .su-postnews-head h2{ font-size:16px; }
+  .su-pn-tiles{ gap:8px; }
+  .su-brk-states{ gap:8px; }
+  .su-brk-state{ padding:12px; }
+  .su-brk-state b{ font-size:14px; }
+  .su-brk-dist{ font-size:12.5px; padding:9px 8px; }
+  .sectionhead{ margin-bottom:10px; }
+  .su-viewall{ font-size:12px; }
+}
+@media (min-width:981px){
+  .su-home-grid{ gap:18px; }
+  .su-quiz-card{ padding:20px 22px; }
+  .su-q{ padding:12px 0; }
+  .su-opt{ padding:10px 12px; }
+  .su-top5-list li{ padding:12px 14px; }
+}
+
