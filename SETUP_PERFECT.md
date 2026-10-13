@@ -42,7 +42,7 @@ cp .env.example .env && nano .env
 
 `.env` లో కనీసం:
 ```bash
-WP_URL=https://studentup.in
+WP_SITE=https://studentup.in
 WP_USERNAME=మీ-username
 WP_APP_PASSWORD=xxxx xxxx xxxx xxxx
 
@@ -90,7 +90,7 @@ python run.py --go-live --apply    # ఇప్పుడు నిజంగా se
 
 ```bash
 python run.py --radar                     # ఈరోజు ఏ notifications వచ్చాయి
-python run.py --run                       # 3–5 drafts
+python run.py --force                     # ventane okka draft (--run ane flag ledu)
 python run.py --daily-quiz-dry            # quiz preview
 python run.py --links-file links.txt      # మీ link list నుంచి (cluster + pace + retry)
 ```

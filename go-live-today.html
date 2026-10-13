@@ -91,7 +91,7 @@ cp .env.example .env && nano .env</pre>
 <pre><button class="cp">copy</button>AI_PROVIDER=gemini
 GEMINI_API_KEYS=key1,key2,key3
 GROQ_API_KEYS=key1,key2
-WP_URL=https://మీ-domain.in
+WP_SITE=https://మీ-domain.in
 WP_USERNAME=admin-username
 WP_APP_PASSWORD=xxxx xxxx xxxx xxxx
 AUTO_PUBLISH_DAILY=0</pre>
@@ -108,7 +108,7 @@ python3 run.py --check-wp</pre>
 <div class="step" data-k="s4">
 <h2><span class="n">4</span> మొదటి 5 posts — చేతితో review <span class="t">~60 నిమిషాలు · skip చేయకండి</span></h2>
 <pre><button class="cp">copy</button>python3 run.py --radar      # ఈరోజు ఏ notifications వచ్చాయి
-python3 run.py --run        # drafts create
+python3 run.py --force      # ventane okka draft
 python3 run.py --daily-quiz # quiz draft</pre>
 <ul>
 <li>WP → Posts → Drafts లో <b>5 drafts</b> ఒక్కొక్కటి చదవండి: తేదీలు, fee, last date, official link — అన్నీ నిజమేనా?</li>
@@ -134,7 +134,7 @@ python3 run.py --verify-deploy</pre>
 <div class="step" data-k="s6">
 <h2><span class="n">6</span> Cron ON — రోజుకి 3–5 posts <span class="t">~5 నిమిషాలు</span></h2>
 <pre><button class="cp">copy</button>crontab -e
-30 6 * * * cd ~/studentup-bot && python3 run.py --run
+30 6 * * * cd ~/studentup-bot && python3 run.py --daily
 0  7 * * * cd ~/studentup-bot && python3 run.py --daily-quiz</pre>
 <ul>
 <li>మొదటి వారం రోజూ drafts చూసి publish చేయండి. నాణ్యత స్థిరం అయ్యాక <code>AUTO_PUBLISH_DAILY=1</code>.</li>

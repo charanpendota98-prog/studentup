@@ -9,7 +9,59 @@
 | వేగం | ఎక్కువ | తక్కువ |
 | సిఫార్సు | **ఇదే వాడండి** | VM కుదరకపోతే |
 
-Deploy readiness ఇప్పుడు: `--deploy-check` → **8 ok · 4 warn · 0 fail**. Warnings అన్నీ server లో `.env` పెట్టాక పోతాయి.
+Deploy readiness ఇప్పుడు: `--deploy-check` → **10 ok · 2 warn · 0 fail** (`.git` లేకపోవడం + Telegram optional — రెండూ warnings మాత్రమే).
+
+---
+
+## ⚡ ఒక్క command — `install-bot.sh` (సిఫార్సు)
+
+`install-bot.sh` + `studentup-bot-cron.zip` రెండూ ఒకే folder లో ఉంచి:
+
+```bash
+bash install-bot.sh
+```
+
+అది వరుసగా చేసేది:
+
+1. python3 + venv + unzip + cron install
+2. `studentup-bot-cron.zip` extract → `~/studentup-bot`
+3. `.env` ని **అడిగి** create — keys paste చేస్తే చాలు (Enter = skip, తర్వాత `nano .env`)
+4. Safety lock: `DEFAULT_POST_STATUS=draft` · `AUTOMATION_DRAFT_ONLY=1` · `AUTO_PUBLISH_DAILY=0` · `chmod 600`
+5. `.env` parse + 3 self-tests (`ci/test_env_parser.py` · `test_cli_flags.py` · `test_shadowed_imports.py`)
+6. `--deploy-check` + `--check-wp` (WP credentials పెట్టి ఉంటే)
+7. **ఒక్క dry-run draft** — నిజంగా పని చేస్తుందా అని proof (Gemini key లేకపోతే `--mock` తో offline proof)
+8. crontab install: 6:30 drafts · 7:00 quiz · 7:10 guardian · */5 approvals · Sunday audit + log rotation
+
+Idempotent — మళ్ళీ run చేసినా ఏమీ పాడవదు, update మాత్రమే. Bot **ఎప్పుడూ direct publish చేయదు**; మీరు draft చూసి approve చేశాకే live.
+
+Prompts వద్దు / ముందే పరీక్షించాలి అంటే:
+
+```bash
+NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
+```
+
+---
+
+## 📱 Site design fix — `studentup-theme-1.9.78.zip` (v280)
+
+Phone screenshots లోని bugs కి fix ఇదే — **WordPress లో theme upload చేయాలి**:
+
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** →
+   `studentup-theme-1.9.78.zip` → **Install Now → Activate**.
+2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
+
+v280 లో ఏమి మారింది:
+
+| Change | Detail |
+|---|---|
+| "Remind me" buttons 2 సార్లు వచ్చాయి | Remind me పూర్తిగా తీసేశాము (owner: avasram ledu) — cards మీద **ఒక్క Save + Read more** మాత్రమే |
+| Card పక్కన clumsy pill columns (Save · Remind · Save · Remind) | duplicate script tail + extra save pills తీసేశాము — card neat & compact, no wasted space |
+| Reminder strip · "Add reminder" · calendar (.ics) buttons | theme లో కూడా తీసేశాము — belt CSS తో ఎప్పటికీ కనపడవు |
+
+Preview: Arena live-preview లో `/preview/v255/index.html` — **phone + laptop రెండింటిలో** open చేసి
+360px → 1440px వరకు చూడండి.
+
+sha256: `e6f5a24d2469ded181811e5961c3c1a80dcd12139bf42a634720ae4d8b69e8c0  studentup-theme-1.9.78.zip`
 
 ---
 
@@ -53,7 +105,7 @@ nano .env
 ```
 కనీసం ఇవి:
 ```bash
-WP_URL=https://studentup.in
+WP_SITE=https://studentup.in
 WP_USERNAME=మీ-wp-username
 WP_APP_PASSWORD=WP → Users → Profile → Application Passwords లో generate చేసింది
 
@@ -78,7 +130,7 @@ python run.py --radar           # ఈరోజు ఏ notifications వచ్చ
 
 ### A7. మొదటి draft
 ```bash
-python run.py --run                       # articles draft
+python run.py --force                     # ventane okka draft (--run ane flag ledu)
 python run.py --daily-quiz-dry            # quiz preview
 python run.py --links-file links.txt      # మీ link list నుంచి (cluster + pace)
 ```
@@ -120,7 +172,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-2d6502a4537e3d78ad76954700eefe90f81024d27d063e46e43e058e18792661  studentup-bot-cron.zip
+d41571914c2da1da529e1b9f53db3b1ba3601c677bfbb0b8d849aaaf6d149301  studentup-bot-cron.zip
 ```
 
 ---
