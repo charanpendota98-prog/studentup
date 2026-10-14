@@ -83,7 +83,7 @@ function studentup_critical_css_inline() {
 		return;
 	}
 	$css = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- theme file, build-time generated.
-	if ( ! $css || strlen( $css ) > 60000 ) {   // sanity cap — unexpected build output ki.
+	if ( ! $css || strlen( $css ) > 65000 ) {   // sanity cap (v305: calc() spaces fix tho union 60.8 KB) — unexpected build output ki.
 		return;
 	}
 	echo '<style id="su-critical">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- own build output, no user input.

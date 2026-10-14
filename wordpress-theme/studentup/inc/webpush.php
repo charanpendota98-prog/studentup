@@ -174,6 +174,7 @@ function studentup_push_prompt() {
 		'key'  => studentup_push_public_key(),
 		'rest' => esc_url_raw( rest_url( 'studentup/v1/push-subscribe' ) ),
 		'sw'   => esc_url_raw( add_query_arg( 'studentup_sw', '1', home_url( '/' ) ) ),
+		'icon' => function_exists( 'studentup_ui_icon' ) ? studentup_ui_icon( 'bell', 15 ) : '',
 	);
 	?>
 	<script>
@@ -185,9 +186,7 @@ function studentup_push_prompt() {
 		var KEY = 'su-push-v1';
 		var store = {};
 		try { store = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { store = {}; }
-		if (store.done) { return; }
-		// "No thanks" annaka 30 rojulu malli adagam.
-		if (store.snoozeUntil && Date.now() < store.snoozeUntil) { return; }
+		var muted = !!store.done || (store.snoozeUntil && Date.now() < store.snoozeUntil);   /* v305: bell tap ki auto-prompt kaadu, user intent → eppudaina */
 
 		// Reader engage ayyaka ne adugutam: 2nd pageview, leda 25s + scroll.
 		store.views = (store.views || 0) + 1;
@@ -229,13 +228,13 @@ function studentup_push_prompt() {
 		}
 
 		var bar = null;
-		function show() {
-			if (bar || !engaged) { return; }
+		function show(force) {
+			if (bar || (!force && (!engaged || muted)) || store.done) { return; }
 			bar = document.createElement('div');
 			bar.className = 'su-push-bar';
-			bar.innerHTML = '<span class="su-push-txt">' . studentup_ui_icon( 'bell', 15 ) . ' Kotha jobs &amp; results alerts kavala?</span>' // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
+			bar.innerHTML = '<span class="su-push-txt">' + CFG.icon + ' Kotha jobs &amp; results alerts kavala?</span>'
 				+ '<button type="button" class="su-push-yes">Yes, alert cheyandi</button>'
-				+ '<button type="button" class="su-push-no">No thanks</button>';
+				+ '<button type="button" class="su-push-no">No thanks</button>';   /* v305 FIX: PHP concat JS lo undedi → SyntaxError → bar eppudu kanipinchaledu */
 			document.body.appendChild(bar);
 			bar.querySelector('.su-push-yes').addEventListener('click', subscribe);
 			bar.querySelector('.su-push-no').addEventListener('click', function () {
@@ -245,9 +244,357 @@ function studentup_push_prompt() {
 			});
 		}
 
-		if (engaged) { window.setTimeout(show, 4000); }
+		if (engaged && !muted) { window.setTimeout(show, 4000); }
+		/* v305: "Alerts" bell (mobile menu / bottom nav / mega) → subscribe avvakapothe ikkade opt-in; already ON ante Telegram/WhatsApp channel ki */
+		var bells = document.querySelectorAll('[data-su-alerts]');
+		for (var bi = 0; bi < bells.length; bi++) {
+			bells[bi].addEventListener('click', function (ev) {
+				if (store.done) { return; }
+				ev.preventDefault();
+				show(true);
+				if (bar) { bar.scrollIntoView && bar.scrollIntoView({ block: 'end' }); }
+			});
+		}
 	})();
 	</script>
 	<?php
 }
 add_action( 'wp_footer', 'studentup_push_prompt', 30 );
+
+/* =====================================================================
+ * v305 AUTO PUSH ENGINE — post publish ayite automatic ga push.
+ *
+ *  publish → studentup_push_enqueue_on_publish() → queue (option)
+ *          → bot `run.py --push-auto` (approval-poll lo prathi 5 min + publish taruvata ventane)
+ *            GET  /studentup/v1/push-queue       (ready items — quiet hours / daily cap already apply)
+ *            POST /studentup/v1/push-queue/ack   (sent / expired / failed stats → log, expired subs delete)
+ *
+ *  Rules (owner: no spam, no fake):
+ *   - kotha publish matrame (update/edit ki push ledu), 48h kante paata posts kaadu (bulk import safety)
+ *   - daily cap (default 3) — Breaking + Results/Hall-ticket "high" items cap ni bypass chestayi
+ *   - quiet hours 22:00–07:00 IST hold (high items bypass)
+ *   - same title (normalized) 7 rojulu lo malli push kaadu
+ *   - body real meta nunchi matrame (vacancies · qualification · last date); data lekapote excerpt
+ * ===================================================================== */
+
+/**
+ * Queue (option, autoload off).
+ *
+ * @return array
+ */
+function studentup_push_queue_get() {
+	$q = get_option( 'studentup_push_queue', array() );
+	return is_array( $q ) ? array_values( $q ) : array();
+}
+
+/**
+ * @param array $q queue.
+ */
+function studentup_push_queue_set( $q ) {
+	$q = array_slice( array_values( (array) $q ), -50 );
+	if ( false === get_option( 'studentup_push_queue', false ) ) {
+		add_option( 'studentup_push_queue', $q, '', 'no' );
+		return;
+	}
+	update_option( 'studentup_push_queue', $q, 'no' );
+}
+
+/**
+ * Post kind: breaking / result / job / other — priority + icon decide cheyyadaniki.
+ *
+ * @param int $post_id post.
+ * @return string
+ */
+function studentup_push_kind( $post_id ) {
+	$slugs = array();
+	foreach ( (array) get_the_category( $post_id ) as $c ) {
+		$slugs[] = $c->slug;
+		$anc     = get_ancestors( $c->term_id, 'category' );
+		foreach ( $anc as $a ) {
+			$t = get_term( $a, 'category' );
+			if ( $t && ! is_wp_error( $t ) ) {
+				$slugs[] = $t->slug;
+			}
+		}
+	}
+	$s = implode( ' ', $slugs );
+	if ( false !== strpos( $s, 'breaking' ) ) {
+		return 'breaking';
+	}
+	if ( preg_match( '/result|hall-?ticket|admit|answer-?key/', $s ) ) {
+		return 'result';
+	}
+	if ( preg_match( '/job|recruit|notification|walk-?in|scholarship|admission/', $s ) ) {
+		return 'job';
+	}
+	return 'other';
+}
+
+/**
+ * Notification body — real meta matrame; lekapote excerpt (hint/fake text ledu).
+ *
+ * @param int $post_id post.
+ * @return string
+ */
+function studentup_push_body( $post_id ) {
+	$bits = array();
+	$vac  = trim( (string) get_post_meta( $post_id, 'studentup_vacancies', true ) );
+	$qual = trim( (string) get_post_meta( $post_id, 'studentup_qual', true ) );
+	$last = trim( (string) get_post_meta( $post_id, 'studentup_last_date', true ) );
+	if ( $vac && preg_match( '/^[\d,]+$/', $vac ) ) {
+		$bits[] = $vac . ' posts';
+	}
+	if ( $qual && function_exists( 'studentup_qual_pretty' ) ) {
+		$bits[] = studentup_qual_pretty( $qual );
+	}
+	if ( $last && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $last ) ) {
+		$ts = strtotime( $last . ' 12:00:00' );
+		if ( $ts && $ts >= strtotime( 'today' ) ) {
+			$bits[] = 'Last date ' . wp_date( 'd M', $ts );
+		}
+	}
+	if ( $bits ) {
+		return implode( ' · ', $bits );
+	}
+	$ex = wp_strip_all_tags( get_the_excerpt( $post_id ) );
+	return mb_substr( trim( preg_replace( '/\s+/', ' ', $ex ) ), 0, 110 );
+}
+
+/**
+ * Publish hook.
+ *
+ * @param string  $new  new status.
+ * @param string  $old  old status.
+ * @param WP_Post $post post.
+ */
+function studentup_push_enqueue_on_publish( $new, $old, $post ) {
+	if ( 'publish' !== $new || 'publish' === $old || ! $post instanceof WP_Post || 'post' !== $post->post_type ) {
+		return;
+	}
+	if ( ! studentup_push_enabled() || ! studentup_opt( 'push_auto', '1' ) ) {
+		return;
+	}
+	if ( ( time() - get_post_time( 'U', true, $post ) ) > 2 * DAY_IN_SECONDS ) {
+		return; // bulk import / backdated — push vaddu.
+	}
+	$title = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
+	$norm  = preg_replace( '/[^a-z0-9\p{Telugu}]+/u', '', mb_strtolower( $title ) );
+	$seen  = get_option( 'studentup_push_seen', array() );
+	$seen  = is_array( $seen ) ? $seen : array();
+	$now   = time();
+	foreach ( $seen as $k => $t ) {
+		if ( $now - (int) $t > 7 * DAY_IN_SECONDS ) {
+			unset( $seen[ $k ] );
+		}
+	}
+	if ( isset( $seen[ $norm ] ) ) {
+		return; // same title 7 days lo already pushed/queued.
+	}
+	$seen[ $norm ] = $now;
+	update_option( 'studentup_push_seen', $seen, 'no' );
+
+	// Meta/featured image REST create lo post insert TARUVATA save avutayi → ikkada id matrame;
+	// title/body/image GET time lo fresh ga hydrate (studentup_push_hydrate()).
+	$q   = studentup_push_queue_get();
+	$q[] = array( 'id' => (int) $post->ID, 'ts' => $now );
+	studentup_push_queue_set( $q );
+}
+add_action( 'transition_post_status', 'studentup_push_enqueue_on_publish', 20, 3 );
+
+/**
+ * Queue item → full payload (fresh title/meta/image at send time).
+ *
+ * @param array $it item.
+ * @return array|null null = post inka publish lo ledu (deleted/unpublished → drop).
+ */
+function studentup_push_hydrate( $it ) {
+	$pid  = (int) $it['id'];
+	$post = get_post( $pid );
+	if ( ! $post || 'publish' !== $post->post_status ) {
+		return null;
+	}
+	$kind  = studentup_push_kind( $pid );
+	$image = get_the_post_thumbnail_url( $pid, 'large' );
+	$icon  = get_site_icon_url( 192 );
+	$title = html_entity_decode( wp_strip_all_tags( get_the_title( $post ) ), ENT_QUOTES, 'UTF-8' );
+	return array(
+		'id'    => $pid,
+		'title' => mb_substr( $title, 0, 80 ),
+		'body'  => studentup_push_body( $pid ),
+		'url'   => add_query_arg( array( 'utm_source' => 'push', 'utm_medium' => 'notification' ), get_permalink( $post ) ),
+		'icon'  => $icon ? $icon : '',
+		'image' => $image ? $image : '',
+		'tag'   => 'su-' . $pid,
+		'kind'  => $kind,
+		'high'  => in_array( $kind, array( 'breaking', 'result' ), true ),
+		'ts'    => (int) $it['ts'],
+	);
+}
+
+/**
+ * Ippudu pampocha? (IST quiet hours 22:00–07:00; high items bypass.)
+ *
+ * @return bool
+ */
+function studentup_push_quiet_now() {
+	if ( ! studentup_opt( 'push_quiet', '1' ) ) {
+		return false;
+	}
+	$h = (int) wp_date( 'G' );
+	return ( $h >= 22 || $h < 7 );
+}
+
+/**
+ * Daily sent counter key.
+ *
+ * @return string
+ */
+function studentup_push_day_key() {
+	return 'su_push_sent_' . wp_date( 'Ymd' );
+}
+
+/**
+ * GET push-queue — bot ki ready items.
+ *
+ * @return WP_REST_Response
+ */
+function studentup_push_queue_rest() {
+	global $wpdb;
+	$q      = studentup_push_queue_get();
+	$cap    = max( 0, (int) studentup_opt( 'push_daily_cap', '3' ) );
+	$sent   = (int) get_transient( studentup_push_day_key() );
+	$quiet  = studentup_push_quiet_now();
+	$ready  = array();
+	$held   = 0;
+	$budget = $cap > 0 ? max( 0, $cap - $sent ) : PHP_INT_MAX;
+	$drop   = array();
+	foreach ( $q as $it ) {
+		$it = studentup_push_hydrate( $it );
+		if ( ! $it ) {
+			$drop[] = 1;
+			continue;
+		}
+		$high = ! empty( $it['high'] );
+		if ( ( $quiet && ! $high ) || ( ! $high && $budget <= 0 ) ) {
+			$held++;
+			continue;
+		}
+		if ( ! $high ) {
+			$budget--;
+		}
+		$ready[] = $it;
+	}
+	if ( $drop ) { // unpublished/deleted posts → queue nunchi teeseyi
+		studentup_push_queue_set( array_values( array_filter( $q, function ( $x ) {
+			$p = get_post( (int) $x['id'] );
+			return $p && 'publish' === $p->post_status;
+		} ) ) );
+	}
+	$table = $wpdb->prefix . STUDENTUP_PUSH_TABLE;
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery
+	$subs = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+	// phpcs:enable
+	return rest_ensure_response(
+		array(
+			'ready'       => $ready,
+			'held'        => $held,
+			'quiet'       => $quiet,
+			'sent_today'  => $sent,
+			'daily_cap'   => $cap,
+			'subscribers' => $subs,
+			'public_key'  => studentup_push_public_key(),
+		)
+	);
+}
+
+/**
+ * POST push-queue/ack — {ids:[], sent:n, expired:[endpoints], failed:n, dry:bool}
+ *
+ * @param WP_REST_Request $req request.
+ * @return WP_REST_Response
+ */
+function studentup_push_queue_ack( $req ) {
+	global $wpdb;
+	$ids     = array_map( 'intval', (array) $req->get_param( 'ids' ) );
+	$sent    = (int) $req->get_param( 'sent' );
+	$failed  = (int) $req->get_param( 'failed' );
+	$expired = array_filter( array_map( 'esc_url_raw', (array) $req->get_param( 'expired' ) ) );
+	$dry     = (bool) $req->get_param( 'dry' );
+
+	if ( $ids && ! $dry ) {
+		$q = array_values( array_filter( studentup_push_queue_get(), function ( $it ) use ( $ids ) {
+			return ! in_array( (int) $it['id'], $ids, true );
+		} ) );
+		studentup_push_queue_set( $q );
+		if ( $sent > 0 ) { // subscribers levu ante cap count avvadu
+			$key = studentup_push_day_key();
+			set_transient( $key, (int) get_transient( $key ) + count( $ids ), DAY_IN_SECONDS + HOUR_IN_SECONDS );
+		}
+		$log   = get_option( 'studentup_push_log', array() );
+		$log   = is_array( $log ) ? $log : array();
+		$log[] = array( 'ts' => time(), 'ids' => $ids, 'sent' => $sent, 'failed' => $failed, 'expired' => count( $expired ) );
+		update_option( 'studentup_push_log', array_slice( $log, -30 ), 'no' );
+	}
+	$removed = 0;
+	if ( $expired ) {
+		$table = $wpdb->prefix . STUDENTUP_PUSH_TABLE;
+		foreach ( $expired as $ep ) {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery
+			$removed += (int) $wpdb->delete( $table, array( 'endpoint' => $ep ), array( '%s' ) );
+			// phpcs:enable
+		}
+	}
+	return rest_ensure_response( array( 'ok' => true, 'removed_expired' => $removed, 'queue' => count( studentup_push_queue_get() ) ) );
+}
+
+/**
+ * Routes.
+ */
+function studentup_push_queue_routes() {
+	$auth = function () {
+		return current_user_can( 'edit_posts' );
+	};
+	register_rest_route( 'studentup/v1', '/push-queue', array(
+		'methods'             => 'GET',
+		'permission_callback' => $auth,
+		'callback'            => 'studentup_push_queue_rest',
+	) );
+	register_rest_route( 'studentup/v1', '/push-queue/ack', array(
+		'methods'             => 'POST',
+		'permission_callback' => $auth,
+		'callback'            => 'studentup_push_queue_ack',
+	) );
+}
+add_action( 'rest_api_init', 'studentup_push_queue_routes' );
+
+/**
+ * Admin status line (StudentUp settings page lo matrame).
+ */
+function studentup_push_admin_status() {
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return;
+	}
+	$scr = get_current_screen();
+	if ( ! $scr || false === strpos( (string) $scr->id, 'studentup' ) ) {
+		return;
+	}
+	global $wpdb;
+	$table = $wpdb->prefix . STUDENTUP_PUSH_TABLE;
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery
+	$subs = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
+	// phpcs:enable
+	$q    = count( studentup_push_queue_get() );
+	$log  = get_option( 'studentup_push_log', array() );
+	$last = is_array( $log ) && $log ? end( $log ) : null;
+	$msg  = sprintf(
+		'🔔 Push: %s · subscribers <b>%d</b> · queue <b>%d</b> · today sent <b>%d</b>/%s%s',
+		studentup_push_enabled() ? 'ON' : '<b>OFF</b> (VAPID public key pettandi — <code>python run.py --push-keys</code>)',
+		$subs,
+		$q,
+		(int) get_transient( studentup_push_day_key() ),
+		(int) studentup_opt( 'push_daily_cap', '3' ),
+		$last ? ' · last send ' . esc_html( wp_date( 'd M H:i', (int) $last['ts'] ) ) . ' (' . (int) $last['sent'] . ' delivered)' : ''
+	);
+	echo '<div class="notice notice-info"><p>' . wp_kses( $msg, array( 'b' => array(), 'code' => array() ) ) . '</p></div>';
+}
+add_action( 'admin_notices', 'studentup_push_admin_status' );

@@ -222,6 +222,7 @@ else
     echo "0 7 * * * cd $BOT_DIR && $PY run.py --daily-quiz >> $BOT_DIR/log/quiz.log 2>&1"
     echo "10 7 * * * cd $BOT_DIR && $PY run.py --guardian >> $BOT_DIR/log/guardian.log 2>&1"
     echo "*/5 * * * * cd $BOT_DIR && $PY run.py --approval-poll >> $BOT_DIR/log/approval.log 2>&1"
+    echo "* * * * * cd $BOT_DIR && $PY run.py --push-auto >> $BOT_DIR/log/push.log 2>&1"
     echo "0 3 * * 0 cd $BOT_DIR && $PY run.py --site-audit >> $BOT_DIR/log/audit.log 2>&1"
     echo "45 3 * * 0 cd $BOT_DIR && $PY run.py --orphans >> $BOT_DIR/log/links.log 2>&1"
     echo "0 3 1 * * tail -c 500000 $BOT_DIR/log/cron.log > /tmp/su-cron.log && mv /tmp/su-cron.log $BOT_DIR/log/cron.log"

@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.102\n"
+"Project-Id-Version: StudentUp 1.9.103\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -279,7 +279,7 @@ msgstr ""
 msgid "Close compare panel"
 msgstr ""
 
-#: inc/pwa.php:299
+#: inc/pwa.php:311
 msgid "Close install banner"
 msgstr ""
 
@@ -637,7 +637,7 @@ msgstr ""
 msgid "Instagram"
 msgstr ""
 
-#: inc/pwa.php:298
+#: inc/pwa.php:310
 msgid "Install"
 msgstr ""
 

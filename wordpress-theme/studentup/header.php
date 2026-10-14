@@ -139,7 +139,7 @@ studentup_breaking_ticker();
 	<a href="<?php echo esc_url( home_url( '/#syllabus-tracker' ) ); ?>"><?php echo studentup_ui_icon( 'book' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Syllabus Tracker</a>
 	<a href="<?php echo esc_url( home_url( '/#salary-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Salary Calculator</a>
 	<?php endif; ?>
-	<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener"><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Instant alerts</a>
+	<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener" data-su-alerts><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Instant alerts</a>
 	<a href="#" class="su-install-cta" role="button"><?php echo studentup_ui_icon( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Download App <span class="su-mpwa">FREE</span></a>
 	<?php
 	// v123: Scholarships mobile menu lo eppudu kanipinchali.

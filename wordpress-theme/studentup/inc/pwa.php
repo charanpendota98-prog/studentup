@@ -176,14 +176,20 @@ self.addEventListener("push", function (e) {
   var d = {};
   try { d = e.data ? e.data.json() : {}; } catch (err) { d = {}; }
   var title = d.title || "StudentUp";
-  e.waitUntil(self.registration.showNotification(title, {
+  var opts = {
     body: d.body || "",
     icon: d.icon || undefined,
     badge: d.badge || undefined,
     tag: d.tag || "studentup",
-    data: { url: d.url || "/" },
-    requireInteraction: false
-  }));
+    renotify: !!d.high,
+    requireInteraction: !!d.high,
+    vibrate: d.high ? [120, 60, 120] : [80],
+    timestamp: d.ts ? d.ts * 1000 : Date.now(),
+    data: { url: d.url || "/", title: title },
+    actions: [{ action: "open", title: "Open" }, { action: "wa", title: "WhatsApp" }]
+  };
+  if (d.image) { opts.image = d.image; }   /* v305: featured image = big picture (Android) */
+  e.waitUntil(self.registration.showNotification(title, opts));
 });
 
 // Notification click -> aa post ki. Already open unna tab unte adi focus
@@ -191,6 +197,12 @@ self.addEventListener("push", function (e) {
 self.addEventListener("notificationclick", function (e) {
   e.notification.close();
   var url = (e.notification.data && e.notification.data.url) || "/";
+  if (e.action === "wa") {   /* v305: share to WhatsApp straight from the notification */
+    var t = (e.notification.data && e.notification.data.title) || "StudentUp";
+    url = "https://wa.me/?text=" + encodeURIComponent(t + "\n" + url.split("?")[0] + "\n— StudentUp (studentup.in)");
+    e.waitUntil(clients.openWindow ? clients.openWindow(url) : null);
+    return;
+  }
   e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (list) {
     for (var i = 0; i < list.length; i++) {
       if (list[i].url === url && "focus" in list[i]) { return list[i].focus(); }
