@@ -1064,3 +1064,7 @@ body.dark .su-brk-search input{ color:#e7f0ff; }
 }
 /* quiz option rows: compact, consistent */
 .su-q-opts .su-opt{ min-height:40px; }
+/* post-your-news: 3 steps stack on phones (third box text was squeezed) */
+@media (max-width:480px){ .su-pn-steps{ grid-template-columns:1fr !important; display:grid; gap:6px; } .su-pn-steps li{ font-size:13px; } }
+/* breaking section cards = news: no auto-detected qualification tags */
+body.su-breaking-section .qualtags{ display:none !important; }

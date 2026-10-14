@@ -428,3 +428,14 @@ function studentup_breaking_section_nav() {
 	</script>
 	<?php
 }
+
+/**
+ * v315: body class on breaking section pages (root/state/district) — CSS hides job-only bits (qualification tags).
+ */
+function studentup_breaking_body_class( $classes ) {
+	if ( is_category() && '' !== studentup_breaking_level( get_queried_object() ) ) {
+		$classes[] = 'su-breaking-section';
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'studentup_breaking_body_class' );
