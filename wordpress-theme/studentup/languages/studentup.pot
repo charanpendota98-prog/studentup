@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.111\n"
+"Project-Id-Version: StudentUp 1.9.112\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgstr ""
 msgid "Age limit"
 msgstr ""
 
-#: front-page.php:102
+#: front-page.php:74
 msgid "All deadlines"
 msgstr ""
 
@@ -282,12 +282,12 @@ msgstr ""
 msgid "Closing in 3 days"
 msgstr ""
 
-#: front-page.php:99
+#: front-page.php:71
 #: inc/workspace.php:139
 msgid "Closing soon"
 msgstr ""
 
-#: front-page.php:101
+#: front-page.php:73
 msgid "Closing Soon"
 msgstr ""
 
@@ -675,11 +675,11 @@ msgstr ""
 msgid "Latest on StudentUp"
 msgstr ""
 
-#: front-page.php:151
+#: front-page.php:123
 msgid "Latest opportunities"
 msgstr ""
 
-#: front-page.php:147
+#: front-page.php:119
 msgid "Latest opportunities — page %d"
 msgstr ""
 
@@ -687,7 +687,7 @@ msgstr ""
 msgid "Latest story"
 msgstr ""
 
-#: front-page.php:126
+#: front-page.php:98
 msgid "Latest student updates — page %d"
 msgstr ""
 

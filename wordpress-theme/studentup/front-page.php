@@ -43,35 +43,7 @@ $su_is_p2 = $su_paged > 1;
 	<?php studentup_latest_notifications(); // v201: “Latest Notifications” sliding track (preview ↔ live parity) ?>
 <?php endif; ?>
 
-<?php if ( ! $su_is_p2 ) : ?>
-<section class="usedwrap" aria-label="Most searched by students">
-	<div class="wrap">
-		<div class="usedhead">
-			<b>Most searched by students</b>
-			<?php /* v203 FIX: owner feedback — "One tap to the sections TS & AP students
-			open most" caption tiseyyabadindi; heading + cards themselves already clear,
-			extra line phone lo vertical space tinestundi. */ ?>
-		</div>
-		<div class="usedgrid">
-			<?php /* v307: LIVE FLASH Breaking card removed here — Breaking already has hero tile + hero link + nav; 4th copy was clutter. */ ?>
-			<?php
-			foreach ( studentup_most_used() as $i => $m ) :
-				$term = studentup_used_term( $m['slug'] );
-				if ( ! $term ) {
-					continue;
-				}
-				$hot = ( $i < 3 ) ? ' hot' : '';
-				?>
-				<a class="usedcard<?php echo esc_attr( $hot ); ?>" href="<?php echo esc_url( get_category_link( $term ) ); ?>">
-					<span class="ui" aria-hidden="true"><?php echo studentup_ui_icon( $m['icon'], 22 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
-					<div><b><?php echo esc_html( $m['label'] ); ?></b></div>
-				<?php // v282: owner — tile = icon + name matrame (hint + count teesesam). ?>
-				</a>
-				<?php endforeach; ?>
-		</div>
-	</div>
-</section>
-<?php endif; ?>
+<?php // v314 NEAT: "Most searched by students" removed on home — same 12 links as the category tiles just above (duplicate block). ?>
 
 <?php // v311: owner — "Top 5 Trending Now" removed; Daily Quiz + Post your news band full width. ?>
 <?php if ( ! $su_is_p2 ) : ?>

@@ -1051,3 +1051,16 @@ body.dark .su-brk-search input{ color:#e7f0ff; }
 @media (max-width:600px){ .wrap{ padding-right:14px !important; padding-left:14px !important; } }
 @media (max-width:980px) and (min-width:601px){ .wrap{ padding-right:16px !important; padding-left:16px !important; } .su-hero-in{ padding-right:16px !important; } }
 @media (max-width:360px){ .wrap{ padding-right:12px !important; padding-left:12px !important; } }
+
+/* v314 — NEAT PASS (laptop + phone) */
+/* category tiles: 14 tiles → 7 per row on laptop = two full rows, no ragged last row */
+@media (min-width:1080px){ .su-catrail{ grid-template-columns:repeat(7,minmax(0,1fr)) !important; gap:12px !important; } }
+/* home band: quiz full width; on laptop the 5 questions sit in two columns (no tall single column + empty side) */
+@media (min-width:1080px){
+  .su-home-grid--solo > .hg-q{ display:block; }
+  .su-home-grid--solo .su-quiz-form{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 22px; align-items:start; }
+  .su-home-grid--solo .su-quiz-form .su-quiz-foot, .su-home-grid--solo .su-quiz-form input[type="hidden"]{ grid-column:1 / -1; }
+  .su-home-grid--solo .su-postnews{ margin-top:14px; }
+}
+/* quiz option rows: compact, consistent */
+.su-q-opts .su-opt{ min-height:40px; }
