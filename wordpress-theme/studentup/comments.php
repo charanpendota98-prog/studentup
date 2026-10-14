@@ -60,9 +60,7 @@ if ( post_password_required() ) {
 			'title_reply_to'       => esc_html__( 'Reply to %s', 'studentup' ),
 			'label_submit'         => esc_html__( 'Post comment', 'studentup' ),
 			'class_submit'         => 'su-btn',
-			'comment_notes_before' => '<p class="su-comment-note">'
-				. esc_html__( 'Your email will not be published. Share personal details only for official information.', 'studentup' )
-				. '</p>',
+			'comment_notes_before' => '', // v308: hint sentence teesesam
 			'comment_field'        => '<p class="comment-form-comment"><label for="comment">'
 				. esc_html__( 'Comment', 'studentup' ) . '</label>'
 				. '<textarea id="comment" name="comment" cols="45" rows="5" required></textarea></p>',

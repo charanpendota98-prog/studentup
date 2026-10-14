@@ -28,9 +28,7 @@ get_header();
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a> › <?php the_title(); ?>
 		</nav>
 		<h1 class="su-quizpage-title"><?php the_title(); ?></h1>
-		<p class="su-ic-page-sub">
-			<?php esc_html_e( 'Five fresh questions every morning, explained answers, and one reader poll that decides what we build next. Free, no login, nothing stored about you.', 'studentup' ); ?>
-		</p>
+		<?php /* v308: page intro sentence teesesam (hint-text rule). */ ?>
 		<?php
 		if ( trim( (string) get_the_content() ) !== '' ) {
 			echo '<div class="su-quizpage-intro">';
@@ -71,19 +69,13 @@ get_header();
 			</section>
 		<?php endif; ?>
 
-		<section class="su-railed" aria-label="<?php esc_attr_e( 'How this works', 'studentup' ); ?>" style="margin-top:22px">
-			<h2 style="font-size:18px;margin:0 0 10px"><?php esc_html_e( 'How the daily quiz works', 'studentup' ); ?></h2>
-			<ul class="su-mini">
-				<li><?php esc_html_e( 'Questions rotate every day and are sourced from official notifications (SSC, TSPSC, APPSC, IBPS, Railways).', 'studentup' ); ?></li>
-				<li><?php esc_html_e( 'Every answer has a one-line explanation and the source — so you learn, not just guess.', 'studentup' ); ?></li>
-				<li><?php esc_html_e( 'Your score and streak stay in your browser. We never see them and never ask for a phone number.', 'studentup' ); ?></li>
-				<li><?php esc_html_e( 'Polls are open (not scientific): only the count is stored, never who voted.', 'studentup' ); ?></li>
-			</ul>
-			<?php
-			// Internal links: keep readers in the habit loop (quiz → current affairs → jobs).
-			$su_ca   = studentup_used_term( 'current-affairs' );
-			$su_jobs = studentup_used_term( 'ts-jobs' );
+		<?php
+		// v308: internal links (quiz → current affairs → jobs). Tools link teesesam (Tools removed — owner). Links lekapote section render kaadu.
+		$su_ca   = studentup_used_term( 'current-affairs' );
+		$su_jobs = studentup_used_term( 'ts-jobs' );
+		if ( $su_ca || $su_jobs ) :
 			?>
+		<section class="su-railed" aria-label="<?php esc_attr_e( 'More', 'studentup' ); ?>" style="margin-top:22px">
 			<p class="su-ic-page-actions">
 				<?php if ( $su_ca ) : ?>
 					<a class="su-cta su-cta--ghost" href="<?php echo esc_url( get_category_link( $su_ca ) ); ?>"><?php esc_html_e( 'Daily current affairs →', 'studentup' ); ?></a>
@@ -91,12 +83,9 @@ get_header();
 				<?php if ( $su_jobs ) : ?>
 					<a class="su-cta su-cta--ghost" href="<?php echo esc_url( get_category_link( $su_jobs ) ); ?>"><?php esc_html_e( 'Today\'s Telangana jobs →', 'studentup' ); ?></a>
 				<?php endif; ?>
-				<?php $su_tools = studentup_mega_page_url( array( 'tools' ) ); ?>
-				<?php if ( $su_tools ) : ?>
-					<a class="su-cta su-cta--ghost" href="<?php echo esc_url( $su_tools ); ?>"><?php esc_html_e( 'Free exam tools →', 'studentup' ); ?></a>
-				<?php endif; ?>
 			</p>
 		</section>
+		<?php endif; ?>
 
 		<?php studentup_ad( 'below-content' ); // ad slot — page footer, content tarvata mattrame. ?>
 	<?php endwhile; ?>

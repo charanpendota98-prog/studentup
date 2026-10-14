@@ -516,7 +516,6 @@ function studentup_daily_quiz( $args = array() ) {
 					</p>
 				</div>
 			<?php endif; ?>
-			<p class="su-quiz-legend"><?php esc_html_e( 'Answers are explained, not just marked. Score stays on your device — we do not store it.', 'studentup' ); ?></p>
 		</div>
 		<?php
 		$json = studentup_quiz_schema( $qs );

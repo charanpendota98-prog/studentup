@@ -459,17 +459,13 @@ function studentup_daily_poll( $args = array() ) {
 			<div class="su-poll-foot">
 				<?php if ( ! $voted ) : ?>
 					<button type="submit" class="su-poll-vote" data-su-poll-vote><?php esc_html_e( 'Vote', 'studentup' ); ?></button>
-					<span><?php esc_html_e( 'No login. One vote per device.', 'studentup' ); ?></span>
 				<?php else : ?>
 					<span class="su-poll-thanks" data-su-thanks><?php esc_html_e( 'Thanks — your vote is counted.', 'studentup' ); ?></span>
 					<span data-su-total><?php echo esc_html( number_format_i18n( $total ) ); ?> votes</span>
 				<?php endif; ?>
 			</div>
 		</form>
-		<?php if ( ! empty( $poll['note'] ) ) : ?>
-			<p class="su-poll-foot"><?php echo esc_html( (string) $poll['note'] ); ?></p>
-		<?php endif; ?>
-		<p class="su-quiz-legend"><?php esc_html_e( 'Open poll, not a scientific survey. We store only the count — never who voted.', 'studentup' ); ?></p>
+		<?php /* v308: poll footnotes (note + 'not a scientific survey') teesesam — hint-text rule. */ ?>
 		<?php
 		$json = studentup_poll_schema( $poll, $counts, $total );
 		if ( $json ) {

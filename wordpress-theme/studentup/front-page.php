@@ -303,12 +303,12 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 
 		<?php if ( ! $su_is_p2 ) : ?>
 			<?php
-			studentup_jobs_table( 8 );       // v202: short + scannable — Google ki rich, reader ki fast
-			studentup_popular_searches();    // internal links (SEO + session depth)
-			studentup_ad( 'mid' );           // slot 2 — content madhya lo
-			studentup_hot_jobs( 10 );        // TOP 10 HOT JOBS TODAY (return visits)
-			studentup_closing_week( 7 );     // urgency (last dates) — real meta mattrame
-			studentup_personal_picks();      // local-only personalised top 5
+			// v308 NEAT: home lo okate posts list 4 sarlu repeat ayyedi (grid → "at a glance" table →
+			// "Top 10 hot jobs" → "Closing this week") + categories 3 sarlu (tiles → Most searched →
+			// "Popular searches") + qualification picker 2 sarlu ("Your qualification" bar → "Your 5 today").
+			// Owner: "agam aga kakunda, neat ga" → duplicates teesesam; grid + Closing Soon band + Top 5 untayi.
+			// Functions (studentup_jobs_table / popular_searches / hot_jobs / closing_week / personal_picks) inka unnayi.
+			studentup_ad( 'mid' );           // slot 2
 			// v277: daily quiz paiki move ayyindi (su-home-grid band — top5 pakkana,
 			// laptop lo side-by-side; phone lo top5 kindha). Ikkada inkundi render kaadu.
 			// v203 FIX: owner feedback — "Reader Poll" block ("Which update do you want

@@ -74,13 +74,11 @@ function studentup_cta_join() {
 	<section class="su-join" aria-labelledby="su-join-title">
 		<div class="su-join-copy">
 			<h2 id="su-join-title"><?php esc_html_e( 'Every job, exam date and result — first on your phone', 'studentup' ); ?></h2>
-			<p><?php esc_html_e( 'Free daily updates for Telangana & Andhra Pradesh students. No spam calls, leave anytime.', 'studentup' ); ?></p>
-			<p class="su-join-te"><?php esc_html_e( 'Jobs · notifications · results — first on our WhatsApp / Telegram.', 'studentup' ); ?></p>
+			<?php /* v308: 2 hint lines teesesam — heading + 2 buttons chalu (hint-text rule). */ ?>
 		</div>
 		<div class="su-join-cta">
 			<a class="su-join-wa" href="<?php echo esc_url( $soc['whatsapp'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'whatsapp', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'WhatsApp updates', 'studentup' ); ?></a>
 			<a class="su-join-tg" href="<?php echo esc_url( $soc['telegram'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'telegram', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Telegram channel', 'studentup' ); ?></a>
-			<small><?php esc_html_e( '100% free · no calls · 1–3 updates a day', 'studentup' ); ?></small>
 		</div>
 	</section>
 	<?php

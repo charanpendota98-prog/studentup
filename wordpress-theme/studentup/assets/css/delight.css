@@ -940,3 +940,36 @@ body.dark .su-daynav a{ background:#152137; color:#d7e3f8; }
 .su-community-card .su-comm-desc{ display:none !important; }
 .su-community-card .su-comm-head{ margin-bottom:10px; }
 .tagrow .qbadge{ margin-left:0; }
+
+/* v308 — NEAT PASS 3 (real-WP render: single/quiz/search/footer) */
+.su-community-card .su-comm-title{ color:var(--navy,#0b2447) !important; }
+body.dark .su-community-card .su-comm-title{ color:#e7f0ff !important; }
+/* comment form: fields one neat stack, cookie consent inline, 44px button */
+.comment-form .comment-form-cookies-consent{ display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--muted,#64748b); margin:8px 0 12px; }
+.comment-form .comment-form-cookies-consent input{ width:16px; height:16px; min-height:0; margin:3px 0 0; flex:0 0 auto; }
+.comment-form .comment-form-cookies-consent label{ display:inline; font-weight:500; }
+.comment-form input[type="text"], .comment-form input[type="email"], .comment-form textarea{ width:100%; max-width:100%; box-sizing:border-box; }
+.comment-form .form-submit{ margin:0; }
+.comment-form .form-submit input{ min-height:44px; }
+/* sidebar on phone: stacked under article, widgets styled like cards; search block tidy */
+.su-sidebar .wp-block-search__inside-wrapper{ display:flex; gap:6px; }
+.su-sidebar .wp-block-search__input{ flex:1 1 auto; min-width:0; }
+.su-sidebar .wp-block-search__label, .su-sidebar .wp-block-heading{ font-size:15px; font-weight:800; color:var(--navy,#0b2447); margin:0 0 8px; display:block; }
+.su-sidebar ul{ list-style:none; margin:0; padding:0; }
+.su-sidebar li{ padding:7px 0; border-bottom:1px solid var(--line,#e5ebf4); font-size:14px; }
+.su-sidebar li:last-child{ border-bottom:0; }
+@media (max-width:980px){ .su-sidebar{ margin-top:14px; } }
+/* quiz page: exam tabs wrap (home band laage) — side-scroll cut ("TSPSC (Grou") poyindi */
+.su-quiz-exams{ flex-wrap:wrap; overflow:visible; }
+/* poll: native radio + custom radio rendu kanipinchevi (double circle) → native hidden (accessible) */
+.su-poll-opt input[type="radio"]{ position:absolute; opacity:0; width:1px; height:1px; margin:0; pointer-events:none; }
+.su-poll-opt{ position:relative; }
+.su-poll-opt:focus-within{ border-color:var(--blue,#2563eb); }
+/* news card action row = Read more · Share · Save (one line, every width). "Compare" button laptop lo
+   2nd line lo ontari ga padedi — card foot nunchi hidden (compare tray code untundi). */
+.newsgrid .news .newsfoot .su-tools-card{ display:none !important; }
+.newsgrid .news .newsfoot{ flex-wrap:nowrap; }
+.newsgrid .news .newsfoot > *{ flex:0 0 auto; white-space:nowrap; }
+.su-helpful-note:empty{ display:none; }
+/* laptop quiz: options 2×2 grid (3+1 orphan poyindi) */
+@media (min-width:641px){ .su-q-opts{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }

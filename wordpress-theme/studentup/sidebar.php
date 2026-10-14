@@ -13,16 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $su_has_widgets = is_active_sidebar( 'sidebar-1' );
-$su_has_ad      = studentup_ads_allowed( 'sidebar' );
+// v308: ad code lekapote (AdSense approval mundu) empty wrapper render kaadu.
+$su_has_ad = function_exists( 'studentup_ad_available' ) ? studentup_ad_available( 'sidebar' ) : studentup_ads_allowed( 'sidebar' );
 if ( ! $su_has_widgets && ! $su_has_ad ) {
 	return;
 }
 ?>
 <aside class="su-sidebar" aria-label="<?php esc_attr_e( 'Sidebar', 'studentup' ); ?>">
 	<?php if ( $su_has_ad ) : ?>
-		<div class="su-sidebar-ad">
-			<?php studentup_ad( 'sidebar' ); ?>
-		</div>
+		<div class="su-sidebar-ad"><?php studentup_ad( 'sidebar' ); ?></div>
 	<?php endif; ?>
 
 	<?php
