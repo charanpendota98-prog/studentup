@@ -778,3 +778,48 @@ body.dark .su-implinks, [data-theme="dark"] .su-implinks{ background:#111a2e; bo
 body.dark .su-implinks-row{ border-color:#1e2d4a; } body.dark .su-implinks-lab{ color:#e7f0ff; }
 body.dark .su-implinks-btn{ background:#1b2a46; border-color:#2e4a73; color:#93c5fd; } body.dark .su-implinks-row.is-primary{ background:#0f2a1c; }
 
+
+/* v300 — CALM UI (owner: "website lo antha zoom avvakoodadu"). Hover/tap meeda elements
+   zoom (scale) / jump (lift) avvavu — phone + laptop rendu. Feedback = color/border/shadow matrame.
+   Positional transforms (centering, drawers) ni touch cheyyaledu. */
+.news:hover, .news:hover .thumb img, .news:hover .thumb-img img,
+.usedcard:hover, .su-used-breaking:hover, .su-scard:hover, .su-hotcard:hover, .su-scard-act:hover,
+.su-fcard:hover, .su-fycard:hover, .su-recirc-card:hover, .su-stats-item:hover, .su-closing-list li:hover,
+.su-catrail>a:hover, .su-catwrap .su-catrail>a:hover, .su-catrail>a.su-cat:hover, .su-catrail>a:hover .su-cat-ic,
+.su-top5-list li:hover .su-top5-n, .su-postnews-tiles a:hover, .su-pn-card:hover,
+.su-abtn:hover, .su-card-wa:hover, .su-sbtn:hover, .su-qp:hover, .su-fb-apply:hover, .su-hact:hover,
+.su-ft-soc a:hover, .su-social a:hover, .su-ab-soc:hover, #su-totop:hover, .su-quiz-share:hover, .su-tchip:hover,
+.su-q-next:hover, .su-q-chip:hover, .su-status-btn:hover, .su-audio-btn:hover, .su-summary-btn:hover, .su-comm-btn:hover,
+.su-admit-btn:hover, .su-sponsor-btn:hover, .su-cathead .su-viewall:hover, .su-wa-box:hover, .share .su-share-btn:hover,
+.chip:hover, .su-tgjoin:hover, .su-calc-btn-primary:hover, .su-fee-btn-primary:hover, .su-score-btn-primary:hover,
+.su-resume-btn-primary:hover, .nav .su-mega-list>li>a:hover, .su-rail-nav:hover, .su-catwrap .su-rail-nav:hover{
+  transform:none !important;
+}
+.su-catnav:hover{ transform:translateY(-50%) !important; }
+/* pulsing/zooming animations off (static UI) */
+.su-applybar--urgent .su-applychip{ animation:none !important; }
+.su-pulse-dot{ animation:none !important; }
+@media (hover:none){ a:active, button:active{ transform:none !important; } }
+
+/* v300 — EDGE-CUT FIXES (real screenshots: hero content touched screen edges, Browse panel
+   tiles/heading flush with panel edge, slider 1st card border clipped, laptop 4th card cut). */
+.su-hero-in{ padding-left:16px !important; padding-right:16px !important; }
+@media (max-width:980px) and (min-width:601px){ .su-hero-in{ padding-right:64px !important; } }
+@media (max-width:640px){ .su-hero-in{ padding-left:14px !important; padding-right:14px !important; } }
+@media (max-width:360px){ .su-hero-in{ padding-left:12px !important; padding-right:12px !important; } }
+/* phone: 3 tiles per row — rail label meeda padadu, tiles pedda ga, neat */
+@media (max-width:480px){ .su-catrail{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+.su-catwrap{ padding:10px 12px 8px !important; }
+.su-catwrap .su-cathead{ margin-bottom:8px; }
+@media (max-width:480px){ .su-catwrap{ padding:8px 8px 6px !important; } }
+.su-slider-viewport{ margin:0 !important; padding:4px 0 8px !important; scroll-padding-left:0; }
+.su-slider-track{ padding:0 1px; }
+.su-scard-acts-row{ margin-top:auto !important; padding-top:9px; }
+@media (min-width:1200px){ .su-scard{ flex-basis:277px !important; } }
+/* laptop lead card: body content vertically centered as one block (big empty gap under excerpt poyindi) */
+@media (min-width:900px){
+  .news--lead .thumb{ width:50%; min-width:50%; }
+  .news--lead .newsbody{ display:flex; flex-direction:column; justify-content:center; }
+  .news--lead .newsfoot{ margin-top:16px !important; }
+  .news--lead .newsbody > *{ flex:0 0 auto; }
+}
