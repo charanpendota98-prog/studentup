@@ -78,6 +78,12 @@ function studentup_critical_css_inline() {
 	if ( is_admin() || is_user_logged_in() ) {
 		return;   // admin bar + logged-in extras ki normal path (safe).
 	}
+	// v306: full CSS blocking ga load avutunnappudu (css_async OFF — v296 default) inline critical
+	// = pure overhead (~59 KB HTML / ~10 KB gzip prathi page; browser blocking CSS vachhe daaka
+	// render cheyyadu kabatti FCP gain zero). css_async ON chesinappudu matrame inline.
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'css_async', '0' ) ) {
+		return;
+	}
 	$file = studentup_critical_css_file();
 	if ( ! $file ) {
 		return;
