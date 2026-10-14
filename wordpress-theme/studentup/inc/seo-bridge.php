@@ -298,6 +298,8 @@ function studentup_seo_list_title() {
 		$t = ( $obj instanceof WP_Term ) ? $obj->name : single_term_title( '', false );
 	} elseif ( is_author() ) {
 		$t = 'Posts by ' . wp_strip_all_tags( get_the_author() );
+	} elseif ( is_day() ) {
+		$t = 'Govt job & result updates — ' . get_the_date( 'j M Y' ); // v303: date landing title
 	} elseif ( is_date() ) {
 		$t = 'Updates archive';
 	} else {

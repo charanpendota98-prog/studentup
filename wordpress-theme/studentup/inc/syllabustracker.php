@@ -34,6 +34,10 @@ function studentup_default_syllabus_topics() {
  * @return void
  */
 function studentup_syllabus_tracker_block() {
+	// v303: v248 owner decision (tools OFF) — article lo tool blocks render avvavu unless tools ON.
+	if ( function_exists( 'studentup_tools_enabled' ) && ! studentup_tools_enabled() ) {
+		return;
+	}
 	if ( ! studentup_opt( 'syllabus_tracker', '1' ) ) {
 		return;
 	}

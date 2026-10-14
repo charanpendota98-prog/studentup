@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.100\n"
+"Project-Id-Version: StudentUp 1.9.101\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -930,6 +930,10 @@ msgstr ""
 msgid "Open today"
 msgstr ""
 
+#: archive.php:54
+msgid "Other days"
+msgstr ""
+
 #: page-internet-center.php:46
 msgid "Our service charge"
 msgstr ""
@@ -1495,6 +1499,10 @@ msgstr ""
 
 #: inc/premium.php:125
 msgid "Updates today"
+msgstr ""
+
+#: archive.php:33
+msgid "Updates — %s"
 msgstr ""
 
 #: inc/engage.php:279

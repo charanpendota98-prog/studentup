@@ -883,3 +883,8 @@ body.dark .news.is-newforyou .newsbody::before{ background:#14532d; color:#bbf7d
 .su-today-dot{ width:7px; height:7px; border-radius:50%; background:#2563eb; }
 .su-today i{ font-style:normal; font-weight:800; }
 body.dark .su-today{ background:#152137; color:#d7e3f8; }
+/* v303 — day archive nav */
+.su-daynav{ display:flex; justify-content:space-between; gap:8px; margin:0 0 12px; }
+.su-daynav a{ display:inline-flex; align-items:center; min-height:34px; padding:0 13px; border-radius:999px; background:var(--soft,#eef3fb); color:var(--navy,#0b2447); font-size:12.5px; font-weight:800; text-decoration:none; }
+.su-daynav a.is-next{ margin-left:auto; }
+body.dark .su-daynav a{ background:#152137; color:#d7e3f8; }

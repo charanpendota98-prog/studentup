@@ -42,12 +42,12 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.100.zip` (v302 · RETURN LAYER)
+## 📱 Theme upload — `studentup-theme-1.9.101.zip` (v303 · FULL FUNCTIONAL QA + fixes)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.100 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.101 zip సరైన structure** — ఇదే upload చేయండి.
 
-1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.100.zip` → **Install Now → Activate**
+1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.101.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
 2. లేదా FTP: `wp-content/themes/studentup` folder మొత్తం replace చేయండి.
 
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v303** — "Anni perfect ga work avvali" | **Real-Chromium functional QA** (phone 390 + laptop 1366): home/v255/6 posts/17 pages — JS errors **0**; quiz 5/5 → WhatsApp Status flow (name → score card image → wa.me text with quiz link) ✅; search "ssc" → own-post suggestions ✅; Save → counter → saved sheet ✅; social rail ✕ ✅; slider arrows ✅; qualification filter ✅; mobile menu ✅; dark mode ✅; card WhatsApp share ✅; v302 return layer ✅. PHP lint 112/112, theme audit 0 err, anni JS syntax OK. **Dorikina rule-violation fix:** article lo **Age calculator / Fee calculator / Syllabus tracker tool blocks** v248 "tools OFF" decision ki gate kaaledu (option default ON → prathi post lo hint text + default DOB tho render ayyevi) → ippudu `studentup_tools_enabled()` (default OFF) gate. **Advanced add:** day archive = clean landing ("Updates — 14 Oct 2026" H1, "Day:" prefix ledu, description ledu, ← Latest, prev/next day nav real posts unna days matrame, OG/title "Govt job & result updates — date") — v302 "N updates posted today →" pill ikkadiki vastundi. |
 | **v302** — "Build some more advanced" | **RETURN-VISIT LAYER** (returning visitors ↑, time-on-site ↑ — local-only, no server, no fake data): (1) **"N new updates since your last visit (2 days ago) →"** strip home lo `#grid` paina + aa cards ki chinna "New for you" tag — real `data-pub` publish timestamps (card markup lo kotha attribute) vs browser lo last-visit stamp; first visit / same session (<20 min) / 0 new aithe render kaadu. (2) **"Continue reading · 57%"** chip single posts lo — scroll position local ga save (8–92% madhya), malli open chesthe chip (9s lo fade / ✕), click → akkadiki scroll; 95% chadivithe forget. (3) **"N updates posted today →"** pill (real count, 10-min transient, save_post lo flush; 0 aithe ledu) → WP day archive (date pages = "today govt jobs" SEO). GA4: `return_since_view/click`, `resume_click`. New file `assets/js/studentup-return.js` (defer, home + single matrame). Real Chromium lo verify chesam (strip 6 new / chip 57%). Theme audit 0 err, php lint 112/112 |
 | **v301** — "Inka neat ga undali" | Screenshot-based neat pass (phone 390 + laptop 1366). (1) **"Most searched" tiles okate look** — first-3 "hot" tiles ki separate orange border/bg + chevron lekapovadam → anni tiles same border, same chevron, 13px label. (2) **Daily quiz** fieldset/legend notch lines (question text madhyalo thin line) → clean. (3) Lead card kinda partial blue line (cut la undedi) → teesesam. (4) Section-head links okate style — "All active sections →" ippudu "All sections →" la pill. (5) **Phone news cards** — 110px thumbnail lo poster text cut avvadam ("S Clerk 20…") → full image top (16:9) + body kinda, Read more/Save/Share okate line. (6) **Slider head** — laptop lo ‹ › arrows okadani meeda okati stack ayyayi → side-by-side, View all pakkana; phone lo arrows hide (swipe). (7) Preview-only clutter: demo "Most searched" head lo duplicate red Breaking pill, v255 slider lo duplicate "NEW" corner badge (head lo already "New" pill) → teesesam. Theme audit 0 err, php lint 112/112 |
 | **v300** — "Antha zoom avvoddu · edges cut · neat UI (phone + laptop)" | Real Chromium screenshots tho UI analysis. **ZOOM OFF:** 60+ hover/tap `transform: scale / translateY(lift)` rules (cards, tiles, category icons, buttons, social icons, slider arrows, thumb image zoom, pulsing apply-chip) → anni `transform:none` (delight.css "CALM UI" block). Feedback ippudu color/border/shadow matrame — website la static, neat. **EDGE CUTS fixed:** (1) hero search + Browse panel phone lo screen edge ki antukuni unnayi (gutter 0) → 14/16px gutter, laptop lo content tho align (109→1257). (2) Browse panel lopala heading/tiles panel edge ki flush → 10/12px inner padding. (3) Phone Browse grid 4→**3 columns** (tiles pedda, social rail label meeda padadu). (4) Slider 1st card border clip (viewport -4px margin) → fix; laptop lo 4th card 12px cut → exact 4 cards fit (≥1200px). (5) Slider card actions row bottom ki (empty gap poyindi). (6) Laptop lead card body vertically centered (excerpt kinda pedda khali space poyindi). (7) Demo footer `.wrap` missing → text x=0 nunchi + right column cut (theme lo already OK). Theme audit 0 err, php lint 112/112 |
@@ -93,7 +94,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `c563394b406b80a02c64709686d5d5b93a494eccc9ecb43ee16aaba34bb700eb  studentup-theme-1.9.100.zip`
+sha256: `b3eff71140e09257a42cfc59410345ed141617ef4817128a24c0d326c71586b7  studentup-theme-1.9.101.zip`
 
 ---
 
@@ -204,7 +205,7 @@ sha256sum studentup-bot-cron.zip
 ```
 `milesweb-kit/SHA256SUMS.txt` లోని విలువతో సరిపోలాలి:
 ```
-d3f4eb3eb2aa66e787d075deb5219ed93191dbdcc03135f4618690a096b334c5  studentup-bot-cron.zip
+1e2b05731bb3c6d5545ba096377487b450df1ad14832df23031ce721c4a0dd97  studentup-bot-cron.zip
 ```
 
 ---
