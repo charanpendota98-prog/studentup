@@ -37,7 +37,9 @@ get_header();
 					?>
 				</h1>
 				<?php if ( ! is_day() ) : ?>
+				<?php if ( ! ( function_exists( 'studentup_breaking_level' ) && is_category() && '' !== studentup_breaking_level( get_queried_object() ) ) ) : // v311: no hint line on breaking pages ?>
 				<p><?php echo esc_html( wp_strip_all_tags( get_the_archive_description() ) ); ?></p>
+				<?php endif; ?>
 				<?php endif; ?>
 			</div>
 			<?php if ( is_day() ) : ?>
@@ -81,8 +83,8 @@ get_header();
 		}
 		?>
 		<?php
-		if ( function_exists( 'studentup_qual_bar' ) ) {
-			studentup_qual_bar();          // v72: qualification filter on archives/categories too
+		$su_is_brk = function_exists( 'studentup_breaking_level' ) && is_category() && '' !== studentup_breaking_level( get_queried_object() );
+		if ( function_exists( 'studentup_qual_bar' ) && ! $su_is_brk ) { // v311: news section — no qualification filter
 			studentup_qual_active_note();
 			studentup_hidden_note();
 		}

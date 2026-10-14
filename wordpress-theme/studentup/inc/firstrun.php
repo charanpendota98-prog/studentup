@@ -518,15 +518,19 @@ function studentup_run_first_setup() {
 	$foot      = wp_get_nav_menu_object( $foot_name );
 	$foot_id   = $foot ? (int) $foot->term_id : wp_create_nav_menu( $foot_name );
 	if ( $foot_id && ! is_wp_error( $foot_id ) ) {
-		$have = array();
+		$have     = array();
+		$have_ids = array();
 		foreach ( (array) wp_get_nav_menu_items( $foot_id ) as $item ) {
-			$have[] = strtolower( $item->title );
+			// v311: titles with "&" are stored as "&amp;" → plain-title compare never matched →
+			// "Daily Quiz & Polls" / "Corrections & Updates" were re-added on EVERY setup run (14 copies live).
+			$have[]     = strtolower( html_entity_decode( (string) $item->title, ENT_QUOTES, 'UTF-8' ) );
+			$have_ids[] = (int) $item->object_id;
 		}
 		// v308 NEAT: footer = bare (owner rule: © + konni links). Mundu anni setup pages + hubs
 		// (~25 links, "Thank You" tho saha) footer lo padevi. Ippudu essential pages mattrame.
 		$foot_items = array_intersect_key( studentup_setup_pages_filtered(), array_flip( studentup_footer_menu_slugs() ) );
 		foreach ( $foot_items as $slug => $title ) {
-			if ( ! isset( $pages[ $slug ] ) || in_array( strtolower( $title ), $have, true ) ) {
+			if ( ! isset( $pages[ $slug ] ) || in_array( strtolower( html_entity_decode( (string) $title, ENT_QUOTES, 'UTF-8' ) ), $have, true ) || in_array( (int) $pages[ $slug ], $have_ids, true ) ) {
 				continue;
 			}
 			wp_update_nav_menu_item(
@@ -713,7 +717,15 @@ function studentup_footer_menu_trim( $items, $args ) {
 		$known = array_merge( $known, array_keys( (array) studentup_hub_plan() ) );
 	}
 	$known[] = 'editorial-team';
+	$seen    = array();
 	foreach ( $items as $k => $it ) {
+		// v311: same page/url twice in the footer menu → show once (live had 14× "Daily Quiz & Polls").
+		$sig = ( 'page' === $it->object ) ? 'p' . (int) $it->object_id : 'u' . strtolower( untrailingslashit( (string) $it->url ) );
+		if ( isset( $seen[ $sig ] ) ) {
+			unset( $items[ $k ] );
+			continue;
+		}
+		$seen[ $sig ] = true;
 		if ( 'page' !== $it->object ) {
 			continue;
 		}
@@ -722,6 +734,36 @@ function studentup_footer_menu_trim( $items, $args ) {
 			unset( $items[ $k ] );
 		}
 	}
-	return $items;
+	return array_values( $items );
 }
+
+/**
+ * v311: one-time DB cleanup — delete duplicate footer menu items created by older setup runs.
+ * Runs once per theme version on admin init; keeps the first item per page, removes the rest.
+ */
+function studentup_footer_menu_dedupe_once() {
+	if ( ! is_admin() || ! current_user_can( 'edit_theme_options' ) ) {
+		return;
+	}
+	$flag = 'studentup_footer_dedupe_' . str_replace( '.', '_', (string) STUDENTUP_VERSION );
+	if ( get_option( $flag ) ) {
+		return;
+	}
+	update_option( $flag, 1, false );
+	$locations = (array) get_theme_mod( 'nav_menu_locations', array() );
+	if ( empty( $locations['footer'] ) ) {
+		return;
+	}
+	$items = (array) wp_get_nav_menu_items( (int) $locations['footer'] );
+	$seen  = array();
+	foreach ( $items as $it ) {
+		$sig = ( 'page' === $it->object ) ? 'p' . (int) $it->object_id : 'u' . strtolower( untrailingslashit( (string) $it->url ) );
+		if ( isset( $seen[ $sig ] ) ) {
+			wp_delete_post( (int) $it->ID, true );
+			continue;
+		}
+		$seen[ $sig ] = true;
+	}
+}
+add_action( 'admin_init', 'studentup_footer_menu_dedupe_once', 20 );
 add_filter( 'wp_nav_menu_objects', 'studentup_footer_menu_trim', 10, 2 );

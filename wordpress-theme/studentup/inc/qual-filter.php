@@ -633,7 +633,7 @@ function studentup_qual_directory() {
 	<section class="qualsplit" id="qualsplit" aria-label="Jobs by qualification">
 		<div class="qsplit-head">
 			<h2>Browse by qualification</h2>
-			<p>Jobs that match your education — these update automatically every time a new post is published.</p>
+			<?php // v314: hint line removed (owner rule: no hint texts). ?>
 		</div>
 		<div class="qsplit-grid" id="qsplit">
 			<?php foreach ( $groups as $g ) : ?>
