@@ -205,7 +205,9 @@ function studentup_breaking_hide_from_home( $q ) {
 		return;
 	}
 	if ( $q->is_main_query() ) {
-		if ( $q->is_singular() || $q->is_search() || $q->is_tag() || $q->is_author() || $q->is_date() || $q->is_feed() ) {
+		// v311: site search kuda breaking ni skip chestundi (owner: "suggestion and all thing" — section lone).
+		// Section lo search = ?s=..&cat=<breaking id> → paina 'asked' check lo pass avutundi.
+		if ( $q->is_singular() || $q->is_tag() || $q->is_author() || $q->is_date() || $q->is_feed() ) {
 			return;
 		}
 		if ( $q->is_category( studentup_breaking_term_ids() ) ) {
@@ -286,7 +288,10 @@ function studentup_breaking_ensure_tree() {
 	if ( get_option( 'studentup_breaking_tree_v1' ) ) {
 		return;
 	}
-	$root = studentup_breaking_term();
+	$root = get_category_by_slug( 'breaking-news' ); // v311: fresh lookup (static cache may predate firstrun's insert)
+	if ( ! $root || is_wp_error( $root ) ) {
+		$root = studentup_breaking_term();
+	}
 	if ( ! $root ) {
 		return;
 	}
@@ -385,6 +390,17 @@ function studentup_breaking_section_nav() {
 	}
 	?>
 	<nav class="su-brk-nav su-brk-nav--<?php echo esc_attr( $level ); ?>" aria-label="<?php esc_attr_e( 'Breaking news by state and district', 'studentup' ); ?>">
+		<?php
+		// v311: search INSIDE the section — results limited to this state/district (or whole section at root).
+		$su_scope = ( $state instanceof WP_Term && 'district' !== $level ) ? $state : ( 'district' === $level ? $term : $root );
+		$su_ph    = 'root' === $level ? __( 'Search Telangana / Andhra news…', 'studentup' ) : sprintf( __( 'Search %s news…', 'studentup' ), $su_scope->name );
+		?>
+		<form class="su-brk-search" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+			<span class="su-brk-search-ic" aria-hidden="true"><?php echo studentup_ui_icon( 'search', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
+			<input type="search" name="s" value="<?php echo esc_attr( get_search_query() ); ?>" placeholder="<?php echo esc_attr( $su_ph ); ?>" aria-label="<?php echo esc_attr( $su_ph ); ?>" autocomplete="off" data-su-brk-filter>
+			<input type="hidden" name="cat" value="<?php echo esc_attr( (string) $su_scope->term_id ); ?>">
+			<button type="submit"><?php esc_html_e( 'Search', 'studentup' ); ?></button>
+		</form>
 		<div class="su-brk-states">
 			<?php foreach ( $states as $st ) : ?>
 				<?php $on = $state instanceof WP_Term && (int) $st->term_id === (int) $state->term_id; ?>
@@ -397,14 +413,18 @@ function studentup_breaking_section_nav() {
 		<?php if ( $state instanceof WP_Term ) : ?>
 			<?php $dists = get_terms( array( 'taxonomy' => 'category', 'parent' => (int) $state->term_id, 'hide_empty' => false, 'orderby' => 'name' ) ); ?>
 			<?php if ( ! is_wp_error( $dists ) && $dists ) : ?>
-				<div class="su-brk-dists" role="list">
+				<div class="su-brk-dists" role="list" data-su-brk-dists>
 					<?php foreach ( $dists as $d ) : ?>
 						<?php $on = 'district' === $level && (int) $d->term_id === (int) $term->term_id; ?>
 						<a role="listitem" class="<?php echo esc_attr( $on ? 'su-brk-dist is-on' : 'su-brk-dist' ); ?>" href="<?php echo esc_url( get_category_link( $d ) ); ?>"<?php if ( $on ) : ?> aria-current="page"<?php endif; ?>><?php echo esc_html( $d->name ); ?></a>
 					<?php endforeach; ?>
 				</div>
+				<p class="su-brk-nomatch" data-su-brk-nomatch hidden><?php esc_html_e( 'No district with that name — press Search to look inside the news.', 'studentup' ); ?></p>
 			<?php endif; ?>
 		<?php endif; ?>
 	</nav>
+	<script>
+	(function(){var i=document.querySelector('[data-su-brk-filter]'),w=document.querySelector('[data-su-brk-dists]'),n=document.querySelector('[data-su-brk-nomatch]');if(!i||!w)return;var a=w.querySelectorAll('.su-brk-dist');i.addEventListener('input',function(){var v=i.value.trim().toLowerCase(),k=0;for(var j=0;j<a.length;j++){var s=!v||a[j].textContent.toLowerCase().indexOf(v)>-1;a[j].hidden=!s;if(s)k++;}if(n)n.hidden=!(v&&k===0);});})();
+	</script>
 	<?php
 }

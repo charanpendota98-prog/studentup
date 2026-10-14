@@ -32,13 +32,15 @@ function studentup_hero_actions() {
 		 * v233 (owner): "Latest Jobs click chethe ANNI jobs open avvali,
 		 * latest ga chesinavi post" — TS category kaadu, FULL board.
 		 */
-		array( 'label' => 'Breaking News', 'icn' => 'bolt', 'tone' => 'breaking', 'url' => '/#jobs' ),
+		array( 'label' => 'Breaking News', 'icn' => 'bolt', 'tone' => 'breaking', 'breaking' => 1 ), // v311: own section (TS/AP district news), NOT the jobs grid
 		array( 'label' => 'Latest Jobs', 'icn' => 'board', 'tone' => '', 'board' => 1 ),
 	);
 	foreach ( $defs as $d ) {
 		$url = '';
 		if ( ! empty( $d['board'] ) ) {
 			$url = studentup_opportunity_board_url();   // v233: anni jobs, latest first
+		} elseif ( ! empty( $d['breaking'] ) && function_exists( 'studentup_breaking_section_url' ) ) {
+			$url = studentup_breaking_section_url();
 		} elseif ( ! empty( $d['url'] ) ) {
 			$url = home_url( $d['url'] );
 		} elseif ( ! empty( $d['slug'] ) ) {
@@ -82,33 +84,7 @@ function studentup_hero_premium() {
 				</form>
 			</div>
 
-			<div class="su-trend" role="group" aria-label="<?php esc_attr_e( 'Trending posts', 'studentup' ); ?>">
-				<b><?php esc_html_e( 'Trending', 'studentup' ); ?></b>
-				<div class="su-trend-clip"><div class="su-trend-track">
-				<?php
-				// v271: trending = nijamaina latest posts — click chesthe post open.
-				$su_tr = new WP_Query(
-					array(
-						'posts_per_page'      => 8,
-						'ignore_sticky_posts' => true,
-						'no_found_rows'       => true,
-						'post_status'         => 'publish',
-					)
-				);
-				if ( $su_tr->have_posts() ) :
-					while ( $su_tr->have_posts() ) :
-						$su_tr->the_post();
-						?>
-						<a class="su-tchip su-tchip-post" href="<?php the_permalink(); ?>"><?php echo esc_html( get_the_title() ); ?></a>
-						<?php
-					endwhile;
-					wp_reset_postdata();
-				else :
-					?>
-					<a class="su-tchip" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Latest updates', 'studentup' ); ?></a>
-				<?php endif; ?>
-				</div></div>
-			</div>
+			<?php // v311: owner — hero Trending strip removed ("avasaram ledu"). ?>
 
 			<?php /* v234: owner — "icons search kinda ne undali, naukri la". */ ?>
 			<?php studentup_category_rail(); ?>
@@ -123,7 +99,7 @@ function studentup_hero_premium() {
 			</div>
 			<?php
 			// v307: stats were hardcoded (12/6/9/100%) = fake data. Now real counts; zero items are not rendered.
-			$su_st = studentup_live_stats();
+			$su_st = array(); // v311: owner — stats band ("9 Categories") removed from hero.
 			if ( $su_st ) :
 				?>
 			<div class="su-stats" role="list" aria-label="<?php esc_attr_e( 'StudentUp live stats', 'studentup' ); ?>">
@@ -483,17 +459,19 @@ function studentup_category_rail() {
 	 * Scholarships · Success Stories (+ Current Affairs · Daily Quiz).
 	 * Category site lo lekapote aa tile render kaadu (v227 golden rule);
 	 * Breaking News category kaadu — board URL tho eppudu untundi.
+	 * v311: slugs = alias-map KEYS (central-jobs/software-jobs/private-jobs/walkin-jobs) —
+	 * short slugs ('software') map lo levu → live lo aa 4 tiles silently vanish ayyayi.
 	 */
 	$defs = array(
 		array( 'slug' => 'ts-jobs', 'icon' => 'bank', 'lab' => 'TS Govt Jobs', 'hint' => '' ),
 		array( 'slug' => 'ap-jobs', 'icon' => 'city', 'lab' => 'AP Govt Jobs', 'hint' => '' ),
-		array( 'slug' => 'central', 'icon' => 'flag', 'lab' => 'Central Jobs', 'hint' => '' ),
-		array( 'slug' => 'software', 'icon' => 'laptop', 'lab' => 'Software Jobs', 'hint' => '' ),
-		array( 'slug' => 'private', 'icon' => 'building', 'lab' => 'Private Jobs', 'hint' => '' ),
+		array( 'slug' => 'central-jobs', 'icon' => 'flag', 'lab' => 'Central Jobs', 'hint' => '' ),
+		array( 'slug' => 'software-jobs', 'icon' => 'laptop', 'lab' => 'Software Jobs', 'hint' => '' ),
+		array( 'slug' => 'private-jobs', 'icon' => 'building', 'lab' => 'Private Jobs', 'hint' => '' ),
 		array( 'slug' => 'hall-tickets', 'icon' => 'ticket', 'lab' => 'Hall Tickets', 'hint' => '' ),
 		array( 'slug' => 'results', 'icon' => 'award', 'lab' => 'Results', 'hint' => '' ),
-		array( 'slug' => '', 'icon' => 'bolt', 'lab' => 'Breaking News', 'hint' => '', 'url' => '/#jobs' ),
-		array( 'slug' => 'walkin', 'icon' => 'walk', 'lab' => 'Walk-in Jobs', 'hint' => '' ),
+		array( 'slug' => '', 'icon' => 'bolt', 'lab' => 'Breaking News', 'hint' => '', 'url' => '/#jobs', 'breaking' => 1 ),
+		array( 'slug' => 'walkin-jobs', 'icon' => 'walk', 'lab' => 'Walk-in Jobs', 'hint' => '' ),
 		array( 'slug' => 'internships', 'icon' => 'work', 'lab' => 'Internships', 'hint' => '' ),
 		array( 'slug' => 'scholarships', 'icon' => 'school', 'lab' => 'Scholarships', 'hint' => '' ),
 		array( 'slug' => 'success-stories', 'icon' => 'trophy', 'lab' => 'Success Stories', 'hint' => '' ),
@@ -502,7 +480,7 @@ function studentup_category_rail() {
 	$rows = array();
 	foreach ( $defs as $d ) {
 		if ( '' === $d['slug'] && ! empty( $d['url'] ) ) {
-			$d['url'] = home_url( $d['url'] );
+			$d['url'] = ( ! empty( $d['breaking'] ) && function_exists( 'studentup_breaking_section_url' ) ) ? studentup_breaking_section_url() : home_url( $d['url'] ); // v311
 			$d['n']   = 0;
 			$rows[]   = $d;
 			continue;

@@ -35,7 +35,7 @@ $su_paged = max( 1, (int) get_query_var( 'paged' ) );
 $su_is_p2 = $su_paged > 1;
 ?>
 
-<?php studentup_latest_ticker(); // v201 demo order: ticker → hero → slider ?>
+<?php // v311: owner — trending ticker removed ("avasaram ledu"). ?>
 
 <?php if ( ! $su_is_p2 ) : ?>
 	<?php studentup_hero_premium(); // search + quick links (hero H1) ?>
@@ -73,54 +73,9 @@ $su_is_p2 = $su_paged > 1;
 </section>
 <?php endif; ?>
 
-<?php
-/* v272: Top 5 Trending Now — ranked list = highest-CTR block on home.
-   Nijamaina latest posts, click chesthe post open. */
-$su_t5 = new WP_Query(
-	array(
-		'posts_per_page'      => 5,
-		'ignore_sticky_posts' => true,
-		'no_found_rows'       => true,
-		'post_status'         => 'publish',
-	)
-);
-if ( $su_t5->have_posts() ) :
-	?>
+<?php // v311: owner — "Top 5 Trending Now" removed; Daily Quiz + Post your news band full width. ?>
 <?php if ( ! $su_is_p2 ) : ?>
-<div class="su-home-grid">
-<?php endif; ?>
-<div class="hg-t">
-<section class="su-top5" aria-label="<?php esc_attr_e( 'Top 5 trending now', 'studentup' ); ?>">
-	<div class="wrap">
-		<div class="sectionhead">
-			<h2><?php esc_html_e( 'Top 5 Trending Now', 'studentup' ); ?></h2>
-			<a class="su-viewall" href="<?php echo esc_url( home_url( '/latest-jobs/' ) ); ?>"><?php esc_html_e( 'View all', 'studentup' ); ?> &rarr;</a>
-		</div>
-		<ol class="su-top5-list">
-		<?php
-		$su_t5n = 0;
-		while ( $su_t5->have_posts() ) :
-			$su_t5->the_post();
-			$su_t5n++;
-			$su_t5c = get_the_category();
-			?>
-			<li>
-				<span class="su-top5-n"><?php echo esc_html( str_pad( (string) $su_t5n, 2, '0', STR_PAD_LEFT ) ); ?></span>
-				<a href="<?php the_permalink(); ?>"><?php echo esc_html( get_the_title() ); ?></a>
-				<?php if ( $su_t5c ) : ?>
-					<span class="su-top5-tag"><?php echo esc_html( $su_t5c[0]->name ); ?></span>
-				<?php endif; ?>
-			</li>
-			<?php
-		endwhile;
-		wp_reset_postdata();
-		?>
-		</ol>
-	</div>
-</section>
-</div>
-<?php endif; ?>
-<?php if ( ! $su_is_p2 ) : ?>
+<div class="su-home-grid su-home-grid--solo">
 	<div class="hg-q">
 		<?php studentup_daily_quiz( array( 'id' => 'daily-quiz', 'heading' => 'Daily Quiz — 5 easy questions, share your score' ) ); ?>
 		<?php if ( function_exists( 'studentup_postnews_cta' ) ) { studentup_postnews_cta(); } // v294: readers send stories/photos/district news → we approve → we post. ?>

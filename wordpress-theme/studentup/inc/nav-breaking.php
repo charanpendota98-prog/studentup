@@ -35,44 +35,20 @@ function studentup_breaking_nav_items( $limit = 5 ) {
 	$limit = max( 1, min( 8, (int) $limit ) );
 	$out   = array();
 
-	// 1) Verified radar feed (bot push) — best source.
-	if ( function_exists( 'studentup_breaking_items' ) ) {
-		foreach ( studentup_breaking_items( $limit ) as $it ) {
-			$ago  = function_exists( 'studentup_ago' ) ? studentup_ago( (string) $it['time'] ) : '';
-			$tag  = function_exists( 'studentup_tag_label' ) ? studentup_tag_label( (string) $it['tag'] ) : '';
-			$meta = trim( implode( ' · ', array_filter( array( $ago, $tag ) ) ) );
+	/*
+	 * v311 (owner): breaking posts home/menu/suggestions lo ravoddu — section open chesthe ne.
+	 * So the nav shows ONLY the two state entry points (no post titles anywhere outside the section).
+	 */
+	if ( function_exists( 'studentup_breaking_tree' ) ) {
+		foreach ( studentup_breaking_tree() as $slug => $st ) {
+			$term = get_category_by_slug( $slug );
 			$out[] = array(
-				'title' => (string) $it['title'],
-				'url'   => (string) $it['link'],
-				'meta'  => $meta ? $meta : 'Verified',
-				'kind'  => 'verified',
+				'title' => (string) $st[0],
+				'url'   => ( $term && ! is_wp_error( $term ) ) ? (string) get_category_link( $term ) : studentup_breaking_nav_url(),
+				'meta'  => __( 'District-wise news', 'studentup' ),
+				'kind'  => 'state',
 			);
 		}
-	}
-	if ( $out ) {
-		return $out;
-	}
-
-	// 2) Latest published posts — real content, honest label.
-	$posts = get_posts(
-		array(
-			'post_type'           => 'post',
-			'post_status'         => 'publish',
-			'posts_per_page'      => $limit,
-			'no_found_rows'       => true,
-			'ignore_sticky_posts' => true,
-		)
-	);
-	foreach ( $posts as $p ) {
-		$when = human_time_diff( (int) get_post_time( 'U', true, $p ), time() );
-		$cats = get_the_category( $p->ID );
-		$cat  = ! empty( $cats ) ? $cats[0]->name : '';
-		$out[] = array(
-			'title' => wp_trim_words( get_the_title( $p ), 12, '…' ),
-			'url'   => (string) get_permalink( $p ),
-			'meta'  => trim( implode( ' · ', array_filter( array( $when . ' ago', $cat ) ) ) ),
-			'kind'  => 'latest',
-		);
 	}
 	return $out;
 }
@@ -83,7 +59,10 @@ function studentup_breaking_nav_items( $limit = 5 ) {
  * @return string
  */
 function studentup_breaking_nav_url() {
-	foreach ( array( 'breaking-news', 'breaking', 'current-affairs' ) as $slug ) {
+	if ( function_exists( 'studentup_breaking_section_url' ) ) {
+		return studentup_breaking_section_url(); // v311: own section only (not current-affairs)
+	}
+	foreach ( array( 'breaking-news', 'breaking' ) as $slug ) {
 		$term = function_exists( 'studentup_used_term' ) ? studentup_used_term( $slug ) : null;
 		if ( $term ) {
 			return (string) get_category_link( $term );
@@ -106,7 +85,6 @@ function studentup_breaking_nav_li() {
 		return '';
 	}
 	$url   = studentup_breaking_nav_url();
-	$has_f = ( 'verified' === $items[0]['kind'] );
 
 	$h  = '<li class="menu-item menu-item-has-children su-navbrk">';
 	$h .= '<a href="' . esc_url( $url ) . '" aria-haspopup="true" aria-expanded="false" aria-controls="su-brkdd">'
@@ -114,8 +92,8 @@ function studentup_breaking_nav_li() {
 		. esc_html__( 'Breaking News', 'studentup' ) . '</span></a>';
 	$h .= '<ul class="sub-menu su-brkdd" id="su-brkdd" aria-label="' . esc_attr__( 'Breaking News', 'studentup' ) . '">';
 	$h .= '<li class="menu-item su-brkdd-head" role="none"><span>'
-		. esc_html__( 'Latest verified updates', 'studentup' )
-		. '</span><em>' . esc_html__( 'Live', 'studentup' ) . '</em></li>';
+		. esc_html__( 'Telangana · Andhra Pradesh district news', 'studentup' )
+		. '</span><em>' . esc_html__( 'News', 'studentup' ) . '</em></li>';
 
 	foreach ( $items as $it ) {
 		$h .= '<li class="menu-item" role="none"><a role="menuitem" href="' . esc_url( $it['url'] ) . '">'
@@ -124,7 +102,7 @@ function studentup_breaking_nav_li() {
 			. '<small>' . esc_html( $it['meta'] ) . '</small></span></a></li>';
 	}
 	$h .= '<li class="menu-item su-brkdd-foot" role="none"><a class="su-brkdd-cta" href="' . esc_url( $url ) . '">'
-		. esc_html( $has_f ? __( 'All updates', 'studentup' ) : __( 'All latest', 'studentup' ) )
+		. esc_html__( 'Open Breaking News', 'studentup' )
 		. ' ' . studentup_ui_icon( 'arrow', 13 ) . '</a></li>';
 	$h .= '</ul></li>';
 	return $h;
@@ -153,7 +131,7 @@ function studentup_breaking_mobile_block() {
 			. '<small>' . esc_html( $it['meta'] ) . '</small></span></a>';
 	}
 	$h .= '<a class="su-mbrk-all" href="' . esc_url( $url ) . '">'
-		. esc_html__( 'All updates', 'studentup' ) . ' ' . studentup_ui_icon( 'arrow', 13 ) . '</a>';
+		. esc_html__( 'Open Breaking News', 'studentup' ) . ' ' . studentup_ui_icon( 'arrow', 13 ) . '</a>';
 	return $h;
 }
 

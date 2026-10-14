@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.108\n"
+"Project-Id-Version: StudentUp 1.9.109\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -89,19 +89,15 @@ msgstr ""
 msgid "Age limit"
 msgstr ""
 
-#: front-page.php:147
+#: front-page.php:102
 msgid "All deadlines"
-msgstr ""
-
-#: inc/nav-breaking.php:127
-msgid "All latest"
 msgstr ""
 
 #: inc/saved.php:302
 msgid "All saved posts removed."
 msgstr ""
 
-#: inc/premium.php:546
+#: inc/premium.php:524
 msgid "All sections"
 msgstr ""
 
@@ -114,13 +110,8 @@ msgstr ""
 msgid "All stories →"
 msgstr ""
 
-#: inc/premium.php:391
+#: inc/premium.php:367
 msgid "All tools"
-msgstr ""
-
-#: inc/nav-breaking.php:127
-#: inc/nav-breaking.php:156
-msgid "All updates"
 msgstr ""
 
 #: inc/workspace.php:115
@@ -190,7 +181,7 @@ msgstr ""
 msgid "Author website / profile"
 msgstr ""
 
-#: inc/premium.php:464
+#: inc/premium.php:440
 msgid "Back to tools"
 msgstr ""
 
@@ -198,13 +189,13 @@ msgstr ""
 msgid "Be the first to vote — results show as soon as people answer."
 msgstr ""
 
-#: inc/nav-breaking.php:114
-#: inc/nav-breaking.php:115
-#: inc/nav-breaking.php:148
+#: inc/nav-breaking.php:92
+#: inc/nav-breaking.php:93
+#: inc/nav-breaking.php:126
 msgid "Breaking News"
 msgstr ""
 
-#: inc/postnews.php:387
+#: inc/postnews.php:392
 msgid "Breaking news by state and district"
 msgstr ""
 
@@ -224,15 +215,15 @@ msgstr ""
 msgid "Cancellation and refund"
 msgstr ""
 
-#: inc/premium.php:395
+#: inc/premium.php:371
 msgid "Career"
 msgstr ""
 
-#: inc/premium.php:607
+#: inc/premium.php:585
 msgid "Categories"
 msgstr ""
 
-#: inc/premium.php:552
+#: inc/premium.php:530
 msgid "Category shortcuts"
 msgstr ""
 
@@ -253,7 +244,7 @@ msgstr ""
 msgid "Clear all"
 msgstr ""
 
-#: inc/premium.php:421
+#: inc/premium.php:397
 msgid "Clear search"
 msgstr ""
 
@@ -291,12 +282,12 @@ msgstr ""
 msgid "Closing in 3 days"
 msgstr ""
 
-#: front-page.php:144
+#: front-page.php:99
 #: inc/workspace.php:139
 msgid "Closing soon"
 msgstr ""
 
-#: front-page.php:146
+#: front-page.php:101
 msgid "Closing Soon"
 msgstr ""
 
@@ -382,7 +373,7 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: inc/premium.php:396
+#: inc/premium.php:372
 msgid "Deadlines"
 msgstr ""
 
@@ -403,6 +394,10 @@ msgstr ""
 msgid "District update"
 msgstr ""
 
+#: inc/nav-breaking.php:48
+msgid "District-wise news"
+msgstr ""
+
 #: inc/doubts.php:290
 msgid "Doubts & Answers"
 msgstr ""
@@ -415,11 +410,11 @@ msgstr ""
 msgid "Ee page ki content add cheyyandi (WP Admin → Pages → Tools). Tools anni kinda unnayi."
 msgstr ""
 
-#: inc/premium.php:432
+#: inc/premium.php:408
 msgid "Ee peru tho tool ledu:"
 msgstr ""
 
-#: inc/premium.php:393
+#: inc/premium.php:369
 msgid "Eligibility"
 msgstr ""
 
@@ -473,11 +468,11 @@ msgstr ""
 msgid "Example: BC-B category ki age relaxation enta?"
 msgstr ""
 
-#: inc/premium.php:394
+#: inc/premium.php:370
 msgid "Exams"
 msgstr ""
 
-#: inc/premium.php:545
+#: inc/premium.php:523
 msgid "Explore by Category"
 msgstr ""
 
@@ -489,7 +484,7 @@ msgstr ""
 msgid "Fees, documents and eligibility for any government application are always as per the official notification."
 msgstr ""
 
-#: inc/premium.php:424
+#: inc/premium.php:400
 msgid "Filter tools by category"
 msgstr ""
 
@@ -521,8 +516,8 @@ msgstr ""
 msgid "Free job alerts on your phone"
 msgstr ""
 
-#: inc/premium.php:404
-#: inc/premium.php:410
+#: inc/premium.php:380
+#: inc/premium.php:386
 #: page-tools.php:36
 msgid "Free tools for students"
 msgstr ""
@@ -551,7 +546,7 @@ msgstr ""
 msgid "Government job & exam last dates"
 msgstr ""
 
-#: inc/premium.php:71
+#: inc/premium.php:73
 msgid "Government Jobs, Results & Notifications"
 msgstr ""
 
@@ -680,11 +675,11 @@ msgstr ""
 msgid "Latest on StudentUp"
 msgstr ""
 
-#: front-page.php:196
+#: front-page.php:151
 msgid "Latest opportunities"
 msgstr ""
 
-#: front-page.php:192
+#: front-page.php:147
 msgid "Latest opportunities — page %d"
 msgstr ""
 
@@ -692,7 +687,7 @@ msgstr ""
 msgid "Latest story"
 msgstr ""
 
-#: front-page.php:171
+#: front-page.php:126
 msgid "Latest student updates — page %d"
 msgstr ""
 
@@ -700,7 +695,6 @@ msgstr ""
 msgid "Latest update"
 msgstr ""
 
-#: inc/premium.php:108
 #: index.php:26
 msgid "Latest updates"
 msgstr ""
@@ -709,23 +703,15 @@ msgstr ""
 msgid "latest updates on the home page"
 msgstr ""
 
-#: inc/nav-breaking.php:117
-msgid "Latest verified updates"
-msgstr ""
-
 #: inc/doubts.php:120
 msgid "Links, emails and phone numbers are not allowed in questions."
-msgstr ""
-
-#: inc/nav-breaking.php:118
-msgid "Live"
 msgstr ""
 
 #: inc/slider.php:178
 msgid "LIVE"
 msgstr ""
 
-#: inc/premium.php:604
+#: inc/premium.php:582
 msgid "Live job alerts"
 msgstr ""
 
@@ -733,7 +719,7 @@ msgstr ""
 msgid "Materials &amp; previous papers"
 msgstr ""
 
-#: inc/premium.php:392
+#: inc/premium.php:368
 msgid "Money"
 msgstr ""
 
@@ -778,7 +764,11 @@ msgstr ""
 msgid "Newer comments"
 msgstr ""
 
-#: inc/premium.php:458
+#: inc/nav-breaking.php:96
+msgid "News"
+msgstr ""
+
+#: inc/premium.php:434
 msgid "Next tool"
 msgstr ""
 
@@ -788,6 +778,10 @@ msgstr ""
 
 #: page-corrections.php:58
 msgid "No corrections have been needed so far. When one happens, it will be listed here with the date - we do not silently edit published facts."
+msgstr ""
+
+#: inc/postnews.php:422
+msgid "No district with that name — press Search to look inside the news."
 msgstr ""
 
 #: search.php:37
@@ -858,6 +852,11 @@ msgstr ""
 msgid "Only for that offline service, documents are shared on WhatsApp at"
 msgstr ""
 
+#: inc/nav-breaking.php:105
+#: inc/nav-breaking.php:134
+msgid "Open Breaking News"
+msgstr ""
+
 #: inc/student-tools.php:71
 msgid "Open comparison"
 msgstr ""
@@ -879,7 +878,7 @@ msgstr ""
 msgid "Open today"
 msgstr ""
 
-#: archive.php:54
+#: archive.php:56
 msgid "Other days"
 msgstr ""
 
@@ -956,7 +955,7 @@ msgstr ""
 msgid "Preparation group"
 msgstr ""
 
-#: inc/premium.php:79
+#: inc/premium.php:81
 msgid "Press / to search"
 msgstr ""
 
@@ -1130,11 +1129,11 @@ msgstr ""
 msgid "Saved posts"
 msgstr ""
 
-#: inc/premium.php:549
+#: inc/premium.php:527
 msgid "Scroll left"
 msgstr ""
 
-#: inc/premium.php:563
+#: inc/premium.php:541
 msgid "Scroll right"
 msgstr ""
 
@@ -1142,27 +1141,36 @@ msgstr ""
 msgid "Scrolling latest jobs carousel"
 msgstr ""
 
-#: inc/premium.php:80
+#: inc/postnews.php:402
+#: inc/premium.php:82
 msgid "Search"
 msgstr ""
 
-#: inc/premium.php:419
+#: inc/postnews.php:396
+msgid "Search %s news…"
+msgstr ""
+
+#: inc/premium.php:395
 msgid "Search a tool — salary, age, fee, resume…"
 msgstr ""
 
-#: inc/premium.php:411
+#: inc/premium.php:387
 msgid "Search cheyandi leda tab tap cheyandi — okka sari lo okka tool, screen clean ga untundi."
 msgstr ""
 
-#: inc/premium.php:76
+#: inc/premium.php:78
 msgid "Search StudentUp"
 msgstr ""
 
-#: inc/premium.php:78
+#: inc/premium.php:80
 msgid "Search StudentUp — jobs, hall tickets, results…"
 msgstr ""
 
-#: inc/premium.php:416
+#: inc/postnews.php:396
+msgid "Search Telangana / Andhra news…"
+msgstr ""
+
+#: inc/premium.php:392
 msgid "Search tools"
 msgstr ""
 
@@ -1280,7 +1288,7 @@ msgstr ""
 msgid "Student"
 msgstr ""
 
-#: inc/premium.php:437
+#: inc/premium.php:413
 msgid "Student tools"
 msgstr ""
 
@@ -1301,7 +1309,7 @@ msgstr ""
 msgid "StudentUp blocks"
 msgstr ""
 
-#: inc/premium.php:129
+#: inc/premium.php:105
 msgid "StudentUp live stats"
 msgstr ""
 
@@ -1322,11 +1330,11 @@ msgstr ""
 msgid "Success story"
 msgstr ""
 
-#: inc/premium.php:81
+#: inc/premium.php:83
 msgid "Suggestions"
 msgstr ""
 
-#: inc/premium.php:179
+#: inc/premium.php:155
 msgid "Swipe sideways for more"
 msgstr ""
 
@@ -1341,6 +1349,10 @@ msgstr ""
 #: inc/workspace.php:114
 #: inc/workspace.php:204
 msgid "Telangana"
+msgstr ""
+
+#: inc/nav-breaking.php:95
+msgid "Telangana · Andhra Pradesh district news"
 msgstr ""
 
 #: footer.php:76
@@ -1393,23 +1405,7 @@ msgstr ""
 msgid "Today's Telangana jobs →"
 msgstr ""
 
-#: front-page.php:93
-msgid "Top 5 trending now"
-msgstr ""
-
-#: front-page.php:96
-msgid "Top 5 Trending Now"
-msgstr ""
-
-#: inc/premium.php:86
-msgid "Trending"
-msgstr ""
-
-#: inc/premium.php:85
-msgid "Trending posts"
-msgstr ""
-
-#: inc/premium.php:433
+#: inc/premium.php:409
 msgid "Try “salary”, “age” leda “resume”."
 msgstr ""
 
@@ -1438,7 +1434,7 @@ msgstr ""
 msgid "Updated:"
 msgstr ""
 
-#: inc/premium.php:601
+#: inc/premium.php:579
 msgid "Updates today"
 msgstr ""
 
@@ -1452,10 +1448,6 @@ msgstr ""
 
 #: inc/keyfacts.php:26
 msgid "Vacancies"
-msgstr ""
-
-#: front-page.php:97
-msgid "View all"
 msgstr ""
 
 #: inc/hubs.php:153

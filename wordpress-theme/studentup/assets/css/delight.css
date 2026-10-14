@@ -1013,3 +1013,34 @@ body.dark .su-applyfact, [data-theme="dark"] .su-applyfact{ background:rgba(255,
 /* dark: sticky apply bar was dark only under the reduced-transparency query → dark everywhere (laptop too) */
 body.dark .su-applybar{ background:rgba(14,27,49,.96); border-top-color:rgba(255,255,255,.10); }
 body.dark .su-applybar-title{ color:#e7f0ff; }
+
+/* v311 — OWNER FIXES (live screenshots) */
+/* footer: menu items were rendering inline (header .menu rules leaked) + duplicates → clean vertical lists */
+.footer-grid ul, .footer-grid ul.menu{ display:block !important; list-style:none; margin:0; padding:0; columns:auto; }
+.footer-grid li{ display:block !important; float:none !important; margin:3px 0 !important; padding:0; white-space:normal; }
+.footer-grid li a{ display:inline-block; line-height:1.35; }
+.footer-grid h3{ white-space:nowrap; }
+@media (min-width:981px){ .footer-grid ul.menu{ display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:14px; } }
+/* home: quiz + post-your-news band — full width after Top 5 removal */
+.su-home-grid--solo{ grid-template-columns:minmax(0,1fr) !important; }
+.su-home-grid--solo > .hg-q{ grid-area:auto !important; }
+@media (min-width:1080px){ .su-home-grid--solo > .hg-q{ display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); gap:16px; align-items:start; } }
+/* quiz: questions must never be hidden by stale/other CSS (live showed 1-5 chips with no questions) */
+.su-quiz-form fieldset.su-q:not([style*="none"]){ display:block !important; opacity:1 !important; visibility:visible !important; max-height:none !important; height:auto !important; overflow:visible !important; }
+.su-quiz-form .su-q-title{ display:block !important; opacity:1 !important; visibility:visible !important; }
+.su-quiz-form .su-q-opts{ display:grid !important; }
+/* quiz foot: "More practice questions" never under the social rail */
+.su-quiz-foot{ flex-wrap:wrap; row-gap:8px; }
+.su-quiz-foot .su-quiz-more{ margin-right:44px; }
+@media (max-width:640px){ .su-quiz-foot .su-quiz-more{ margin-right:0; } }
+/* breaking section: in-section search (state/district scoped) + live district filter */
+.su-brk-search{ display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:6px 6px 6px 12px; border:1.5px solid var(--line,#e5ebf4); border-radius:14px; background:var(--card,#fff); }
+.su-brk-search-ic{ display:inline-flex; color:#64748b; flex:0 0 auto; }
+.su-brk-search input{ flex:1 1 auto; min-width:0; border:0; outline:0; background:transparent; font:600 15px/1.3 inherit; color:var(--ink,#0f172a); padding:8px 0; }
+.su-brk-search input::placeholder{ color:#94a3b8; font-weight:500; }
+.su-brk-search button{ flex:0 0 auto; border:0; border-radius:10px; padding:9px 14px; font:700 13px/1 inherit; color:#fff; background:linear-gradient(135deg,var(--su-g1,#4f46e5),var(--su-g2,#7c3aed)); cursor:pointer; min-height:36px; }
+.su-brk-search:focus-within{ border-color:#4f46e5; box-shadow:0 0 0 3px rgba(79,70,229,.14); }
+.su-brk-nomatch{ margin:6px 2px 0; font-size:12.5px; color:#64748b; }
+.su-brk-dist[hidden]{ display:none !important; }
+body.dark .su-brk-search{ background:#14243c; border-color:#26364f; }
+body.dark .su-brk-search input{ color:#e7f0ff; }
