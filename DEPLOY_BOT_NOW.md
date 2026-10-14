@@ -42,7 +42,7 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.109.zip` (v311 · owner fixes: trending/Top5/stats removed, footer dedupe, categories, breaking = district news)
+## 📱 Theme upload — `studentup-theme-1.9.110.zip` (v312 · v311 fixes + auto cache purge on version change)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
 > **1.9.107 zip సరైన structure** — ఇదే upload చేయండి.
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v312** — 1.9.110 | `inc/cachepurge.php`: first admin request after a theme version change purges LiteSpeed (pages + CSS/JS combine), WP Super Cache, W3TC, WP Rocket, Fastest Cache, Autoptimize, SiteGround, Breeze, Cache Enabler + object cache, shows admin notice; `Cache-Control: no-transform` so optimisers don't re-bundle theme CSS. Reason: live kept serving stale CSS/JS (quiz questions hidden, old trending/footer) after uploads. Verified: footer dedupe 14→9 items, notice renders. |
 | **v311** — 1.9.109 | Owner live-screenshot fixes: hero Trending strip + ticker removed; hero stats band ("9 Categories") removed; "Top 5 Trending Now" removed (Daily Quiz + Post your news full-width band); category tiles Central/Software/Private/Walk-in now render (alias-key bug: short slugs never resolved on live); footer menu duplicates fixed (root cause: `&amp;` title compare in firstrun → re-added every run; now object-id dedupe + render dedupe + one-time DB cleanup) + vertical 2-col "Other links"; quiz questions force-visible guard; Breaking News = TS/AP district news only: hero/tile/menu links go to the section, header/drawer show only state entry points (no post titles outside section), breaking posts excluded from site search too, in-section search (state/district scoped) + live district filter, no qualification bar/hint line on news pages; breaking tree fresh-lookup fix. Audit 54 renders: 0 edge-cut/0 hscroll/0 JS/0 PHP. |
 | **v310** — 1.9.108 | Deep-audit round 2 (visual states): dark-mode fixes (Most-searched icon boxes, apply-bar facts, apply bar dark on laptop); "Browse by qualification" moved inside `<main>` (was rendering BELOW the footer); duplicate Key-facts strip removed on posts (Key Highlights already shows it); breaking root/state pages no longer show sub-category chips with counts (tiles only; subcat chips count-free everywhere); state tile word-break fix; search-suggestion row ellipsis; PHP warning fix `postnews.php` array post_type. Audit: 60 renders 0 edge-cut/0 hscroll/0 JS/0 PHP. |
 | **v309** — "deep audit, edge cut avvakunda, neat" | **Automated deep audit (real Chromium): 6 viewports (360/390/412/768/1024/1366) × 10 pages = 60 renders** — checks: edge-cut (element viewport daati), horizontal scroll, clipped text, tap targets <32px, fonts <10.5px, fixed-bar overlap, JS errors. Result: **0 edge-cuts, 0 horizontal scroll, 0 clipped text, 0 JS errors** on all 60. Fixed: (1) post page phone dock — app-bar bottom-nav meeda overlap ayyedi, "Read next" bar nav/apply-bar meeda overlap → strict lanes (apply bar → nav → app-bar), Read-next phone lo apply/app-bar unte hidden; (2) tap targets: text-size A-/A/A+ 22px → 32px, card Share/Save 25px → 32px, quiz number chips 28 → 34px, slider dots 12px hit-area; (3) tiny fonts: stats labels 8.8px → 10.5px, FREE chip / Trending / slider tag / IC badges / Top5 tag → 10.5px; (4) ≤380px apply bar 3rd chip hidden (2-line wrap poyindi). Real-WP crawl 0 PHP errors; theme audit 0 errors. | `studentup-theme-1.9.107.zip` + bot zip |
@@ -102,7 +103,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `8c732d3668510c8efe39a513f2a5e965fa9ae941a584cfa8f0317ee92241938c  studentup-theme-1.9.109.zip`
+sha256: `0f7b0b8eba46e205dea3361917857cf2792aafc0ecc76b9025c24f2a621375f0  studentup-theme-1.9.110.zip`
 
 ---
 
