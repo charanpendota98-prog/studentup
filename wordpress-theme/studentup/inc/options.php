@@ -451,6 +451,18 @@ function studentup_call_number( $raw = '' ) {
 /**
  * Social URLs — options nunchi (footer/header ki).
  */
+/**
+ * v304: "Alerts" bell destination. Home lo #alerts section render avvadu (studentup_alerts_card() ekkada call ledu)
+ * → dead anchor badulu real instant-alert channel (WhatsApp channel unte adi, lekapote Telegram).
+ */
+function studentup_alerts_url() {
+	$soc = studentup_social_links();
+	if ( ! empty( $soc['whatsapp_channel'] ) ) {
+		return $soc['whatsapp_channel'];
+	}
+	return ! empty( $soc['telegram'] ) ? $soc['telegram'] : home_url( '/' );
+}
+
 function studentup_social_links() {
 	$wa  = studentup_wa_number( studentup_opt( 'social_whatsapp', '9182739312' ) );
 	$wa_ch = trim( (string) studentup_opt( 'whatsapp_channel_url', '' ) );

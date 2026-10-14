@@ -89,6 +89,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 </footer>
 
+<?php $su_soc = studentup_social_links(); // v304 FIX: header.php lo define ayina $su_soc footer template scope lo undadu → rail hrefs khali ayyevi (live bug). ?>
 <nav class="su-social" id="surail" aria-label="<?php esc_attr_e( 'Social media', 'studentup' ); ?>">
 	<button type="button" class="su-close" id="suclose" aria-label="<?php esc_attr_e( 'Hide social icons', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 	<a class="su-soc su-socb-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?php echo studentup_social_icon( 'whatsapp', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>

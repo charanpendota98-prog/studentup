@@ -32,7 +32,8 @@ function studentup_audio_reader() {
 		$speech_parts[] = 'Total vacancies ' . $vacancies . '.';
 	}
 	if ( $last_date ) {
-		$speech_parts[] = 'Last date to apply is ' . $last_date . '.';
+		$ld_ts          = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $last_date ) ? strtotime( $last_date . ' 12:00:00' ) : false;   // v304: TTS "2026-11-05" kaadu — "5 November 2026"
+		$speech_parts[] = 'Last date to apply is ' . ( $ld_ts ? wp_date( 'j F Y', $ld_ts ) : $last_date ) . '.';
 	}
 	$speech_parts[] = 'Read the full notification details below.';
 	$speech_text = implode( ' ', $speech_parts );

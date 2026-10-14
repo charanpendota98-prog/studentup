@@ -107,6 +107,7 @@ function studentup_command_palette() {
 	}
 	$links[] = array( 'i' => studentup_cmdk_icon( 'bolt' ), 't' => 'My Workspace', 'u' => function_exists( 'studentup_workspace_url' ) ? ( studentup_workspace_url() ? studentup_workspace_url() : home_url( '/' ) ) : home_url( '/' ) );
 	$links[] = array( 'i' => studentup_cmdk_icon( 'board' ), 't' => 'Active jobs board', 'u' => studentup_opportunity_board_url() );
+	if ( function_exists( 'studentup_tools_enabled' ) && studentup_tools_enabled() ) { // v304: tools OFF → dead #anchor shortcuts vaddu
 		$links[] = array( 'i' => studentup_cmdk_icon( 'chart' ), 't' => 'Age & Eligibility Calculator', 'u' => home_url( '/#age-calculator' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'card' ), 't' => 'Fee & Concession Calculator', 'u' => home_url( '/#fee-calculator' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'board' ), 't' => 'Exam Negative Marks Score Calculator', 'u' => home_url( '/#score-calculator' ) );
@@ -114,9 +115,10 @@ function studentup_command_palette() {
 		$links[] = array( 'i' => studentup_cmdk_icon( 'doc' ), 't' => 'Fresher Resume & Bio-Data Maker', 'u' => home_url( '/#resume-maker' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'book' ), 't' => 'Syllabus & Study Progress Tracker', 'u' => home_url( '/#syllabus-tracker' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'wallet' ), 't' => 'In-hand Salary Calculator', 'u' => home_url( '/#salary-calculator' ) );
-		$links[] = array( 'i' => studentup_cmdk_icon( 'bolt' ), 't' => 'Daily Quiz', 'u' => home_url( '/#daily-quiz' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'person' ), 't' => 'AI Job Match', 'u' => home_url( '/#job-match' ) );
 		$links[] = array( 'i' => studentup_cmdk_icon( 'calendar' ), 't' => 'Job Calendar', 'u' => home_url( '/#job-calendar' ) );
+	}
+	$links[] = array( 'i' => studentup_cmdk_icon( 'bolt' ), 't' => 'Daily Quiz', 'u' => ( function_exists( 'studentup_mega_page_url' ) && studentup_mega_page_url( array( 'daily-quiz', 'quiz' ) ) ) ? studentup_mega_page_url( array( 'daily-quiz', 'quiz' ) ) : home_url( '/#daily-quiz' ) );
 	?>
 	<div class="su-cmdk" id="su-cmdk" hidden role="dialog" aria-modal="true" aria-label="Quick search">
 		<div class="su-cmdk-box">

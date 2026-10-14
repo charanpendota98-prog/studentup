@@ -332,7 +332,7 @@ function studentup_bottom_nav() {
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="<?php echo is_front_page() ? 'on' : ''; ?>"><?php echo studentup_ui_icon( 'home', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Home</a>
 		<a href="<?php echo esc_url( $jobs_u ); ?>"><?php echo studentup_ui_icon( 'work', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Jobs</a>
 		<a href="<?php echo esc_url( $sch_u ); ?>"><?php echo studentup_ui_icon( 'school', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Scholar</a>
-		<a href="<?php echo esc_url( home_url( '/#alerts' ) ); ?>"><?php echo studentup_ui_icon( 'bell', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Alerts</a>
+		<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener"><?php echo studentup_ui_icon( 'bell', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Alerts</a>
 		<button type="button" class="su-bnav-search" id="su-bnav-search"><?php echo studentup_ui_icon( 'search', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Search</button>
 	</nav>
 	<?php

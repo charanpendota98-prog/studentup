@@ -888,3 +888,17 @@ body.dark .su-today{ background:#152137; color:#d7e3f8; }
 .su-daynav a{ display:inline-flex; align-items:center; min-height:34px; padding:0 13px; border-radius:999px; background:var(--soft,#eef3fb); color:var(--navy,#0b2447); font-size:12.5px; font-weight:800; text-decoration:none; }
 .su-daynav a.is-next{ margin-left:auto; }
 body.dark .su-daynav a{ background:#152137; color:#d7e3f8; }
+
+/* v304 — REAL-WP RENDER FIXES (php-wasm WordPress lo theme render chesi chusina bugs) */
+/* 390px header: flex squeeze + global `a{overflow-wrap:anywhere}` valla brand "Stude/ntUp" ga rendu lines lo break ayyedi. */
+.logo{ flex:0 0 auto; }
+.logo .brand{ white-space:nowrap; overflow-wrap:normal; }
+/* ≤400px (360px phones): logo + 4 icon buttons oka row lo fit avvali — menu button cut avvakudadu */
+@media (max-width:400px){
+  .headrow{ gap:6px; }
+  .logo{ gap:7px; }
+  .logo .mark{ width:34px; height:34px; border-radius:10px; }
+  .logo .brand{ font-size:17px; }
+  .headactions{ gap:5px; }
+  .headactions .iconbtn{ width:40px; min-width:40px; height:40px; min-height:40px; }
+}

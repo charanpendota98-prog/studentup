@@ -36,7 +36,8 @@ function studentup_quick_summary_box() {
 		$points[] = array( 'icon' => 'school', 'label' => 'Qualification', 'val' => studentup_qual_pretty( $qual ) );   // v174: raw keys kaadu — human labels
 	}
 	if ( $last_date ) {
-		$points[] = array( 'icon' => 'clock', 'label' => 'Last Date to Apply', 'val' => $last_date );
+		$ld_ts = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $last_date ) ? strtotime( $last_date . ' 12:00:00' ) : false;   // v304: raw "2026-11-05" kaadu — "05 Nov 2026"
+		$points[] = array( 'icon' => 'clock', 'label' => 'Last Date to Apply', 'val' => $ld_ts ? wp_date( 'd M Y', $ld_ts ) : $last_date );
 	}
 	if ( $salary ) {
 		$points[] = array( 'icon' => 'wallet', 'label' => 'Pay Scale / Salary', 'val' => $salary );
