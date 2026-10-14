@@ -973,3 +973,26 @@ body.dark .su-community-card .su-comm-title{ color:#e7f0ff !important; }
 .su-helpful-note:empty{ display:none; }
 /* laptop quiz: options 2×2 grid (3+1 orphan poyindi) */
 @media (min-width:641px){ .su-q-opts{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+
+/* v309 — DEEP AUDIT FIXES (6 viewports × 10 pages, real Chromium): phone dock overlaps · tap targets · tiny fonts */
+/* 1) Phone dock lanes (post page: apply bar 0 → bottom nav 64 → app-bar ABOVE nav; mundu app-bar nav meeda padedi) */
+@media (max-width:899px){
+  body.su-has-applybar .su-appbar{ bottom:calc(136px + env(safe-area-inset-bottom, 0px)); }
+  /* "Read next" bar: nav meeda overlap ayyedi → nav paina; apply bar / app-bar unte phone lo hide (okka lane = okka bar) */
+  .su-nextbar{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
+  body.su-has-applybar .su-nextbar, body.su-appbar-on .su-nextbar{ display:none !important; }
+}
+/* 2) Tap targets ≥ 32px (phone): text-size buttons, card Share/Save, quiz number chips, slider dots hit-area */
+.su-fz-btn{ min-width:34px; min-height:32px; padding:4px 9px; }
+.su-card-wa, .su-save-btn{ min-height:32px; }
+.su-q-chip{ width:34px; height:34px; }
+.su-sdot{ position:relative; }
+.su-sdot::after{ content:""; position:absolute; inset:-12px -6px; }
+/* 3) Minimum readable text 10.5px (phone) — stats labels 8.8px → 10.5px (3 items = space undi), FREE chip, Trending label, slider tag */
+@media (max-width:640px){ .su-stats-item span{ font-size:10.5px !important; } }
+.su-mpwa{ font-size:10.5px; }
+.su-trend > b{ font-size:10.5px; }
+.su-scard-tag{ font-size:10.5px; }
+.su-ic-badge, .ibadge, .su-top5-tag{ font-size:10.5px !important; }
+.su-q-chip, .su-q-chip.cur{ width:34px !important; height:34px !important; }
+@media (max-width:380px){ .su-applybar .su-applychip:nth-of-type(n+3){ display:none; } }
