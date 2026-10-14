@@ -66,7 +66,7 @@ get_header();
 		?>
 		<?php
 		// v80 (P16): subcategory chips — category landing rich (child cats + counts).
-		if ( is_category() && function_exists( 'studentup_subcat_chips' ) ) {
+		if ( is_category() && function_exists( 'studentup_subcat_chips' ) && ! ( function_exists( 'studentup_breaking_level' ) && '' !== studentup_breaking_level( get_queried_object() ) ) ) {
 			$su_chips_obj = get_queried_object();
 			if ( function_exists( 'studentup_alias_primary_term' ) ) {
 				$su_chips_obj = studentup_alias_primary_term( $su_chips_obj );

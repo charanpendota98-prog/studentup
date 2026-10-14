@@ -643,7 +643,7 @@ function studentup_qual_directory() {
 	</section>
 	<?php
 }
-add_action( 'wp_footer', 'studentup_qual_directory', 5 );
+// v310: called directly from front-page.php (inside <main>) — no longer hooked to wp_footer.
 
 /**
  * Card lo qualification chip (template.php nunchi call avutundi).

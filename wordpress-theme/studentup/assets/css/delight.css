@@ -996,3 +996,20 @@ body.dark .su-community-card .su-comm-title{ color:#e7f0ff !important; }
 .su-ic-badge, .ibadge, .su-top5-tag{ font-size:10.5px !important; }
 .su-q-chip, .su-q-chip.cur{ width:34px !important; height:34px !important; }
 @media (max-width:380px){ .su-applybar .su-applychip:nth-of-type(n+3){ display:none; } }
+
+/* v310 — DEEP AUDIT round 2 (dark mode · drawer · tablet · states) */
+/* dark: "Most searched" icon box white square (icon invisible) → navy box + light icon */
+body.dark .usedcard .ui, body.dark .usedcard.hot .ui, [data-theme="dark"] .usedcard .ui{ background:#1b2a46 !important; color:#93c5fd !important; }
+body.dark .usedcard .ui svg{ color:#93c5fd; fill:currentColor; }
+/* dark: apply bar facts (783 posts · Degree) dark-on-dark → readable */
+body.dark .su-applyfact, [data-theme="dark"] .su-applyfact{ background:rgba(255,255,255,.12); color:#e7f0ff; }
+/* breaking state tiles: never break a word ("Telangan-a") → wrap at spaces, slightly tighter type on phone */
+.su-brk-state b{ overflow-wrap:normal; word-break:keep-all; hyphens:none; }
+@media (max-width:420px){ .su-brk-nav--root .su-brk-state b{ font-size:15px; } .su-brk-nav--root .su-brk-state{ padding:16px 12px; gap:8px; } }
+/* search suggestions: title ellipsis, POST badge never clipped at the right edge */
+.su-sug-item{ overflow:hidden; }
+.su-sug-main{ flex:1 1 0; min-width:0; }
+.su-sug-title{ min-width:0; }
+/* dark: sticky apply bar was dark only under the reduced-transparency query → dark everywhere (laptop too) */
+body.dark .su-applybar{ background:rgba(14,27,49,.96); border-top-color:rgba(255,255,255,.10); }
+body.dark .su-applybar-title{ color:#e7f0ff; }

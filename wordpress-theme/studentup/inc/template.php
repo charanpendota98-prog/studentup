@@ -489,10 +489,9 @@ function studentup_subcat_chips( $cat_id ) {
 	echo '<nav class="su-subcats" aria-label="Subcategories">';
 	foreach ( $kids as $kid ) {
 		printf(
-			'<a href="%s">%s <span>(%d)</span></a>',
+			'<a href="%s">%s</a>',
 			esc_url( get_category_link( $kid ) ),
-			esc_html( $kid->name ),
-			(int) $kid->count
+			esc_html( $kid->name )
 		);
 	}
 	echo '</nav>';

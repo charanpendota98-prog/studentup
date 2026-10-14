@@ -60,6 +60,11 @@ function studentup_keyfacts_box() {
 	if ( ! is_singular( 'post' ) || ! studentup_opt( 'keyfacts', '1' ) ) {
 		return;
 	}
+	// v310: Key Highlights box (quick_summary) already lists vacancies/qualification/salary/last date —
+	// same facts twice, stacked = clutter. Strip renders only when that box is switched off.
+	if ( studentup_opt( 'quick_summary', '1' ) && function_exists( 'studentup_quick_summary_box' ) ) {
+		return;
+	}
 	$facts = studentup_keyfacts_data();
 	if ( count( $facts ) < 2 ) {
 		return; // okate fact unte strip ki value ledu.

@@ -318,6 +318,12 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 			studentup_ad( 'below-content' ); // slot 3 — finish chesina reader ki
 			?>
 		<?php endif; ?>
+		<?php
+		// v310: "Browse by qualification" lives INSIDE main (was wp_footer → rendered below the site footer).
+		if ( function_exists( 'studentup_qual_directory' ) ) {
+			studentup_qual_directory();
+		}
+		?>
 	</div>
 </main>
 
