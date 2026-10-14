@@ -907,3 +907,36 @@ body.dark .su-daynav a{ background:#152137; color:#d7e3f8; }
 .su-push-bar .su-push-txt{ display:flex; align-items:center; gap:6px; flex:1 1 100%; font-weight:700; font-size:13.5px; }
 .su-push-bar .su-push-txt svg{ flex:0 0 auto; }
 @media (max-width:640px){ .su-push-bar{ padding:10px 12px; gap:6px; } .su-push-bar button{ padding:8px 12px; font-size:12.5px; } }
+
+/* v307 — NEAT PASS 2 (owner: "antha chaala neat ga undali, agam aga kakunda") — real Chromium 390/1366 render fixes */
+/* 1) Category tiles: 10 tiles → laptop 5 per row (2 full rows, no 3-tile orphan row); phone 3 per row, lone last tile = wide horizontal tile */
+@media (min-width:640px){ .su-catrail{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } }
+@media (min-width:1024px){ .su-catrail{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } }
+@media (max-width:480px){
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child{ grid-column:1 / -1; flex-direction:row !important; justify-content:center; gap:10px !important; padding:8px 10px !important; }
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child .su-cat-ic{ width:40px !important; height:40px !important; margin:0 !important; }
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child .su-cat-ic svg{ width:24px !important; height:24px !important; }
+}
+/* 2) Daily quiz option rows: global input height (46px) radio ni 73px tall options ga chesindi → compact 44px rows */
+.su-opt input[type="radio"]{ width:16px !important; height:16px !important; min-height:0 !important; margin:0 !important; flex:0 0 auto; accent-color:#2563eb; }
+.su-opt{ min-height:42px; padding:8px 12px; }
+@media (max-width:640px){ .su-q{ padding:10px 0 !important; } .su-q-opts{ gap:6px; } }
+/* 3) Trending chips: full post titles 400px+ wide → ellipsis, max 220px */
+.su-tchip{ max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:360px){ .su-tchip{ max-width:180px; } }
+/* 4) Phone news cards: action row (Read more · Share · Save · Compare) nowrap lo "Sh/ar/e" ga letters break ayyayi → labels nowrap, Compare phone lo hidden (compare tray desktop feature) */
+@media (max-width:640px){
+  .newsgrid .news .newsfoot > *{ flex:0 0 auto; white-space:nowrap; }
+  .newsgrid .news .newsfoot .su-tools-card{ display:none !important; }
+  .newsgrid .news .newsfoot .su-readmore{ margin-left:0; }
+  .newsgrid .news .newsfoot .su-save-btn{ margin-left:auto; }
+  /* placeholder cover (no featured image) 16:9 full-width = 200px empty gradient per card → short banner */
+  .newsgrid .news .thumb--auto{ aspect-ratio:3 / 1 !important; min-height:0 !important; }
+  .newsgrid .news .thumb--auto .su-cov-mono{ font-size:34px; }
+}
+/* 5) Category name twice per card (cover badge + chip) → chip hidden when cover already shows it */
+.news:has(.thumb--auto) .tagrow > .tag:not(.qual):first-child{ display:none; }
+/* 6) Community card: badge/desc poyayi — title + 2 buttons only */
+.su-community-card .su-comm-desc{ display:none !important; }
+.su-community-card .su-comm-head{ margin-bottom:10px; }
+.tagrow .qbadge{ margin-left:0; }

@@ -60,9 +60,7 @@ function studentup_community_pulse_card() {
 	?>
 	<section class="su-community-card" aria-label="Join Student Community">
 		<div class="su-comm-head">
-			<span class="su-pulse-badge"><span class="su-pulse-dot" aria-hidden="true"></span> 50,000+ Students Live Community</span>
 			<h3 class="su-comm-title">Instant Job Alerts & Exam Updates</h3>
-			<p class="su-comm-desc">Get the latest notifications, syllabus breakdowns, and preparation guides directly on your mobile.</p>
 		</div>
 		<div class="su-comm-buttons">
 			<a href="<?php echo esc_url( $wa_link ); ?>" target="_blank" rel="noopener" class="su-comm-btn su-comm-wa">

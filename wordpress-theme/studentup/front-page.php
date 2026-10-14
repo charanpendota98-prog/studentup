@@ -53,17 +53,7 @@ $su_is_p2 = $su_paged > 1;
 			extra line phone lo vertical space tinestundi. */ ?>
 		</div>
 		<div class="usedgrid">
-			<a class="su-used-breaking" href="<?php echo esc_url( function_exists( 'studentup_breaking_section_url' ) ? studentup_breaking_section_url() : home_url( '/#jobs' ) ); ?>" aria-label="Breaking News - Live Flash Updates">
-				<span class="ui ui--breaking" aria-hidden="true"><?php echo studentup_ui_icon( 'bolt', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
-				<div class="su-ub-body">
-					<div class="su-ub-top">
-						<span class="su-ub-tag"><span class="su-pulse-dot"></span> LIVE FLASH</span>
-						<b>Breaking News</b>
-					</div>
-					
-				</div>
-				<em class="ucount ucount--brk"><?php esc_html_e( 'Flash Updates →', 'studentup' ); ?></em>
-			</a>
+			<?php /* v307: LIVE FLASH Breaking card removed here — Breaking already has hero tile + hero link + nav; 4th copy was clutter. */ ?>
 			<?php
 			foreach ( studentup_most_used() as $i => $m ) :
 				$term = studentup_used_term( $m['slug'] );
