@@ -223,6 +223,29 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 		studentup_qual_bar();
 		studentup_qual_active_note();
 		studentup_hidden_note();
+		// v302: "N posted today" → day archive (real count, 10-min cache; 0 aithe render kaadu).
+		if ( ! $su_is_p2 ) {
+			$su_today_n = get_transient( 'su_today_count' );
+			if ( false === $su_today_n ) {
+				$su_tq = new WP_Query(
+					array(
+						'post_type'      => 'post',
+						'post_status'    => 'publish',
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+						'date_query'     => array( array( 'after' => 'today', 'inclusive' => true ) ),
+					)
+				);
+				$su_today_n = (int) $su_tq->found_posts;
+				set_transient( 'su_today_count', $su_today_n, 10 * MINUTE_IN_SECONDS );
+			}
+			if ( $su_today_n > 0 ) {
+				$su_day_url = get_day_link( (int) current_time( 'Y' ), (int) current_time( 'm' ), (int) current_time( 'd' ) );
+				echo '<a class="su-today" href="' . esc_url( $su_day_url ) . '"><span class="su-today-dot" aria-hidden="true"></span><b>'
+					. esc_html( sprintf( _n( '%d update posted today', '%d updates posted today', $su_today_n, 'studentup' ), $su_today_n ) )
+					. '</b><i aria-hidden="true">→</i></a>';
+			}
+		}
 		?>
 
 		<?php

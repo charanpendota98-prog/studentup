@@ -135,6 +135,7 @@ $label = $terms ? $terms[0]->name : 'Update';
 		data-qual="<?php echo esc_attr( $su_qual_raw ); ?>"
 		data-state="<?php echo esc_attr( $su_states ); ?>"
 		data-last="<?php echo esc_attr( $su_last_raw ); ?>"
+		data-pub="<?php echo esc_attr( (string) get_post_time( 'U', true ) ); ?>"
 		data-text="<?php echo esc_attr( mb_strtolower( get_the_title() . ' ' . get_the_excerpt() ) ); ?>">
 		<?php if ( has_post_thumbnail() ) : ?>
 			<a class="thumb <?php echo esc_attr( $tone ); ?>" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">

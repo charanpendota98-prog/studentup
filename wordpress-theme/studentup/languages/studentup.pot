@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.99\n"
+"Project-Id-Version: StudentUp 1.9.100\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -592,7 +592,7 @@ msgid "Hide social icons"
 msgstr ""
 
 #: inc/megamenu.php:356
-#: inc/template.php:396
+#: inc/template.php:397
 msgid "Home"
 msgstr ""
 
@@ -708,7 +708,7 @@ msgstr ""
 msgid "Last day today"
 msgstr ""
 
-#: inc/breaking.php:286
+#: inc/breaking.php:288
 msgid "Latest Jobs"
 msgstr ""
 
@@ -805,7 +805,7 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: inc/template.php:173
+#: inc/template.php:174
 msgid "NEW"
 msgstr ""
 
@@ -1055,7 +1055,7 @@ msgstr ""
 msgid "Quick tools"
 msgstr ""
 
-#: inc/template.php:189
+#: inc/template.php:190
 msgid "Read more"
 msgstr ""
 
