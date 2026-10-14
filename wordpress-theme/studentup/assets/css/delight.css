@@ -144,7 +144,7 @@ html.su-js .su-reveal.su-on{opacity:1;transform:none}
 .su-q-opt .su-kbd{margin-left:auto;opacity:.75}
 .su-q-opt{display:flex;align-items:center;gap:8px;width:100%;text-align:left}
 .su-q-run{display:block}
-html.su-js .su-q:not(.su-q-run){display:none}
+html.su-js .su-q-stepper .su-q:not(.su-q-run){display:none} /* v296: stepper-only (preview); theme shows all 5 Qs — earlier rule hid every question on live */
 .su-quiz-result{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 4px;
   padding:12px;border:1px solid var(--line,#e5ebf4);border-radius:14px;background:var(--soft,#f5f8fc)}
 .su-quiz-sring{width:66px;height:66px;border-radius:50%;flex:0 0 auto;
@@ -532,7 +532,13 @@ body.dark .usedgrid .usedcard .ui{color:#e7f0ff !important}
 [data-theme="dark"] .su-stats-ic{ color:#9db8ff; }
 
 /* v277 — home perfection: phone neat + laptop advanced band */
-.su-home-grid{ display:grid; gap:14px; margin:14px 0; }
+.su-home-grid{ display:grid; gap:14px; margin:14px auto; max-width:1180px; padding:0 16px; box-sizing:border-box; }
+.su-home-grid .wrap{ max-width:none; padding:0; }
+.su-home-grid > *{ min-width:0; }
+.su-home-grid .su-quiz, .su-home-grid .su-quiz-card, .su-home-grid .su-top5, .su-home-grid .su-postnews{ max-width:100%; box-sizing:border-box; }
+.su-home-grid .su-quiz-exams{ display:flex; flex-wrap:wrap; gap:8px; overflow:visible; }
+.su-home-grid .su-quiz-exams .su-qtab{ white-space:nowrap; }
+@media (max-width:640px){ .su-home-grid{ padding:0 14px; gap:12px; margin:12px auto; } }
 @media (min-width:1080px){
   .su-home-grid{ grid-template-columns:minmax(0,5fr) minmax(0,7fr); align-items:start; gap:16px; }
   .su-home-grid > .hg-t{ grid-area:1/1/2/2; }
@@ -772,3 +778,238 @@ body.dark .su-implinks, [data-theme="dark"] .su-implinks{ background:#111a2e; bo
 body.dark .su-implinks-row{ border-color:#1e2d4a; } body.dark .su-implinks-lab{ color:#e7f0ff; }
 body.dark .su-implinks-btn{ background:#1b2a46; border-color:#2e4a73; color:#93c5fd; } body.dark .su-implinks-row.is-primary{ background:#0f2a1c; }
 
+
+/* v300 — CALM UI (owner: "website lo antha zoom avvakoodadu"). Hover/tap meeda elements
+   zoom (scale) / jump (lift) avvavu — phone + laptop rendu. Feedback = color/border/shadow matrame.
+   Positional transforms (centering, drawers) ni touch cheyyaledu. */
+.news:hover, .news:hover .thumb img, .news:hover .thumb-img img,
+.usedcard:hover, .su-used-breaking:hover, .su-scard:hover, .su-hotcard:hover, .su-scard-act:hover,
+.su-fcard:hover, .su-fycard:hover, .su-recirc-card:hover, .su-stats-item:hover, .su-closing-list li:hover,
+.su-catrail>a:hover, .su-catwrap .su-catrail>a:hover, .su-catrail>a.su-cat:hover, .su-catrail>a:hover .su-cat-ic,
+.su-top5-list li:hover .su-top5-n, .su-postnews-tiles a:hover, .su-pn-card:hover,
+.su-abtn:hover, .su-card-wa:hover, .su-sbtn:hover, .su-qp:hover, .su-fb-apply:hover, .su-hact:hover,
+.su-ft-soc a:hover, .su-social a:hover, .su-ab-soc:hover, #su-totop:hover, .su-quiz-share:hover, .su-tchip:hover,
+.su-q-next:hover, .su-q-chip:hover, .su-status-btn:hover, .su-audio-btn:hover, .su-summary-btn:hover, .su-comm-btn:hover,
+.su-admit-btn:hover, .su-sponsor-btn:hover, .su-cathead .su-viewall:hover, .su-wa-box:hover, .share .su-share-btn:hover,
+.chip:hover, .su-tgjoin:hover, .su-calc-btn-primary:hover, .su-fee-btn-primary:hover, .su-score-btn-primary:hover,
+.su-resume-btn-primary:hover, .nav .su-mega-list>li>a:hover, .su-rail-nav:hover, .su-catwrap .su-rail-nav:hover{
+  transform:none !important;
+}
+.su-catnav:hover{ transform:translateY(-50%) !important; }
+/* pulsing/zooming animations off (static UI) */
+.su-applybar--urgent .su-applychip{ animation:none !important; }
+.su-pulse-dot{ animation:none !important; }
+@media (hover:none){ a:active, button:active{ transform:none !important; } }
+
+/* v300 — EDGE-CUT FIXES (real screenshots: hero content touched screen edges, Browse panel
+   tiles/heading flush with panel edge, slider 1st card border clipped, laptop 4th card cut). */
+.su-hero-in{ padding-left:16px !important; padding-right:16px !important; }
+@media (max-width:980px) and (min-width:601px){ .su-hero-in{ padding-right:64px !important; } }
+@media (max-width:640px){ .su-hero-in{ padding-left:14px !important; padding-right:14px !important; } }
+@media (max-width:360px){ .su-hero-in{ padding-left:12px !important; padding-right:12px !important; } }
+/* phone: 3 tiles per row — rail label meeda padadu, tiles pedda ga, neat */
+@media (max-width:480px){ .su-catrail{ grid-template-columns:repeat(3,minmax(0,1fr)) !important; } }
+.su-catwrap{ padding:10px 12px 8px !important; }
+.su-catwrap .su-cathead{ margin-bottom:8px; }
+@media (max-width:480px){ .su-catwrap{ padding:8px 8px 6px !important; } }
+.su-slider-viewport{ margin:0 !important; padding:4px 0 8px !important; scroll-padding-left:0; }
+.su-slider-track{ padding:0 1px; }
+.su-scard-acts-row{ margin-top:auto !important; padding-top:9px; }
+@media (min-width:1200px){ .su-scard{ flex-basis:277px !important; } }
+/* laptop lead card: body content vertically centered as one block (big empty gap under excerpt poyindi) */
+@media (min-width:900px){
+  .news--lead .thumb{ width:50%; min-width:50%; }
+  .news--lead .newsbody{ display:flex; flex-direction:column; justify-content:center; }
+  .news--lead .newsfoot{ margin-top:16px !important; }
+  .news--lead .newsbody > *{ flex:0 0 auto; }
+}
+
+/* v301 — NEAT PASS (owner: "inka neat ga undali") */
+/* 1) "Most searched" tiles okate look — hot tiles ki separate colour/border ledu, anni tiles ki same chevron */
+.usedcard.hot{ border-width:1px !important; border-color:var(--line,#e5ebf4) !important; background:var(--card,#fff) !important; }
+.usedcard.hot .ui{ background:var(--soft,#eef3fb) !important; }
+.usedcard.hot::after{ inset:auto; box-shadow:none; right:16px; top:50%; width:8px; height:8px;
+  border-right:2px solid #94a3b8; border-top:2px solid #94a3b8; transform:translateY(-50%) rotate(45deg); opacity:.5; border-radius:0; }
+.usedcard b{ font-size:13px; }
+@media (min-width:1040px){ .usedcard{ padding-right:30px; } }
+/* 2) Daily quiz — fieldset/legend notch lines poyayi (question meedha line la kanipinchedi) */
+.su-q{ min-inline-size:0; }
+.su-q legend.su-q-title{ float:left; width:100%; padding:0; margin:0 0 9px; }
+.su-q legend.su-q-title + *{ clear:both; }
+/* 3) Lead card kinda partial accent line (cut la kanipinchedi) → teesesam */
+.news--lead::after{ display:none !important; }
+/* 4) Section-head links okate style: pill (All sections → la) */
+.su-board-link{ display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 13px; border-radius:999px;
+  background:var(--soft,#eef3fb); color:var(--navy,#0b2447) !important; font-size:12.5px; font-weight:800; text-decoration:none; }
+body.dark .su-board-link{ background:#152137; color:#d7e3f8 !important; }
+/* 5) Phone news cards — thumbnail crop (poster text cut) badulu full image top, body kinda; action row okate line */
+@media (max-width:640px){
+  .newsgrid .news:not(.news--lead){ flex-direction:column; min-height:0; }
+  .newsgrid .news:not(.news--lead) .thumb{ width:100%; min-width:0; height:auto; min-height:0; aspect-ratio:16/9; padding:0; }
+  .newsgrid .news:not(.news--lead) .thumb img{ width:100%; height:100%; min-height:0; object-fit:cover; }
+  .newsgrid .news:not(.news--lead) .newsbody{ padding:12px 14px 13px; gap:6px; }
+  .newsgrid .news:not(.news--lead) h3{ font-size:16px; line-height:1.35; }
+  .newsgrid .news:not(.news--lead) .newsfoot{ flex-wrap:nowrap; }
+}
+/* 6) slider arrows side-by-side, head right side one neat row (arrows + View all) */
+.su-slider-head{ flex-wrap:nowrap !important; }
+.su-slider-arrs, .su-slider-ctrls{ display:inline-flex; gap:6px; margin-left:auto; flex:0 0 auto; }
+.su-slider-head .su-viewall{ flex:0 0 auto; }
+@media (max-width:640px){ .su-slider-arrs, .su-slider-ctrls{ display:none; } }
+
+/* v302 — RETURN LAYER: "new since your last visit" strip + "New for you" mark + "Continue reading" chip */
+.su-since{ display:flex; align-items:center; gap:8px; margin:0 0 12px; padding:9px 13px; border-radius:12px;
+  background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:13px; font-weight:600; text-decoration:none; }
+.su-since-t{ flex:1 1 auto; min-width:0; }
+.su-since b{ font-weight:800; }
+.su-since small{ color:#047857; font-size:12px; }
+.su-since i{ margin-left:auto; font-style:normal; font-weight:800; }
+.su-since-dot{ width:8px; height:8px; border-radius:50%; background:#10b981; flex:0 0 auto; }
+.news.is-newforyou .newsbody::before{ content:"New for you"; align-self:flex-start; font-size:10.5px; font-weight:800; letter-spacing:.02em;
+  color:#065f46; background:#d1fae5; border-radius:999px; padding:2px 8px; margin-bottom:-2px; }
+body.dark .su-since{ background:#0f2a1c; border-color:#14532d; color:#bbf7d0; }
+body.dark .su-since small{ color:#86efac; }
+body.dark .news.is-newforyou .newsbody::before{ background:#14532d; color:#bbf7d0; }
+.su-cont{ position:fixed; left:50%; bottom:calc(78px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:1300;
+  display:inline-flex; align-items:center; gap:10px; padding:10px 14px 10px 16px; border:0; border-radius:999px; cursor:pointer;
+  background:#0b2447; color:#fff; font:700 13px/1 system-ui,sans-serif; box-shadow:0 10px 28px rgba(2,8,23,.35); white-space:nowrap; }
+.su-cont-bar{ width:46px; height:5px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; }
+.su-cont-bar i{ display:block; height:100%; background:#34d399; border-radius:999px; }
+.su-cont-x{ margin-left:2px; width:22px; height:22px; border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.14); font-size:14px; }
+.su-cont.is-out{ opacity:0; transition:opacity .35s ease; }
+@media (min-width:981px){ .su-cont{ bottom:26px; } }
+.su-today{ display:inline-flex; align-items:center; gap:8px; margin:0 0 10px; padding:6px 12px; border-radius:999px;
+  background:var(--soft,#eef3fb); color:var(--navy,#0b2447); font-size:12.5px; font-weight:700; text-decoration:none; }
+.su-today-dot{ width:7px; height:7px; border-radius:50%; background:#2563eb; }
+.su-today i{ font-style:normal; font-weight:800; }
+body.dark .su-today{ background:#152137; color:#d7e3f8; }
+/* v303 — day archive nav */
+.su-daynav{ display:flex; justify-content:space-between; gap:8px; margin:0 0 12px; }
+.su-daynav a{ display:inline-flex; align-items:center; min-height:34px; padding:0 13px; border-radius:999px; background:var(--soft,#eef3fb); color:var(--navy,#0b2447); font-size:12.5px; font-weight:800; text-decoration:none; }
+.su-daynav a.is-next{ margin-left:auto; }
+body.dark .su-daynav a{ background:#152137; color:#d7e3f8; }
+
+/* v304 — REAL-WP RENDER FIXES (php-wasm WordPress lo theme render chesi chusina bugs) */
+/* 390px header: flex squeeze + global `a{overflow-wrap:anywhere}` valla brand "Stude/ntUp" ga rendu lines lo break ayyedi. */
+.logo{ flex:0 0 auto; }
+.logo .brand{ white-space:nowrap; overflow-wrap:normal; }
+/* ≤400px (360px phones): logo + 4 icon buttons oka row lo fit avvali — menu button cut avvakudadu */
+@media (max-width:400px){
+  .headrow{ gap:6px; }
+  .logo{ gap:7px; }
+  .logo .mark{ width:34px; height:34px; border-radius:10px; }
+  .logo .brand{ font-size:17px; }
+  .headactions{ gap:5px; }
+  .headactions .iconbtn{ width:40px; min-width:40px; height:40px; min-height:40px; }
+}
+
+/* v305 — push opt-in bar: phone lo bottom nav + install button paina, compact */
+.su-push-bar .su-push-txt{ display:flex; align-items:center; gap:6px; flex:1 1 100%; font-weight:700; font-size:13.5px; }
+.su-push-bar .su-push-txt svg{ flex:0 0 auto; }
+@media (max-width:640px){ .su-push-bar{ padding:10px 12px; gap:6px; } .su-push-bar button{ padding:8px 12px; font-size:12.5px; } }
+
+/* v307 — NEAT PASS 2 (owner: "antha chaala neat ga undali, agam aga kakunda") — real Chromium 390/1366 render fixes */
+/* 1) Category tiles: 10 tiles → laptop 5 per row (2 full rows, no 3-tile orphan row); phone 3 per row, lone last tile = wide horizontal tile */
+@media (min-width:640px){ .su-catrail{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } }
+@media (min-width:1024px){ .su-catrail{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } }
+@media (max-width:480px){
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child{ grid-column:1 / -1; flex-direction:row !important; justify-content:center; gap:10px !important; padding:8px 10px !important; }
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child .su-cat-ic{ width:40px !important; height:40px !important; margin:0 !important; }
+  .su-catrail>a.su-cat:nth-child(3n+1):last-child .su-cat-ic svg{ width:24px !important; height:24px !important; }
+}
+/* 2) Daily quiz option rows: global input height (46px) radio ni 73px tall options ga chesindi → compact 44px rows */
+.su-opt input[type="radio"]{ width:16px !important; height:16px !important; min-height:0 !important; margin:0 !important; flex:0 0 auto; accent-color:#2563eb; }
+.su-opt{ min-height:42px; padding:8px 12px; }
+@media (max-width:640px){ .su-q{ padding:10px 0 !important; } .su-q-opts{ gap:6px; } }
+/* 3) Trending chips: full post titles 400px+ wide → ellipsis, max 220px */
+.su-tchip{ max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+@media (max-width:360px){ .su-tchip{ max-width:180px; } }
+/* 4) Phone news cards: action row (Read more · Share · Save · Compare) nowrap lo "Sh/ar/e" ga letters break ayyayi → labels nowrap, Compare phone lo hidden (compare tray desktop feature) */
+@media (max-width:640px){
+  .newsgrid .news .newsfoot > *{ flex:0 0 auto; white-space:nowrap; }
+  .newsgrid .news .newsfoot .su-tools-card{ display:none !important; }
+  .newsgrid .news .newsfoot .su-readmore{ margin-left:0; }
+  .newsgrid .news .newsfoot .su-save-btn{ margin-left:auto; }
+  /* placeholder cover (no featured image) 16:9 full-width = 200px empty gradient per card → short banner */
+  .newsgrid .news .thumb--auto{ aspect-ratio:3 / 1 !important; min-height:0 !important; }
+  .newsgrid .news .thumb--auto .su-cov-mono{ font-size:34px; }
+}
+/* 5) Category name twice per card (cover badge + chip) → chip hidden when cover already shows it */
+.news:has(.thumb--auto) .tagrow > .tag:not(.qual):first-child{ display:none; }
+/* 6) Community card: badge/desc poyayi — title + 2 buttons only */
+.su-community-card .su-comm-desc{ display:none !important; }
+.su-community-card .su-comm-head{ margin-bottom:10px; }
+.tagrow .qbadge{ margin-left:0; }
+
+/* v308 — NEAT PASS 3 (real-WP render: single/quiz/search/footer) */
+.su-community-card .su-comm-title{ color:var(--navy,#0b2447) !important; }
+body.dark .su-community-card .su-comm-title{ color:#e7f0ff !important; }
+/* comment form: fields one neat stack, cookie consent inline, 44px button */
+.comment-form .comment-form-cookies-consent{ display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--muted,#64748b); margin:8px 0 12px; }
+.comment-form .comment-form-cookies-consent input{ width:16px; height:16px; min-height:0; margin:3px 0 0; flex:0 0 auto; }
+.comment-form .comment-form-cookies-consent label{ display:inline; font-weight:500; }
+.comment-form input[type="text"], .comment-form input[type="email"], .comment-form textarea{ width:100%; max-width:100%; box-sizing:border-box; }
+.comment-form .form-submit{ margin:0; }
+.comment-form .form-submit input{ min-height:44px; }
+/* sidebar on phone: stacked under article, widgets styled like cards; search block tidy */
+.su-sidebar .wp-block-search__inside-wrapper{ display:flex; gap:6px; }
+.su-sidebar .wp-block-search__input{ flex:1 1 auto; min-width:0; }
+.su-sidebar .wp-block-search__label, .su-sidebar .wp-block-heading{ font-size:15px; font-weight:800; color:var(--navy,#0b2447); margin:0 0 8px; display:block; }
+.su-sidebar ul{ list-style:none; margin:0; padding:0; }
+.su-sidebar li{ padding:7px 0; border-bottom:1px solid var(--line,#e5ebf4); font-size:14px; }
+.su-sidebar li:last-child{ border-bottom:0; }
+@media (max-width:980px){ .su-sidebar{ margin-top:14px; } }
+/* quiz page: exam tabs wrap (home band laage) — side-scroll cut ("TSPSC (Grou") poyindi */
+.su-quiz-exams{ flex-wrap:wrap; overflow:visible; }
+/* poll: native radio + custom radio rendu kanipinchevi (double circle) → native hidden (accessible) */
+.su-poll-opt input[type="radio"]{ position:absolute; opacity:0; width:1px; height:1px; margin:0; pointer-events:none; }
+.su-poll-opt{ position:relative; }
+.su-poll-opt:focus-within{ border-color:var(--blue,#2563eb); }
+/* news card action row = Read more · Share · Save (one line, every width). "Compare" button laptop lo
+   2nd line lo ontari ga padedi — card foot nunchi hidden (compare tray code untundi). */
+.newsgrid .news .newsfoot .su-tools-card{ display:none !important; }
+.newsgrid .news .newsfoot{ flex-wrap:nowrap; }
+.newsgrid .news .newsfoot > *{ flex:0 0 auto; white-space:nowrap; }
+.su-helpful-note:empty{ display:none; }
+/* laptop quiz: options 2×2 grid (3+1 orphan poyindi) */
+@media (min-width:641px){ .su-q-opts{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } }
+
+/* v309 — DEEP AUDIT FIXES (6 viewports × 10 pages, real Chromium): phone dock overlaps · tap targets · tiny fonts */
+/* 1) Phone dock lanes (post page: apply bar 0 → bottom nav 64 → app-bar ABOVE nav; mundu app-bar nav meeda padedi) */
+@media (max-width:899px){
+  body.su-has-applybar .su-appbar{ bottom:calc(136px + env(safe-area-inset-bottom, 0px)); }
+  /* "Read next" bar: nav meeda overlap ayyedi → nav paina; apply bar / app-bar unte phone lo hide (okka lane = okka bar) */
+  .su-nextbar{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
+  body.su-has-applybar .su-nextbar, body.su-appbar-on .su-nextbar{ display:none !important; }
+}
+/* 2) Tap targets ≥ 32px (phone): text-size buttons, card Share/Save, quiz number chips, slider dots hit-area */
+.su-fz-btn{ min-width:34px; min-height:32px; padding:4px 9px; }
+.su-card-wa, .su-save-btn{ min-height:32px; }
+.su-q-chip{ width:34px; height:34px; }
+.su-sdot{ position:relative; }
+.su-sdot::after{ content:""; position:absolute; inset:-12px -6px; }
+/* 3) Minimum readable text 10.5px (phone) — stats labels 8.8px → 10.5px (3 items = space undi), FREE chip, Trending label, slider tag */
+@media (max-width:640px){ .su-stats-item span{ font-size:10.5px !important; } }
+.su-mpwa{ font-size:10.5px; }
+.su-trend > b{ font-size:10.5px; }
+.su-scard-tag{ font-size:10.5px; }
+.su-ic-badge, .ibadge, .su-top5-tag{ font-size:10.5px !important; }
+.su-q-chip, .su-q-chip.cur{ width:34px !important; height:34px !important; }
+@media (max-width:380px){ .su-applybar .su-applychip:nth-of-type(n+3){ display:none; } }
+
+/* v310 — DEEP AUDIT round 2 (dark mode · drawer · tablet · states) */
+/* dark: "Most searched" icon box white square (icon invisible) → navy box + light icon */
+body.dark .usedcard .ui, body.dark .usedcard.hot .ui, [data-theme="dark"] .usedcard .ui{ background:#1b2a46 !important; color:#93c5fd !important; }
+body.dark .usedcard .ui svg{ color:#93c5fd; fill:currentColor; }
+/* dark: apply bar facts (783 posts · Degree) dark-on-dark → readable */
+body.dark .su-applyfact, [data-theme="dark"] .su-applyfact{ background:rgba(255,255,255,.12); color:#e7f0ff; }
+/* breaking state tiles: never break a word ("Telangan-a") → wrap at spaces, slightly tighter type on phone */
+.su-brk-state b{ overflow-wrap:normal; word-break:keep-all; hyphens:none; }
+@media (max-width:420px){ .su-brk-nav--root .su-brk-state b{ font-size:15px; } .su-brk-nav--root .su-brk-state{ padding:16px 12px; gap:8px; } }
+/* search suggestions: title ellipsis, POST badge never clipped at the right edge */
+.su-sug-item{ overflow:hidden; }
+.su-sug-main{ flex:1 1 0; min-width:0; }
+.su-sug-title{ min-width:0; }
+/* dark: sticky apply bar was dark only under the reduced-transparency query → dark everywhere (laptop too) */
+body.dark .su-applybar{ background:rgba(14,27,49,.96); border-top-color:rgba(255,255,255,.10); }
+body.dark .su-applybar-title{ color:#e7f0ff; }

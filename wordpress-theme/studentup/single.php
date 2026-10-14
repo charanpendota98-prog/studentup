@@ -134,12 +134,7 @@ get_header();
 				// mugistadu → share → related reading → appudu okka CTA.
 				?>
 
-				<div class="share" aria-label="Share">
-					<a class="su-share-btn su-share-wa" href="https://wa.me/?text=<?php echo rawurlencode( get_the_title() . ' — ' . get_permalink() ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'whatsapp', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Share on WhatsApp</a>
-					<a class="su-share-btn su-share-tg" href="https://t.me/share/url?url=<?php echo rawurlencode( get_permalink() ); ?>&text=<?php echo rawurlencode( get_the_title() ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'telegram', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Share on Telegram</a>
-					<a class="su-share-btn su-share-x" href="<?php echo esc_url( 'https://twitter.com/intent/tweet?url=' . rawurlencode( get_permalink() ) ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'x', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Share on X</a>
-					<button type="button" class="su-copy su-share-copy" data-url="<?php echo esc_url( get_permalink() ); ?>"><?php echo studentup_social_icon( 'link', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Copy link</button>
-				</div>
+				<?php /* v307: second share row removed — studentup_share_bar() (content filter) already renders WhatsApp/Telegram/Copy. */ ?>
 
 				<?php if ( has_tag() ) : ?>
 					<div class="su-tags" aria-label="Tags"><?php echo studentup_ui_icon( 'tag', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php the_tags( '', ' · ', '' ); ?></div>

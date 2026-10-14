@@ -135,6 +135,7 @@ $label = $terms ? $terms[0]->name : 'Update';
 		data-qual="<?php echo esc_attr( $su_qual_raw ); ?>"
 		data-state="<?php echo esc_attr( $su_states ); ?>"
 		data-last="<?php echo esc_attr( $su_last_raw ); ?>"
+		data-pub="<?php echo esc_attr( (string) get_post_time( 'U', true ) ); ?>"
 		data-text="<?php echo esc_attr( mb_strtolower( get_the_title() . ' ' . get_the_excerpt() ) ); ?>">
 		<?php if ( has_post_thumbnail() ) : ?>
 			<a class="thumb <?php echo esc_attr( $tone ); ?>" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
@@ -331,13 +332,15 @@ function studentup_menu_fallback() {
 	$more = array(
 		array( 'label' => 'Latest active jobs', 'url' => studentup_opportunity_board_url(), 'desc' => 'Dates unna active notices only' ),
 		array( 'label' => 'Daily Quiz', 'url' => $home . '#daily-quiz', 'desc' => 'Today\'s 5 questions' ),
-		array( 'label' => 'Age Calculator', 'url' => $home . '#age-calculator', 'desc' => 'Check age eligibility with reservation relaxation' ),
-		array( 'label' => 'Fee Calculator', 'url' => $home . '#fee-calculator', 'desc' => 'Calculate application & exam fee' ),
-		array( 'label' => 'Syllabus Tracker', 'url' => $home . '#syllabus-tracker', 'desc' => 'Track your exam study progress' ),
-		array( 'label' => 'Salary Calculator', 'url' => $home . '#salary-calculator', 'desc' => '7th Pay Commission in-hand pay' ),
 		array( 'label' => 'Compare Jobs', 'url' => studentup_compare_page_url(), 'desc' => 'Compare up to 3 posts' ),
-		array( 'label' => 'Instant alerts', 'url' => $home . '#alerts', 'desc' => 'Notification · WhatsApp · Telegram' ),
+		array( 'label' => 'Instant alerts', 'url' => studentup_alerts_url(), 'desc' => 'WhatsApp · Telegram channel' ),
 	);
+	if ( function_exists( 'studentup_tools_enabled' ) && studentup_tools_enabled() ) { // v304: tools OFF (v248) → dead #anchor entries vaddu
+		$more[] = array( 'label' => 'Age Calculator', 'url' => $home . '#age-calculator', 'desc' => 'Check age eligibility with reservation relaxation' );
+		$more[] = array( 'label' => 'Fee Calculator', 'url' => $home . '#fee-calculator', 'desc' => 'Calculate application & exam fee' );
+		$more[] = array( 'label' => 'Syllabus Tracker', 'url' => $home . '#syllabus-tracker', 'desc' => 'Track your exam study progress' );
+		$more[] = array( 'label' => 'Salary Calculator', 'url' => $home . '#salary-calculator', 'desc' => '7th Pay Commission in-hand pay' );
+	}
 	$intern_term = $term_of( 'internships' );
 	if ( $intern_term ) {
 		$more[] = array( 'label' => 'Internships', 'url' => get_category_link( $intern_term ), 'desc' => 'Stipend · remote · college' );
@@ -486,10 +489,9 @@ function studentup_subcat_chips( $cat_id ) {
 	echo '<nav class="su-subcats" aria-label="Subcategories">';
 	foreach ( $kids as $kid ) {
 		printf(
-			'<a href="%s">%s <span>(%d)</span></a>',
+			'<a href="%s">%s</a>',
 			esc_url( get_category_link( $kid ) ),
-			esc_html( $kid->name ),
-			(int) $kid->count
+			esc_html( $kid->name )
 		);
 	}
 	echo '</nav>';

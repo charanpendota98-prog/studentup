@@ -168,7 +168,11 @@ function studentup_breaking_hide_from_home( $q ) {
 	if ( ! $t ) {
 		return;
 	}
-	if ( 'post' !== (string) ( $q->get( 'post_type' ) ?: 'post' ) ) {
+	$pt = $q->get( 'post_type' );
+	if ( is_array( $pt ) ) {
+		$pt = ( 1 === count( $pt ) ) ? (string) reset( $pt ) : 'mixed'; // v310: array post_type (search) → no warning
+	}
+	if ( 'post' !== (string) ( $pt ?: 'post' ) ) {
 		return;
 	}
 	// Queries that explicitly ask for the breaking category → leave them alone.

@@ -522,13 +522,9 @@ function studentup_run_first_setup() {
 		foreach ( (array) wp_get_nav_menu_items( $foot_id ) as $item ) {
 			$have[] = strtolower( $item->title );
 		}
-		$foot_items = studentup_setup_pages_filtered();
-		if ( function_exists( 'studentup_hub_plan' ) ) {
-			foreach ( studentup_hub_plan() as $hslug => $hinfo ) {
-				$foot_items[ $hslug ] = $hinfo[0];
-			}
-		}
-		$foot_items['editorial-team'] = 'Editorial Team & Fact-checking';
+		// v308 NEAT: footer = bare (owner rule: © + konni links). Mundu anni setup pages + hubs
+		// (~25 links, "Thank You" tho saha) footer lo padevi. Ippudu essential pages mattrame.
+		$foot_items = array_intersect_key( studentup_setup_pages_filtered(), array_flip( studentup_footer_menu_slugs() ) );
 		foreach ( $foot_items as $slug => $title ) {
 			if ( ! isset( $pages[ $slug ] ) || in_array( strtolower( $title ), $have, true ) ) {
 				continue;
@@ -690,3 +686,42 @@ function studentup_setup_notice() {
 		'(categories, menus, policy pages) &mdash; <a href="' . esc_url( $url ) . '">open setup</a>.</p></div>';
 }
 add_action( 'admin_notices', 'studentup_setup_notice' );
+
+/**
+ * v308: pages allowed in the auto-built footer menu (bare footer rule).
+ *
+ * @return string[] Page slugs.
+ */
+function studentup_footer_menu_slugs() {
+	return (array) apply_filters(
+		'studentup_footer_menu_slugs',
+		array( 'about', 'contact', 'privacy', 'disclaimer', 'terms', 'editorial-policy', 'corrections', 'post-your-news', 'daily-quiz' )
+	);
+}
+
+/**
+ * v308: existing installs — hide theme-generated junk from the footer menu at render time
+ * (Thank You page, hub pages, tools pages). Owner-added custom links are untouched.
+ */
+function studentup_footer_menu_trim( $items, $args ) {
+	if ( empty( $args->theme_location ) || 'footer' !== $args->theme_location ) {
+		return $items;
+	}
+	$keep = studentup_footer_menu_slugs();
+	$known = array_keys( studentup_setup_pages() );
+	if ( function_exists( 'studentup_hub_plan' ) ) {
+		$known = array_merge( $known, array_keys( (array) studentup_hub_plan() ) );
+	}
+	$known[] = 'editorial-team';
+	foreach ( $items as $k => $it ) {
+		if ( 'page' !== $it->object ) {
+			continue;
+		}
+		$pg = get_post( (int) $it->object_id );
+		if ( $pg && in_array( $pg->post_name, $known, true ) && ! in_array( $pg->post_name, $keep, true ) ) {
+			unset( $items[ $k ] );
+		}
+	}
+	return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'studentup_footer_menu_trim', 10, 2 );

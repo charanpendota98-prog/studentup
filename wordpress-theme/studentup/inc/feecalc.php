@@ -18,6 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function studentup_fee_calculator_block( $args = array() ) {
+	// v303: v248 owner decision (tools OFF) — article lo tool blocks render avvavu unless tools ON.
+	if ( function_exists( 'studentup_tools_enabled' ) && ! studentup_tools_enabled() ) {
+		return;
+	}
 	if ( ! studentup_opt( 'fee_calc', '1' ) ) {
 		return;
 	}

@@ -78,7 +78,7 @@ function studentup_author_box() {
 						<span>CP</span>
 					</div>
 				<?php endif; ?>
-				<span class="su-ab-verified-badge" title="E-E-A-T Verified Author" aria-label="Verified"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
+				<span class="su-ab-verified-badge" title="Author" aria-label="Author"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 			</div>
 		</div>
 
@@ -88,14 +88,13 @@ function studentup_author_box() {
 					<h3 class="su-ab-name" itemprop="name"><?php echo esc_html( $name ); ?></h3>
 					<span class="su-ab-exp" itemprop="jobTitle"><?php echo esc_html( $exp ); ?></span>
 				</div>
-				<span class="su-ab-shield"><?php echo studentup_ui_icon( 'shield', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> E-E-A-T Certified</span>
+				<?php /* v308: "E-E-A-T Certified" badge teesesam — meaningless self-awarded claim (trust rule). */ ?>
 			</div>
 
 			<p class="su-ab-bio" itemprop="description"><?php echo esc_html( $bio ); ?></p>
 
 			<div class="su-ab-footer">
 				<div class="su-ab-trust-pills">
-					<span class="su-ab-pill"><?php echo studentup_ui_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> 100% Official Source Verified</span>
 					<?php if ( $rev ) : ?>
 						<span class="su-ab-pill"><?php echo studentup_ui_icon( 'search', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Reviewed: <?php echo esc_html( $rev ); ?></span>
 					<?php endif; ?>

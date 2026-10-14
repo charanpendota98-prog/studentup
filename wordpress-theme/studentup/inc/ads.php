@@ -37,7 +37,7 @@ function studentup_adsense_client() {
  * @param string $slot slot name.
  * @param string $layout display layout (auto|in-article|fluid).
  */
-function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height = 250 ) {
+function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height = 250, $place = '' ) {
 	$client = studentup_adsense_client();
 	if ( ! $client ) {
 		return;
@@ -50,7 +50,7 @@ function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height
 		? ' data-ad-format="fluid" data-ad-layout="' . esc_attr( $layout ) . '"'
 		: ' data-ad-format="auto"';
 	printf(
-		'<div class="adsense-slot su-ad-reserved%1$s" style="min-height:%2$dpx" data-su-lazy="%3$d" data-su-height="%2$d">'
+		'<div class="adsense-slot su-ad-reserved%1$s" style="min-height:%2$dpx" data-su-lazy="%3$d" data-su-height="%2$d" data-su-place="%8$s">'
 		. '<ins class="adsbygoogle" style="display:block;text-align:center" data-ad-client="%4$s" '
 		. 'data-ad-slot="%5$s"%6$s data-full-width-responsive="true"></ins>%7$s</div>',
 		$lazy ? ' su-ad-lazy' : '',
@@ -59,7 +59,8 @@ function studentup_adsense_unit( $slot, $layout = 'auto', $lazy = false, $height
 		esc_attr( $client ),
 		esc_attr( $slot ),
 		$attrs,
-		$lazy ? '' : '<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>'
+		$lazy ? '' : '<script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>',
+		esc_attr( (string) $place )
 	);
 }
 
@@ -278,7 +279,8 @@ function studentup_ad( $place = 'mid' ) {
 			$slot,
 			'mid' === $place ? 'in-article' : ( 'in-feed' === $place ? 'fluid' : 'auto' ),
 			$lazy,
-			$height
+			$height,
+			$place
 		);
 		return;
 	}
@@ -481,4 +483,33 @@ function studentup_ad_multiplex() {
 	);
 	echo '<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>';
 	echo '</div>';
+}
+
+/**
+ * v308: will studentup_ad( $place ) actually print something? (sidebar wrapper ni empty ga render cheyakunda)
+ *
+ * @param string $place Placement.
+ * @return bool
+ */
+function studentup_ad_available( $place ) {
+	if ( ! studentup_ads_allowed( $place ) ) {
+		return false;
+	}
+	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '5' );
+	if ( studentup_ad_count() >= ( $max > 0 ? $max : 5 ) ) {
+		return false;
+	}
+	if ( 'mid' === $place && is_front_page() && studentup_featured_partner_ad() ) {
+		return true;
+	}
+	$slot_key = ( 'leaderboard' === $place ) ? 'top_leaderboard' : str_replace( '-', '_', $place );
+	if ( function_exists( 'studentup_slot_for' ) ) {
+		list( $slot ) = studentup_slot_for( $slot_key );
+	} else {
+		$slot = (string) get_option( 'studentup_adsense_slot_' . $slot_key, '' );
+	}
+	if ( studentup_adsense_client() && $slot && studentup_consent_ok() ) {
+		return true;
+	}
+	return (bool) studentup_rotate_house( studentup_house_ads(), $place );
 }

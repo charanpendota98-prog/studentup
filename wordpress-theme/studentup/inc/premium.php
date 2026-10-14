@@ -121,12 +121,17 @@ function studentup_hero_premium() {
 					</a>
 				<?php endforeach; ?>
 			</div>
+			<?php
+			// v307: stats were hardcoded (12/6/9/100%) = fake data. Now real counts; zero items are not rendered.
+			$su_st = studentup_live_stats();
+			if ( $su_st ) :
+				?>
 			<div class="su-stats" role="list" aria-label="<?php esc_attr_e( 'StudentUp live stats', 'studentup' ); ?>">
-				<div class="su-stats-item" role="listitem"><b class="su-count" data-count="12">0</b><span><?php esc_html_e( 'Updates today', 'studentup' ); ?></span></div>
-				<div class="su-stats-item" role="listitem"><b class="su-count" data-count="6">0</b><span><?php esc_html_e( 'Live job alerts', 'studentup' ); ?></span></div>
-				<div class="su-stats-item" role="listitem"><b class="su-count" data-count="9">0</b><span><?php esc_html_e( 'Categories', 'studentup' ); ?></span></div>
-				<div class="su-stats-item" role="listitem"><b class="su-count" data-count="100" data-suffix="%">0</b><span><?php esc_html_e( 'Free forever', 'studentup' ); ?></span></div>
+				<?php foreach ( $su_st as $su_it ) : ?>
+				<div class="su-stats-item" role="listitem"><b class="su-count" data-count="<?php echo esc_attr( (string) $su_it[0] ); ?>">0</b><span><?php echo esc_html( $su_it[1] ); ?></span></div>
+				<?php endforeach; ?>
 			</div>
+			<?php endif; ?>
 		</div>
 	</section>
 	<?php
@@ -332,7 +337,7 @@ function studentup_bottom_nav() {
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="<?php echo is_front_page() ? 'on' : ''; ?>"><?php echo studentup_ui_icon( 'home', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Home</a>
 		<a href="<?php echo esc_url( $jobs_u ); ?>"><?php echo studentup_ui_icon( 'work', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Jobs</a>
 		<a href="<?php echo esc_url( $sch_u ); ?>"><?php echo studentup_ui_icon( 'school', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Scholar</a>
-		<a href="<?php echo esc_url( home_url( '/#alerts' ) ); ?>"><?php echo studentup_ui_icon( 'bell', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Alerts</a>
+		<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener" data-su-alerts><?php echo studentup_ui_icon( 'bell', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Alerts</a>
 		<button type="button" class="su-bnav-search" id="su-bnav-search"><?php echo studentup_ui_icon( 'search', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>Search</button>
 	</nav>
 	<?php
@@ -562,4 +567,46 @@ function studentup_category_rail() {
 		<div class="su-catbar" aria-hidden="true"><i></i></div>
 	</section>
 	<?php
+}
+
+/**
+ * v307: real homepage stats (cached 10 min). Returns [[count,label],...] — only non-zero items.
+ */
+function studentup_live_stats() {
+	$key = 'studentup_live_stats_v2';
+	$out = get_transient( $key );
+	if ( false === $out ) {
+		$out   = array();
+		$today = current_time( 'Y-m-d' );
+		$q1    = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+				'date_query'     => array( array( 'after' => $today . ' 00:00:00', 'inclusive' => true ) ),
+			)
+		);
+		$q2    = new WP_Query(
+			array(
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+				'meta_query'     => array( array( 'key' => 'studentup_last_date', 'value' => $today, 'compare' => '>=', 'type' => 'CHAR' ) ),
+			)
+		);
+		$cats  = (int) wp_count_terms( array( 'taxonomy' => 'category', 'hide_empty' => true ) );
+		if ( (int) $q1->found_posts > 0 ) {
+			$out[] = array( (int) $q1->found_posts, __( 'Updates today', 'studentup' ) );
+		}
+		if ( (int) $q2->found_posts > 0 ) {
+			$out[] = array( (int) $q2->found_posts, __( 'Live job alerts', 'studentup' ) );
+		}
+		if ( $cats > 0 ) {
+			$out[] = array( $cats, __( 'Categories', 'studentup' ) );
+		}
+		set_transient( $key, $out, 10 * MINUTE_IN_SECONDS );
+	}
+	return is_array( $out ) ? $out : array();
 }

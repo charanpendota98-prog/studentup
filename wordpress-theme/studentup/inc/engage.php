@@ -49,14 +49,13 @@ function studentup_helpful_box() {
 	}
 	$id = (int) get_the_ID();
 	?>
-	<section class="su-helpful" data-post="<?php echo esc_attr( $id ); ?>" aria-labelledby="su-helpful-title">
+	<section class="su-helpful" data-post="<?php echo esc_attr( $id ); ?>" data-mail="<?php echo esc_attr( (string) studentup_opt( 'contact_email', 'studentupinformative@gmail.com' ) ); ?>" aria-labelledby="su-helpful-title">
 		<h2 id="su-helpful-title">Was this update helpful?</h2>
 		<div class="su-helpful-btns">
 			<button type="button" class="su-help-btn" data-vote="yes"><?php echo studentup_ui_icon( 'thumbup', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Yes, clear</button>
 			<button type="button" class="su-help-btn" data-vote="no"><?php echo studentup_ui_icon( 'thumbdown', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Something is missing</button>
 		</div>
-		<p class="su-helpful-note" role="status" aria-live="polite">Your answer stays in this browser. For a correction, mail
-			<a href="mailto:<?php echo esc_attr( studentup_opt( 'contact_email', 'studentupinformative@gmail.com' ) ); ?>"><?php echo esc_html( studentup_opt( 'contact_email', 'studentupinformative@gmail.com' ) ); ?></a>.</p>
+		<p class="su-helpful-note" role="status" aria-live="polite"></p>
 	</section>
 	<script>
 	(function(){
@@ -71,8 +70,8 @@ function studentup_helpful_box() {
 				b.setAttribute('aria-pressed', String(b.getAttribute('data-vote') === v));
 			});
 			note.textContent = v === 'yes'
-				? 'Thanks — glad it helped. Saved in this browser only.'
-				: 'Thanks — tell us what is missing at the mail id on this page.';
+				? 'Thanks!'
+				: 'Thanks — mail us what is missing: ' + (box.getAttribute('data-mail') || '');
 		}
 		if (done) { mark(done); }
 		box.querySelectorAll('.su-help-btn').forEach(function(b){
@@ -143,7 +142,10 @@ function studentup_closing_week( $days = 7 ) {
 			<?php
 			while ( $q->have_posts() ) :
 				$q->the_post();
-				$last = get_post_meta( get_the_ID(), 'su_last_date', true );
+				$last = (string) get_post_meta( get_the_ID(), 'studentup_last_date', true ); // v307.1: wrong key (su_last_date) → '-20740 days left' garbage
+				if ( ! $last || ! strtotime( $last ) ) {
+					continue;
+				}
 				$left = (int) floor( ( strtotime( $last ) - strtotime( $today ) ) / DAY_IN_SECONDS );
 				if ( $left <= 1 ) {
 					$tone = 'su-radar-red';

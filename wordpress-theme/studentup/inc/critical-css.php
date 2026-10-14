@@ -78,12 +78,18 @@ function studentup_critical_css_inline() {
 	if ( is_admin() || is_user_logged_in() ) {
 		return;   // admin bar + logged-in extras ki normal path (safe).
 	}
+	// v306: full CSS blocking ga load avutunnappudu (css_async OFF — v296 default) inline critical
+	// = pure overhead (~59 KB HTML / ~10 KB gzip prathi page; browser blocking CSS vachhe daaka
+	// render cheyyadu kabatti FCP gain zero). css_async ON chesinappudu matrame inline.
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'css_async', '0' ) ) {
+		return;
+	}
 	$file = studentup_critical_css_file();
 	if ( ! $file ) {
 		return;
 	}
 	$css = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- theme file, build-time generated.
-	if ( ! $css || strlen( $css ) > 60000 ) {   // sanity cap — unexpected build output ki.
+	if ( ! $css || strlen( $css ) > 65000 ) {   // sanity cap (v305: calc() spaces fix tho union 60.8 KB) — unexpected build output ki.
 		return;
 	}
 	echo '<style id="su-critical">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- own build output, no user input.
@@ -102,6 +108,12 @@ function studentup_async_stylesheets( $tag, $handle ) {
 		return $tag;
 	}
 	if ( ! studentup_critical_css_file() ) {
+		return $tag;
+	}
+	// v296 (live screenshot): media=print→onload swap live lo fail ayyi style.css/premium.css
+	// apply avvaledu (qual bar, cards, Compare chips raw ga vachayi). Default = normal blocking
+	// load (critical CSS inline already undi, so CWV loss chinnadi). Opt-in: option css_async = 1.
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'css_async', '0' ) ) {
 		return $tag;
 	}
 	if ( ! in_array( $handle, array( 'studentup', 'studentup-premium' ), true ) ) {

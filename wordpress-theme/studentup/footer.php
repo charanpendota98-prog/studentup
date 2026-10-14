@@ -38,26 +38,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div>
 				<h3>Other links</h3>
 				<?php
+				// v308 NEAT: menu unte menu mattrame; lekapote policy fallback list. Mundu rendu render ayyi
+				// (About Us + About us, Privacy Policy + Privacy policy ...) prathi link 2 sarlu kanipinchedi.
 				if ( has_nav_menu( 'footer' ) ) {
 					wp_nav_menu( array( 'theme_location' => 'footer', 'container' => false, 'depth' => 1, 'fallback_cb' => false ) );
-				}
-				?>
+				} else {
+					?>
 				<ul>
-					<li><a href="<?php echo esc_url( studentup_social_links()['telegram'] ); ?>" target="_blank" rel="noopener">Telegram channel</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#qualsplit' ) ); ?>">Jobs by qualification</a></li>
 					<?php
-					/*
-					 * v94: policy pages footer lo link avvali — readers + Google
-					 * (AdSense reviewers kuda) prathi page nunchi reach avvali.
-					 * Page publish kaakapote link render avvadu (404 ledu).
-					 */
 					$su_policy = array(
-						'privacy'          => 'Privacy policy',
 						'about'            => 'About us',
 						'contact'          => 'Contact',
+						'privacy'          => 'Privacy policy',
 						'disclaimer'       => 'Disclaimer',
 						'terms'            => 'Terms',
 						'editorial-policy' => 'Editorial policy',
+						'post-your-news'   => 'Post your news',
 					);
 					foreach ( $su_policy as $su_slug => $su_label ) :
 						$su_page = get_page_by_path( $su_slug );
@@ -68,6 +64,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<li><a href="<?php echo esc_url( get_permalink( $su_page ) ); ?>"><?php echo esc_html( $su_label ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
+					<?php
+				}
+				?>
 			</div>
 			<div>
 				<h3><?php esc_html_e( 'Follow us', 'studentup' ); ?></h3>
@@ -89,6 +88,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 </footer>
 
+<?php $su_soc = studentup_social_links(); // v304 FIX: header.php lo define ayina $su_soc footer template scope lo undadu → rail hrefs khali ayyevi (live bug). ?>
 <nav class="su-social" id="surail" aria-label="<?php esc_attr_e( 'Social media', 'studentup' ); ?>">
 	<button type="button" class="su-close" id="suclose" aria-label="<?php esc_attr_e( 'Hide social icons', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 	<a class="su-soc su-socb-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?php echo studentup_social_icon( 'whatsapp', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>

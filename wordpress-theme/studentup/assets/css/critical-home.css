@@ -870,7 +870,7 @@ body.dark .usedcard .ucount{ background:#0f2038; color:#a9c1e6; border-color:var
   .su-tab{ top:50% !important; bottom:auto !important; transform:translateY(-50%) !important }}
 @media(max-width:1339px) and (min-width:981px){
   
-  .wrap{ padding-right:74px }}
+  .wrap{ padding-right:16px }}
 @media(max-width:600px){
   .su-social{ right:8px !important; top:50% !important; bottom:auto !important; transform:translateY(-50%) !important; gap:6px !important; padding:7px 5px !important }
   .su-social a{ width:33px !important; height:33px !important }
@@ -956,3 +956,21 @@ html, body{ overflow-x:clip }
 @media (max-width:600px){
   .wrap{ padding-right:50px }}
 .su-cathead{ align-items:center }
+.su-postnews-ic .su-uicon{ width:20px; height:20px; }
+.su-postnews-tiles a .su-uicon{ width:18px; height:18px; }
+.su-postnews-btn .su-uicon{ width:16px; height:16px; }
+.su-pn-tic .su-uicon{ width:24px; height:24px; }
+ .su-pn-btn .su-uicon{ width:18px; height:18px; }
+.su-brk-state-ic .su-uicon{ width:20px; height:20px; }
+html, body{ overflow-x:hidden; }
+:root{ --su-fs-h2:clamp(16px,1.2vw + 11px,21px); --su-fs-body:clamp(14px,.35vw + 12.5px,16px); --su-fs-meta:clamp(11px,.2vw + 10px,12.5px); --su-r:14px; --su-pad:clamp(12px,1vw + 8px,18px); }
+.sectionhead h2, .su-cathead b{ font-size:var(--su-fs-h2); line-height:1.2; letter-spacing:-.01em; }
+@media (max-width:640px){
+  .sectionhead{ margin-bottom:10px; }
+  .su-viewall{ font-size:12px; }}
+.usedcard b{ overflow-wrap:normal; word-break:keep-all; hyphens:manual }
+@media (max-width:480px){
+  .usedcard{ padding:10px 24px 10px 10px; gap:8px }
+  .usedcard .ui{ width:34px; height:34px; border-radius:10px }
+  .usedcard b{ font-size:12.5px; line-height:1.25 }
+  .usedcard .ucount{ right:6px }}

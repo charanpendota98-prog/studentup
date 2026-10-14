@@ -133,11 +133,13 @@ studentup_breaking_ticker();
 	$su_quiz_url = $su_quiz_url ? $su_quiz_url : home_url( '/#daily-quiz' );
 	?>
 	<a href="<?php echo esc_url( $su_quiz_url ); ?>"><?php echo studentup_ui_icon( 'chart' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Daily Quiz &amp; Polls</a>
+	<?php if ( function_exists( 'studentup_tools_enabled' ) && studentup_tools_enabled() ) : // v304: tools OFF (v248) → ee dead #anchor links menu lo vaddu ?>
 	<a href="<?php echo esc_url( home_url( '/#age-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'person' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Age Calculator</a>
 	<a href="<?php echo esc_url( home_url( '/#fee-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'card' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Fee Calculator</a>
 	<a href="<?php echo esc_url( home_url( '/#syllabus-tracker' ) ); ?>"><?php echo studentup_ui_icon( 'book' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Syllabus Tracker</a>
 	<a href="<?php echo esc_url( home_url( '/#salary-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Salary Calculator</a>
-	<a href="<?php echo esc_url( home_url( '/#alerts' ) ); ?>"><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Instant alerts</a>
+	<?php endif; ?>
+	<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener" data-su-alerts><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Instant alerts</a>
 	<a href="#" class="su-install-cta" role="button"><?php echo studentup_ui_icon( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Download App <span class="su-mpwa">FREE</span></a>
 	<?php
 	// v123: Scholarships mobile menu lo eppudu kanipinchali.

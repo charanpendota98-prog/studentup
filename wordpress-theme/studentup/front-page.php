@@ -53,17 +53,7 @@ $su_is_p2 = $su_paged > 1;
 			extra line phone lo vertical space tinestundi. */ ?>
 		</div>
 		<div class="usedgrid">
-			<a class="su-used-breaking" href="<?php echo esc_url( function_exists( 'studentup_breaking_section_url' ) ? studentup_breaking_section_url() : home_url( '/#jobs' ) ); ?>" aria-label="Breaking News - Live Flash Updates">
-				<span class="ui ui--breaking" aria-hidden="true"><?php echo studentup_ui_icon( 'bolt', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
-				<div class="su-ub-body">
-					<div class="su-ub-top">
-						<span class="su-ub-tag"><span class="su-pulse-dot"></span> LIVE FLASH</span>
-						<b>Breaking News</b>
-					</div>
-					
-				</div>
-				<em class="ucount ucount--brk"><?php esc_html_e( 'Flash Updates →', 'studentup' ); ?></em>
-			</a>
+			<?php /* v307: LIVE FLASH Breaking card removed here — Breaking already has hero tile + hero link + nav; 4th copy was clutter. */ ?>
 			<?php
 			foreach ( studentup_most_used() as $i => $m ) :
 				$term = studentup_used_term( $m['slug'] );
@@ -223,6 +213,29 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 		studentup_qual_bar();
 		studentup_qual_active_note();
 		studentup_hidden_note();
+		// v302: "N posted today" → day archive (real count, 10-min cache; 0 aithe render kaadu).
+		if ( ! $su_is_p2 ) {
+			$su_today_n = get_transient( 'su_today_count' );
+			if ( false === $su_today_n ) {
+				$su_tq = new WP_Query(
+					array(
+						'post_type'      => 'post',
+						'post_status'    => 'publish',
+						'posts_per_page' => 1,
+						'fields'         => 'ids',
+						'date_query'     => array( array( 'after' => 'today', 'inclusive' => true ) ),
+					)
+				);
+				$su_today_n = (int) $su_tq->found_posts;
+				set_transient( 'su_today_count', $su_today_n, 10 * MINUTE_IN_SECONDS );
+			}
+			if ( $su_today_n > 0 ) {
+				$su_day_url = get_day_link( (int) current_time( 'Y' ), (int) current_time( 'm' ), (int) current_time( 'd' ) );
+				echo '<a class="su-today" href="' . esc_url( $su_day_url ) . '"><span class="su-today-dot" aria-hidden="true"></span><b>'
+					. esc_html( sprintf( _n( '%d update posted today', '%d updates posted today', $su_today_n, 'studentup' ), $su_today_n ) )
+					. '</b><i aria-hidden="true">→</i></a>';
+			}
+		}
 		?>
 
 		<?php
@@ -290,12 +303,12 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 
 		<?php if ( ! $su_is_p2 ) : ?>
 			<?php
-			studentup_jobs_table( 8 );       // v202: short + scannable — Google ki rich, reader ki fast
-			studentup_popular_searches();    // internal links (SEO + session depth)
-			studentup_ad( 'mid' );           // slot 2 — content madhya lo
-			studentup_hot_jobs( 10 );        // TOP 10 HOT JOBS TODAY (return visits)
-			studentup_closing_week( 7 );     // urgency (last dates) — real meta mattrame
-			studentup_personal_picks();      // local-only personalised top 5
+			// v308 NEAT: home lo okate posts list 4 sarlu repeat ayyedi (grid → "at a glance" table →
+			// "Top 10 hot jobs" → "Closing this week") + categories 3 sarlu (tiles → Most searched →
+			// "Popular searches") + qualification picker 2 sarlu ("Your qualification" bar → "Your 5 today").
+			// Owner: "agam aga kakunda, neat ga" → duplicates teesesam; grid + Closing Soon band + Top 5 untayi.
+			// Functions (studentup_jobs_table / popular_searches / hot_jobs / closing_week / personal_picks) inka unnayi.
+			studentup_ad( 'mid' );           // slot 2
 			// v277: daily quiz paiki move ayyindi (su-home-grid band — top5 pakkana,
 			// laptop lo side-by-side; phone lo top5 kindha). Ikkada inkundi render kaadu.
 			// v203 FIX: owner feedback — "Reader Poll" block ("Which update do you want
@@ -305,6 +318,12 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 			studentup_ad( 'below-content' ); // slot 3 — finish chesina reader ki
 			?>
 		<?php endif; ?>
+		<?php
+		// v310: "Browse by qualification" lives INSIDE main (was wp_footer → rendered below the site footer).
+		if ( function_exists( 'studentup_qual_directory' ) ) {
+			studentup_qual_directory();
+		}
+		?>
 	</div>
 </main>
 

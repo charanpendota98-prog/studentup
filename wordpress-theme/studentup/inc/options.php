@@ -54,6 +54,9 @@ function studentup_option_fields() {
 				'personal_picks' => array( 'Your 5 today (personalised strip)', 'check', '1', 'v156: qualification+state profile browser lo ne — login ledu, server call ledu' ),
 				'webpush' => array( 'Web push notifications', 'check', '1', 'v163: VAPID public key pettaka ne pani chestundi (python run.py --push-keys)' ),
 				'push_public_key' => array( 'Web push: VAPID public key', 'text', '', 'v163: --push-keys output lo public key' ),
+				'push_auto'       => array( 'Auto push on publish', 'check', '1', 'v305: kotha post publish ayite automatic ga subscribers ki notification (bot --push-auto / approval-poll pampistundi)' ),
+				'push_daily_cap'  => array( 'Auto push: max per day', 'text', '3', 'v305: roju ki ఇన్ని matrame (Breaking + Results cap ni daatutayi). 0 = no limit' ),
+				'push_quiet'      => array( 'Auto push: quiet hours 22:00–07:00', 'check', '1', 'v305: raatri push hold (Breaking/Results ventane veltayi)' ),
 				'age_calc' => array( 'Age & eligibility calculator (posts & tools)', 'check', '1', 'v165: interactive Telugu age and reservation relaxation calculator' ),
 				'audio_reader' => array( 'Telugu text-to-speech audio reader (posts)', 'check', '1', 'v165: Web Speech API voice synthesis bar — increases dwell time' ),
 				'faq_schema' => array( 'FAQ accordion & FAQPage schema (posts)', 'check', '1', 'v165: rich snippet FAQ schema for Google SERP expandable snippets' ),
@@ -117,6 +120,7 @@ function studentup_option_fields() {
 			'title'  => 'Content & site',
 			'fields' => array(
 				'contact_email' => array( 'Contact email', 'text', '', 'Errors/suggestions — falls back to the admin email if empty' ),
+				'css_async'              => array( 'Async full CSS (media=print swap)', 'check', '0', 'OFF = safe normal load (default). ON only if your cache plugin keeps onload attributes.' ),
 				'success_story_form_url' => array( 'Verified Success Story Google Form URL', 'text', '', 'Public intake link. Collect consent + evidence only; never ask for Aadhaar, PAN, bank details, OTPs or passwords.' ),
 				'author_name'   => array( 'Author name', 'text', 'Charan Pendota', 'Shown in the byline and E-E-A-T box under the post' ),
 				'author_role'   => array( 'Author role (v195, E-E-A-T)', 'text', 'Founder & Content Writer', 'editorial-team page + Person schema lo kanipistundi' ),
@@ -450,6 +454,18 @@ function studentup_call_number( $raw = '' ) {
 /**
  * Social URLs — options nunchi (footer/header ki).
  */
+/**
+ * v304: "Alerts" bell destination. Home lo #alerts section render avvadu (studentup_alerts_card() ekkada call ledu)
+ * → dead anchor badulu real instant-alert channel (WhatsApp channel unte adi, lekapote Telegram).
+ */
+function studentup_alerts_url() {
+	$soc = studentup_social_links();
+	if ( ! empty( $soc['whatsapp_channel'] ) ) {
+		return $soc['whatsapp_channel'];
+	}
+	return ! empty( $soc['telegram'] ) ? $soc['telegram'] : home_url( '/' );
+}
+
 function studentup_social_links() {
 	$wa  = studentup_wa_number( studentup_opt( 'social_whatsapp', '9182739312' ) );
 	$wa_ch = trim( (string) studentup_opt( 'whatsapp_channel_url', '' ) );

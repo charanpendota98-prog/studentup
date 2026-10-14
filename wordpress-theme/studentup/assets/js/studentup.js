@@ -117,8 +117,10 @@
     var foot = card.querySelector(".newsfoot");
     if (left < 0) card.classList.add("expired");
     if (!foot) return;
-    var old = foot.querySelector(".qbadge");
+    var old = card.querySelector(".qbadge");
     if (old) old.remove();
+    /* v307: urgency chip lives in the tag row (status chip) — newsfoot action row phone lo overflow ayyedi. */
+    var row = card.querySelector(".tagrow") || foot;
     var b = document.createElement("span");
     /* v281: tiered urgency (real last-date only) — red ≤2d · amber ≤7d · green ≤14d. */
     if (left < 0) { b.className = "qbadge done"; b.textContent = "Deadline passed"; }
@@ -126,7 +128,7 @@
     else if (left <= 7) { b.className = "qbadge soon"; b.textContent = left + " days left"; }
     else if (left <= 14) { b.className = "qbadge open"; b.textContent = left + " days left"; }
     else { return; }
-    foot.appendChild(b);
+    row.appendChild(b);
   }
   function applyFilter() {
     if (!grid) return;
@@ -772,3 +774,5 @@
     });
   });
 })();
+/* v296: safety net — if a stylesheet is still media=print after load (onload stripped by a cache/optimizer plugin), swap it. */
+(function(){try{var fix=function(){var ls=document.querySelectorAll('link[rel="stylesheet"][media="print"]');for(var i=0;i<ls.length;i++){if(/studentup/i.test(ls[i].href))ls[i].media='all';}};fix();window.addEventListener('load',fix);setTimeout(fix,1500);}catch(e){}})();

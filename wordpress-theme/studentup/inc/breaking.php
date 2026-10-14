@@ -267,6 +267,8 @@ function studentup_latest_ticker_flush( $post_id ) {
 	}
 }
 add_action( 'save_post', 'studentup_latest_ticker_flush', 30 );
+// v302: home "N updates posted today" count cache.
+add_action( 'save_post', static function () { delete_transient( 'su_today_count' ); }, 31 );
 
 /**
  * Render the marquee — home page mattrame (post pages lo reading ki distraction vaddu).
