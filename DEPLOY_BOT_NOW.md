@@ -45,7 +45,7 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 ## 📱 Theme upload — `studentup-theme-1.9.102.zip` (v304 · REAL WORDPRESS RENDER QA + live bug fixes)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
-> **1.9.101 zip సరైన structure** — ఇదే upload చేయండి.
+> **1.9.102 zip సరైన structure** — ఇదే upload చేయండి.
 
 1. WP Admin → **Appearance → Themes → Add New → Upload Theme** → `studentup-theme-1.9.102.zip` → **Install Now → Activate**
    (పాత version active ఉంటే → "Replace active with uploaded").
