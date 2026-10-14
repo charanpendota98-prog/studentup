@@ -823,3 +823,36 @@ body.dark .su-implinks-btn{ background:#1b2a46; border-color:#2e4a73; color:#93c
   .news--lead .newsfoot{ margin-top:16px !important; }
   .news--lead .newsbody > *{ flex:0 0 auto; }
 }
+
+/* v301 — NEAT PASS (owner: "inka neat ga undali") */
+/* 1) "Most searched" tiles okate look — hot tiles ki separate colour/border ledu, anni tiles ki same chevron */
+.usedcard.hot{ border-width:1px !important; border-color:var(--line,#e5ebf4) !important; background:var(--card,#fff) !important; }
+.usedcard.hot .ui{ background:var(--soft,#eef3fb) !important; }
+.usedcard.hot::after{ inset:auto; box-shadow:none; right:16px; top:50%; width:8px; height:8px;
+  border-right:2px solid #94a3b8; border-top:2px solid #94a3b8; transform:translateY(-50%) rotate(45deg); opacity:.5; border-radius:0; }
+.usedcard b{ font-size:13px; }
+@media (min-width:1040px){ .usedcard{ padding-right:30px; } }
+/* 2) Daily quiz — fieldset/legend notch lines poyayi (question meedha line la kanipinchedi) */
+.su-q{ min-inline-size:0; }
+.su-q legend.su-q-title{ float:left; width:100%; padding:0; margin:0 0 9px; }
+.su-q legend.su-q-title + *{ clear:both; }
+/* 3) Lead card kinda partial accent line (cut la kanipinchedi) → teesesam */
+.news--lead::after{ display:none !important; }
+/* 4) Section-head links okate style: pill (All sections → la) */
+.su-board-link{ display:inline-flex; align-items:center; gap:6px; min-height:34px; padding:0 13px; border-radius:999px;
+  background:var(--soft,#eef3fb); color:var(--navy,#0b2447) !important; font-size:12.5px; font-weight:800; text-decoration:none; }
+body.dark .su-board-link{ background:#152137; color:#d7e3f8 !important; }
+/* 5) Phone news cards — thumbnail crop (poster text cut) badulu full image top, body kinda; action row okate line */
+@media (max-width:640px){
+  .newsgrid .news:not(.news--lead){ flex-direction:column; min-height:0; }
+  .newsgrid .news:not(.news--lead) .thumb{ width:100%; min-width:0; height:auto; min-height:0; aspect-ratio:16/9; padding:0; }
+  .newsgrid .news:not(.news--lead) .thumb img{ width:100%; height:100%; min-height:0; object-fit:cover; }
+  .newsgrid .news:not(.news--lead) .newsbody{ padding:12px 14px 13px; gap:6px; }
+  .newsgrid .news:not(.news--lead) h3{ font-size:16px; line-height:1.35; }
+  .newsgrid .news:not(.news--lead) .newsfoot{ flex-wrap:nowrap; }
+}
+/* 6) slider arrows side-by-side, head right side one neat row (arrows + View all) */
+.su-slider-head{ flex-wrap:nowrap !important; }
+.su-slider-arrs, .su-slider-ctrls{ display:inline-flex; gap:6px; margin-left:auto; flex:0 0 auto; }
+.su-slider-head .su-viewall{ flex:0 0 auto; }
+@media (max-width:640px){ .su-slider-arrs, .su-slider-ctrls{ display:none; } }

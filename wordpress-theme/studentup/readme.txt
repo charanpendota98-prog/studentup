@@ -2,7 +2,7 @@
 Contributors: studentup
 Requires at least: 6.0
 Tested up to: 6.7
-Stable tag: 1.9.98
+Stable tag: 1.9.99
 Requires PHP: 7.4
 Version: 1.9.42
 License: GNU General Public License v2 or later
