@@ -193,9 +193,9 @@ function studentup_hreflang_tags() {
 	if ( '' === $tag ) {
 		$tag = 'te-IN';
 	}
-	/* WordPress default en_US ayina mana readers India — en-IN ga ivvadam correct. */
+	/* v1.9.116: content is Telugu even when WP locale is en_US — hreflang must say so. */
 	if ( 0 === strpos( strtolower( $tag ), 'en' ) ) {
-		$tag = 'en-IN';
+		$tag = function_exists( 'studentup_content_lang_tag' ) ? studentup_content_lang_tag() : 'te-IN';
 	}
 
 	printf(

@@ -77,6 +77,7 @@ function studentup_option_fields() {
 				'keyfacts' => array( 'Key facts strip + HowTo schema', 'check', '1', 'v158: meta unte ne — 2 kanna thakkuva facts unte block raadu' ),
 				'calendar_button' => array( 'Add last date to calendar (.ics)', 'check', '1', 'v156: last date meta unte ne button vastundi; 1 roju mundu alarm' ),
 				'autolink' => array( 'Auto internal links in posts', 'check', '1', 'v154: article lopala related posts ki links — max 3, first mention only, headings/links lo touch cheyyadu' ),
+				'content_lang' => array( 'Content language (BCP-47)', 'text', 'te-IN', 'v1.9.116: html lang / hreflang / og:locale / schema inLanguage — Telugu site ki te-IN' ),
 				'autolink_max' => array( 'Max auto links per post', 'text', '3', 'v154: 0-6 (ekkuva pedithe spam signal)' ),
 				'static_search' => array( 'Instant search index', 'check', '1', 'v153: /?su_index=1 lo chinna JSON index — search instant + offline, server load zero' ),
 				'index_limit' => array( 'Search index size (posts)', 'text', '300', 'v153: entha recent posts index lo undali (20-1000)' ),

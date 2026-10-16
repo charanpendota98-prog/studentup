@@ -383,7 +383,7 @@ function studentup_poll_schema( $poll, $counts, $total ) {
 		'text'            => (string) $poll['q'],
 		'answerCount'     => $total,
 		'suggestedAnswer' => $answers,
-		'inLanguage'      => 'en-IN',
+		'inLanguage'      => 'te-IN',
 	);
 	return wp_json_encode( $graph, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 }
