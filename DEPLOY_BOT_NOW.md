@@ -42,7 +42,7 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.114.zip` (v322 · neat pass 2)
+## 📱 Theme upload — `studentup-theme-1.9.115.zip` (v323 · neat pass 2)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
 > **1.9.107 zip సరైన structure** — ఇదే upload చేయండి.
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v323** — bot + theme 1.9.115 | **Owner rules: no promo boxes above/inside the article; Telugu-only prose.** Theme: on single posts house boxes render ONLY once, after the article (`below-content`); bot-injected `.su-ad` blocks and the bot's duplicate “More updates” list are stripped from old post bodies at render (theme related block stays). Bot: strict LANGUAGE rule in all 7 prompts (every sentence Telugu script; English only for standard labels/org names; no English paragraph + Telugu tail line); post-gate `telugu_share` threshold 25%→55% (`TELUGU_MIN_SHARE`), weight 4, drives refine; transitions check advisory. sha256 4f74e54d5b7beeea |
 | **v322** — bot + theme 1.9.114 | **Post quality (BSNL draft audit).** Bot: keyword-density cap never touches headings and never writes the pronoun “idi” (was “idi Apply Online”, “What is idi?”) → natural “this recruitment/exam/…”; no duplicate FAQ block (checks for existing FAQ H2 / question H3s); TOC = H2 sections only (max 8), no FAQ questions in TOC; “Related Questions” block (repeated section text) OFF; prompt: no robotic Telugu connective/filler tail lines, keyword 5–8× natural (was 8–15); validator transition-words check advisory only; bot-side house promo blocks in article body OFF (theme already renders slots → was 4 promos incl. 2× quiz per post). Theme: house blocks now labelled “STUDENTUP · మా సేవ” + “StudentUp’s own section — not a paid advertisement” (never fake SPONSORED/Advertisement; rel=noopener); audio reader “undefined” icon fixed (icon map was shadowed by i18n var). sha256 78dc3a99cb96c77c |
 | **v321** — bot only | **Phase-1 "advanced" = visibility + coverage.** New Telegram `/report`: today's drafts/published, radar vs hourly-queue counts vs caps, by-category split, skipped reasons (fetch failed / stale / blocked by checks / draft error), queue pending, drafts waiting in WP. Nightly digest now appends the same report. Radar sweep wider: `RADAR_SOURCES_PER_RUN` 10→20, `RADAR_DISTRICTS_PER_RUN` 10→15 (scraping only, no extra Gemini cost; drafts still capped). |
 | **v320** — bot only | **Why radar jobs were not becoming drafts — fixed.** (1) Radar processed only `min(RADAR_POSTS_PER_DAY, fresh-this-sweep)`: a sweep that found 0 *new* URLs made 0 drafts even with a full queue → now it works the backlog against a per-day budget (`radar:posts:<date>`). (2) Queue URLs were otherwise consumed only inside the 3–5 plan slots (06–09) → new hourly `drain_source_queue()` turns up to `QUEUE_DRAIN_PER_HOUR=3` verified links into review drafts every active hour (06–22), cap `QUEUE_DRAFTS_PER_DAY=25`. Each draft → Telegram card (with v319 warnings if any). Category = auto-classified from the article (jobs/results/admissions/scholarships…). |
@@ -114,7 +115,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `a4ce236bd499a16c9251eaaed65a8996ea016f90e275b264d3ff82189eeaf64b  studentup-theme-1.9.114.zip`
+sha256: `a4ce236bd499a16c9251eaaed65a8996ea016f90e275b264d3ff82189eeaf64b  studentup-theme-1.9.115.zip`
 
 ---
 

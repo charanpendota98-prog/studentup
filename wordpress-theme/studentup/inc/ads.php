@@ -286,6 +286,11 @@ function studentup_ad( $place = 'mid' ) {
 	}
 
 	// 2) House/sponsor ad (AdSense lekapote leda slot set kaakapote)
+	// v1.9.115 owner rule: single post lo house box okkate — article CHIVARLO
+	// ('below-content'). Top/mid/in-feed house boxes phone lo distraction.
+	if ( is_singular( 'post' ) && 'below-content' !== $place ) {
+		return;
+	}
 	$house = studentup_rotate_house( studentup_house_ads(), $place );
 	if ( ! $house ) {
 		return;
