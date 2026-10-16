@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.118\n"
+"Project-Id-Version: StudentUp 1.9.119\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -124,7 +124,7 @@ msgstr ""
 msgid "Answer coming soon — our editor is verifying it."
 msgstr ""
 
-#: inc/doubts.php:351
+#: inc/doubts.php:358
 msgid "Answer with the official source. Only answered questions go into QAPage schema."
 msgstr ""
 
@@ -1310,7 +1310,7 @@ msgstr ""
 msgid "Students Internet Center (separate offline service)"
 msgstr ""
 
-#: inc/doubts.php:347
+#: inc/doubts.php:354
 msgid "StudentUp answer (public)"
 msgstr ""
 
@@ -1330,7 +1330,7 @@ msgstr ""
 msgid "StudentUp publishes government job, result, hall ticket and scholarship updates for Telangana and Andhra Pradesh students. This page names who writes and verifies them."
 msgstr ""
 
-#: inc/doubts.php:357
+#: inc/doubts.php:364
 msgid "StudentUp — Doubt answer"
 msgstr ""
 

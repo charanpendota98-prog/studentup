@@ -108,6 +108,7 @@ get_header();
 				if ( function_exists( 'studentup_important_links_box' ) ) {
 					studentup_important_links_box(); // v292: Apply · Notification · Official site · More · Telegram (real data only)
 				}
+				do_action( 'studentup_after_important_links' ); // v1.9.119: Doubts & Answers lands here
 				?>
 				<?php
 				if ( function_exists( 'studentup_faq_box' ) ) {

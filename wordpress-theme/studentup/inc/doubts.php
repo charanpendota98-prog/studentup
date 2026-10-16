@@ -290,7 +290,14 @@ function studentup_doubts_block( $content ) {
 		. '<h2 id="su-doubts-title">' . esc_html__( 'Doubts & Answers', 'studentup' ) . '</h2>'
 		. $notice . $list . $form . '</section>';
 }
-add_filter( 'the_content', 'studentup_doubts_block', 40 );
+// v1.9.119: render AFTER Important Links (template action) instead of inside
+// the_content — reader sees official links first, then community doubts.
+add_action( 'studentup_after_important_links', function () {
+	if ( ! is_singular( 'post' ) || ! studentup_doubts_enabled() ) {
+		return;
+	}
+	echo studentup_doubts_block( '' ); // phpcs:ignore WordPress.Security.EscapeOutput -- block builds escaped HTML (single.php loop lo call avutundi)
+} );
 
 /* --------------------------------------------------------------- 6. schema */
 

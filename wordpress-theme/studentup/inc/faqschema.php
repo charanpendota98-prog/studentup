@@ -131,6 +131,12 @@ function studentup_faq_box() {
 	if ( empty( $faqs ) ) {
 		return;
 	}
+	// v1.9.119: bot articles carry their own FAQ (h2 "Frequently Asked Questions" /
+	// .su-faq) — a second generic FAQ box underneath was duplicate content.
+	$raw = (string) get_post_field( 'post_content', get_the_ID() );
+	if ( preg_match( '/<h2[^>]*>\s*(frequently asked questions|faq)/i', $raw ) || false !== strpos( $raw, 'su-faq' ) ) {
+		return;
+	}
 
 	?>
 	<section class="su-faq-section" id="faqs" aria-labelledby="su-faq-title">

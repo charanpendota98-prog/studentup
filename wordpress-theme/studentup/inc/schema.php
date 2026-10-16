@@ -159,6 +159,11 @@ function studentup_newsarticle_schema() {
 	if ( $image ) {
 		$data['image'] = array( $image );
 	}
+	// v1.9.119: one article node — entities merged here (was a 2nd Article node).
+	if ( function_exists( 'studentup_ai_entities_for_post' ) ) {
+		$data = array_merge( $data, studentup_ai_entities_for_post( get_the_ID() ) );
+	}
+	$data = apply_filters( 'studentup_newsarticle_schema', $data );
 	echo '<script type="application/ld+json">'
 		. wp_json_encode( $data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES )
 		. '</script>' . "\n";
