@@ -377,7 +377,7 @@ function studentup_quiz_schema( $qs ) {
 		'@type'         => 'Quiz',
 		'name'          => 'StudentUp Daily Quiz — ' . date_i18n( 'M j, Y' ),
 		'about'         => 'Government exam practice questions for Telangana, Andhra Pradesh and Central exams',
-		'inLanguage'    => 'en-IN',
+		'inLanguage'    => 'te-IN',
 		'educationalLevel' => 'Intermediate to graduate',
 		'hasPart'       => $items,
 	);
