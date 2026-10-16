@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.117\n"
+"Project-Id-Version: StudentUp 1.9.118\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +76,7 @@ msgstr ""
 msgid "Advertisement"
 msgstr ""
 
+#: inc/keyfacts.php:30
 #: inc/workspace.php:142
 #: inc/workspace.php:197
 msgid "Age"
@@ -165,7 +166,7 @@ msgstr ""
 msgid "Apply Online"
 msgstr ""
 
-#: inc/keyfacts.php:74
+#: inc/keyfacts.php:80
 msgid "Apply Online (Official)"
 msgstr ""
 
@@ -480,6 +481,10 @@ msgstr ""
 msgid "Explore by Category"
 msgstr ""
 
+#: inc/keyfacts.php:29
+msgid "Fee"
+msgstr ""
+
 #: inc/workspace.php:166
 msgid "Fee & concession calculator"
 msgstr ""
@@ -629,12 +634,12 @@ msgstr ""
 msgid "Join WhatsApp"
 msgstr ""
 
-#: inc/keyfacts.php:72
+#: inc/keyfacts.php:78
 msgid "Key details"
 msgstr ""
 
 #: inc/calendar.php:180
-#: inc/keyfacts.php:29
+#: inc/keyfacts.php:31
 msgid "Last date"
 msgstr ""
 

@@ -26,6 +26,8 @@ function studentup_keyfacts_data( $post_id = 0 ) {
 		'studentup_vacancies' => array( __( 'Vacancies', 'studentup' ), 'card' ),
 		'studentup_qual'      => array( __( 'Qualification', 'studentup' ), 'school' ),
 		'studentup_salary'    => array( __( 'Salary', 'studentup' ), 'wallet' ),
+		'studentup_fee'       => array( __( 'Fee', 'studentup' ), 'ticket' ),
+		'studentup_age_min'   => array( __( 'Age', 'studentup' ), 'person' ),
 		'studentup_last_date' => array( __( 'Last date', 'studentup' ), 'calendar' ),
 	);
 
@@ -37,6 +39,10 @@ function studentup_keyfacts_data( $post_id = 0 ) {
 		}
 		if ( 'studentup_qual' === $key && function_exists( 'studentup_qual_pretty' ) ) {
 			$val = studentup_qual_pretty( $val );   // v174: "degree,pg" → "Degree · PG".
+		}
+		if ( 'studentup_age_min' === $key ) {
+			$mx  = trim( (string) get_post_meta( $post_id, 'studentup_age_max', true ) );
+			$val = $mx ? $val . ' – ' . $mx . ' yrs' : $val . '+ yrs';
 		}
 		if ( 'studentup_last_date' === $key ) {
 			$ts = strtotime( $val );

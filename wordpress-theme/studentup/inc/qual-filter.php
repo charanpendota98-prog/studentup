@@ -295,6 +295,7 @@ function studentup_register_qual_meta() {
 		'studentup_source_url', 'studentup_source_urls', 'studentup_source_checked', 'studentup_org_url',
 		// v133: full job dataset so the bot can publish a complete card in one call.
 		'studentup_salary', 'studentup_vacancies', 'studentup_age_min', 'studentup_age_max',
+		'studentup_fee', // v1.9.118: application fee (bot evidence only)
 	);
 	foreach ( $keys as $key ) {
 		register_post_meta(
