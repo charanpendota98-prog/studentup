@@ -2617,3 +2617,9 @@ html, body{ overflow-x:hidden; }
 .su-kf-apply:active{transform:translateY(1px)}
 @media(min-width:981px){.su-kf-apply:hover{filter:brightness(1.06);box-shadow:0 10px 26px rgba(29,78,216,.32)}}
 body.dark .su-kf-apply{background:#2563eb}
+
+/* v1.9.122 — jobs-by-qualification link row (wrapping chips, no side-scroll) */
+.su-qual-links{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 14px}
+.su-qual-links a{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line,#e5e7eb);background:var(--card,#fff);color:inherit;font-size:14px;font-weight:600;text-decoration:none}
+.su-qual-links a.on{background:var(--su-g2,#7c3aed);border-color:transparent;color:#fff}
+@media(min-width:981px){.su-qual-links a:hover{border-color:var(--su-g2,#7c3aed)}}

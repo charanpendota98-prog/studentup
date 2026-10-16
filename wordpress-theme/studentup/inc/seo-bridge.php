@@ -307,7 +307,8 @@ add_action( 'wp_head', 'studentup_site_icons', 2 );
  */
 function studentup_seo_og_list_view() {
 	return is_front_page() || is_home() || is_category() || is_tag() || is_date() || is_author()
-		|| (bool) get_query_var( 'studentup_opportunities' ); // v1.9.119 virtual jobs board
+		|| (bool) get_query_var( 'studentup_opportunities' ) // v1.9.119 virtual jobs board
+		|| '' !== (string) get_query_var( 'studentup_qual_page' ); // v1.9.122 /jobs/<qual>/
 }
 
 /**
