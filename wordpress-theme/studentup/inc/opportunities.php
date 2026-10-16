@@ -380,3 +380,49 @@ function studentup_opportunities_activate() {
 	flush_rewrite_rules();
 }
 add_action( 'after_switch_theme', 'studentup_opportunities_activate' );
+
+
+/* ------------------------------------------------------------------ v1.9.119
+ * /latest-jobs/ is a virtual route (no page object) → WP + Rank Math treated it
+ * as HOME: <title>StudentUp</title>, canonical "/", og:url "/". Google saw a
+ * duplicate of the homepage and never indexed the jobs board. Own title /
+ * description / self-canonical now, via both core and Rank Math filters.
+ * ------------------------------------------------------------------------ */
+
+function studentup_opportunities_is_route() {
+	return (bool) get_query_var( 'studentup_opportunities' );
+}
+
+function studentup_opportunities_seo_title() {
+	return 'Latest Govt Jobs 2026 — Active Notifications for TS & AP (Last Dates) — ' . wp_strip_all_tags( get_bloginfo( 'name' ) );
+}
+
+function studentup_opportunities_seo_desc() {
+	return 'Telangana & Andhra Pradesh students kosam currently open government job notifications — last date, qualification, official apply link okate list lo. Expired notices automatic ga hide avutayi.';
+}
+
+add_filter( 'pre_get_document_title', function ( $title ) {
+	return studentup_opportunities_is_route() ? studentup_opportunities_seo_title() : $title;
+}, 99 );
+add_filter( 'rank_math/frontend/title', function ( $title ) {
+	return studentup_opportunities_is_route() ? studentup_opportunities_seo_title() : $title;
+}, 99 );
+add_filter( 'rank_math/frontend/description', function ( $desc ) {
+	return studentup_opportunities_is_route() ? studentup_opportunities_seo_desc() : $desc;
+}, 99 );
+add_filter( 'rank_math/frontend/canonical', function ( $canon ) {
+	return studentup_opportunities_is_route() ? studentup_opportunity_board_url() : $canon;
+}, 99 );
+add_filter( 'rank_math/opengraph/url', function ( $url ) {
+	return studentup_opportunities_is_route() ? studentup_opportunity_board_url() : $url;
+}, 99 );
+// Core/theme fallback (Rank Math inactive): list helpers return the real URL/title.
+add_filter( 'studentup_seo_list_url', function ( $url ) {
+	return studentup_opportunities_is_route() ? studentup_opportunity_board_url() : $url;
+} );
+add_filter( 'studentup_seo_list_title', function ( $t ) {
+	return studentup_opportunities_is_route() ? 'Latest Govt Jobs 2026 — Active Notifications for TS & AP' : $t;
+} );
+add_filter( 'studentup_seo_list_desc', function ( $d ) {
+	return studentup_opportunities_is_route() ? studentup_opportunities_seo_desc() : $d;
+} );

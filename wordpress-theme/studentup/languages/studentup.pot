@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.119\n"
+"Project-Id-Version: StudentUp 1.9.120\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: inc/ads.php:485
+#: inc/ads.php:481
 msgid "Advertisement"
 msgstr ""
 
@@ -741,7 +741,7 @@ msgstr ""
 msgid "More %s"
 msgstr ""
 
-#: inc/seo-max.php:180
+#: inc/seo-max.php:187
 msgid "More updates:"
 msgstr ""
 
@@ -899,7 +899,7 @@ msgstr ""
 msgid "Outside this website we run a small offline Students Internet Center that helps students fill government application forms. This is optional: every job, result, hall ticket and scholarship update on this website is free to read and you never need this service to use the site."
 msgstr ""
 
-#: inc/seo-max.php:129
+#: inc/seo-max.php:131
 msgid "Page %d"
 msgstr ""
 

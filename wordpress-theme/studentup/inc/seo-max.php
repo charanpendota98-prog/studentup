@@ -124,9 +124,11 @@ add_action( 'wp_head', 'studentup_speakable_schema', 9 );
  */
 function studentup_seo_max_title_parts( $parts ) {
 	$paged = max( (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
-	if ( $paged > 1 && isset( $parts['title'] ) ) {
+	// v1.9.119: core already fills $parts['page'] ("Page N") — only add ours when
+	// core did not (was rendering "… — Page 2 – Page 2").
+	if ( $paged > 1 && isset( $parts['title'] ) && empty( $parts['page'] ) ) {
 		/* translators: %d: page number */
-		$parts['title'] .= ' — ' . sprintf( __( 'Page %d', 'studentup' ), $paged );
+		$parts['page'] = sprintf( __( 'Page %d', 'studentup' ), $paged );
 	}
 	return $parts;
 }
@@ -143,12 +145,17 @@ function studentup_seo_max_robots( $robots ) {
 		return $robots;
 	}
 	global $wp_query;
-	$empty_archive = ( is_archive() || is_category() || is_tag() )
-		&& isset( $wp_query->found_posts ) && 0 === (int) $wp_query->found_posts;
-	if ( is_search() || $empty_archive ) {
-		$robots['index']  = 'noindex';
-		$robots['follow'] = 'follow';
-		unset( $robots['noindex'] );
+	// v1.9.119 FIX: wp_robots() takes directive => true (key only) — the old
+	// `index => 'noindex'` rendered as "index:noindex", which Google does not
+	// understand, so search pages were effectively NOT noindexed.
+	$found = isset( $wp_query->found_posts ) ? (int) $wp_query->found_posts : -1;
+	$empty_archive = ( is_archive() || is_category() || is_tag() ) && 0 === $found;
+	// Thin tag archives (1 post) = low-value pages for AdSense review + crawl budget.
+	$thin_tag = is_tag() && $found > 0 && $found < 2;
+	if ( is_search() || $empty_archive || $thin_tag ) {
+		$robots['noindex'] = true;
+		$robots['follow']  = true;
+		unset( $robots['index'], $robots['nofollow'], $robots['max-image-preview'], $robots['max-snippet'], $robots['max-video-preview'] );
 	}
 	return $robots;
 }

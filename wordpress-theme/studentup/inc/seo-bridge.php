@@ -201,7 +201,35 @@ function studentup_seo_fallback_head() {
 		if ( '' === trim( (string) $desc ) || 'Just another WordPress site' === $desc ) {
 			$desc = 'Telangana & AP students ki jobs, scholarships, results, hall tickets — okate place lo anni updates';
 		}
+		// v1.9.119: every category/tag page carried the SAME site description
+		// (duplicate meta descriptions). Term description, else a unique line
+		// built from the term name + its latest post titles (real data only).
+		if ( is_category() || is_tag() || is_tax() ) {
+			$term = get_queried_object();
+			if ( $term instanceof WP_Term ) {
+				$td = trim( wp_strip_all_tags( (string) term_description( $term ) ) );
+				if ( '' !== $td ) {
+					$desc = $td;
+				} else {
+					$titles = array();
+					global $wp_query;
+					foreach ( array_slice( (array) $wp_query->posts, 0, 3 ) as $tp ) {
+						$titles[] = wp_strip_all_tags( get_the_title( $tp ) );
+					}
+					$desc = $term->name . ' — latest updates';
+					if ( $titles ) {
+						$desc .= ': ' . implode( ' · ', $titles );
+					}
+					$desc .= ' | ' . wp_strip_all_tags( get_bloginfo( 'name' ) );
+				}
+			}
+		}
+		$desc = (string) apply_filters( 'studentup_seo_list_desc', $desc );
 		$img = '';
+	}
+	// v1.9.119: pages without excerpt (Daily Quiz etc.) had NO description at all.
+	if ( '' === trim( (string) $desc ) && is_singular() ) {
+		$desc = wp_strip_all_tags( get_the_title() ) . ' — ' . wp_strip_all_tags( get_bloginfo( 'name' ) ) . ': Telangana & AP students ki jobs, results, scholarships updates.';
 	}
 	$desc = trim( wp_strip_all_tags( (string) $desc ) );
 	if ( '' !== $desc ) {
@@ -278,7 +306,8 @@ add_action( 'wp_head', 'studentup_site_icons', 2 );
  * @return bool
  */
 function studentup_seo_og_list_view() {
-	return is_front_page() || is_home() || is_category() || is_tag() || is_date() || is_author();
+	return is_front_page() || is_home() || is_category() || is_tag() || is_date() || is_author()
+		|| (bool) get_query_var( 'studentup_opportunities' ); // v1.9.119 virtual jobs board
 }
 
 /**
@@ -287,6 +316,9 @@ function studentup_seo_og_list_view() {
  * @return string
  */
 function studentup_seo_list_title() {
+	return (string) apply_filters( 'studentup_seo_list_title', studentup_seo_list_title_raw() );
+}
+function studentup_seo_list_title_raw() {
 	$site = trim( (string) wp_strip_all_tags( get_bloginfo( 'name' ) ) );
 	$t    = '';
 	if ( is_category() || is_tag() || is_tax() ) {
@@ -314,6 +346,9 @@ function studentup_seo_list_title() {
  * @return string
  */
 function studentup_seo_list_url() {
+	return (string) apply_filters( 'studentup_seo_list_url', studentup_seo_list_url_raw() );
+}
+function studentup_seo_list_url_raw() {
 	$paged = max( 1, (int) get_query_var( 'paged' ) );
 	if ( is_front_page() || is_home() ) {
 		return $paged > 1 ? get_pagenum_link( $paged ) : home_url( '/' );

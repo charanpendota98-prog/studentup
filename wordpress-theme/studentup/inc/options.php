@@ -86,7 +86,7 @@ function studentup_option_fields() {
 				'jobs_table' => array( 'Latest jobs table (homepage)', 'check', '1', 'v142: scannable rows — post, qualification, last date, apply link (meta nunchi, invent cheyyadu)' ),
 				'closing_week' => array( 'Deadline radar (closing this week)', 'check', '1', 'v146: su_last_date meta nunchi next 7 days lo close ayye posts — live days-left pills' ),
 				'popular_searches' => array( 'Popular searches strip (homepage)', 'check', '1', 'v140: long-tail internal links — category archives + real on-site searches' ),
-				'max_ads'        => array( 'Page ki max ads (density cap)', 'text', '5', '4-5 safe (AdSense + UX). Ekkuva = policy risk' ),
+				'max_ads'        => array( 'Page ki max ads (density cap)', 'text', '3', 'Max 3 (REVENUE_CLICK_PLAN rule: policy-safe + higher CTR per unit). Hard-capped at 3.' ),
 				'lazy_ads'       => array( 'Lazy ads (below-fold) ON', 'check', '1', 'Viewability + CLS — AdSense RPM ki manchi' ),
 				'ads_on_policy'  => array( 'Legal pages lo ads (privacy/about)', 'check', '0', 'Default OFF (AdSense policy safe)' ),
 				'sticky_ad'      => array( 'Sticky bottom ad ON', 'check', '0', 'Mobile lo kindha fixed ad (house/AdSense anchor)' ),
