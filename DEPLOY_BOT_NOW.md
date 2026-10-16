@@ -42,7 +42,7 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.116.zip` (v324 · neat pass 2)
+## 📱 Theme upload — `studentup-theme-1.9.117.zip` (v325 · neat pass 2)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
 > **1.9.107 zip సరైన structure** — ఇదే upload చేయండి.
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v325** — theme 1.9.117 (CLEAN READER) | **Single post rebuilt for click + readability.** Order now: title/meta → **Key facts with big “Apply Online (Official)” button above the fold** → ad → article (share bar moved to END of article; mid-article join strip OFF by default) → Important links → FAQ (one) → tags → author → ONE related grid → ONE house box. Removed from post template: quick-summary (dup of key facts), updated-stamp (dup of meta row), smart-recirculation (dup of related), community-pulse, status-card generator, helpful-box, syllabus tracker. Key facts strip no longer hides behind quick-summary. Fewer blocks = faster LCP, less phone clutter, apply click first. sha256 47537bd63c855dc3 |
 | **v324** — bot + theme 1.9.116 | **Measured SEO, not guessed.** Bot: `--live-seo-recent N [--notify]` audits the newest N published posts on the LIVE site (Rank Math stored score readback + rendered-HTML coverage checks); Telegram `/seo [N]`; nightly auto-run at `LIVE_SEO_DAILY_HOUR=20` IST (`LIVE_SEO_DAILY_LIMIT=5`) → summary card with per-post fixes. Theme: new `inc/lang.php` — `<html lang="te-IN">`, hreflang te-IN, og:locale te_IN (only without SEO plugin), quiz/polls schema inLanguage te-IN; option `content_lang` (default te-IN). Google/TTS/screen-readers now see the correct content language. sha256 5e38d66af33f383e |
 | **v323** — bot + theme 1.9.115 | **Owner rules: no promo boxes above/inside the article; Telugu-only prose.** Theme: on single posts house boxes render ONLY once, after the article (`below-content`); bot-injected `.su-ad` blocks and the bot's duplicate “More updates” list are stripped from old post bodies at render (theme related block stays). Bot: strict LANGUAGE rule in all 7 prompts (every sentence Telugu script; English only for standard labels/org names; no English paragraph + Telugu tail line); post-gate `telugu_share` threshold 25%→55% (`TELUGU_MIN_SHARE`), weight 4, drives refine; transitions check advisory. sha256 4f74e54d5b7beeea |
 | **v322** — bot + theme 1.9.114 | **Post quality (BSNL draft audit).** Bot: keyword-density cap never touches headings and never writes the pronoun “idi” (was “idi Apply Online”, “What is idi?”) → natural “this recruitment/exam/…”; no duplicate FAQ block (checks for existing FAQ H2 / question H3s); TOC = H2 sections only (max 8), no FAQ questions in TOC; “Related Questions” block (repeated section text) OFF; prompt: no robotic Telugu connective/filler tail lines, keyword 5–8× natural (was 8–15); validator transition-words check advisory only; bot-side house promo blocks in article body OFF (theme already renders slots → was 4 promos incl. 2× quiz per post). Theme: house blocks now labelled “STUDENTUP · మా సేవ” + “StudentUp’s own section — not a paid advertisement” (never fake SPONSORED/Advertisement; rel=noopener); audio reader “undefined” icon fixed (icon map was shadowed by i18n var). sha256 78dc3a99cb96c77c |
@@ -116,7 +117,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 Preview (Arena live-preview, port 8090): `/preview/v255/index.html` → quiz ఆడి score card చూడండి ·
 `/preview/worldclass/index.html` → tiles + social rail · phone + laptop రెండింటిలో.
 
-sha256: `a4ce236bd499a16c9251eaaed65a8996ea016f90e275b264d3ff82189eeaf64b  studentup-theme-1.9.116.zip`
+sha256: `a4ce236bd499a16c9251eaaed65a8996ea016f90e275b264d3ff82189eeaf64b  studentup-theme-1.9.117.zip`
 
 ---
 

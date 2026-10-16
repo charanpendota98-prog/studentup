@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.116\n"
+"Project-Id-Version: StudentUp 1.9.117\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,10 @@ msgstr ""
 
 #: inc/important-links.php:41
 msgid "Apply Online"
+msgstr ""
+
+#: inc/keyfacts.php:74
+msgid "Apply Online (Official)"
 msgstr ""
 
 #: inc/calendar.php:186
@@ -625,7 +629,7 @@ msgstr ""
 msgid "Join WhatsApp"
 msgstr ""
 
-#: inc/keyfacts.php:73
+#: inc/keyfacts.php:72
 msgid "Key details"
 msgstr ""
 

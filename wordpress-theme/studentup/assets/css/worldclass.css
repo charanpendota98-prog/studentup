@@ -2608,3 +2608,12 @@ html, body{ overflow-x:hidden; }
   .article-content th, .article-content td{ min-width:120px; overflow-wrap:anywhere }
   .article-content table thead th{ white-space:nowrap }
 }
+
+/* ============================================================== 
+   v1.9.117 CLEAN READER — primary apply CTA inside Key facts (above fold).
+   ============================================================== */
+.su-keyfacts{display:grid}
+.su-kf-apply{grid-column:1/-1;order:-1;display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px;border-radius:13px;background:var(--blue,#1d4ed8);color:#fff !important;font-weight:800;font-size:clamp(14px,3.9vw,16px);text-decoration:none;box-shadow:0 6px 18px rgba(29,78,216,.25)}
+.su-kf-apply:active{transform:translateY(1px)}
+@media(min-width:981px){.su-kf-apply:hover{filter:brightness(1.06);box-shadow:0 10px 26px rgba(29,78,216,.32)}}
+body.dark .su-kf-apply{background:#2563eb}

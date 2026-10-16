@@ -80,15 +80,6 @@ get_header();
 
 				<?php echo function_exists( 'studentup_expired_notice' ) ? wp_kses_post( studentup_expired_notice() ) : ''; ?>
 
-				<?php studentup_updated_stamp(); // v144: honest freshness line ?>
-
-				<?php studentup_ad( 'mid' ); ?>
-
-				<?php
-				if ( function_exists( 'studentup_quick_summary_box' ) ) {
-					studentup_quick_summary_box();
-				}
-				?>
 				<?php
 				if ( function_exists( 'studentup_sponsor_partner_box' ) ) {
 					studentup_sponsor_partner_box();
@@ -96,6 +87,7 @@ get_header();
 				?>
 
 				<?php studentup_keyfacts_box(); // v158 ?>
+				<?php studentup_ad( 'mid' ); // v1.9.117 Clean Reader: facts first, then the ad ?>
 				<?php
 				if ( function_exists( 'studentup_age_calculator_block' ) ) {
 					studentup_age_calculator_block();
@@ -116,9 +108,6 @@ get_header();
 				if ( function_exists( 'studentup_important_links_box' ) ) {
 					studentup_important_links_box(); // v292: Apply · Notification · Official site · More · Telegram (real data only)
 				}
-				if ( function_exists( 'studentup_syllabus_tracker_block' ) ) {
-					studentup_syllabus_tracker_block();
-				}
 				?>
 				<?php
 				if ( function_exists( 'studentup_faq_box' ) ) {
@@ -134,26 +123,14 @@ get_header();
 				// mugistadu → share → related reading → appudu okka CTA.
 				?>
 
+				<?php /* v1.9.117 CLEAN READER: quick-summary (dup of Key facts), updated-stamp (dup of meta row),
+				   smart-recirculation + community-pulse + status-card + helpful-box (CTA stack) removed from
+				   the post template — owner rule: article → links → FAQ → tags → author → ONE related grid → ONE box. */ ?>
 				<?php /* v307: second share row removed — studentup_share_bar() (content filter) already renders WhatsApp/Telegram/Copy. */ ?>
 
 				<?php if ( has_tag() ) : ?>
 					<div class="su-tags" aria-label="Tags"><?php echo studentup_ui_icon( 'tag', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php the_tags( '', ' · ', '' ); ?></div>
 				<?php endif; ?>
-				<?php
-				if ( function_exists( 'studentup_smart_recirculation_box' ) ) {
-					studentup_smart_recirculation_box();
-				}
-				?>
-				<?php
-				if ( function_exists( 'studentup_community_pulse_card' ) ) {
-					studentup_community_pulse_card();
-				}
-				?>
-				<?php
-				if ( function_exists( 'studentup_status_card_generator' ) ) {
-					studentup_status_card_generator();
-				}
-				?>
 
 				<?php studentup_author_box(); ?>
 
@@ -172,7 +149,6 @@ get_header();
 				studentup_upnext_block();
 			}
 			?>
-			<?php studentup_helpful_box(); // v144: browser-only helpfulness vote ?>
 
 			<?php studentup_ad( 'below-content' ); ?>
 			<?php

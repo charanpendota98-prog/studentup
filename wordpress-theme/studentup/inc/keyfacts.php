@@ -62,15 +62,17 @@ function studentup_keyfacts_box() {
 	}
 	// v310: Key Highlights box (quick_summary) already lists vacancies/qualification/salary/last date —
 	// same facts twice, stacked = clutter. Strip renders only when that box is switched off.
-	if ( studentup_opt( 'quick_summary', '1' ) && function_exists( 'studentup_quick_summary_box' ) ) {
-		return;
-	}
+	// v1.9.117: quick_summary box no longer in the post template → this strip is THE facts block.
 	$facts = studentup_keyfacts_data();
-	if ( count( $facts ) < 2 ) {
+	$apply = esc_url_raw( (string) get_post_meta( get_the_ID(), 'studentup_apply_url', true ) );
+	if ( count( $facts ) < 2 && ! $apply ) {
 		return; // okate fact unte strip ki value ledu.
 	}
 	?>
 	<div class="su-keyfacts" aria-label="<?php esc_attr_e( 'Key details', 'studentup' ); ?>">
+		<?php if ( $apply ) : // v1.9.117: primary click — official apply link first, above the fold ?>
+			<a class="su-kf-apply" href="<?php echo esc_url( $apply ); ?>" target="_blank" rel="noopener nofollow" data-su-click="apply-top"><?php echo studentup_ui_icon( 'external', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Apply Online (Official)', 'studentup' ); ?></a>
+		<?php endif; ?>
 		<?php foreach ( $facts as $f ) : ?>
 			<div class="su-kf">
 				<span class="su-kf-i" aria-hidden="true"><?php echo studentup_ui_icon( $f['icon'], 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
