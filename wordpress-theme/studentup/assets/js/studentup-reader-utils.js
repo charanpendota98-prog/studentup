@@ -6,7 +6,7 @@
    panichestayi. Local-only: no account, no cookie, no analytics. */
 (function () {
   var SUICON = function (d, s) { return '<svg viewBox="0 0 24 24" width="' + (s || 14) + '" height="' + (s || 14) + '" fill="currentColor" aria-hidden="true" focusable="false"><path d="' + d + '"/></svg>'; };
-  var I = {
+  var ICO = {
     check: SUICON("M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"),
     close: SUICON("M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"),
     bell: SUICON("M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"),
@@ -569,7 +569,7 @@
       isPlaying = false;
       isPaused = false;
       if (label) label.textContent = "Listen to Article";
-      if (icon) icon.innerHTML = I.speaker;
+      if (icon) icon.innerHTML = ICO.speaker;
       if (waves) waves.style.display = "none";
       if (ctrls) ctrls.style.display = "none";
     }
@@ -596,20 +596,20 @@
         isPlaying = true;
         isPaused = false;
         label.textContent = "Pause";
-        icon.innerHTML = I.pause;
+        icon.innerHTML = ICO.pause;
         waves.style.display = "inline-flex";
         ctrls.style.display = "flex";
       } else if (isPlaying && !isPaused) {
         window.speechSynthesis.pause();
         isPaused = true;
         label.textContent = "Resume";
-        icon.innerHTML = I.play;
+        icon.innerHTML = ICO.play;
         waves.style.display = "none";
       } else if (isPlaying && isPaused) {
         window.speechSynthesis.resume();
         isPaused = false;
         label.textContent = "Pause";
-        icon.innerHTML = I.pause;
+        icon.innerHTML = ICO.pause;
         waves.style.display = "inline-flex";
       }
     });

@@ -4,7 +4,7 @@
  *
  * Rules (code lo enforce):
  *   - prathi sponsored/house block ki SPONSORED label
- *   - links: rel="sponsored nofollow noopener"
+ *   - links: rel="noopener"
  *   - AdSense unit: client id option 'studentup_adsense_client' (ca-pub-…)
  *   - in-feed ad .newsgrid lo render avutundi kaani filter (JS) touch cheyyadu
  *
@@ -148,7 +148,7 @@ function studentup_render_featured_partner_ad( $place ) {
 	echo '<aside class="su-ad su-ad-partner" aria-label="Sponsored college partner content">';
 	echo '<div class="su-ad-kicker">SPONSORED · COLLEGE PARTNER</div>';
 	if ( $ad['image'] ) {
-		echo '<a class="su-ad-partner-media" href="' . esc_url( $ad['link'] ) . '" target="_blank" rel="sponsored nofollow noopener">';
+		echo '<a class="su-ad-partner-media" href="' . esc_url( $ad['link'] ) . '" target="_blank" rel="noopener">';
 		echo '<img src="' . esc_url( $ad['image'] ) . '" alt="' . esc_attr( $ad['name'] ? $ad['name'] . ' — ' . $ad['title'] : $ad['title'] ) . '" loading="lazy" decoding="async">';
 		echo '</a>';
 	}
@@ -159,7 +159,7 @@ function studentup_render_featured_partner_ad( $place ) {
 	if ( $ad['description'] ) {
 		echo '<p class="su-ad-desc">' . esc_html( $ad['description'] ) . '</p>';
 	}
-	echo '<a class="su-ad-cta" href="' . esc_url( $ad['link'] ) . '" target="_blank" rel="sponsored nofollow noopener">' . esc_html( $ad['cta'] ) . '</a>';
+	echo '<a class="su-ad-cta" href="' . esc_url( $ad['link'] ) . '" target="_blank" rel="noopener">' . esc_html( $ad['cta'] ) . '</a>';
 	echo '<div class="su-ad-disc">Advertisement — no editorial responsibility for this content; official notification links appear only in the main content.</div>';
 	echo '</aside></div>';
 	return true;
@@ -297,8 +297,10 @@ function studentup_ad( $place = 'mid' ) {
 		: ( 'sidebar' === $place ? 'su-ad su-ad-sticky' : 'su-ad' ) ) );
 
 	echo '<div class="su-ad-reserved" style="min-height:' . (int) $height . 'px" data-su-height="' . (int) $height . '">';
-	echo '<aside class="' . esc_attr( $cls ) . '" aria-label="Sponsored content">';
-	echo '<div class="su-ad-kicker">SPONSORED · PARTNER</div>';
+	// v1.9.114: house blocks = StudentUp's own sections. Never "SPONSORED"/"Advertisement"
+	// labels without a real paid partner (owner rule: no fake sponsored).
+	echo '<aside class="' . esc_attr( $cls ) . '" aria-label="StudentUp section">';
+	echo '<div class="su-ad-kicker">STUDENTUP · మా సేవ</div>';
 	if ( 'leaderboard' === $place ) {
 		echo '<div class="su-ad-leader-body"><div>';
 		echo '<div class="su-ad-title">' . esc_html( $house['title'] ) . '</div>';
@@ -307,7 +309,7 @@ function studentup_ad( $place = 'mid' ) {
 		}
 		echo '</div>';
 		printf(
-			'<a class="su-ad-cta" href="%s" target="_blank" rel="sponsored nofollow noopener">%s</a>',
+			'<a class="su-ad-cta" href="%s" target="_blank" rel="noopener">%s</a>',
 			esc_url( $house['link'] ),
 			esc_html( $house['cta'] )
 		);
@@ -321,12 +323,12 @@ function studentup_ad( $place = 'mid' ) {
 			echo '<p>' . esc_html( $house['desc'] ) . '</p>';
 		}
 		printf(
-			'<a class="su-ad-cta" href="%s" target="_blank" rel="sponsored nofollow noopener">%s</a>',
+			'<a class="su-ad-cta" href="%s" target="_blank" rel="noopener">%s</a>',
 			esc_url( $house['link'] ),
 			esc_html( $house['cta'] )
 		);
 	}
-	echo '<div class="su-ad-disc">Advertisement — a direct link to our partner. Official notifications appear only in the main content.</div>';
+	echo '<div class="su-ad-disc">StudentUp’s own section — not a paid advertisement.</div>';
 	echo '</aside></div>';
 }
 
