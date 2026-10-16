@@ -165,6 +165,24 @@
 
   /* ---------------- Bottom nav search ---------------- */
   function bnav() {
+    /* v1.9.121: reading-mode bottom nav — slides away while the reader scrolls
+       DOWN (more content + anchor-ad room, no overlap), returns on scroll UP or
+       near the top. Standard top-site pattern; phone only (CSS hides ≥981px). */
+    var nav = document.querySelector(".su-bnav");
+    if (nav && window.matchMedia && window.matchMedia("(max-width: 980px)").matches) {
+      var lastY = window.pageYOffset || 0, ticking = false;
+      window.addEventListener("scroll", function () {
+        if (ticking) return;
+        ticking = true;
+        window.requestAnimationFrame(function () {
+          var y = window.pageYOffset || 0, d = y - lastY;
+          if (y < 120 || d < -12) nav.classList.remove("su-bnav-hide");
+          else if (d > 12 && y > 240) nav.classList.add("su-bnav-hide");
+          if (Math.abs(d) > 12) lastY = y;
+          ticking = false;
+        });
+      }, { passive: true });
+    }
     var b = document.getElementById("su-bnav-search");
     if (!b) return;
     b.addEventListener("click", function () {
