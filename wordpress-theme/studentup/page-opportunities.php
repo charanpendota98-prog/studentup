@@ -33,6 +33,7 @@ $total = count( $rows );
 			<div class="su-op-count"><strong><?php echo esc_html( number_format_i18n( $total ) ); ?></strong><span>active updates</span></div>
 		</section>
 		<?php do_action( 'studentup_qual_links_row' ); // v1.9.122: /jobs/<qualification>/ landing pages ?>
+		<?php do_action( 'studentup_org_links_row' ); // v1.9.123: /org/<organisation>/ ?>
 		<div class="su-op-notice" role="note">
 			<?php echo studentup_ui_icon( 'check', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> This list updates from published StudentUp posts. Verified last dates are shown, expired notices are hidden automatically, and an unavailable date is shown as <strong>Not announced</strong> — never guessed.
 		</div>
