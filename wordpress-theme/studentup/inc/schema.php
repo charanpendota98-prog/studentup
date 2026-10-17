@@ -282,6 +282,12 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 			if ( ! array_intersect( $types, array( 'Article', 'NewsArticle', 'BlogPosting' ) ) ) {
 				continue;
 			}
+			// Rank Math default = BlogPosting; a jobs/results/news site qualifies for
+			// NewsArticle (Top Stories / Discover eligibility). Only the default is
+			// upgraded — an owner-chosen Article type stays.
+			if ( array( 'BlogPosting' ) === $types && studentup_opt( 'news_schema', '1' ) ) {
+				$data[ $key ]['@type'] = 'NewsArticle';
+			}
 			$data[ $key ]['inLanguage'] = $lang;
 			if ( function_exists( 'studentup_ai_entities_for_post' ) ) {
 				foreach ( studentup_ai_entities_for_post( get_the_ID() ) as $k => $v ) {

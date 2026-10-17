@@ -214,3 +214,46 @@ function studentup_livefix_rankmath_archive_description( $desc ) {
 	return mb_substr( $out . ' | ' . wp_strip_all_tags( get_bloginfo( 'name' ) ), 0, 160 );
 }
 add_filter( 'rank_math/frontend/description', 'studentup_livefix_rankmath_archive_description', 98 );
+
+/**
+ * v1.9.125 — Rank Math OG image fallback: when a page/archive has no image and
+ * no default OG image is configured, use the theme brand card (1200×630) so
+ * WhatsApp/Telegram shares never render a blank card.
+ */
+add_filter( 'rank_math/opengraph/facebook/image', 'studentup_livefix_rm_og_image' );
+add_filter( 'rank_math/opengraph/twitter/image', 'studentup_livefix_rm_og_image' );
+function studentup_livefix_rm_og_image( $url ) {
+	if ( '' !== trim( (string) $url ) ) {
+		return $url;
+	}
+	// Single post without featured image → generated per-post card (title +
+	// last date, inc/ogimage.php) when the server can render it.
+	if ( is_singular( 'post' ) && function_exists( 'studentup_og_url' ) ) {
+		$card = studentup_og_url( get_the_ID() );
+		if ( $card ) {
+			return $card;
+		}
+	}
+	return get_template_directory_uri() . '/assets/og-default.png';
+}
+
+/**
+ * v1.9.125 — Rank Math description fallback for theme-rendered pages whose
+ * post_content is empty (Daily Quiz, Post your news, Latest Jobs page…).
+ */
+function studentup_livefix_rm_page_description( $desc ) {
+	if ( '' !== trim( (string) $desc ) || ! is_page() ) {
+		return $desc;
+	}
+	$slug = (string) get_post_field( 'post_name', get_queried_object_id() );
+	$site = wp_strip_all_tags( get_bloginfo( 'name' ) );
+	$map  = array(
+		'daily-quiz'     => 'Daily Telugu quiz for govt exam preparation — 5 new reasoning/aptitude/GK questions every day, instant score, streak and WhatsApp status share. Free on ' . $site . '.',
+		'post-your-news' => 'Mee district/college news, job updates or exam info ' . $site . ' ki pampandi — editorial team verify chesi publish chestundi. Spam/ads vaddu.',
+	);
+	if ( isset( $map[ $slug ] ) ) {
+		return $map[ $slug ];
+	}
+	return wp_strip_all_tags( get_the_title() ) . ' — ' . $site . ': Telangana & AP students ki jobs, results, scholarships updates Telugu lo.';
+}
+add_filter( 'rank_math/frontend/description', 'studentup_livefix_rm_page_description', 97 );
