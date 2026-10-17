@@ -341,6 +341,82 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 			}
 		}
 	}
+	// v1.9.128: E-E-A-T — enrich Rank Math's author Person node (same name as
+	// the configured founder/author) with jobTitle, knowsAbout, sameAs, bio.
+	if ( function_exists( 'studentup_author_card_data' ) ) {
+		$ad      = studentup_author_card_data();
+		$pub_id  = ( isset( $data['publisher']['@id'] ) && is_string( $data['publisher']['@id'] ) ) ? $data['publisher']['@id'] : home_url( '/' ) . '#organization';
+		$matched = false;
+		// Rank Math default Knowledge Graph type is "person" → publisher becomes
+		// a Person named after the site. A news site is an Organization.
+		if ( isset( $data['publisher']['@type'] ) && 'Person' === $data['publisher']['@type']
+			&& 0 === strcasecmp( trim( (string) ( $data['publisher']['name'] ?? '' ) ), trim( (string) get_bloginfo( 'name' ) ) ) ) {
+			$data['publisher']['@type'] = 'Organization';
+			if ( isset( $data['publisher']['image'] ) && empty( $data['publisher']['logo'] ) ) {
+				$data['publisher']['logo'] = $data['publisher']['image'];
+			}
+		}
+		foreach ( $data as $k => $node ) {
+			if ( ! is_array( $node ) || empty( $node['@type'] ) || empty( $node['name'] ) ) {
+				continue;
+			}
+			$types = (array) $node['@type'];
+			if ( ! in_array( 'Person', $types, true ) || 0 !== strcasecmp( trim( (string) $node['name'] ), $ad['name'] ) ) {
+				continue;
+			}
+			if ( $ad['role'] && empty( $node['jobTitle'] ) ) {
+				$data[ $k ]['jobTitle'] = $ad['role'];
+			}
+			if ( empty( $node['knowsAbout'] ) && function_exists( 'studentup_author_expertise_list' ) ) {
+				$list = array_values( studentup_author_expertise_list() );
+				if ( $list ) {
+					$data[ $k ]['knowsAbout'] = $list;
+				}
+			}
+			if ( $ad['bio'] && empty( $node['description'] ) ) {
+				$data[ $k ]['description'] = $ad['bio'];
+			}
+			$same = array_values( array_filter( array( $ad['linkedin'], $ad['x'], $ad['youtube'] ) ) );
+			if ( $same ) {
+				$data[ $k ]['sameAs'] = array_values( array_unique( array_merge( (array) ( $node['sameAs'] ?? array() ), $same ) ) );
+			}
+			if ( empty( $node['worksFor'] ) ) {
+				$data[ $k ]['worksFor'] = array( '@id' => $pub_id );
+			}
+			$matched = true;
+		}
+		// No Rank Math Person for the founder (different WP display name) →
+		// add the theme's founder node once (posts/pages; author archives have RM's).
+		if ( ! $matched && ( is_singular( 'post' ) || is_page() ) ) {
+			$founder = array(
+				'@type'      => 'Person',
+				'@id'        => home_url( '/' ) . '#founder',
+				'name'       => $ad['name'],
+				'url'        => ( function_exists( 'studentup_hub_url' ) && studentup_hub_url( 'editorial-team' ) ) ? studentup_hub_url( 'editorial-team' ) : home_url( '/' ),
+				'worksFor'   => array( '@id' => $pub_id ),
+			);
+			if ( $ad['role'] ) {
+				$founder['jobTitle'] = $ad['role'];
+			}
+			if ( $ad['bio'] ) {
+				$founder['description'] = $ad['bio'];
+			}
+			if ( function_exists( 'studentup_author_expertise_list' ) ) {
+				$list = array_values( studentup_author_expertise_list() );
+				if ( $list ) {
+					$founder['knowsAbout'] = $list;
+				}
+			}
+			if ( $ad['avatar'] ) {
+				$founder['image'] = array( '@type' => 'ImageObject', 'url' => $ad['avatar'] );
+			}
+			$same = array_values( array_filter( array( $ad['linkedin'], $ad['x'], $ad['youtube'] ) ) );
+			if ( $same ) {
+				$founder['sameAs'] = $same;
+			}
+			$data['studentup_founder'] = $founder;
+		}
+	}
 	// v1.9.126: Rank Math breadcrumbs module is OFF by default → no
 	// BreadcrumbList in its graph. Add the theme trail (Home › Category › Post)
 	// only when Rank Math did not emit one (never a duplicate).
