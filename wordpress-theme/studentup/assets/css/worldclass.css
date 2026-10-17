@@ -2652,3 +2652,19 @@ body.dark .su-kf-apply{background:#2563eb}
 .su-side-days.is-hot{color:#b91c1c}
 .su-side-orgs .su-qual-links{margin:0}
 .su-sidebar .su-secwise-more{display:inline-block;margin-top:8px}
+
+/* v1.9.134 — /today/ date-wise updates */
+.su-today{margin:6px 0 18px}
+.su-today-day{margin:0 0 18px}
+.su-today-day h2{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;margin:0 0 6px;padding:8px 0 6px;border-bottom:2px solid var(--su-g2,#7c3aed)}
+.su-today-day h2 span{font-size:12px;font-weight:700;color:var(--su-mute,#64748b);background:var(--su-soft,#f1f5f9);border-radius:999px;padding:2px 9px}
+.su-today-day ol{list-style:none;margin:0;padding:0;counter-reset:none}
+.su-today-day li{display:flex;flex-direction:column;gap:4px;padding:10px 0;border-bottom:1px dashed var(--su-line,#e5e7eb)}
+.su-today-day li:last-child{border-bottom:0}
+.su-today-t{color:var(--su-ink,#0f172a);font-weight:600;font-size:15px;line-height:1.45;text-decoration:none}
+.su-today-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12px;color:var(--su-mute,#64748b)}
+.su-today-cat{color:var(--su-g2,#7c3aed);font-weight:700;text-decoration:none}
+.su-today-dl{font-weight:700;color:#b45309}
+.su-today-dl.is-hot{color:#b91c1c}
+body.dark .su-today-day h2 span{background:#152137}
+@media (min-width:981px){.su-today-day li{flex-direction:row;align-items:baseline;justify-content:space-between;gap:16px}.su-today-t{flex:1}.su-today-t:hover{color:var(--su-g2,#7c3aed)}.su-today-meta{flex:0 0 auto;justify-content:flex-end}}
