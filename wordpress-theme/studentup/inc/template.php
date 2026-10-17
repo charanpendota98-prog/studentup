@@ -441,7 +441,11 @@ function studentup_breadcrumbs() {
 	if ( function_exists( 'rank_math_the_breadcrumbs' ) ) {
 		ob_start();
 		rank_math_the_breadcrumbs();
-		return (string) ob_get_clean();
+		$rm = trim( (string) ob_get_clean() );
+		if ( '' !== $rm ) {
+			return $rm;
+		}
+		// v1.9.126: Rank Math breadcrumbs module OFF (default) → theme trail below.
 	}
 	$out = '<a href="' . esc_url( home_url( '/' ) ) . '">Home</a>';
 	if ( is_singular() ) {

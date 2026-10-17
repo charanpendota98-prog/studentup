@@ -298,6 +298,28 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 			}
 		}
 	}
+	// v1.9.126: Rank Math breadcrumbs module is OFF by default → no
+	// BreadcrumbList in its graph. Add the theme trail (Home › Category › Post)
+	// only when Rank Math did not emit one (never a duplicate).
+	if ( is_singular( 'post' ) && function_exists( 'studentup_breadcrumb_items' ) ) {
+		$has_bc = false;
+		foreach ( $data as $node ) {
+			if ( is_array( $node ) && isset( $node['@type'] ) && 'BreadcrumbList' === $node['@type'] ) {
+				$has_bc = true;
+				break;
+			}
+		}
+		if ( ! $has_bc ) {
+			$data['studentup_breadcrumb'] = array(
+				'@type'           => 'BreadcrumbList',
+				'@id'             => get_permalink() . '#breadcrumb',
+				'itemListElement' => studentup_breadcrumb_items(),
+			);
+			if ( isset( $data['WebPage'] ) && is_array( $data['WebPage'] ) && empty( $data['WebPage']['breadcrumb'] ) ) {
+				$data['WebPage']['breadcrumb'] = array( '@id' => get_permalink() . '#breadcrumb' );
+			}
+		}
+	}
 	// Any remaining inLanguage (images, FAQ, author…) → content language.
 	array_walk_recursive( $data, function ( &$v, $k ) use ( $lang ) {
 		if ( 'inLanguage' === $k && is_string( $v ) ) {
