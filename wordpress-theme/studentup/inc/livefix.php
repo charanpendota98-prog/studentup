@@ -134,3 +134,83 @@ function studentup_livefix_empty_search_robots( $robots ) {
 	return $robots;
 }
 add_filter( 'wp_robots', 'studentup_livefix_empty_search_robots', 98 );
+
+
+/**
+ * v1.9.124 — safety net: Rank Math must never noindex a real category/tag
+ * archive that has posts (unless the owner set it per-term or it is page 2+).
+ * Root cause (category__not_in → "multiple terms") is fixed in postnews.php;
+ * this guards against any other plugin/theme query tweak doing the same.
+ */
+function studentup_livefix_rankmath_archive_index( $robots ) {
+	if ( ! is_array( $robots ) || ! ( is_category() || is_tag() ) || is_paged() ) {
+		return $robots;
+	}
+	$term = get_queried_object();
+	if ( ! $term instanceof WP_Term || (int) $term->count < 1 ) {
+		return $robots;
+	}
+	$manual = get_term_meta( $term->term_id, 'rank_math_robots', true );
+	if ( ! empty( $manual ) ) {
+		return $robots; // owner decided per term
+	}
+	if ( isset( $robots['index'] ) && 'noindex' === $robots['index'] ) {
+		$robots['index'] = 'index';
+	}
+	return $robots;
+}
+add_filter( 'rank_math/frontend/robots', 'studentup_livefix_rankmath_archive_index', 98 );
+
+/**
+ * v1.9.124 — alias-group category archives (functions.php v178 merges sibling
+ * categories into one `category__in` query) look like a "multiple terms" query
+ * to Rank Math, which then returns NO canonical and NO description. Supply
+ * both from the primary term so every category page stays fully indexable.
+ */
+function studentup_livefix_rankmath_archive_canonical( $canonical ) {
+	if ( '' !== (string) $canonical || ! ( is_category() || is_tag() ) ) {
+		return $canonical;
+	}
+	$obj = get_queried_object();
+	if ( function_exists( 'studentup_alias_primary_term' ) ) {
+		$obj = studentup_alias_primary_term( $obj );
+	}
+	if ( ! $obj instanceof WP_Term ) {
+		return $canonical;
+	}
+	$link = get_term_link( $obj );
+	if ( is_wp_error( $link ) ) {
+		return $canonical;
+	}
+	$paged = max( 1, (int) get_query_var( 'paged' ) );
+	return $paged > 1 ? get_pagenum_link( $paged ) : (string) $link;
+}
+add_filter( 'rank_math/frontend/canonical', 'studentup_livefix_rankmath_archive_canonical', 98 );
+
+function studentup_livefix_rankmath_archive_description( $desc ) {
+	if ( '' !== trim( (string) $desc ) || ! ( is_category() || is_tag() ) ) {
+		return $desc;
+	}
+	$obj = get_queried_object();
+	if ( function_exists( 'studentup_alias_primary_term' ) ) {
+		$obj = studentup_alias_primary_term( $obj );
+	}
+	if ( ! $obj instanceof WP_Term ) {
+		return $desc;
+	}
+	$td = trim( wp_strip_all_tags( (string) term_description( $obj ) ) );
+	if ( '' !== $td ) {
+		return $td;
+	}
+	global $wp_query;
+	$titles = array();
+	foreach ( array_slice( (array) $wp_query->posts, 0, 3 ) as $p ) {
+		$titles[] = wp_strip_all_tags( get_the_title( $p ) );
+	}
+	$out = $obj->name . ' — latest updates';
+	if ( $titles ) {
+		$out .= ': ' . implode( ' · ', $titles );
+	}
+	return mb_substr( $out . ' | ' . wp_strip_all_tags( get_bloginfo( 'name' ) ), 0, 160 );
+}
+add_filter( 'rank_math/frontend/description', 'studentup_livefix_rankmath_archive_description', 98 );

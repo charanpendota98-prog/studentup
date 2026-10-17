@@ -19,6 +19,13 @@ function studentup_schema_head() {
 	if ( is_admin() || is_feed() || ! studentup_opt( 'schema', '1' ) ) {
 		return;
 	}
+	// v1.9.124: Rank Math active → it already emits Organization(#organization)
+	// + WebSite(#website). A second Organization/WebSite pair from the theme was
+	// a duplicate-entity signal; our extra facts (sameAs, contactPoint, founder,
+	// inLanguage) are merged INTO Rank Math's graph instead (studentup_rm_jsonld).
+	if ( class_exists( 'RankMath' ) ) {
+		return;
+	}
 	$home  = home_url( '/' );
 	$name  = get_bloginfo( 'name' );
 	$desc  = get_bloginfo( 'description' );
@@ -214,3 +221,83 @@ function studentup_hreflang_tags() {
 	);
 }
 add_action( 'wp_head', 'studentup_hreflang_tags', 6 );
+
+
+/* ------------------------------------------------------------------ v1.9.124
+ * Rank Math graph bridge — one knowledge graph, theme facts merged in.
+ * ------------------------------------------------------------------------ */
+
+/**
+ * @param array  $data   Rank Math json-ld entities (publisher, WebSite, WebPage, richSnippet…).
+ * @param object $jsonld Rank Math JsonLD instance.
+ * @return array
+ */
+function studentup_rm_jsonld( $data, $jsonld = null ) {
+	if ( ! is_array( $data ) ) {
+		return $data;
+	}
+	$home = home_url( '/' );
+	// Publisher (Organization/Person): social sameAs + editorial contact + founder.
+	if ( isset( $data['publisher'] ) && is_array( $data['publisher'] ) ) {
+		$socials = function_exists( 'studentup_social_links' ) ? array_values( array_filter( (array) studentup_social_links(), function ( $u ) {
+			return is_string( $u ) && 0 === strpos( $u, 'http' );
+		} ) ) : array();
+		if ( $socials ) {
+			$have = isset( $data['publisher']['sameAs'] ) ? (array) $data['publisher']['sameAs'] : array();
+			$data['publisher']['sameAs'] = array_values( array_unique( array_merge( $have, $socials ) ) );
+		}
+		if ( function_exists( 'studentup_contact_email' ) && studentup_contact_email() && empty( $data['publisher']['contactPoint'] ) ) {
+			$data['publisher']['contactPoint'] = array(
+				'@type'             => 'ContactPoint',
+				'contactType'       => 'editorial',
+				'email'             => studentup_contact_email(),
+				'availableLanguage' => array( 'te', 'en' ),
+			);
+		}
+		if ( isset( $data['publisher']['@type'] ) && 'Organization' === $data['publisher']['@type'] && empty( $data['publisher']['founder'] ) ) {
+			$data['publisher']['founder'] = array( '@id' => $home . '#founder' );
+		}
+	}
+	// Rank Math copies the WP locale (en-US) into inLanguage — content is Telugu.
+	$lang = function_exists( 'studentup_content_lang_tag' ) ? studentup_content_lang_tag() : 'te-IN';
+	if ( isset( $data['WebSite'] ) && is_array( $data['WebSite'] ) ) {
+		$data['WebSite']['inLanguage'] = $lang;
+	}
+	if ( isset( $data['WebPage'] ) && is_array( $data['WebPage'] ) ) {
+		$data['WebPage']['inLanguage'] = $lang;
+		if ( is_singular( 'post' ) && empty( $data['WebPage']['speakable'] ) ) {
+			$data['WebPage']['speakable'] = array(
+				'@type'       => 'SpeakableSpecification',
+				'cssSelector' => array( '.article-head h1', '.su-quick-summary' ),
+			);
+		}
+	}
+	// Article node (Rank Math key "richSnippet"): entities + language.
+	if ( is_singular( 'post' ) ) {
+		foreach ( $data as $key => $node ) {
+			if ( ! is_array( $node ) || empty( $node['@type'] ) ) {
+				continue;
+			}
+			$types = (array) $node['@type'];
+			if ( ! array_intersect( $types, array( 'Article', 'NewsArticle', 'BlogPosting' ) ) ) {
+				continue;
+			}
+			$data[ $key ]['inLanguage'] = $lang;
+			if ( function_exists( 'studentup_ai_entities_for_post' ) ) {
+				foreach ( studentup_ai_entities_for_post( get_the_ID() ) as $k => $v ) {
+					if ( empty( $node[ $k ] ) ) {
+						$data[ $key ][ $k ] = $v;
+					}
+				}
+			}
+		}
+	}
+	// Any remaining inLanguage (images, FAQ, author…) → content language.
+	array_walk_recursive( $data, function ( &$v, $k ) use ( $lang ) {
+		if ( 'inLanguage' === $k && is_string( $v ) ) {
+			$v = $lang;
+		}
+	} );
+	return $data;
+}
+add_filter( 'rank_math/json_ld', 'studentup_rm_jsonld', 100, 2 ); // after Rank Math's connect_schema_entities (99)

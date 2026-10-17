@@ -101,6 +101,9 @@ function studentup_speakable_schema() {
 	if ( is_admin() || is_feed() || ! is_singular( 'post' ) ) {
 		return;
 	}
+	if ( class_exists( 'RankMath' ) ) {
+		return; // v1.9.124: speakable merged into Rank Math's WebPage node (schema.php)
+	}
 	$data = array(
 		'@context'  => 'https://schema.org',
 		'@type'     => 'WebPage',

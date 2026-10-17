@@ -162,7 +162,11 @@ function studentup_ai_site_schema() {
 	if ( $same ) {
 		$org['sameAs'] = array_values( $same );
 	}
-	$graph[] = $org;
+	// v1.9.124: Rank Math active → its publisher node is THE organisation
+	// (knowsAbout/sameAs merged there via studentup_rm_jsonld); no 2nd org node.
+	if ( ! class_exists( 'RankMath' ) ) {
+		$graph[] = $org;
+	}
 
 	echo '<script type="application/ld+json">'
 		. wp_json_encode(

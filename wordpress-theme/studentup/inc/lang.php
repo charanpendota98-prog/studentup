@@ -29,7 +29,11 @@ function studentup_html_lang_attr( $output ) {
 	if ( false !== stripos( $output, 'lang="' . $tag . '"' ) ) {
 		return $output;
 	}
-	$output = preg_replace( '/\slang="[^"]*"/i', '', (string) $output );
+	// v1.9.124 FIX: WP prints lang="en-US" as the FIRST attribute (no leading
+	// space) → old `\slang=` regex missed it → <html lang="en-US" lang="te-IN">
+	// (invalid; browsers/Google keep the first → en-US). Strip at any position.
+	$output = preg_replace( '/(^|\s)lang="[^"]*"/i', ' ', (string) $output );
+	$output = trim( preg_replace( '/\s{2,}/', ' ', $output ) );
 	return trim( $output . ' lang="' . esc_attr( $tag ) . '"' );
 }
 add_filter( 'language_attributes', 'studentup_html_lang_attr', 20 );

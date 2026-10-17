@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.123\n"
+"Project-Id-Version: StudentUp 1.9.124\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -200,7 +200,7 @@ msgstr ""
 msgid "Breaking News"
 msgstr ""
 
-#: inc/postnews.php:392
+#: inc/postnews.php:401
 msgid "Breaking news by state and district"
 msgstr ""
 
@@ -742,7 +742,7 @@ msgid "More %s"
 msgstr ""
 
 #: inc/org-pages.php:307
-#: inc/seo-max.php:187
+#: inc/seo-max.php:190
 msgid "More updates:"
 msgstr ""
 
@@ -790,7 +790,7 @@ msgstr ""
 msgid "No corrections have been needed so far. When one happens, it will be listed here with the date - we do not silently edit published facts."
 msgstr ""
 
-#: inc/postnews.php:422
+#: inc/postnews.php:431
 msgid "No district with that name — press Search to look inside the news."
 msgstr ""
 
@@ -900,7 +900,7 @@ msgstr ""
 msgid "Outside this website we run a small offline Students Internet Center that helps students fill government application forms. This is optional: every job, result, hall ticket and scholarship update on this website is free to read and you never need this service to use the site."
 msgstr ""
 
-#: inc/seo-max.php:131
+#: inc/seo-max.php:134
 msgid "Page %d"
 msgstr ""
 
@@ -1151,12 +1151,12 @@ msgstr ""
 msgid "Scrolling latest jobs carousel"
 msgstr ""
 
-#: inc/postnews.php:402
+#: inc/postnews.php:411
 #: inc/premium.php:82
 msgid "Search"
 msgstr ""
 
-#: inc/postnews.php:396
+#: inc/postnews.php:405
 msgid "Search %s news…"
 msgstr ""
 
@@ -1176,7 +1176,7 @@ msgstr ""
 msgid "Search StudentUp — jobs, hall tickets, results…"
 msgstr ""
 
-#: inc/postnews.php:396
+#: inc/postnews.php:405
 msgid "Search Telangana / Andhra news…"
 msgstr ""
 
