@@ -16,15 +16,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admissions · TS/AP/Central jobs — 5 titles each, category link as head.
  * Breaking News never appears here (owner rule).
  */
-function studentup_home_sectionwise() {
-	if ( ! is_front_page() || is_paged() ) {
+function studentup_home_sectionwise( $exclude = 0, $heading = '' ) {
+	if ( is_paged() || ( ! $exclude && ! is_front_page() && ! is_archive() && ! is_search() && ! is_404() && ! is_page() ) ) {
 		return;
 	}
+	$exclude = (int) $exclude;
 	$slugs = array( 'results', 'hall-tickets', 'scholarships', 'admissions', 'ts-govt-jobs', 'ap-govt-jobs', 'central-govt-jobs' );
 	$cols  = array();
 	foreach ( $slugs as $slug ) {
 		$term = function_exists( 'studentup_used_term' ) ? studentup_used_term( $slug ) : get_category_by_slug( $slug );
-		if ( ! $term || (int) $term->count < 2 ) {
+		if ( ! $term || (int) $term->count < 2 || (int) $term->term_id === $exclude ) {
 			continue;
 		}
 		$q = new WP_Query(
@@ -51,7 +52,7 @@ function studentup_home_sectionwise() {
 	}
 	?>
 	<section class="su-secwise" aria-label="Latest by section">
-		<div class="qsplit-head"><h2>విభాగాల వారీగా తాజా అప్‌డేట్స్</h2></div>
+		<div class="qsplit-head"><h2><?php echo esc_html( $heading ? $heading : 'విభాగాల వారీగా తాజా అప్‌డేట్స్' ); ?></h2></div>
 		<div class="su-secwise-grid">
 			<?php foreach ( $cols as $c ) : ?>
 				<div class="su-secwise-col">
@@ -88,4 +89,20 @@ function studentup_home_orgdir() {
 		<?php echo wp_kses_post( $links ); ?>
 	</section>
 	<?php
+}
+
+/**
+ * Archive / search / 404 / landing pages: same section lists, current
+ * section excluded — every list page links out to the rest of the site.
+ */
+function studentup_sectionwise_elsewhere() {
+	if ( is_front_page() || is_singular( 'post' ) ) {
+		return;
+	}
+	$cur = 0;
+	if ( is_category() ) {
+		$qo  = get_queried_object();
+		$cur = $qo ? (int) $qo->term_id : 0;
+	}
+	studentup_home_sectionwise( $cur ? $cur : -1, 'ఇతర విభాగాల్లో తాజా అప్‌డేట్స్' );
 }
