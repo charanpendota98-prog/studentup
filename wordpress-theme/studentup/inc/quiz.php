@@ -495,7 +495,7 @@ function studentup_daily_quiz( $args = array() ) {
 						href="<?php echo esc_url( 'https://wa.me/?text=' . $share ); ?>" hidden><?php echo studentup_ui_icon( 'upload', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Share my score</a>
 					<span class="su-quiz-streak" data-su-quiz-streak hidden></span>
 					<?php if ( $more ) : ?>
-						<a class="su-quiz-more" href="<?php echo esc_url( $more ); ?>">More practice questions →</a>
+						<a class="su-quiz-more" href="<?php echo esc_url( $more ); ?>"><?php esc_html_e( 'More practice questions', 'studentup' ); ?> →</a>
 					<?php endif; ?>
 				</div>
 			</form>

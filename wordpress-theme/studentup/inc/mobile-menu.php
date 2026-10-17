@@ -86,7 +86,7 @@ function studentup_mobile_main_menu() {
 	if ( ! $rows ) {
 		return;
 	}
-	echo '<div class="mlabel">Main menu</div>';
+	echo '<div class="mlabel">' . esc_html__( 'Main menu', 'studentup' ) . '</div>';
 	echo '<nav class="su-mmain" aria-label="Main menu">';
 	foreach ( $rows as $row ) {
 		printf(

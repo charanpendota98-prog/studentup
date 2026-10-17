@@ -132,7 +132,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 			<?php if ( $su_is_p2 ) : ?>
 				<a class="su-viewall" href="<?php echo esc_url( home_url( '/' ) ); ?>">← Newest updates</a>
 			<?php else : ?>
-				<a class="su-viewall" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>">All active sections →</a>
+				<a class="su-viewall" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php esc_html_e( 'All active sections', 'studentup' ); ?> →</a>
 			<?php endif; ?>
 		</div>
 
@@ -206,7 +206,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 			<p class="nores" style="display:block">No posts yet — the bot will publish the first update soon.</p>
 			<?php endif; ?>
 		</div>
-		<p class="nores" id="nores">Nothing for this filter — open the "All" tab and try again.</p>
+		<p class="nores" id="nores"><?php esc_html_e( 'Nothing for this filter — open the "All" tab and try again.', 'studentup' ); ?></p>
 
 		<nav class="sectionhead" aria-label="Post pages">
 			<div>

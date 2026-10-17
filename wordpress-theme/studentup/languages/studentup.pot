@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.132\n"
+"Project-Id-Version: StudentUp 1.9.133\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -90,8 +90,16 @@ msgstr ""
 msgid "Age limit"
 msgstr ""
 
+#: front-page.php:135
+msgid "All active sections"
+msgstr ""
+
 #: front-page.php:74
 msgid "All deadlines"
+msgstr ""
+
+#: inc/qual-filter.php:493
+msgid "All qualifications"
 msgstr ""
 
 #: inc/saved.php:302
@@ -204,6 +212,14 @@ msgstr ""
 msgid "Breaking news by state and district"
 msgstr ""
 
+#: inc/qual-filter.php:636
+msgid "Browse by qualification"
+msgstr ""
+
+#: header.php:152
+msgid "Browse everything"
+msgstr ""
+
 #: inc/personal.php:53
 msgid "Build my list"
 msgstr ""
@@ -285,6 +301,11 @@ msgstr ""
 
 #: inc/workspace.php:137
 msgid "Closing in 3 days"
+msgstr ""
+
+#: inc/qual-filter.php:499
+#: inc/qual-filter.php:554
+msgid "Closing in 7 days"
 msgstr ""
 
 #: front-page.php:71
@@ -563,7 +584,7 @@ msgstr ""
 msgid "Hide social icons"
 msgstr ""
 
-#: inc/megamenu.php:356
+#: inc/megamenu.php:357
 #: inc/template.php:399
 msgid "Home"
 msgstr ""
@@ -605,6 +626,10 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
+#: footer.php:127
+msgid "Install now"
+msgstr ""
+
 #: inc/saved.php:306
 #: inc/workspace.php:133
 msgid "Interview"
@@ -616,6 +641,10 @@ msgstr ""
 
 #: inc/cta.php:117
 msgid "Jobs · results · hall tickets — first on WhatsApp / Telegram."
+msgstr ""
+
+#: footer.php:21
+msgid "Jobs, scholarships, results and exam updates for students."
 msgstr ""
 
 #: inc/cta.php:115
@@ -716,12 +745,20 @@ msgstr ""
 msgid "Links, emails and phone numbers are not allowed in questions."
 msgstr ""
 
+#: inc/audioreader.php:46
+msgid "Listen to Article"
+msgstr ""
+
 #: inc/slider.php:178
 msgid "LIVE"
 msgstr ""
 
 #: inc/premium.php:582
 msgid "Live job alerts"
+msgstr ""
+
+#: inc/mobile-menu.php:89
+msgid "Main menu"
 msgstr ""
 
 #: inc/cta.php:42
@@ -741,9 +778,17 @@ msgstr ""
 msgid "More %s"
 msgstr ""
 
+#: inc/quiz.php:498
+msgid "More practice questions"
+msgstr ""
+
 #: inc/org-pages.php:310
 #: inc/seo-max.php:190
 msgid "More updates:"
+msgstr ""
+
+#: header.php:159
+msgid "Most searched by students"
 msgstr ""
 
 #: inc/workspace.php:175
@@ -830,6 +875,10 @@ msgstr ""
 msgid "No saved posts yet. Tap Save on any card to keep it here."
 msgstr ""
 
+#: front-page.php:209
+msgid "Nothing for this filter — open the "All" tab and try again."
+msgstr ""
+
 #: inc/important-links.php:45
 msgid "Official Notification"
 msgstr ""
@@ -852,6 +901,10 @@ msgstr ""
 
 #: page-internet-center.php:52
 msgid "One online form filled, checked and returned as a PDF"
+msgstr ""
+
+#: inc/pwa.php:309
+msgid "One-tap install · new job alerts direct ga"
 msgstr ""
 
 #: inc/apply.php:206
@@ -1041,7 +1094,7 @@ msgstr ""
 msgid "Recently read"
 msgstr ""
 
-#: inc/megamenu.php:401
+#: inc/megamenu.php:402
 msgid "Recommended"
 msgstr ""
 
@@ -1260,6 +1313,10 @@ msgstr ""
 msgid "Single application form"
 msgstr ""
 
+#: header.php:50
+msgid "Skip to content"
+msgstr ""
+
 #: inc/slider.php:184
 msgid "Slide Left"
 msgstr ""
@@ -1278,6 +1335,10 @@ msgstr ""
 
 #: inc/sponsorhub.php:34
 msgid "Sponsored partner"
+msgstr ""
+
+#: footer.php:22
+msgid "Spotted a mistake? Tell us at"
 msgstr ""
 
 #: inc/personal.php:45
@@ -1376,6 +1437,10 @@ msgstr ""
 
 #: page-corrections.php:65
 msgid "Tell us what the official notification says instead - a screenshot or the official link helps most."
+msgstr ""
+
+#: inc/readerbar.php:35
+msgid "Text Size:"
 msgstr ""
 
 #: inc/polls.php:463
@@ -1551,6 +1616,10 @@ msgstr ""
 
 #: inc/doubts.php:279
 msgid "Your name (optional)"
+msgstr ""
+
+#: inc/qual-filter.php:491
+msgid "Your qualification:"
 msgstr ""
 
 #: inc/doubts.php:275

@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="footer-grid">
 			<div>
 				<h3><?php bloginfo( 'name' ); ?></h3>
-				<p>Jobs, scholarships, results and exam updates for students.</p>
-				<p><?php echo studentup_ui_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Spotted a mistake? Tell us at <a href="mailto:<?php echo esc_attr( studentup_contact_email() ); ?>"><?php echo esc_html( studentup_contact_email() ); ?></a></p>
+				<p><?php esc_html_e( 'Jobs, scholarships, results and exam updates for students.', 'studentup' ); ?></p>
+				<p><?php echo studentup_ui_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Spotted a mistake? Tell us at', 'studentup' ); ?> <a href="mailto:<?php echo esc_attr( studentup_contact_email() ); ?>"><?php echo esc_html( studentup_contact_email() ); ?></a></p>
 			</div>
 			<div>
 				<h3>Categories</h3>
@@ -124,7 +124,7 @@ if ( studentup_opt( 'pwa', '1' ) && studentup_opt( 'install_prompt', '1' ) ) :
 			<li><b>Computer:</b> click the install icon in the address bar</li>
 		</ol>
 		<div class="irow">
-			<button type="button" class="installok" id="installnow">Install now</button>
+			<button type="button" class="installok" id="installnow"><?php esc_html_e( 'Install now', 'studentup' ); ?></button>
 			<button type="button" class="installclose" id="installclose">Later</button>
 		</div>
 	</div>

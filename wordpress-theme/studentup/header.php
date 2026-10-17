@@ -47,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </script>
 <?php wp_body_open(); ?>
 <?php studentup_notify_public_banner(); // v90: critical alerts site-wide banner (option gate + localStorage dismiss) ?>
-<a class="skip-link screen-reader-text" href="#main">Skip to content</a>
+<a class="skip-link screen-reader-text" href="#main"><?php esc_html_e( 'Skip to content', 'studentup' ); ?></a>
 
 <header class="header">
 	<div class="wrap headrow">
@@ -149,14 +149,14 @@ studentup_breaking_ticker();
 		<a href="<?php echo esc_url( get_category_link( $su_schol ) ); ?>"><?php echo studentup_ui_icon( 'school' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Scholarships</a>
 	<?php endif; ?>
 	<?php if ( function_exists( 'studentup_mega_mobile_groups' ) ) : ?>
-		<div class="mlabel">Browse everything</div>
+		<div class="mlabel"><?php esc_html_e( 'Browse everything', 'studentup' ); ?></div>
 		<?php
 		foreach ( studentup_mega_mobile_groups() as $su_gi => $su_group ) {
 			studentup_mega_mobile_accordion( $su_group, 0 === $su_gi );
 		}
 		?>
 	<?php endif; ?>
-	<div class="mlabel">Most searched by students</div>
+	<div class="mlabel"><?php esc_html_e( 'Most searched by students', 'studentup' ); ?></div>
 	<?php foreach ( studentup_most_used() as $m ) : ?>
 		<?php
 		$term = studentup_used_term( $m['slug'] );   // v89: alias-aware — TS/AP/Central eppudu kanipistayi

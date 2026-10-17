@@ -121,6 +121,7 @@ function studentup_option_fields() {
 			'title'  => 'Content & site',
 			'fields' => array(
 				'contact_email' => array( 'Contact email', 'text', '', 'Errors/suggestions — falls back to the admin email if empty' ),
+				'ui_telugu'              => array( 'Telugu UI chrome (headings, buttons, labels)', 'check', '1', 'v1.9.133: ON = site chrome in Telugu (standard terms stay English). OFF = English UI.' ),
 				'css_async'              => array( 'Async full CSS (media=print swap)', 'check', '0', 'OFF = safe normal load (default). ON only if your cache plugin keeps onload attributes.' ),
 				'success_story_form_url' => array( 'Verified Success Story Google Form URL', 'text', '', 'Public intake link. Collect consent + evidence only; never ask for Aadhaar, PAN, bank details, OTPs or passwords.' ),
 				'author_name'   => array( 'Author name', 'text', 'Charan Pendota', 'Shown in the byline and E-E-A-T box under the post' ),

@@ -32,7 +32,7 @@ function studentup_reader_toolbar() {
 			<span class="su-rb-time"><?php echo studentup_ui_icon( 'clock', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo (int) $minutes; ?> min read</span>
 		</div>
 		<div class="su-rb-right">
-			<span class="su-rb-label">Text Size:</span>
+			<span class="su-rb-label"><?php esc_html_e( 'Text Size:', 'studentup' ); ?></span>
 			<div class="su-font-sizer" role="group" aria-label="Font size controls">
 				<button type="button" class="su-fz-btn" data-su-font="small" title="Small text" aria-label="Decrease font size">A-</button>
 				<button type="button" class="su-fz-btn is-active" data-su-font="normal" title="Normal text" aria-label="Reset font size">A</button>
