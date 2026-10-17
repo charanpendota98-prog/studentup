@@ -287,6 +287,46 @@ function studentup_apply_schema() {
 	if ( function_exists( 'studentup_opportunity_is_expired' ) && studentup_opportunity_is_expired( $meta['last'] ) ) {
 		return;
 	}
+	/*
+	 * v1.9.126: hiringOrganization must be the REAL recruiter (Google Jobs
+	 * policy) — StudentUp is the publisher, not the employer. Recruiter comes
+	 * from the org map (title aliases) or the official org_url meta; when
+	 * neither is known the JobPosting is skipped rather than misattributed.
+	 */
+	$hiring = null;
+	$org    = function_exists( 'studentup_org_from_title' ) ? studentup_org_from_title( get_the_title() ) : '';
+	if ( $org && function_exists( 'studentup_org_map' ) ) {
+		$row    = studentup_org_map()[ $org ];
+		$hiring = array(
+			'@type'  => 'Organization',
+			'name'   => $row[1],
+			'sameAs' => $row[2],
+			'url'    => $row[2],
+		);
+	} else {
+		$org_url = trim( (string) get_post_meta( get_the_ID(), 'studentup_org_url', true ) );
+		$host    = $org_url ? wp_parse_url( $org_url, PHP_URL_HOST ) : '';
+		if ( $host ) {
+			$hiring = array(
+				'@type' => 'Organization',
+				'name'  => preg_replace( '/^www\./', '', $host ),
+				'url'   => $org_url,
+			);
+		}
+	}
+	if ( ! $hiring ) {
+		return;
+	}
+	// Location from the post's category (Telangana / Andhra Pradesh / India).
+	$address = array( '@type' => 'PostalAddress', 'addressCountry' => 'IN' );
+	$slugs   = implode( ' ', wp_list_pluck( get_the_category(), 'slug' ) ) . ' ' . $org;
+	if ( preg_match( '/(^|[\s-])(ts|tg|telangana)([\s-]|$)/', $slugs ) ) {
+		$address['addressRegion']   = 'Telangana';
+		$address['addressLocality'] = 'Hyderabad';
+	} elseif ( preg_match( '/(^|[\s-])(ap|andhra-pradesh|andhra)([\s-]|$)/', $slugs ) ) {
+		$address['addressRegion']   = 'Andhra Pradesh';
+		$address['addressLocality'] = 'Amaravati';
+	}
 	$data = array(
 		'@context'           => 'https://schema.org',
 		'@type'              => 'JobPosting',
@@ -297,19 +337,13 @@ function studentup_apply_schema() {
 		'employmentType'     => 'FULL_TIME',
 		'url'                => get_permalink(),   // v176: Google Jobs — ee page ye job landing page.
 		'educationRequirements' => function_exists( 'studentup_qual_pretty' ) ? studentup_qual_pretty( $meta['qual'] ) : $meta['qual'],   // v175: human labels.
-		'hiringOrganization' => array(
-			'@type' => 'Organization',
-			'name'  => get_bloginfo( 'name' ),
-			'url'   => home_url( '/' ),
-		),
+		'hiringOrganization' => $hiring,
 		'jobLocation'        => array(
 			'@type'   => 'Place',
-			'address' => array(
-				'@type'          => 'PostalAddress',
-				'addressCountry' => 'IN',
-			),
+			'address' => $address,
 		),
-		'directApply'        => ( '' !== $meta['apply'] ),
+		// v1.9.126: application happens on the official portal, not on this page.
+		'directApply'        => false,
 	);
 	if ( '' !== $meta['vac'] && is_numeric( str_replace( ',', '', $meta['vac'] ) ) ) {
 		$data['totalJobOpenings'] = (int) str_replace( ',', '', $meta['vac'] );   // v175: "12,000" kuda numeric ga.

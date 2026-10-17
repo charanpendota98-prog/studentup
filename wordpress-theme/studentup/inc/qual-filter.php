@@ -295,6 +295,7 @@ function studentup_register_qual_meta() {
 		'studentup_source_url', 'studentup_source_urls', 'studentup_source_checked', 'studentup_org_url',
 		// v133: full job dataset so the bot can publish a complete card in one call.
 		'studentup_salary', 'studentup_vacancies', 'studentup_age_min', 'studentup_age_max',
+		'studentup_fee', // v1.9.118: application fee (bot evidence only)
 	);
 	foreach ( $keys as $key ) {
 		register_post_meta(
@@ -487,15 +488,15 @@ function studentup_qual_bar() {
 	$icons   = studentup_qual_icons();
 	$current = studentup_qual_current();
 	echo '<form class="qrow qualform" method="get" action="' . esc_url( home_url( '/' ) ) . '" aria-label="Jobs by qualification" data-icons="' . esc_attr( wp_json_encode( $icons, JSON_UNESCAPED_UNICODE ) ) . '">';
-	echo '<label class="catlabel qualabel" for="qualsel">' . studentup_ui_icon( 'school', 14 ) . ' Your qualification:</label>'; // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
+	echo '<label class="catlabel qualabel" for="qualsel">' . studentup_ui_icon( 'school', 14 ) . ' ' . esc_html__( 'Your qualification:', 'studentup' ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 	echo '<select id="qualsel" class="qualsel" name="qual">';
-	echo '<option value="all"' . selected( $current, 'all', false ) . '>All qualifications</option>';
+	echo '<option value="all"' . selected( $current, 'all', false ) . '>' . esc_html__( 'All qualifications', 'studentup' ) . '</option>';
 	foreach ( $terms as $slug => $label ) {
 		$n = studentup_qual_count( $slug );
 		echo '<option value="' . esc_attr( $slug ) . '"' . selected( $current, $slug, false ) . '>'
 			. esc_html( $label ) . ( $n ? ' (' . (int) $n . ')' : '' ) . '</option>';
 	}
-	echo '<option value="closing"' . selected( $current, 'closing', false ) . '>Closing in 7 days</option>';   // v174: option lo text matrame (SVG support ledu)
+	echo '<option value="closing"' . selected( $current, 'closing', false ) . '>' . esc_html__( 'Closing in 7 days', 'studentup' ) . '</option>';   // v174: option lo text matrame (SVG support ledu)
 	echo '</select>';
 	echo '<noscript><button type="submit" class="chip">Filter</button></noscript>';
 	echo '</form>';
@@ -550,7 +551,7 @@ function studentup_qual_active_note( $count = 0 ) {
 		return;
 	}
 	$terms = studentup_qual_terms();
-	$label = ( 'closing' === $qual ) ? 'Closing in 7 days' : ( $terms[ $qual ] ?? $qual );
+	$label = ( 'closing' === $qual ) ? __( 'Closing in 7 days', 'studentup' ) : ( $terms[ $qual ] ?? $qual );
 	echo '<p class="qnote">Qualification: <b>' . esc_html( $label ) . '</b>';
 	if ( $count ) {
 		echo ' · ' . (int) $count . ' jobs';
@@ -632,7 +633,7 @@ function studentup_qual_directory() {
 	?>
 	<section class="qualsplit" id="qualsplit" aria-label="Jobs by qualification">
 		<div class="qsplit-head">
-			<h2>Browse by qualification</h2>
+			<h2><?php esc_html_e( 'Browse by qualification', 'studentup' ); ?></h2>
 			<?php // v314: hint line removed (owner rule: no hint texts). ?>
 		</div>
 		<div class="qsplit-grid" id="qsplit">

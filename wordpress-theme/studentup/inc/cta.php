@@ -132,7 +132,7 @@ function studentup_inject_join_cta( $content ) {
 	if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() || is_feed() ) {
 		return $content;
 	}
-	if ( '0' === (string) studentup_opt( 'join_cta_inline', '1' ) ) {
+	if ( '1' !== (string) studentup_opt( 'join_cta_inline', '0' ) ) {   // v1.9.117: default OFF (bottom join block stays)
 		return $content;
 	}
 	if ( false !== strpos( $content, 'su-join-inline' ) ) {

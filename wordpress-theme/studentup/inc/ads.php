@@ -245,8 +245,8 @@ function studentup_ad( $place = 'mid' ) {
 	if ( ! studentup_ads_allowed( $place ) ) {
 		return;
 	}
-	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '5' );
-	$max = $max > 0 ? $max : 5;
+	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '3' );
+	$max = $max > 0 ? min( 3, $max ) : 3;
 	if ( studentup_ad_count() >= $max ) {
 		return; // v216 adaptive density cap — AdSense safe + UX
 	}
@@ -360,7 +360,7 @@ function studentup_inject_in_article_ad( $content ) {
 	if ( ! studentup_ads_allowed( 'mid' ) ) {
 		return $content;
 	}
-	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '5' );
+	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '3' );
 	if ( studentup_ad_count() >= max( 1, $max ) ) {
 		return $content;
 	}
@@ -398,7 +398,7 @@ function studentup_inject_deep_ad( $content ) {
 	if ( false !== strpos( $content, 'su-ad-anchor-deep' ) ) {
 		return $content;
 	}
-	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '5' );
+	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '3' );
 	if ( studentup_ad_count() >= max( 1, $max ) ) {
 		return $content;
 	}
@@ -435,8 +435,8 @@ add_filter( 'the_content', 'studentup_inject_in_article_ad', 20 );
  * @return int
  */
 function studentup_ad_cap() {
-	$max = (int) studentup_opt( 'max_ads', '5' );
-	$max = $max > 0 ? $max : 5;
+	$max = (int) studentup_opt( 'max_ads', '3' );
+	$max = $max > 0 ? min( 3, $max ) : 3;
 	if ( ! is_singular( 'post' ) ) {
 		return $max;
 	}
@@ -444,14 +444,10 @@ function studentup_ad_cap() {
 	if ( null !== $cap ) {
 		return $cap;
 	}
+	// v1.9.119: REVENUE_CLICK_PLAN rule — never more than 3 ads on a page
+	// (policy safety + CTR per unit goes UP with fewer units). Short posts 2.
 	$words = str_word_count( wp_strip_all_tags( (string) get_post_field( 'post_content', get_the_ID() ) ) );
-	if ( $words < 600 ) {
-		$cap = min( 3, $max );
-	} elseif ( $words > 1500 ) {
-		$cap = $max + 1;
-	} else {
-		$cap = $max;
-	}
+	$cap   = $words < 600 ? min( 2, $max ) : min( 3, $max );
 	return $cap;
 }
 
@@ -502,7 +498,7 @@ function studentup_ad_available( $place ) {
 	if ( ! studentup_ads_allowed( $place ) ) {
 		return false;
 	}
-	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '5' );
+	$max = function_exists( 'studentup_ad_cap' ) ? studentup_ad_cap() : (int) studentup_opt( 'max_ads', '3' );
 	if ( studentup_ad_count() >= ( $max > 0 ? $max : 5 ) ) {
 		return false;
 	}

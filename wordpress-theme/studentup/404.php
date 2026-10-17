@@ -65,6 +65,7 @@ get_header();
 			?>
 		</article>
 	</div>
+<?php if ( function_exists( 'studentup_sectionwise_elsewhere' ) ) { echo '<div class="wrap">'; studentup_sectionwise_elsewhere(); echo '</div>'; } // v1.9.131 ?>
 </main>
 <?php
 get_footer();

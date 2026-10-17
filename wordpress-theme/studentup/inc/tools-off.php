@@ -106,9 +106,9 @@ function studentup_tools_off_robots( $robots ) {
 	if ( studentup_tools_enabled() || ! studentup_is_tool_page() ) {
 		return $robots;
 	}
-	$robots['index']  = 'noindex';
-	$robots['follow'] = 'nofollow';
-	unset( $robots['max-image-preview'], $robots['max-snippet'] );
+	$robots['noindex']  = true; // v1.9.119: boolean directives (was "index:noindex" — invalid)
+	$robots['nofollow'] = true;
+	unset( $robots['index'], $robots['follow'], $robots['max-image-preview'], $robots['max-snippet'], $robots['max-video-preview'] );
 	return $robots;
 }
 add_filter( 'wp_robots', 'studentup_tools_off_robots', 20 );

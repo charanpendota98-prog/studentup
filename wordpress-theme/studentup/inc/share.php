@@ -153,8 +153,11 @@ function studentup_inject_share_bar( $content ) {
 	if ( '' === $bar ) {
 		return $content;
 	}
-	// Modati </h2> tarvata insert (bot quick-answer card ni skip chestundi —
-	// adi h2 kaadu). H2 ye lekapothe content chivara.
+	// v1.9.117 Clean Reader: share bar at the END of the article (reader finished →
+	// share; mid-article bar was clutter on phone, highlight-to-share covers the body).
+	if ( '1' !== (string) studentup_opt( 'share_inline_mid', '0' ) ) {
+		return $content . $bar;
+	}
 	$pos = stripos( $content, '</h2>' );
 	if ( false === $pos ) {
 		return $content . $bar;

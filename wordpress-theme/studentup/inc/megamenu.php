@@ -58,7 +58,8 @@ function studentup_mega_home_url( $anchor = '' ) {
  * @return array<string,string>
  */
 function studentup_mega_item( $label, $url, $desc, $icon = 'arrow' ) {
-	return array( 'label' => $label, 'url' => $url, 'desc' => $desc, 'icon' => $icon );
+	// v1.9.133: descriptions pass through gettext so inc/lang-ui.php can show Telugu chrome.
+	return array( 'label' => $label, 'url' => $url, 'desc' => ( '' !== $desc ? translate( $desc, 'studentup' ) : '' ), 'icon' => $icon );
 }
 
 /**
@@ -379,7 +380,7 @@ function studentup_mega_render( $groups, $home ) {
 		foreach ( $g['cols'] as $col ) {
 			echo '<li class="su-mega-col menu-item" role="none">';
 			if ( ! empty( $col['title'] ) ) {
-				printf( '<p class="su-mega-title">%s</p>', esc_html( (string) $col['title'] ) );
+				printf( '<p class="su-mega-title">%s</p>', esc_html( translate( (string) $col['title'], 'studentup' ) ) );
 			}
 			echo '<ul class="su-mega-list">';
 			foreach ( $col['items'] as $it ) {
@@ -399,12 +400,12 @@ function studentup_mega_render( $groups, $home ) {
 			$f = $g['feature'];
 			echo '<li class="su-mega-feat menu-item" role="none">';
 			printf( '<span class="su-mega-eyebrow">%s</span>', esc_html__( 'Recommended', 'studentup' ) );
-			printf( '<b>%s</b>', esc_html( (string) $f['title'] ) );
-			printf( '<small>%s</small>', esc_html( (string) $f['desc'] ) );
+			printf( '<b>%s</b>', esc_html( translate( (string) $f['title'], 'studentup' ) ) );
+			printf( '<small>%s</small>', esc_html( translate( (string) $f['desc'], 'studentup' ) ) );
 			printf(
 				'<a class="su-mega-cta" href="%s">%s%s</a>',
 				esc_url( (string) $f['url'] ),
-				esc_html( (string) $f['cta'] ),
+				esc_html( translate( (string) $f['cta'], 'studentup' ) ),
 				studentup_ui_icon( 'arrow', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 			);
 			echo '</li>';

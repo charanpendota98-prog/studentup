@@ -39,11 +39,19 @@ function studentup_content_toc( $content ) {
 		if ( '' === $inner ) {
 			continue;
 		}
+		// v1.9.129: short TOC — h2 sections only; no question headings, no FAQ /
+		// related chrome; max 7 entries (owner rule).
+		if ( '3' === (string) $h[1] || '?' === substr( $inner, -1 ) || count( $items ) >= 7
+			|| preg_match( '/^(frequently asked|faq|తరచుగా అడిగే)/iu', $inner ) || false !== stripos( $inner, 'related questions' ) ) {
+			continue;
+		}
 		if ( preg_match( '/id=["\']([^"\']+)["\']/', $h[2], $idm ) ) {
 			$id = $idm[1];
 		} else {
 			$id = sanitize_title( $inner );
-			if ( '' === $id ) {
+			// v1.9.119: Telugu headings → sanitize_title() gives "%e0%b0…" ids (ugly
+			// anchors, Rank Math TOC check unhappy). ASCII-only ids; else sec-N.
+			if ( '' === $id || false !== strpos( $id, '%' ) || ! preg_match( '/^[a-z0-9-]+$/', $id ) ) {
 				$id = 'sec-' . ( count( $items ) + 1 );
 			}
 			$base = $id;
@@ -52,7 +60,12 @@ function studentup_content_toc( $content ) {
 				$id = $base . '-' . $i;
 				$i++;
 			}
-			$content = str_replace( $h[0], '<h' . $h[1] . $h[2] . ' id="' . esc_attr( $id ) . '">' . $h[3] . '</h' . $h[1] . '>', $content );
+			// v1.9.119: replace only the FIRST occurrence — identical headings twice
+			// produced duplicate ids and dead TOC links.
+			$pos = strpos( $content, $h[0] );
+			if ( false !== $pos ) {
+				$content = substr_replace( $content, '<h' . $h[1] . $h[2] . ' id="' . esc_attr( $id ) . '">' . $h[3] . '</h' . $h[1] . '>', $pos, strlen( $h[0] ) );
+			}
 		}
 		$used[]  = $id;
 		$items[] = '<li><a href="#' . esc_attr( $id ) . '">' . esc_html( $inner ) . '</a></li>';
@@ -66,7 +79,10 @@ function studentup_content_toc( $content ) {
 		. '</ol></div>';
 	// first paragraph tarvata pettali (ledu ante modatlo)
 	if ( preg_match( '/<p[^>]*>.*?<\/p>/s', $content, $pm ) ) {
-		return str_replace( $pm[0], $pm[0] . "\n" . $toc, $content );
+		// v1.9.119: first occurrence only (str_replace duplicated the TOC when the
+		// same paragraph text appeared twice).
+		$pos = strpos( $content, $pm[0] );
+		return substr_replace( $content, $pm[0] . "\n" . $toc, $pos, strlen( $pm[0] ) );
 	}
 	return $toc . $content;
 }

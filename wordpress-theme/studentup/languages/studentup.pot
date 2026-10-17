@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.116\n"
+"Project-Id-Version: StudentUp 1.9.133\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -72,10 +72,11 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: inc/ads.php:485
+#: inc/ads.php:481
 msgid "Advertisement"
 msgstr ""
 
+#: inc/keyfacts.php:30
 #: inc/workspace.php:142
 #: inc/workspace.php:197
 msgid "Age"
@@ -89,8 +90,16 @@ msgstr ""
 msgid "Age limit"
 msgstr ""
 
+#: front-page.php:135
+msgid "All active sections"
+msgstr ""
+
 #: front-page.php:74
 msgid "All deadlines"
+msgstr ""
+
+#: inc/qual-filter.php:493
+msgid "All qualifications"
 msgstr ""
 
 #: inc/saved.php:302
@@ -123,7 +132,7 @@ msgstr ""
 msgid "Answer coming soon — our editor is verifying it."
 msgstr ""
 
-#: inc/doubts.php:351
+#: inc/doubts.php:358
 msgid "Answer with the official source. Only answered questions go into QAPage schema."
 msgstr ""
 
@@ -165,6 +174,10 @@ msgstr ""
 msgid "Apply Online"
 msgstr ""
 
+#: inc/keyfacts.php:80
+msgid "Apply Online (Official)"
+msgstr ""
+
 #: inc/calendar.php:186
 msgid "Apply today - last date tomorrow"
 msgstr ""
@@ -195,8 +208,16 @@ msgstr ""
 msgid "Breaking News"
 msgstr ""
 
-#: inc/postnews.php:392
+#: inc/postnews.php:401
 msgid "Breaking news by state and district"
+msgstr ""
+
+#: inc/qual-filter.php:636
+msgid "Browse by qualification"
+msgstr ""
+
+#: header.php:152
+msgid "Browse everything"
 msgstr ""
 
 #: inc/personal.php:53
@@ -280,6 +301,11 @@ msgstr ""
 
 #: inc/workspace.php:137
 msgid "Closing in 3 days"
+msgstr ""
+
+#: inc/qual-filter.php:499
+#: inc/qual-filter.php:554
+msgid "Closing in 7 days"
 msgstr ""
 
 #: front-page.php:71
@@ -476,6 +502,10 @@ msgstr ""
 msgid "Explore by Category"
 msgstr ""
 
+#: inc/keyfacts.php:29
+msgid "Fee"
+msgstr ""
+
 #: inc/workspace.php:166
 msgid "Fee & concession calculator"
 msgstr ""
@@ -554,7 +584,7 @@ msgstr ""
 msgid "Hide social icons"
 msgstr ""
 
-#: inc/megamenu.php:356
+#: inc/megamenu.php:357
 #: inc/template.php:399
 msgid "Home"
 msgstr ""
@@ -596,6 +626,10 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
+#: footer.php:127
+msgid "Install now"
+msgstr ""
+
 #: inc/saved.php:306
 #: inc/workspace.php:133
 msgid "Interview"
@@ -607,6 +641,10 @@ msgstr ""
 
 #: inc/cta.php:117
 msgid "Jobs · results · hall tickets — first on WhatsApp / Telegram."
+msgstr ""
+
+#: footer.php:21
+msgid "Jobs, scholarships, results and exam updates for students."
 msgstr ""
 
 #: inc/cta.php:115
@@ -625,12 +663,12 @@ msgstr ""
 msgid "Join WhatsApp"
 msgstr ""
 
-#: inc/keyfacts.php:73
+#: inc/keyfacts.php:78
 msgid "Key details"
 msgstr ""
 
 #: inc/calendar.php:180
-#: inc/keyfacts.php:29
+#: inc/keyfacts.php:31
 msgid "Last date"
 msgstr ""
 
@@ -707,12 +745,20 @@ msgstr ""
 msgid "Links, emails and phone numbers are not allowed in questions."
 msgstr ""
 
+#: inc/audioreader.php:46
+msgid "Listen to Article"
+msgstr ""
+
 #: inc/slider.php:178
 msgid "LIVE"
 msgstr ""
 
 #: inc/premium.php:582
 msgid "Live job alerts"
+msgstr ""
+
+#: inc/mobile-menu.php:89
+msgid "Main menu"
 msgstr ""
 
 #: inc/cta.php:42
@@ -732,8 +778,17 @@ msgstr ""
 msgid "More %s"
 msgstr ""
 
-#: inc/seo-max.php:180
+#: inc/quiz.php:498
+msgid "More practice questions"
+msgstr ""
+
+#: inc/org-pages.php:310
+#: inc/seo-max.php:190
 msgid "More updates:"
+msgstr ""
+
+#: header.php:159
+msgid "Most searched by students"
 msgstr ""
 
 #: inc/workspace.php:175
@@ -780,7 +835,7 @@ msgstr ""
 msgid "No corrections have been needed so far. When one happens, it will be listed here with the date - we do not silently edit published facts."
 msgstr ""
 
-#: inc/postnews.php:422
+#: inc/postnews.php:431
 msgid "No district with that name — press Search to look inside the news."
 msgstr ""
 
@@ -820,6 +875,10 @@ msgstr ""
 msgid "No saved posts yet. Tap Save on any card to keep it here."
 msgstr ""
 
+#: front-page.php:209
+msgid "Nothing for this filter — open the "All" tab and try again."
+msgstr ""
+
 #: inc/important-links.php:45
 msgid "Official Notification"
 msgstr ""
@@ -842,6 +901,10 @@ msgstr ""
 
 #: page-internet-center.php:52
 msgid "One online form filled, checked and returned as a PDF"
+msgstr ""
+
+#: inc/pwa.php:309
+msgid "One-tap install · new job alerts direct ga"
 msgstr ""
 
 #: inc/apply.php:206
@@ -890,7 +953,7 @@ msgstr ""
 msgid "Outside this website we run a small offline Students Internet Center that helps students fill government application forms. This is optional: every job, result, hall ticket and scholarship update on this website is free to read and you never need this service to use the site."
 msgstr ""
 
-#: inc/seo-max.php:129
+#: inc/seo-max.php:134
 msgid "Page %d"
 msgstr ""
 
@@ -1031,7 +1094,7 @@ msgstr ""
 msgid "Recently read"
 msgstr ""
 
-#: inc/megamenu.php:401
+#: inc/megamenu.php:402
 msgid "Recommended"
 msgstr ""
 
@@ -1141,12 +1204,12 @@ msgstr ""
 msgid "Scrolling latest jobs carousel"
 msgstr ""
 
-#: inc/postnews.php:402
+#: inc/postnews.php:411
 #: inc/premium.php:82
 msgid "Search"
 msgstr ""
 
-#: inc/postnews.php:396
+#: inc/postnews.php:405
 msgid "Search %s news…"
 msgstr ""
 
@@ -1166,7 +1229,7 @@ msgstr ""
 msgid "Search StudentUp — jobs, hall tickets, results…"
 msgstr ""
 
-#: inc/postnews.php:396
+#: inc/postnews.php:405
 msgid "Search Telangana / Andhra news…"
 msgstr ""
 
@@ -1242,12 +1305,16 @@ msgstr ""
 msgid "Show social icons"
 msgstr ""
 
-#: sidebar.php:22
+#: sidebar.php:26
 msgid "Sidebar"
 msgstr ""
 
 #: page-internet-center.php:51
 msgid "Single application form"
+msgstr ""
+
+#: header.php:50
+msgid "Skip to content"
 msgstr ""
 
 #: inc/slider.php:184
@@ -1268,6 +1335,10 @@ msgstr ""
 
 #: inc/sponsorhub.php:34
 msgid "Sponsored partner"
+msgstr ""
+
+#: footer.php:22
+msgid "Spotted a mistake? Tell us at"
 msgstr ""
 
 #: inc/personal.php:45
@@ -1301,7 +1372,7 @@ msgstr ""
 msgid "Students Internet Center (separate offline service)"
 msgstr ""
 
-#: inc/doubts.php:347
+#: inc/doubts.php:354
 msgid "StudentUp answer (public)"
 msgstr ""
 
@@ -1321,7 +1392,7 @@ msgstr ""
 msgid "StudentUp publishes government job, result, hall ticket and scholarship updates for Telangana and Andhra Pradesh students. This page names who writes and verifies them."
 msgstr ""
 
-#: inc/doubts.php:357
+#: inc/doubts.php:364
 msgid "StudentUp — Doubt answer"
 msgstr ""
 
@@ -1366,6 +1437,10 @@ msgstr ""
 
 #: page-corrections.php:65
 msgid "Tell us what the official notification says instead - a screenshot or the official link helps most."
+msgstr ""
+
+#: inc/readerbar.php:35
+msgid "Text Size:"
 msgstr ""
 
 #: inc/polls.php:463
@@ -1541,6 +1616,10 @@ msgstr ""
 
 #: inc/doubts.php:279
 msgid "Your name (optional)"
+msgstr ""
+
+#: inc/qual-filter.php:491
+msgid "Your qualification:"
 msgstr ""
 
 #: inc/doubts.php:275

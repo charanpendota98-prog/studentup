@@ -1,0 +1,390 @@
+<?php
+/**
+ * v1.9.133 — Telugu UI chrome (owner rule: site language is Telugu; English
+ * only for standard terms — Apply Online, Results, Hall Ticket, PDF …).
+ *
+ * All theme strings go through the 'studentup' text domain, so one gettext
+ * map localises headings, buttons, empty-states and labels without touching
+ * ninety template files. Admin option `ui_telugu` ('1' default) switches it
+ * off for an English site.
+ *
+ * @package studentup
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * English → Telugu map (visible chrome only; keep placeholders intact).
+ *
+ * @return array<string,string>
+ */
+function studentup_ui_te_map() {
+	static $map = null;
+	if ( null !== $map ) {
+		return $map;
+	}
+	$map = array(
+		// Mega menu descriptions (v1.9.133).
+		'Telangana & Andhra Pradesh' => 'తెలంగాణ & ఆంధ్రప్రదేశ్',
+		'Central & private' => 'కేంద్ర & ప్రైవేట్',
+		'Updates' => 'అప్‌డేట్స్',
+		'Practice' => 'ప్రాక్టీస్',
+		'Find money' => 'ఆర్థిక సాయం',
+		'By level' => 'స్థాయి వారీగా',
+		'Schemes & local' => 'పథకాలు & స్థానికం',
+		'Site' => 'సైట్',
+		'Policies' => 'విధానాలు',
+		'Only notices with live dates — no expired lists.' => 'గడువు ఉన్న నోటిఫికేషన్లు మాత్రమే — ముగిసినవి ఉండవు.',
+		'Open the board' => 'బోర్డు తెరవండి',
+		'Exam calendar 2026' => 'పరీక్షల క్యాలెండర్ 2026',
+		'Add every confirmed last date to your phone in one tap.' => 'నిర్ధారిత చివరి తేదీలన్నీ ఒక్క ట్యాప్‌తో మీ ఫోన్‌లోకి.',
+		'Open calendar' => 'క్యాలెండర్ తెరవండి',
+		'Free Internet Center' => 'ఫ్రీ ఇంటర్నెట్ సెంటర్',
+		'Form filling at a fixed, published price — what we do and never do.' => 'నిర్ణీత ధరకే ఫారం ఫిల్లింగ్ — మేము ఏమి చేస్తాం, ఏమి చేయం.',
+		'See the price list' => 'ధరల జాబితా చూడండి',
+		'Telegram channel' => 'టెలిగ్రామ్ ఛానల్',
+		'Job alerts reach you first — no spam, leave anytime.' => 'జాబ్ అలర్ట్స్ మీకే ముందుగా — స్పామ్ లేదు, ఎప్పుడైనా వదిలేయవచ్చు.',
+		'Join channel' => 'ఛానల్‌లో చేరండి',
+		'Recommended' => 'సిఫార్సు',
+		'TSPSC · Police · Gurukul' => 'TSPSC · పోలీస్ · గురుకుల',
+		'APPSC · Police · DSC · Secretariat' => 'APPSC · పోలీస్ · DSC · సచివాలయం',
+		'10th · Inter · Degree · PG' => '10th · Inter · Degree · PG',
+		'SSC · UPSC · Railways · Banks' => 'SSC · UPSC · రైల్వే · బ్యాంకులు',
+		'Off-campus · fresher drives' => 'ఆఫ్-క్యాంపస్ · ఫ్రెషర్ డ్రైవ్స్',
+		'IT · developer · support' => 'IT · డెవలపర్ · సపోర్ట్',
+		'This week drives · venues' => 'ఈ వారం డ్రైవ్స్ · వేదికలు',
+		'Stipend · remote · college' => 'స్టైపెండ్ · రిమోట్ · కాలేజీ',
+		'Board · competitive · keys' => 'బోర్డు · పోటీ పరీక్షలు · కీలు',
+		'Admit card · instructions' => 'అడ్మిట్ కార్డ్ · సూచనలు',
+		'Confirmed last dates + .ics' => 'నిర్ధారిత చివరి తేదీలు',
+		'Fresh questions every day' => 'ప్రతిరోజూ కొత్త ప్రశ్నలు',
+		'Daily GK for exams' => 'పరీక్షల కోసం రోజువారీ GK',
+		'Answer keys after every exam' => 'ప్రతి పరీక్ష తర్వాత Answer Keys',
+		'NSP · ePASS · state schemes' => 'NSP · ePASS · రాష్ట్ర పథకాలు',
+		'Amounts, eligibility, last dates' => 'మొత్తాలు, అర్హత, చివరి తేదీలు',
+		'Verified journeys · lessons' => 'నిజమైన ప్రయాణాలు · పాఠాలు',
+		'School-level schemes' => 'పాఠశాల స్థాయి పథకాలు',
+		'The biggest State schemes' => 'ప్రధాన రాష్ట్ర పథకాలు',
+		'NSP minority + abroad aid' => 'NSP మైనారిటీ + విదేశీ విద్య సాయం',
+		'Rythu Bharosa · pensions · ration · housing' => 'రైతు భరోసా · పెన్షన్లు · రేషన్ · ఇళ్లు',
+		'TS & AP districts · holidays · alerts' => 'TS & AP జిల్లాలు · సెలవులు · అలర్ట్స్',
+		'Last 7 days + explanations' => 'గత 7 రోజులు + వివరణలు',
+		'Who writes and verifies' => 'ఎవరు రాస్తారు, ఎవరు ధృవీకరిస్తారు',
+		'Standards + sources' => 'ప్రమాణాలు + ఆధారాలు',
+		'Public fixes · 48h SLA' => 'బహిరంగ సవరణలు · 48 గంటల్లో',
+		'Corrections · suggestions' => 'సవరణలు · సూచనలు',
+		'Sponsorship slots' => 'స్పాన్సర్‌షిప్ అవకాశాలు',
+		'What we store (very little)' => 'మేము ఏమి నిల్వ చేస్తాం (చాలా తక్కువ)',
+		'Rules for using the site' => 'సైట్ వినియోగ నియమాలు',
+		'Not a government website' => 'ఇది ప్రభుత్వ వెబ్‌సైట్ కాదు',
+		'How we verify every update' => 'ప్రతి అప్‌డేట్‌ను ఎలా ధృవీకరిస్తాం',
+		'Latest active jobs' => 'తాజా యాక్టివ్ ఉద్యోగాలు',
+		'Instant alerts' => 'తక్షణ అలర్ట్స్',
+		'Browse everything' => 'అన్నీ చూడండి',
+		'Most searched by students' => 'విద్యార్థులు ఎక్కువగా వెతికేవి',
+		'Main menu' => 'ప్రధాన మెనూ',
+		'Skip to content' => 'కంటెంట్‌కు వెళ్లండి',
+		// Home / sections.
+		'Jobs, scholarships, results and exam updates for students.' => 'విద్యార్థుల కోసం ఉద్యోగాలు, స్కాలర్‌షిప్‌లు, Results, పరీక్షల అప్‌డేట్స్.',
+		'Spotted a mistake? Tell us at'           => 'తప్పు కనిపించిందా? ఇక్కడ తెలపండి:',
+		'Install now'                             => 'ఇప్పుడే ఇన్‌స్టాల్ చేయండి',
+		'All active sections'                     => 'అన్ని యాక్టివ్ విభాగాలు',
+		'Nothing for this filter — open the "All" tab and try again.' => 'ఈ ఫిల్టర్‌కు పోస్టులు లేవు — "అన్నీ" ట్యాబ్ తెరిచి చూడండి.',
+		'Listen to Article'                       => 'ఆర్టికల్ వినండి',
+		'Text Size:'                              => 'అక్షర పరిమాణం:',
+		'One-tap install · new job alerts direct ga' => 'ఒక్క ట్యాప్ ఇన్‌స్టాల్ · కొత్త జాబ్ అలర్ట్స్ నేరుగా',
+		'Your qualification:'                     => 'మీ అర్హత:',
+		'All qualifications'                      => 'అన్ని అర్హతలు',
+		'Closing in 7 days'                       => '7 రోజుల్లో ముగుస్తున్నవి',
+		'Browse by qualification'                 => 'అర్హత వారీగా చూడండి',
+		'More practice questions'                 => 'మరిన్ని ప్రాక్టీస్ ప్రశ్నలు',
+		'Latest Notifications'                    => 'తాజా నోటిఫికేషన్లు',
+		'Latest Jobs'                             => 'తాజా ఉద్యోగాలు',
+		'Latest opportunities'                    => 'తాజా అవకాశాలు',
+		'Latest opportunities — page %d'          => 'తాజా అవకాశాలు — పేజీ %d',
+		'Latest student updates — page %d'        => 'తాజా అప్‌డేట్స్ — పేజీ %d',
+		'Latest updates'                          => 'తాజా అప్‌డేట్స్',
+		'Latest update'                           => 'తాజా అప్‌డేట్',
+		'Latest on StudentUp'                     => 'StudentUp లో తాజా',
+		'Closing Soon'                            => 'త్వరలో ముగుస్తున్నవి',
+		'Closing soon'                            => 'త్వరలో ముగుస్తున్నవి',
+		'Closing this week'                       => 'ఈ వారం ముగుస్తున్నవి',
+		'Closing in 3 days'                       => '3 రోజుల్లో ముగుస్తున్నవి',
+		'All deadlines'                           => 'అన్ని చివరి తేదీలు',
+		'All sections'                            => 'అన్ని విభాగాలు',
+		'Explore by Category'                     => 'విభాగాల వారీగా చూడండి',
+		'Full details & Apply'                    => 'పూర్తి వివరాలు & Apply',
+		'Full details'                            => 'పూర్తి వివరాలు',
+		'Full details and official apply link'    => 'పూర్తి వివరాలు + Official Apply link',
+		'View details'                            => 'వివరాలు చూడండి',
+		'Read more'                               => 'పూర్తి వివరాలు',
+		'Read next'                               => 'తర్వాత చదవండి',
+		'Up next'                                 => 'తర్వాత',
+		'Up next — read this too'                 => 'తర్వాత చదవండి — ఇవి కూడా',
+		'Recent articles'                         => 'తాజా ఆర్టికల్స్',
+		'Related sections'                        => 'సంబంధిత విభాగాలు',
+		'More updates:'                           => 'మరిన్ని అప్‌డేట్స్:',
+		'More %s'                                 => 'మరిన్ని %s',
+		'More'                                    => 'మరిన్ని',
+		'Updates today'                           => 'ఈరోజు అప్‌డేట్స్',
+		'Updates — %s'                            => 'అప్‌డేట్స్ — %s',
+		'%d update posted today'                  => 'ఈరోజు %d అప్‌డేట్',
+		'%d updates posted today'                 => 'ఈరోజు %d అప్‌డేట్స్',
+		'New notifications are added every day.'  => 'ప్రతిరోజూ కొత్త నోటిఫికేషన్లు జోడిస్తాం.',
+		'New notifications are added every day. Meanwhile:' => 'ప్రతిరోజూ కొత్త నోటిఫికేషన్లు జోడిస్తాం. ఈలోగా:',
+		'No matching posts yet — relax the filters or check back after the next update.' => 'ఈ ఫిల్టర్‌కు పోస్టులు లేవు — ఫిల్టర్ మార్చండి లేదా తర్వాత అప్‌డేట్ తర్వాత చూడండి.',
+		'Government Jobs, Results & Notifications' => 'ప్రభుత్వ ఉద్యోగాలు, Results & నోటిఫికేషన్లు',
+		'Search StudentUp'                        => 'StudentUp లో వెతకండి',
+		'Search StudentUp — jobs, hall tickets, results…' => 'వెతకండి — jobs, hall tickets, results…',
+		'Search'                                  => 'వెతకండి',
+		'Press / to search'                       => 'వెతకడానికి / నొక్కండి',
+		'Results for “%s”'                        => '“%s” కోసం ఫలితాలు',
+		'Did you mean'                            => 'మీ ఉద్దేశం ఇదేనా',
+		'No exact match.'                         => 'సరిగ్గా సరిపోయే ఫలితం లేదు.',
+		'Closest matches'                         => 'దగ్గరి ఫలితాలు',
+		'Suggestions'                             => 'సూచనలు',
+		'Page %d'                                 => 'పేజీ %d',
+		'Pages'                                   => 'పేజీలు',
+		'Posts'                                   => 'పోస్టులు',
+		'posts'                                   => 'పోస్టులు',
+		'%s Posts'                                => '%s Posts',
+		'Home'                                    => 'హోమ్',
+		'News'                                    => 'వార్తలు',
+		'Exams'                                   => 'పరీక్షలు',
+		'Categories'                              => 'విభాగాలు',
+		// Deadlines.
+		'%d days left'                            => '%d రోజులు మిగిలాయి',
+		'Only %d days left'                       => 'ఇంకా %d రోజులే',
+		'1 day left'                              => '1 రోజు మిగిలింది',
+		'days left'                               => 'రోజులు మిగిలాయి',
+		'%s Day Left'                             => '%s రోజు మిగిలింది',
+		'%s Days Left'                            => '%s రోజులు మిగిలాయి',
+		'Last date'                               => 'చివరి తేదీ',
+		'Last date:'                              => 'చివరి తేదీ:',
+		'Last date today'                         => 'ఈరోజే చివరి తేదీ',
+		'Last day today'                          => 'ఈరోజే చివరి రోజు',
+		'Last day'                                => 'చివరి రోజు',
+		'Last date over'                          => 'చివరి తేదీ ముగిసింది',
+		'Closes today'                            => 'ఈరోజే ముగుస్తుంది',
+		'Closed'                                  => 'ముగిసింది',
+		'Application window closed'               => 'దరఖాస్తు గడువు ముగిసింది',
+		'Apply today - last date tomorrow'        => 'ఈరోజే Apply చేయండి — రేపే చివరి తేదీ',
+		'Deadline'                                => 'చివరి తేదీ',
+		'Deadlines'                               => 'చివరి తేదీలు',
+		'Key details'                             => 'ముఖ్య వివరాలు',
+		'Vacancies'                               => 'ఖాళీలు',
+		'Qualification'                           => 'అర్హత',
+		'Eligibility'                             => 'అర్హత',
+		'Age'                                     => 'వయస్సు',
+		'Age limit'                               => 'వయోపరిమితి',
+		'Fee'                                     => 'ఫీజు',
+		'Salary'                                  => 'జీతం',
+		'Pay'                                     => 'జీతం',
+		'Result'                                  => 'Result',
+		'State'                                   => 'రాష్ట్రం',
+		'Telangana'                               => 'తెలంగాణ',
+		'Andhra Pradesh'                          => 'ఆంధ్రప్రదేశ్',
+		'Central'                                 => 'కేంద్రం',
+		'All states'                              => 'అన్ని రాష్ట్రాలు',
+		'Any qualification'                       => 'ఏ అర్హత అయినా',
+		'NEW'                                     => 'కొత్త',
+		'New'                                     => 'కొత్త',
+		'LIVE'                                    => 'LIVE',
+		// Post page.
+		'Share this with your friends'            => 'మీ స్నేహితులకు షేర్ చేయండి',
+		'Share'                                   => 'షేర్',
+		'Share on WhatsApp'                       => 'WhatsApp లో షేర్ చేయండి',
+		'Copy link'                               => 'లింక్ కాపీ',
+		'Save'                                    => 'సేవ్',
+		'Saved'                                   => 'సేవ్ అయింది',
+		'Saved posts'                             => 'సేవ్ చేసిన పోస్టులు',
+		'Save this post for later'                => 'తర్వాత చదవడానికి సేవ్ చేయండి',
+		'Remove this post from saved'             => 'సేవ్ నుంచి తీసేయండి',
+		'Removed from saved'                      => 'సేవ్ నుంచి తీసేశాం',
+		'Post saved — open the Saved panel any time to read it later.' => 'సేవ్ అయింది — Saved ప్యానెల్ లో ఎప్పుడైనా చదవండి.',
+		'No saved posts yet. Tap Save on any card to keep it here.' => 'ఇంకా సేవ్ చేసిన పోస్టులు లేవు. ఏ కార్డ్ లోనైనా సేవ్ నొక్కండి.',
+		'No saved posts yet. Open any post and tap Save.' => 'ఇంకా సేవ్ చేసిన పోస్టులు లేవు. ఏ పోస్ట్ లోనైనా సేవ్ నొక్కండి.',
+		'No saved posts yet. Open any post and tap the Save button.' => 'ఇంకా సేవ్ చేసిన పోస్టులు లేవు. ఏ పోస్ట్ లోనైనా సేవ్ బటన్ నొక్కండి.',
+		'View saved here'                         => 'సేవ్ చేసినవి ఇక్కడ చూడండి',
+		'Clear all'                               => 'అన్నీ తీసేయండి',
+		'Clear'                                   => 'క్లియర్',
+		'Compare'                                 => 'పోల్చండి',
+		'Compare posts'                           => 'పోస్టులను పోల్చండి',
+		'Compare up to three posts.'              => 'గరిష్ఠంగా 3 పోస్టులు పోల్చవచ్చు.',
+		'Add this post to compare'                => 'పోల్చడానికి జోడించండి',
+		'Added'                                   => 'జోడించారు',
+		'Open comparison'                         => 'పోలిక చూడండి',
+		'Select at least two posts to compare.'   => 'పోల్చడానికి కనీసం 2 పోస్టులు ఎంచుకోండి.',
+		'Important Links'                         => 'ముఖ్యమైన లింకులు',
+		'Apply Online (Official)'                 => 'Apply Online (Official)',
+		'Official Website'                        => 'Official Website',
+		'Official Notification'                   => 'Official Notification',
+		'Official Notification (PDF)'             => 'Official Notification (PDF)',
+		'Click Here'                              => 'ఇక్కడ క్లిక్ చేయండి',
+		'Apply Now'                               => 'Apply చేయండి',
+		'Job alerts on Telegram'                  => 'Telegram లో జాబ్ అలర్ట్స్',
+		'Doubts & Answers'                        => 'సందేహాలు & సమాధానాలు',
+		'No questions yet. Ask the first one — we answer with the official source.' => 'ఇంకా ప్రశ్నలు లేవు. మొదటి ప్రశ్న మీరే అడగండి — official source ఆధారంగా సమాధానం ఇస్తాం.',
+		'Your question (Telugu or English)'       => 'మీ ప్రశ్న (తెలుగు లేదా English)',
+		'Your name (optional)'                    => 'మీ పేరు (ఐచ్ఛికం)',
+		'Ask question'                            => 'ప్రశ్న పంపండి',
+		'Reviewed before publishing. No links, emails or phone numbers.' => 'ప్రచురణకు ముందు పరిశీలిస్తాం. లింకులు, ఈమెయిల్, ఫోన్ నంబర్లు వద్దు.',
+		'Thanks! Your question is waiting for review — the answer will appear on this page.' => 'ధన్యవాదాలు! మీ ప్రశ్న పరిశీలనలో ఉంది — సమాధానం ఈ పేజీలో కనిపిస్తుంది.',
+		'Thanks! Your question is waiting for review.' => 'ధన్యవాదాలు! మీ ప్రశ్న పరిశీలనలో ఉంది.',
+		'This question is already asked — the answer will appear here.' => 'ఈ ప్రశ్న ఇప్పటికే అడిగారు — సమాధానం ఇక్కడ కనిపిస్తుంది.',
+		'Answer coming soon — our editor is verifying it.' => 'సమాధానం త్వరలో — మా ఎడిటర్ ధృవీకరిస్తున్నారు.',
+		'Please write your question in a few more words.' => 'ప్రశ్నను ఇంకొన్ని పదాల్లో రాయండి.',
+		'Please keep the question under 600 characters.' => 'ప్రశ్న 600 అక్షరాల లోపు ఉండాలి.',
+		'Links, emails and phone numbers are not allowed in questions.' => 'ప్రశ్నలో లింకులు, ఈమెయిల్, ఫోన్ నంబర్లు అనుమతించం.',
+		'Please wait a minute before asking again.' => 'మళ్లీ అడగడానికి ఒక నిమిషం ఆగండి.',
+		'Questions are closed right now.'         => 'ప్రస్తుతం ప్రశ్నలు స్వీకరించడం లేదు.',
+		'Write your comment'                      => 'మీ కామెంట్ రాయండి',
+		'Post comment'                            => 'కామెంట్ పంపండి',
+		'Comment'                                 => 'కామెంట్',
+		'Comments are closed.'                    => 'కామెంట్లు మూసివేయబడ్డాయి.',
+		'Updated on'                              => 'అప్‌డేట్ చేసినది',
+		'Updated:'                                => 'అప్‌డేట్:',
+		'Sources verified:'                       => 'ధృవీకరించిన మూలాలు:',
+		'Save this notification as PDF'           => 'ఈ నోటిఫికేషన్‌ను PDF గా సేవ్ చేయండి',
+		'Uses your browser print dialog - choose "Save as PDF".' => 'బ్రౌజర్ ప్రింట్ విండోలో "Save as PDF" ఎంచుకోండి.',
+		'Print / PDF'                             => 'ప్రింట్ / PDF',
+		'Print or save this article as PDF'       => 'ఈ ఆర్టికల్‌ను ప్రింట్ చేయండి లేదా PDF గా సేవ్ చేయండి',
+		'Add last date to my calendar'            => 'చివరి తేదీని నా క్యాలెండర్‌కు జోడించు',
+		'Recently read'                           => 'ఇటీవల చదివినవి',
+		'Recommended'                             => 'సిఫార్సు',
+		'Eligible for you'                        => 'మీకు అర్హత ఉన్నవి',
+		'Eligible by age'                         => 'వయస్సు ప్రకారం అర్హత',
+		'Partly eligible — check details'         => 'పాక్షిక అర్హత — వివరాలు చూడండి',
+		// Quiz.
+		'Daily quiz'                              => 'డైలీ క్విజ్',
+		'Your 5 today'                            => 'ఈరోజు మీ 5 ప్రశ్నలు',
+		'Why:'                                    => 'ఎందుకంటే:',
+		'Reader poll'                             => 'రీడర్ పోల్',
+		'Vote'                                    => 'ఓటు వేయండి',
+		'Thanks — your vote is counted.'          => 'ధన్యవాదాలు — మీ ఓటు నమోదైంది.',
+		'Be the first to vote — results show as soon as people answer.' => 'మొదటి ఓటు మీదే — సమాధానాలు రాగానే ఫలితాలు కనిపిస్తాయి.',
+		'%s readers voted — tap an option to see live results.' => '%s మంది ఓటు వేశారు — ఫలితాల కోసం ఒక ఆప్షన్ నొక్కండి.',
+		'Strong — keep this streak alive tomorrow.' => 'అద్భుతం — రేపు కూడా ఈ స్ట్రీక్ కొనసాగించండి.',
+		'Decent start. Read the "why" lines once and retry.' => 'మంచి ప్రారంభం. "ఎందుకంటే" వివరణలు చదివి మళ్లీ ప్రయత్నించండి.',
+		'No problem — practice is the point. Try again tomorrow.' => 'పర్వాలేదు — ప్రాక్టీసే ముఖ్యం. రేపు మళ్లీ ప్రయత్నించండి.',
+		'Other days'                              => 'ఇతర రోజులు',
+		'Daily current affairs →'                 => 'డైలీ కరెంట్ అఫైర్స్ →',
+		// Post your news.
+		'Post your news'                          => 'మీ వార్త పంపండి',
+		'Success story'                           => 'సక్సెస్ స్టోరీ',
+		'Photo / Video'                           => 'ఫోటో / వీడియో',
+		'District update'                         => 'జిల్లా అప్‌డేట్',
+		'Send now'                                => 'ఇప్పుడే పంపండి',
+		'We post with your name'                  => 'మీ పేరుతో పోస్ట్ చేస్తాం',
+		'We review every submission. Approved stories are posted by the StudentUp team with your name (or anonymous, if you ask).' => 'ప్రతి సబ్మిషన్ పరిశీలిస్తాం. ఆమోదించిన కథనాలు మీ పేరుతో (కోరితే పేరు లేకుండా) StudentUp టీమ్ పోస్ట్ చేస్తుంది.',
+		'Approved stories'                        => 'ఆమోదించిన కథనాలు',
+		'All stories →'                           => 'అన్ని కథనాలు →',
+		// Join / alerts / footer.
+		'Every job, exam date and result — first on your phone' => 'ప్రతి ఉద్యోగం, పరీక్ష తేదీ, Result — ముందుగా మీ ఫోన్‌లో',
+		'Free job alerts on your phone'           => 'మీ ఫోన్‌లో ఉచిత జాబ్ అలర్ట్స్',
+		'Jobs · results · hall tickets — first on WhatsApp / Telegram.' => 'Jobs · Results · Hall Tickets — ముందుగా WhatsApp / Telegram లో.',
+		'Join WhatsApp'                           => 'WhatsApp లో జాయిన్',
+		'Join Telegram'                           => 'Telegram లో జాయిన్',
+		'Join our Telegram channel'               => 'మా Telegram ఛానల్‌లో జాయిన్ అవ్వండి',
+		'Join our channels'                       => 'మా ఛానల్స్‌లో జాయిన్ అవ్వండి',
+		'WhatsApp updates'                        => 'WhatsApp అప్‌డేట్స్',
+		'Telegram channel'                        => 'Telegram ఛానల్',
+		'Live job alerts'                         => 'లైవ్ జాబ్ అలర్ట్స్',
+		'Daily updates free ga — join avvandi.'   => 'రోజూ ఉచిత అప్‌డేట్స్ — జాయిన్ అవ్వండి.',
+		'Follow us'                               => 'మమ్మల్ని ఫాలో అవ్వండి',
+		'Corrections'                             => 'సవరణలు',
+		'Corrections &amp; updates'               => 'సవరణలు &amp; అప్‌డేట్స్',
+		'Install'                                 => 'ఇన్‌స్టాల్',
+		'Close'                                   => 'మూసివేయి',
+		'Dismiss'                                 => 'తీసేయి',
+		'Hide social icons'                       => 'సోషల్ ఐకాన్లు దాచు',
+		'Show social icons'                       => 'సోషల్ ఐకాన్లు చూపు',
+		'Swipe sideways for more'                 => 'మరిన్నింటికి పక్కకు స్వైప్ చేయండి',
+		'Scroll left'                             => 'ఎడమకు',
+		'Scroll right'                            => 'కుడికి',
+		'Slide Left'                              => 'ఎడమకు',
+		'Slide Right'                             => 'కుడికి',
+		// Archive / tools misc.
+		'Active jobs board'                       => 'యాక్టివ్ జాబ్స్ బోర్డ్',
+		'Government job & exam last dates'        => 'ప్రభుత్వ ఉద్యోగ & పరీక్షల చివరి తేదీలు',
+		'Last dates from the official notifications' => 'Official నోటిఫికేషన్ల ప్రకారం చివరి తేదీలు',
+		'Every last date from official notifications — never guessed.' => 'ప్రతి చివరి తేదీ official నోటిఫికేషన్ నుంచే — ఊహించినవి కావు.',
+		'No confirmed date is available for this post.' => 'ఈ పోస్ట్‌కు ధృవీకరించిన తేదీ లేదు.',
+		'Quick tools'                             => 'క్విక్ టూల్స్',
+		'Student tools'                           => 'విద్యార్థి టూల్స్',
+		'Free tools for students'                 => 'విద్యార్థులకు ఉచిత టూల్స్',
+		'Breaking News'                           => 'బ్రేకింగ్ న్యూస్',
+		'Open Breaking News'                      => 'బ్రేకింగ్ న్యూస్ చూడండి',
+		'District-wise news'                      => 'జిల్లాల వారీగా వార్తలు',
+		'Telangana · Andhra Pradesh district news' => 'తెలంగాణ · ఆంధ్రప్రదేశ్ జిల్లా వార్తలు',
+		'Latest story'                            => 'తాజా కథనం',
+		'Students Internet Center'                => 'స్టూడెంట్స్ ఇంటర్నెట్ సెంటర్',
+		'Open today'                              => 'ఈరోజు తెరిచి ఉంది',
+		'Call now'                                => 'కాల్ చేయండి',
+		'Call'                                    => 'కాల్',
+		'Email'                                   => 'ఈమెయిల్',
+		'Read our editorial policy'               => 'మా ఎడిటోరియల్ పాలసీ చదవండి',
+		'Every post links the official source so you can check it yourself.' => 'ప్రతి పోస్ట్ official source కు లింక్ ఇస్తుంది — మీరే సరిచూసుకోవచ్చు.',
+	);
+	return $map;
+}
+
+/**
+ * gettext filter — 'studentup' domain only.
+ */
+function studentup_ui_gettext( $translation, $text, $domain ) {
+	if ( 'studentup' !== $domain || is_admin() ) {
+		return $translation;
+	}
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $translation;
+	}
+	$map = studentup_ui_te_map();
+	return isset( $map[ $text ] ) ? $map[ $text ] : $translation;
+}
+add_filter( 'gettext', 'studentup_ui_gettext', 10, 3 );
+
+/**
+ * ngettext filter — plural forms (days left, posts, updates today).
+ */
+function studentup_ui_ngettext( $translation, $single, $plural, $number, $domain ) {
+	if ( 'studentup' !== $domain || is_admin() ) {
+		return $translation;
+	}
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $translation;
+	}
+	$map = studentup_ui_te_map();
+	$key = ( 1 === (int) $number ) ? $single : $plural;
+	return isset( $map[ $key ] ) ? $map[ $key ] : $translation;
+}
+add_filter( 'ngettext', 'studentup_ui_ngettext', 10, 5 );
+
+/**
+ * Core WordPress strings that leak into the front end (comment form etc.).
+ */
+function studentup_ui_core_gettext( $translation, $text, $domain ) {
+	if ( 'default' !== $domain || is_admin() ) {
+		return $translation;
+	}
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $translation;
+	}
+	static $core = array(
+		'Leave a Reply'       => 'మీ కామెంట్ రాయండి',
+		'Post Comment'        => 'కామెంట్ పంపండి',
+		'Cancel reply'        => 'రద్దు చేయండి',
+		'Name'                => 'పేరు',
+		'Website'             => 'వెబ్‌సైట్',
+		'Save my name, email, and website in this browser for the next time I comment.' => 'తదుపరి కామెంట్ కోసం నా పేరు, ఈమెయిల్ ఈ బ్రౌజర్‌లో సేవ్ చేయండి.',
+		'Older posts'         => 'పాత పోస్టులు',
+		'Newer posts'         => 'కొత్త పోస్టులు',
+		'Search for:'         => 'వెతకండి:',
+		'Nothing Found'       => 'ఏమీ దొరకలేదు',
+		'Skip to content'     => 'కంటెంట్‌కు వెళ్లండి',
+	);
+	return isset( $core[ $text ] ) ? $core[ $text ] : $translation;
+}
+add_filter( 'gettext', 'studentup_ui_core_gettext', 10, 3 );

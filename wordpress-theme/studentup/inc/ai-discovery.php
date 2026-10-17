@@ -132,11 +132,11 @@ function studentup_ai_site_schema() {
 			'itemListElement' => $nav_items,
 		);
 	}
+	// v1.9.119: SAME entity id as schema.php (#org) — two Organization ids for one
+	// site split the knowledge-graph signal. knowsAbout/sameAs merge onto #org.
 	$org = array(
 		'@type' => 'Organization',
-		'@id'   => $home . '/#organization',
-		'name'  => get_bloginfo( 'name' ),
-		'url'   => $home . '/',
+		'@id'   => $home . '/#org',
 	);
 	if ( $topics ) {
 		$org['knowsAbout'] = $topics;
@@ -162,7 +162,11 @@ function studentup_ai_site_schema() {
 	if ( $same ) {
 		$org['sameAs'] = array_values( $same );
 	}
-	$graph[] = $org;
+	// v1.9.124: Rank Math active → its publisher node is THE organisation
+	// (knowsAbout/sameAs merged there via studentup_rm_jsonld); no 2nd org node.
+	if ( ! class_exists( 'RankMath' ) ) {
+		$graph[] = $org;
+	}
 
 	echo '<script type="application/ld+json">'
 		. wp_json_encode(
@@ -181,6 +185,12 @@ add_action( 'wp_head', 'studentup_ai_site_schema', 11 );
  */
 function studentup_ai_article_entities() {
 	if ( is_admin() || is_feed() || ! is_singular( 'post' ) ) {
+		return;
+	}
+	// v1.9.119: entities now travel INSIDE the single NewsArticle node (see
+	// studentup_ai_entities_for_post + filter in schema.php). A second Article
+	// node for the same URL was a duplicate-article signal in rich-results tests.
+	if ( function_exists( 'studentup_newsarticle_schema' ) ) {
 		return;
 	}
 	$post_id = get_the_ID();
@@ -237,3 +247,42 @@ function studentup_ai_article_entities() {
 		. '</script>' . "\n";
 }
 add_action( 'wp_head', 'studentup_ai_article_entities', 12 );
+
+
+/**
+ * v1.9.119 — about/mentions (categories/tags as Things) for the NewsArticle node.
+ *
+ * @param int $post_id post.
+ * @return array keys about|mentions (only non-empty).
+ */
+function studentup_ai_entities_for_post( $post_id ) {
+	$about = array();
+	foreach ( (array) get_the_category( $post_id ) as $cat ) {
+		if ( isset( $cat->name ) ) {
+			$about[] = array(
+				'@type' => 'Thing',
+				'name'  => $cat->name,
+				'url'   => esc_url_raw( (string) get_category_link( $cat->term_id ) ),
+			);
+		}
+	}
+	$mentions = array();
+	$tags     = get_the_tags( $post_id );
+	if ( is_array( $tags ) ) {
+		foreach ( array_slice( $tags, 0, 10 ) as $tag ) {
+			$mentions[] = array(
+				'@type' => 'Thing',
+				'name'  => $tag->name,
+				'url'   => esc_url_raw( (string) get_tag_link( $tag->term_id ) ),
+			);
+		}
+	}
+	$out = array();
+	if ( $about ) {
+		$out['about'] = count( $about ) === 1 ? $about[0] : $about;
+	}
+	if ( $mentions ) {
+		$out['mentions'] = $mentions;
+	}
+	return $out;
+}

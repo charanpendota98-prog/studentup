@@ -213,6 +213,15 @@ function studentup_breaking_hide_from_home( $q ) {
 		if ( $q->is_category( studentup_breaking_term_ids() ) ) {
 			return;
 		}
+		// v1.9.124 CRITICAL SEO FIX: on a normal category archive `category__not_in`
+		// turns the query into a "multiple terms" query for Rank Math
+		// (Term::is_multiple_terms_query → count(queried_terms) > 1) → Rank Math
+		// emitted <meta robots noindex> and dropped canonical + description on
+		// EVERY category page. Breaking posts live only in the breaking tree, so a
+		// non-breaking category archive needs no exclusion at all.
+		if ( $q->is_category() ) {
+			return;
+		}
 	}
 	$not = array_merge( (array) $q->get( 'category__not_in' ), studentup_breaking_term_ids() );
 	$q->set( 'category__not_in', array_values( array_unique( array_map( 'intval', $not ) ) ) );

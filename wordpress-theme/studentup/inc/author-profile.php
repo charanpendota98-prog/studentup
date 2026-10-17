@@ -38,7 +38,7 @@ function studentup_author_card_data() {
 		'role'      => trim( (string) studentup_opt( 'author_role', 'Founder & Content Writer' ) ),
 		'bio'       => trim( (string) studentup_opt( 'author_bio', '' ) ),
 		'avatar'    => trim( (string) studentup_opt( 'author_avatar_url', '' ) ),
-		'expertise' => trim( (string) studentup_opt( 'author_expertise', 'Telangana & AP government jobs, exam patterns, scholarships, eligibility rules' ) ),
+		'expertise' => trim( (string) studentup_opt( 'author_expertise', 'Telangana and AP government jobs, exam patterns, scholarships, eligibility rules' ) ),
 		'since'     => trim( (string) studentup_opt( 'author_since', '' ) ),
 		'linkedin'  => trim( (string) studentup_opt( 'social_linkedin', '' ) ),
 		'x'         => trim( (string) studentup_opt( 'social_x', '' ) ),
@@ -133,6 +133,12 @@ function studentup_person_schema() {
 		return;
 	}
 	if ( ! is_singular( 'post' ) && ! is_author() && ! is_page() ) {
+		return;
+	}
+	// v1.9.128: Rank Math already emits Person + ProfilePage on author
+	// archives (a second ProfilePage was a duplicate). The founder facts are
+	// merged into Rank Math's Person node in inc/schema.php instead.
+	if ( class_exists( 'RankMath' ) ) {
 		return;
 	}
 	$d    = studentup_author_card_data();
