@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.131\n"
+"Project-Id-Version: StudentUp 1.9.132\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -1252,7 +1252,7 @@ msgstr ""
 msgid "Show social icons"
 msgstr ""
 
-#: sidebar.php:22
+#: sidebar.php:26
 msgid "Sidebar"
 msgstr ""
 
