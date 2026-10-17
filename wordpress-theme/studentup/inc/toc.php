@@ -39,6 +39,12 @@ function studentup_content_toc( $content ) {
 		if ( '' === $inner ) {
 			continue;
 		}
+		// v1.9.129: short TOC — h2 sections only; no question headings, no FAQ /
+		// related chrome; max 7 entries (owner rule).
+		if ( '3' === (string) $h[1] || '?' === substr( $inner, -1 ) || count( $items ) >= 7
+			|| preg_match( '/^(frequently asked|faq|తరచుగా అడిగే)/iu', $inner ) || false !== stripos( $inner, 'related questions' ) ) {
+			continue;
+		}
 		if ( preg_match( '/id=["\']([^"\']+)["\']/', $h[2], $idm ) ) {
 			$id = $idm[1];
 		} else {
