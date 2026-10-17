@@ -245,6 +245,9 @@ add_filter( 'wp_robots', function ( $robots ) {
  * CollectionPage + ItemList + the Organization entity (about) — real items only.
  */
 function studentup_org_page_schema() {
+	if ( class_exists( 'RankMath' ) ) {
+		return;   // v1.9.127: merged into Rank Math graph (inc/schema.php) — no 2nd CollectionPage.
+	}
 	$s = studentup_org_page_slug();
 	if ( ! $s ) {
 		return;

@@ -192,6 +192,9 @@ add_filter( 'wp_robots', function ( $robots ) {
  * ItemList + CollectionPage schema (real items on this page only).
  */
 function studentup_qual_page_schema() {
+	if ( class_exists( 'RankMath' ) ) {
+		return;   // v1.9.127: merged into Rank Math graph (inc/schema.php) — no 2nd CollectionPage.
+	}
 	$s = studentup_qual_page_slug();
 	if ( ! $s ) {
 		return;

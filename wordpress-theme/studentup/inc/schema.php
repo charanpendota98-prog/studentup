@@ -298,6 +298,49 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 			}
 		}
 	}
+	// v1.9.127: list pages (category/tag/qualification/org landing) — attach a
+	// real ItemList of the posts on this page to Rank Math's CollectionPage
+	// (Google list identity; theme's own CollectionPage is suppressed under RM).
+	if ( ! is_singular() && ! is_front_page() && ! is_search() && ! is_404() ) {
+		global $wp_query;
+		$pkey = null;
+		foreach ( $data as $k => $node ) {
+			if ( is_array( $node ) && isset( $node['@type'] ) && in_array( $node['@type'], array( 'CollectionPage', 'WebPage' ), true ) ) {
+				$pkey = $k;
+				break;
+			}
+		}
+		if ( null !== $pkey && empty( $data[ $pkey ]['mainEntity'] ) && $wp_query instanceof WP_Query && ! empty( $wp_query->posts ) ) {
+			$items = array();
+			$i     = 0;
+			foreach ( (array) $wp_query->posts as $p ) {
+				if ( ! ( $p instanceof WP_Post ) || 'post' !== $p->post_type ) {
+					continue;
+				}
+				$i++;
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => $i,
+					'url'      => get_permalink( $p ),
+					'name'     => wp_strip_all_tags( get_the_title( $p ) ),
+				);
+			}
+			if ( $items ) {
+				$data[ $pkey ]['mainEntity'] = array(
+					'@type'           => 'ItemList',
+					'numberOfItems'   => max( (int) $wp_query->found_posts, count( $items ) ),
+					'itemListElement' => $items,
+				);
+			}
+			if ( function_exists( 'studentup_org_page_slug' ) && function_exists( 'studentup_org_map' ) ) {
+				$os = studentup_org_page_slug();
+				if ( $os && empty( $data[ $pkey ]['about'] ) ) {
+					$row = studentup_org_map()[ $os ];
+					$data[ $pkey ]['about'] = array( '@type' => 'Organization', 'name' => $row[1], 'url' => $row[2] );
+				}
+			}
+		}
+	}
 	// v1.9.126: Rank Math breadcrumbs module is OFF by default → no
 	// BreadcrumbList in its graph. Add the theme trail (Home › Category › Post)
 	// only when Rank Math did not emit one (never a duplicate).
