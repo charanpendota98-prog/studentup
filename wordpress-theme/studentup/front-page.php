@@ -250,6 +250,11 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 		if ( function_exists( 'studentup_qual_directory' ) ) {
 			studentup_qual_directory();
 		}
+		// v1.9.130: dense section-wise headlines + organisation directory (real data only).
+		if ( function_exists( 'studentup_home_sectionwise' ) ) {
+			studentup_home_sectionwise();
+			studentup_home_orgdir();
+		}
 		?>
 	</div>
 </main>
