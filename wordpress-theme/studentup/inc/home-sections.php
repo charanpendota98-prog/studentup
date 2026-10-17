@@ -147,7 +147,7 @@ function studentup_sidebar_auto_cards() {
 	wp_reset_postdata();
 	if ( $n >= 3 ) {
 		$out .= '<section class="sidecard su-side-latest"><h3>లేటెస్ట్ అప్‌డేట్స్</h3><ul>' . $items . '</ul>'
-			. '<a class="su-secwise-more" href="' . esc_url( function_exists( 'studentup_opportunity_board_url' ) ? studentup_opportunity_board_url() : home_url( '/' ) ) . '">అన్నీ చూడండి →</a></section>';
+			. '<a class="su-secwise-more" href="' . esc_url( function_exists( 'studentup_today_url' ) ? studentup_today_url() : home_url( '/' ) ) . '">తేదీల వారీగా అన్నీ →</a></section>';
 	}
 	// 2) Closing soon — only posts with a REAL future last date (≤ 15 days).
 	if ( function_exists( 'studentup_opportunity_board_posts' ) ) {

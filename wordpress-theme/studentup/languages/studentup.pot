@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.133\n"
+"Project-Id-Version: StudentUp 1.9.134\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -10,6 +10,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language-Team: Telugu (te_IN)\n"
 "X-Generator: tools/build_pot.py\n"
+
+#: inc/today.php:102
+msgid "%1$d updates from the last %2$d days, grouped by date: notifications, last dates, results, hall tickets — Telugu. Updated every day."
+msgstr ""
 
 #: inc/apply.php:210
 #: inc/engage.php:163
@@ -95,6 +99,7 @@ msgid "All active sections"
 msgstr ""
 
 #: front-page.php:74
+#: page-today.php:23
 msgid "All deadlines"
 msgstr ""
 
@@ -552,6 +557,10 @@ msgstr ""
 msgid "Free tools for students"
 msgstr ""
 
+#: inc/today.php:158
+msgid "Friday"
+msgstr ""
+
 #: inc/apply.php:238
 msgid "Full details"
 msgstr ""
@@ -694,6 +703,7 @@ msgstr ""
 
 #: inc/engage.php:158
 #: inc/slider.php:75
+#: inc/today.php:188
 msgid "Last day today"
 msgstr ""
 
@@ -757,12 +767,16 @@ msgstr ""
 msgid "Live job alerts"
 msgstr ""
 
-#: inc/mobile-menu.php:89
+#: inc/mobile-menu.php:96
 msgid "Main menu"
 msgstr ""
 
 #: inc/cta.php:42
 msgid "Materials &amp; previous papers"
+msgstr ""
+
+#: inc/today.php:158
+msgid "Monday"
 msgstr ""
 
 #: inc/premium.php:368
@@ -1151,6 +1165,10 @@ msgstr ""
 msgid "Salary"
 msgstr ""
 
+#: inc/today.php:158
+msgid "Saturday"
+msgstr ""
+
 #: inc/saved.php:180
 #: inc/saved.php:293
 #: inc/workspace.php:130
@@ -1405,6 +1423,10 @@ msgstr ""
 msgid "Suggestions"
 msgstr ""
 
+#: inc/today.php:158
+msgid "Sunday"
+msgstr ""
+
 #: inc/premium.php:155
 msgid "Swipe sideways for more"
 msgstr ""
@@ -1476,8 +1498,28 @@ msgstr ""
 msgid "This service is a private offline service. It is not connected to any government department, and paying us gives you no advantage in any selection process."
 msgstr ""
 
+#: inc/today.php:158
+msgid "Thursday"
+msgstr ""
+
+#: inc/today.php:154
+msgid "Today"
+msgstr ""
+
 #: page-quiz.php:84
 msgid "Today's Telangana jobs →"
+msgstr ""
+
+#: inc/today.php:125
+msgid "Today’s updates"
+msgstr ""
+
+#: inc/today.php:94
+msgid "Today’s updates (%s) — latest jobs, results, hall tickets"
+msgstr ""
+
+#: inc/today.php:89
+msgid "Today’s updates — jobs, results, hall tickets"
 msgstr ""
 
 #: inc/premium.php:409
@@ -1486,6 +1528,10 @@ msgstr ""
 
 #: inc/cta.php:29
 msgid "TS &amp; AP"
+msgstr ""
+
+#: inc/today.php:158
+msgid "Tuesday"
 msgstr ""
 
 #: page-internet-center.php:84
@@ -1507,6 +1553,10 @@ msgstr ""
 
 #: page-corrections.php:48
 msgid "Updated:"
+msgstr ""
+
+#: page-today.php:21
+msgid "Updates from the last %d days. Older posts are in each section."
 msgstr ""
 
 #: inc/premium.php:579
@@ -1573,6 +1623,10 @@ msgstr ""
 msgid "We verify"
 msgstr ""
 
+#: inc/today.php:158
+msgid "Wednesday"
+msgstr ""
+
 #: page-internet-center.php:72
 msgid "What we never do"
 msgstr ""
@@ -1604,6 +1658,10 @@ msgstr ""
 
 #: comments.php:59
 msgid "Write your comment"
+msgstr ""
+
+#: inc/today.php:156
+msgid "Yesterday"
 msgstr ""
 
 #: page-post-news.php:51

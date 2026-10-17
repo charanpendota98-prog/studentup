@@ -42,7 +42,7 @@ NONINTERACTIVE=1 SKIP_APT=1 SKIP_CRON=1 bash install-bot.sh
 
 ---
 
-## 📱 Theme upload — `studentup-theme-1.9.133.zip` (v344 · Telugu UI chrome: menus · buttons · labels · empty states) · bot v338 (drafts keep flowing + failed-slot retry + `--why-no-draft`)
+## 📱 Theme upload — `studentup-theme-1.9.134.zip` (v345 · /today/ date-wise updates page — the daily-habit URL) · bot v338 (drafts keep flowing + failed-slot retry + `--why-no-draft`)
 
 > ⚠️ పాత `studentup-theme-1.9.78.zip` తప్పుగా package అయింది (nested folder) — WordPress reject చేసేది.
 > **1.9.107 zip సరైన structure** — ఇదే upload చేయండి.
@@ -65,6 +65,7 @@ v282 లో ఏమి మారింది (మీ screenshot feedback):
 | "Browse by section" icons line-wise, side scroll వద్దు | Wrapping grid: phone 4 per row · tablet 6 · laptop 7 — arrows, fades, drag అన్నీ తీసేశాము (theme + previews) |
 | Footer లో "Preview build…" + long disclaimer avasarama? | తీసేశాము — footer లో © line + policy links మాత్రమే (Disclaimer page లో legal text ఉంది) |
 | Bot advanced గా ఉందా (SEO copy, keywords, Rank Math)? | ఉంది — rm100 engine (title/meta/slug/TOC/FAQ/density/links deterministic fixes) + LLM refine rounds + `rankmath_strict` validator + Rank Math REST meta (focus keyword, title, description, OG, canonical) + live Rank Math score read-back (seo-bridge plugin) + keyword engine/verify + cannibalization + GSC/IndexNow. ఈ round లో title "· ·" double-separator bug fix |
+| **v345** | theme 1.9.134 | **`/today/` — ఈరోజు అప్‌డేట్స్ (date-wise).** Eenadu-Pratibha-style daily habit page: last 14 days of posts grouped Today / Yesterday / date (Telugu weekday), category chip, time, real deadline pill only from `studentup_last_date`; Breaking excluded; 404 when empty. Indexed, own title/description/canonical, Rank Math ItemList. Entry points: mega menu Updates column, mobile menu (2nd item), sidebar "తేదీల వారీగా అన్నీ →". Live: Settings → Permalinks → Save once. | sha256 `f6ff71a547151392…` |
 | **v344** | theme 1.9.133 | Telugu UI chrome everywhere (gettext map `inc/lang-ui.php`, mega-menu titles/descriptions, header/footer/PWA/quiz/qual-filter/reader labels; standard terms stay English; option `ui_telugu`) | sha256 `c47f2d7e8bc53639…` |
 | **v343** — theme 1.9.132 | **Desktop sidebar is no longer empty.** Archive/search/single/author/qual/org pages had a two-column layout whose sidebar rendered only with widgets or ads (none on live) → single empty column. Now auto sidecards from real data (`studentup_sidebar_auto_cards`): **లేటెస్ట్ అప్‌డేట్స్** (8 latest, current post + Breaking excluded), **త్వరలో ముగుస్తున్నవి** (only posts with a real future last_date ≤15 days, sorted, "N రోజులు మిగిలాయి", red ≤3), **సంస్థల వారీగా** chips. Sticky on ≥1080px; hidden on phone (lists already in main column). Widgets/ads, if configured, still render first. Rig: 5 page types show all 3 cards, home untouched, debug.log 0. sha256 28b63bbe57636efd |
 | **v342** — theme 1.9.131 | **Section-wise headline lists site-wide** ("ఇతర విభాగాల్లో తాజా అప్‌డేట్స్"): category/tag archives (current section excluded), search results (incl. zero-result), 404, `/jobs/<qual>/`, `/org/<org>/`. Every list/dead-end page now links 5 fresh titles per other section → no dead ends, stronger internal linking, lower bounce. Same real-data gates as v341. Rig: 8 URLs 200/404 as expected, h1=1 each, debug.log 0. sha256 fca3324c1dce885c |
