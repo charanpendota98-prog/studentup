@@ -271,7 +271,7 @@ function studentup_saved_assets() {
 	}
 	wp_enqueue_script(
 		'studentup-saved',
-		get_template_directory_uri() . '/assets/js/studentup-saved.js',
+		studentup_js_url( 'assets/js/studentup-saved.js' ),
 		array(),
 		STUDENTUP_VERSION,
 		true

@@ -95,7 +95,7 @@ function studentup_workspace_assets() {
 	}
 	wp_enqueue_script(
 		'studentup-workspace',
-		get_template_directory_uri() . '/assets/js/studentup-workspace.js',
+		studentup_js_url( 'assets/js/studentup-workspace.js' ),
 		array(),
 		STUDENTUP_VERSION,
 		true

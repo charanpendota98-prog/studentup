@@ -2685,3 +2685,9 @@ body.dark .su-today-day h2 span{background:#152137}
 /* v1.9.137 — Live Exams tile: small LIVE dot so the external exam app is recognisable */
 .su-cat-live{position:relative}
 .su-cat-live::after{content:"LIVE";position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.04em;color:#fff;background:#dc2626;border-radius:999px;padding:1px 5px;line-height:1.3}
+
+/* v1.9.138 — render budget for the newer below-fold sections (same rule as premium.css v130) */
+.su-secwise,.su-orgdir,.su-today-day:nth-of-type(n+3){content-visibility:auto}
+.su-secwise{contain-intrinsic-size:auto 520px}
+.su-orgdir{contain-intrinsic-size:auto 160px}
+.su-today-day:nth-of-type(n+3){contain-intrinsic-size:auto 240px}

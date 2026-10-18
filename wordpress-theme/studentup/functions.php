@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.137' );  // v283: Browse-by-section = wrapping grid (no side-scroll/arrows), footer disclaimer sentence removed (owner), social rail icon paths fix in previews. v282 QUIZ STATUS GAME: easy reasoning/aptitude bank (24 Qs, easy-first rotation), finish → 'Share your score to WhatsApp Status' → name once → canvas score card (Hey <name>! X/Y + quiz link) → native share (WhatsApp → My status) / wa.me / download; social rail icons blank fix (su-socb-* + inline paths + belt); category tiles = icon + name only (hint text + counts teesesam). v281 ADVANCED BEST BUILD: tiered urgency pills (red ≤2d · amber ≤7d · green ≤14d, real last-date only, grid + slider parity, '1 Day Left' grammar fix), home 'Closing Soon' band (nearest deadlines first, data lekapote render kaadu), highlight-to-share on articles (select text → WhatsApp/Telegram/Copy icon chips, GA4 share_select), laptop-only premium elevation (hover lift/glow, gradient rank medallions, section accent bar) — phone neat ga untundi. v227 TRUST + LEADS: real reviews (+Review schema, fake rating ledu), case studies, team block, address nunchi auto Google Map + directions, response-time promise, /thank-you/ page (noindex + GA4 generate_lead) — anni 'data lekapote render kaadu' rule tho. v226 MEASUREMENT + LEADS: GA4 tag nijamga emit (mundu emit avvaledu — bug), lead events (call/WhatsApp/email/telegram/apply/form/read-75), Microsoft Clarity, LocalBusiness schema (data unte matrame). v225 FLUID TYPE SYSTEM: okate clamp() scale (rem+vw) — phone 360px → laptop 1440px varaku prathi text size smooth ga marutundi (body 14.5→17, article H1 22→33); browser font-size setting (accessibility zoom) gauravinchabadutundi; 74ch reading column laptop lo; 44px tap targets phone lo; ≥1600px lo inka pedda scale. v221 VIRAL STREAMS: Govt Schemes + TS/AP District News categories (mega menu + alias map; bot auto-classifies), v220 bot advanced link intake; v219 PHONE PERFECT UI: mobile perfection layer (fluid type scale, Telugu letter-spacing fix, unified card padding/radius, 44px tap targets, overflow guards, drawer rows, 16px inputs) + mobile menu double-toggle bug fixed (studentup.js vs studentup-menu.js single owner); v217 INTERNET CENTER BOX: okate premium card (gradient strip, live dot, Telugu owner copy, 4 perk chips, WhatsApp/Call/Email actions) + bot advanced sourcing gates (independent domains, confidence floor, key-fact corroboration); v216 REVENUE MAX: multiplex (autorelaxed) related-ads unit after related posts, adaptive density cap (word-count based), app-bar auto-release so mobile anchor ad returns; v215 READABILITY ENGINE: article typography (16.75/18px, 1.85 leading, 72ch measure, Telugu extra leading), heading scale + accent, tables/lists/links/quotes polish, CTA dedupe (4 WhatsApp blocks → 1) + top-blogger reading order, content-visibility CWV; v214 NEAT PASS: okate design system (card shell · rhythm · type scale · 44px buttons) anni in-article + CTA blocks ki; v213 PHONE PERFECT: self-contained SVG icons (sprite <use> fail fix), bullet-proof mobile menu drawer, Save/Compare/Print row removed from articles, empty video-ad placeholder removed, stray Blocksy search block stripped, compact in-article blocks; v201 PREVIEW-PARITY: hero H1 + search + 8 chips, ticker→hero→"Latest Notifications" carousel from real posts (inc/slider.php + assets/js/studentup-slider.js); v188 HOOK LEAD: 'main enti' first line (su-hook, dark/print safe) + Telugu daily list hooks; v185 WORLD-CLASS PASS: no-flash dark mode (pre-paint) + color-scheme (native controls) + single H1 per view + card containment + fresh min.css; v184 ACTIVE BOARD HYGIENE: expired out + stale sweep (120d) + same-recruitment dedupe (site ↔ bot parity); v183 FORWARD LIST: outsourcing/contract board section (site + bot daily list align); v181 SEARCH-DEMAND LOG (readers' queries → content gaps); v180 SVG SPRITE (home -30KB) + live-JS-clean; v179 ATTACHMENT-REDIRECT + RICH FEEDS; v178 ALIAS-MERGE ARCHIVES + PWA icons; v177 SHARE-CARD + ICONS: og/twitter for home+archives, archive canonicals, favicon fallback, llms tools; v176 REAL-INSTALL AUDIT: home pagination + og:image guarantee + baseSalary; v175 CONTEXT-AWARE CTAs + schema gates; v174 BOARD RICHNESS + pretty labels; v173 REAL-INSTALL FIXES (hot rail meta keys + days-left, paginate null fatal, saved page auto-create); v172 COMMAND CENTER: My Workspace (profile → eligible jobs → application pipeline → deadline radar); v171 SVG icons + critical CSS + apply tracker; v170 phone mode
+define( 'STUDENTUP_VERSION', '1.9.138' );  // v283: Browse-by-section = wrapping grid (no side-scroll/arrows), footer disclaimer sentence removed (owner), social rail icon paths fix in previews. v282 QUIZ STATUS GAME: easy reasoning/aptitude bank (24 Qs, easy-first rotation), finish → 'Share your score to WhatsApp Status' → name once → canvas score card (Hey <name>! X/Y + quiz link) → native share (WhatsApp → My status) / wa.me / download; social rail icons blank fix (su-socb-* + inline paths + belt); category tiles = icon + name only (hint text + counts teesesam). v281 ADVANCED BEST BUILD: tiered urgency pills (red ≤2d · amber ≤7d · green ≤14d, real last-date only, grid + slider parity, '1 Day Left' grammar fix), home 'Closing Soon' band (nearest deadlines first, data lekapote render kaadu), highlight-to-share on articles (select text → WhatsApp/Telegram/Copy icon chips, GA4 share_select), laptop-only premium elevation (hover lift/glow, gradient rank medallions, section accent bar) — phone neat ga untundi. v227 TRUST + LEADS: real reviews (+Review schema, fake rating ledu), case studies, team block, address nunchi auto Google Map + directions, response-time promise, /thank-you/ page (noindex + GA4 generate_lead) — anni 'data lekapote render kaadu' rule tho. v226 MEASUREMENT + LEADS: GA4 tag nijamga emit (mundu emit avvaledu — bug), lead events (call/WhatsApp/email/telegram/apply/form/read-75), Microsoft Clarity, LocalBusiness schema (data unte matrame). v225 FLUID TYPE SYSTEM: okate clamp() scale (rem+vw) — phone 360px → laptop 1440px varaku prathi text size smooth ga marutundi (body 14.5→17, article H1 22→33); browser font-size setting (accessibility zoom) gauravinchabadutundi; 74ch reading column laptop lo; 44px tap targets phone lo; ≥1600px lo inka pedda scale. v221 VIRAL STREAMS: Govt Schemes + TS/AP District News categories (mega menu + alias map; bot auto-classifies), v220 bot advanced link intake; v219 PHONE PERFECT UI: mobile perfection layer (fluid type scale, Telugu letter-spacing fix, unified card padding/radius, 44px tap targets, overflow guards, drawer rows, 16px inputs) + mobile menu double-toggle bug fixed (studentup.js vs studentup-menu.js single owner); v217 INTERNET CENTER BOX: okate premium card (gradient strip, live dot, Telugu owner copy, 4 perk chips, WhatsApp/Call/Email actions) + bot advanced sourcing gates (independent domains, confidence floor, key-fact corroboration); v216 REVENUE MAX: multiplex (autorelaxed) related-ads unit after related posts, adaptive density cap (word-count based), app-bar auto-release so mobile anchor ad returns; v215 READABILITY ENGINE: article typography (16.75/18px, 1.85 leading, 72ch measure, Telugu extra leading), heading scale + accent, tables/lists/links/quotes polish, CTA dedupe (4 WhatsApp blocks → 1) + top-blogger reading order, content-visibility CWV; v214 NEAT PASS: okate design system (card shell · rhythm · type scale · 44px buttons) anni in-article + CTA blocks ki; v213 PHONE PERFECT: self-contained SVG icons (sprite <use> fail fix), bullet-proof mobile menu drawer, Save/Compare/Print row removed from articles, empty video-ad placeholder removed, stray Blocksy search block stripped, compact in-article blocks; v201 PREVIEW-PARITY: hero H1 + search + 8 chips, ticker→hero→"Latest Notifications" carousel from real posts (inc/slider.php + assets/js/studentup-slider.js); v188 HOOK LEAD: 'main enti' first line (su-hook, dark/print safe) + Telugu daily list hooks; v185 WORLD-CLASS PASS: no-flash dark mode (pre-paint) + color-scheme (native controls) + single H1 per view + card containment + fresh min.css; v184 ACTIVE BOARD HYGIENE: expired out + stale sweep (120d) + same-recruitment dedupe (site ↔ bot parity); v183 FORWARD LIST: outsourcing/contract board section (site + bot daily list align); v181 SEARCH-DEMAND LOG (readers' queries → content gaps); v180 SVG SPRITE (home -30KB) + live-JS-clean; v179 ATTACHMENT-REDIRECT + RICH FEEDS; v178 ALIAS-MERGE ARCHIVES + PWA icons; v177 SHARE-CARD + ICONS: og/twitter for home+archives, archive canonicals, favicon fallback, llms tools; v176 REAL-INSTALL AUDIT: home pagination + og:image guarantee + baseSalary; v175 CONTEXT-AWARE CTAs + schema gates; v174 BOARD RICHNESS + pretty labels; v173 REAL-INSTALL FIXES (hot rail meta keys + days-left, paginate null fatal, saved page auto-create); v172 COMMAND CENTER: My Workspace (profile → eligible jobs → application pipeline → deadline radar); v171 SVG icons + critical CSS + apply tracker; v170 phone mode
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -55,7 +55,7 @@ require_once get_template_directory() . '/inc/smartrecirc.php'; // v169: scroll-
 require_once get_template_directory() . '/inc/seo-bridge.php';
 require_once get_template_directory() . '/inc/toc.php';
 require_once get_template_directory() . '/inc/schema.php';
-require_once get_template_directory() . '/inc/lang.php';   // v1.9.137: Telugu language signals
+require_once get_template_directory() . '/inc/lang.php';   // v1.9.138: Telugu language signals
 require_once get_template_directory() . '/inc/author-box.php';
 require_once get_template_directory() . '/inc/consent.php';
 require_once get_template_directory() . '/inc/ads-txt.php';
@@ -78,13 +78,13 @@ require_once get_template_directory() . '/inc/share.php';     // v98: viral shar
 require_once get_template_directory() . '/inc/success-stories.php'; // v117: consented TS/AP story intake CTA
 require_once get_template_directory() . '/inc/student-tools.php'; // v120: compare, reminders and print/PDF utility layer
 require_once get_template_directory() . '/inc/qual-pages.php';
-require_once get_template_directory() . '/inc/qual-pages.php';    // v1.9.137: /jobs/<qualification>/ programmatic SEO landing pages
+require_once get_template_directory() . '/inc/qual-pages.php';    // v1.9.138: /jobs/<qualification>/ programmatic SEO landing pages
 require_once get_template_directory() . '/inc/org-pages.php';
 require_once get_template_directory() . '/inc/home-sections.php';
-require_once get_template_directory() . '/inc/lang-ui.php';         // v1.9.137: Telugu UI chrome (gettext map)  // v1.9.137: section-wise headlines + org directory (home)     // v1.9.123: /org/<organisation>/ landing pages
-require_once get_template_directory() . '/inc/today.php';           // v1.9.137: /today/ date-wise updates page
-require_once get_template_directory() . '/inc/live-exam.php';       // v1.9.137: Live Exams tile + menu links (exam subdomain)
-require_once get_template_directory() . '/inc/landing-sitemap.php'; // v1.9.137: Rank Math sitemap provider for landing routes
+require_once get_template_directory() . '/inc/lang-ui.php';         // v1.9.138: Telugu UI chrome (gettext map)  // v1.9.138: section-wise headlines + org directory (home)     // v1.9.123: /org/<organisation>/ landing pages
+require_once get_template_directory() . '/inc/today.php';           // v1.9.138: /today/ date-wise updates page
+require_once get_template_directory() . '/inc/live-exam.php';       // v1.9.138: Live Exams tile + menu links (exam subdomain)
+require_once get_template_directory() . '/inc/landing-sitemap.php'; // v1.9.138: Rank Math sitemap provider for landing routes
 require_once get_template_directory() . '/inc/opportunities.php'; // v121: live active list, expiry-safe sections and job board
 require_once get_template_directory() . '/inc/premium.php'; // v123: hero, hot jobs, scholarships, alerts, bottom nav
 require_once get_template_directory() . '/inc/cachepurge.php'; // v312: auto purge every cache layer when theme version changes
@@ -442,6 +442,23 @@ function studentup_css_url( $rel ) {
 	return get_template_directory_uri() . '/' . $rel;
 }
 
+/**
+ * v1.9.138: minified JS when the build shipped it (assets/js/x.min.js) —
+ * same contract as studentup_css_url(). SCRIPT_DEBUG → raw file.
+ *
+ * @param string $rel Theme-relative path ending in .js.
+ * @return string URL.
+ */
+function studentup_js_url( $rel ) {
+	$min = preg_replace( '/\.js$/', '.min.js', $rel );
+	if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+		if ( file_exists( get_template_directory() . '/' . $min ) ) {
+			return get_template_directory_uri() . '/' . $min;
+		}
+	}
+	return get_template_directory_uri() . '/' . $rel;
+}
+
 function studentup_assets() {
 	wp_enqueue_style( 'studentup', studentup_css_url( 'style.css' ), array(), STUDENTUP_VERSION );
 	// v123: premium layer — style.css tarvata load (overrides work).
@@ -452,43 +469,43 @@ function studentup_assets() {
 	wp_enqueue_style( 'studentup-worldclass', studentup_css_url( 'assets/css/worldclass.css' ), array( 'studentup-premium' ), STUDENTUP_VERSION );
 	// v260 DELIGHT: advanced polish layer (entrance stagger, hover spring, hero drift).
 	wp_enqueue_style( 'studentup-delight', studentup_css_url( 'assets/css/delight.css' ), array( 'studentup-worldclass' ), STUDENTUP_VERSION );
-	wp_enqueue_script( 'studentup', get_template_directory_uri() . '/assets/js/studentup.js', array(), STUDENTUP_VERSION, true );
+	wp_enqueue_script( 'studentup', studentup_js_url( 'assets/js/studentup.js' ), array(), STUDENTUP_VERSION, true );
 	// v197: quiz + poll instant layer (only where they render — tiny file, defer).
 	if ( is_front_page() || is_page_template( 'page-quiz.php' ) || is_home() ) {
-		wp_enqueue_script( 'studentup-engage', get_template_directory_uri() . '/assets/js/studentup-engage.js', array(), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-engage', studentup_js_url( 'assets/js/studentup-engage.js' ), array(), STUDENTUP_VERSION, true );
 		// v282: quiz → WhatsApp Status score card (name + score + quiz link; canvas, no server).
-		wp_enqueue_script( 'studentup-status', get_template_directory_uri() . '/assets/js/studentup-status.js', array(), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-status', studentup_js_url( 'assets/js/studentup-status.js' ), array(), STUDENTUP_VERSION, true );
 	}
-	wp_enqueue_script( 'studentup-premium', get_template_directory_uri() . '/assets/js/studentup-premium.js', array( 'studentup' ), STUDENTUP_VERSION, true );
+	wp_enqueue_script( 'studentup-premium', studentup_js_url( 'assets/js/studentup-premium.js' ), array( 'studentup' ), STUDENTUP_VERSION, true );
 	// v197: advanced menu — keyboard/aria/touch accordion (tiny, no deps).
-	wp_enqueue_script( 'studentup-menu', get_template_directory_uri() . '/assets/js/studentup-menu.js', array(), STUDENTUP_VERSION, true );
+	wp_enqueue_script( 'studentup-menu', studentup_js_url( 'assets/js/studentup-menu.js' ), array(), STUDENTUP_VERSION, true );
 	// v198: tools engine (finder · sticky strip · swipe · steppers · result
 	// actions · "how it is calculated"). Tools page lo mattrame — light ga.
 	if ( is_page_template( 'page-tools.php' ) ) {
-		wp_enqueue_script( 'studentup-tools', get_template_directory_uri() . '/assets/js/studentup-tools.js', array(), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-tools', studentup_js_url( 'assets/js/studentup-tools.js' ), array(), STUDENTUP_VERSION, true );
 	}
 	// v127: command palette (Ctrl/⌘+K). v191.4 PERF: phone ki idi nishprayojanam
 	// (keyboard ledu) — 9 KB mattrame save avutundi; desktop ki mattrame load.
 	if ( ! wp_is_mobile() ) {
-		wp_enqueue_script( 'studentup-cmdk', get_template_directory_uri() . '/assets/js/studentup-cmdk.js', array( 'studentup' ), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-cmdk', studentup_js_url( 'assets/js/studentup-cmdk.js' ), array( 'studentup' ), STUDENTUP_VERSION, true );
 	}
 	// v302 RETURN LAYER: "N new since your last visit" (home) + "Continue reading" (single).
 	// Browser-local only (localStorage), renders nothing on first visit / no data.
 	if ( is_front_page() || is_home() || is_singular( 'post' ) || ( function_exists( 'studentup_is_today_page' ) && studentup_is_today_page() ) ) {
-		wp_enqueue_script( 'studentup-return', get_template_directory_uri() . '/assets/js/studentup-return.js', array(), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-return', studentup_js_url( 'assets/js/studentup-return.js' ), array(), STUDENTUP_VERSION, true );
 	}
 	if ( is_front_page() || is_home() ) {
 		// v124: smart tools homepage lo mattrame — article pages fast ga untayi.
-		wp_enqueue_script( 'studentup-smart', get_template_directory_uri() . '/assets/js/studentup-smart.js', array( 'studentup-premium' ), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-smart', studentup_js_url( 'assets/js/studentup-smart.js' ), array( 'studentup-premium' ), STUDENTUP_VERSION, true );
 	}
 	// v201: Latest Notifications sliding track (auto-slide + controls + "/" search).
 	// Home lo mattrame — article pages ki extra KB ledu.
 	if ( is_front_page() ) {
-		wp_enqueue_script( 'studentup-slider', get_template_directory_uri() . '/assets/js/studentup-slider.js', array(), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-slider', studentup_js_url( 'assets/js/studentup-slider.js' ), array(), STUDENTUP_VERSION, true );
 	}
 	// v72: PWA install prompt (app-laga install) — pwa option ON unte mattrame
 	if ( studentup_opt( 'pwa', '1' ) ) {
-		wp_enqueue_script( 'studentup-pwa', get_template_directory_uri() . '/assets/js/studentup-pwa.js', array( 'studentup' ), STUDENTUP_VERSION, true );
+		wp_enqueue_script( 'studentup-pwa', studentup_js_url( 'assets/js/studentup-pwa.js' ), array( 'studentup' ), STUDENTUP_VERSION, true );
 	}
 	wp_localize_script(
 		'studentup',
