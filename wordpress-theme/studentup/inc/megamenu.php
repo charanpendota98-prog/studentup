@@ -57,9 +57,19 @@ function studentup_mega_home_url( $anchor = '' ) {
  * @param string $icon  Icon key.
  * @return array<string,string>
  */
+/**
+ * 1.9.150 — menu text: English when `nav_english` is ON, Telugu map otherwise.
+ */
+function studentup_mega_t( $text, $domain = 'studentup' ) {
+	if ( function_exists( 'studentup_nav_english' ) && studentup_nav_english() ) {
+		return (string) $text;
+	}
+	return translate( $text, $domain );
+}
+
 function studentup_mega_item( $label, $url, $desc, $icon = 'arrow' ) {
 	// v1.9.133: descriptions pass through gettext so inc/lang-ui.php can show Telugu chrome.
-	return array( 'label' => translate( $label, 'studentup' ), 'url' => $url, 'desc' => ( '' !== $desc ? translate( $desc, 'studentup' ) : '' ), 'icon' => $icon );
+	return array( 'label' => studentup_mega_t( $label, 'studentup' ), 'url' => $url, 'desc' => ( '' !== $desc ? studentup_mega_t( $desc, 'studentup' ) : '' ), 'icon' => $icon );
 }
 
 /**
@@ -370,17 +380,17 @@ function studentup_mega_render( $groups, $home ) {
 			esc_url( (string) $g['url'] ),
 			esc_attr( $key ),
 			studentup_ui_icon( $ic, 16 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-			esc_html( translate( (string) $g['label'], 'studentup' ) )
+			esc_html( studentup_mega_t( (string) $g['label'], 'studentup' ) )
 		);
 		printf(
 			'<ul class="sub-menu" id="su-mega-%s" data-su-mega aria-label="%s">',
 			esc_attr( $key ),
-			esc_attr( translate( (string) $g['label'], 'studentup' ) )
+			esc_attr( studentup_mega_t( (string) $g['label'], 'studentup' ) )
 		);
 		foreach ( $g['cols'] as $col ) {
 			echo '<li class="su-mega-col menu-item" role="none">';
 			if ( ! empty( $col['title'] ) ) {
-				printf( '<p class="su-mega-title">%s</p>', esc_html( translate( (string) $col['title'], 'studentup' ) ) );
+				printf( '<p class="su-mega-title">%s</p>', esc_html( studentup_mega_t( (string) $col['title'], 'studentup' ) ) );
 			}
 			echo '<ul class="su-mega-list">';
 			foreach ( $col['items'] as $it ) {
@@ -389,7 +399,7 @@ function studentup_mega_render( $groups, $home ) {
 					. '<span class="su-mega-t">%s<small>%s</small></span></a></li>',
 					esc_url( (string) $it['url'] ),
 					studentup_ui_icon( (string) $it['icon'], 18 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-					esc_html( translate( (string) $it['label'], 'studentup' ) ),
+					esc_html( studentup_mega_t( (string) $it['label'], 'studentup' ) ),
 					esc_html( (string) $it['desc'] )
 				);
 			}
@@ -400,12 +410,12 @@ function studentup_mega_render( $groups, $home ) {
 			$f = $g['feature'];
 			echo '<li class="su-mega-feat menu-item" role="none">';
 			printf( '<span class="su-mega-eyebrow">%s</span>', esc_html__( 'Recommended', 'studentup' ) );
-			printf( '<b>%s</b>', esc_html( translate( (string) $f['title'], 'studentup' ) ) );
-			printf( '<small>%s</small>', esc_html( translate( (string) $f['desc'], 'studentup' ) ) );
+			printf( '<b>%s</b>', esc_html( studentup_mega_t( (string) $f['title'], 'studentup' ) ) );
+			printf( '<small>%s</small>', esc_html( studentup_mega_t( (string) $f['desc'], 'studentup' ) ) );
 			printf(
 				'<a class="su-mega-cta" href="%s">%s%s</a>',
 				esc_url( (string) $f['url'] ),
-				esc_html( translate( (string) $f['cta'], 'studentup' ) ),
+				esc_html( studentup_mega_t( (string) $f['cta'], 'studentup' ) ),
 				studentup_ui_icon( 'arrow', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 			);
 			echo '</li>';
@@ -428,15 +438,15 @@ function studentup_mega_mobile_accordion( $g, $is_new = false ) {
 		'<details class="mgroup"%s><summary>%s<span>%s</span>%s</summary><div class="mgroup-body">',
 		$is_new ? ' open' : '',
 		studentup_ui_icon( (string) ( $g['icon'] ?? 'arrow' ), 16 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-		esc_html( translate( (string) $g['label'], 'studentup' ) ),
+		esc_html( studentup_mega_t( (string) $g['label'], 'studentup' ) ),
 		studentup_ui_icon( 'chevron', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 	);
 	foreach ( $g['items'] as $it ) {
 		printf(
 			'<a href="%s"><span class="mgroup-t">%s</span><small>%s</small></a>',
 			esc_url( (string) $it['url'] ),
-			esc_html( translate( (string) $it['label'], 'studentup' ) ),
-			esc_html( translate( (string) $it['desc'], 'studentup' ) )
+			esc_html( studentup_mega_t( (string) $it['label'], 'studentup' ) ),
+			esc_html( studentup_mega_t( (string) $it['desc'], 'studentup' ) )
 		);
 	}
 	echo '</div></details>';

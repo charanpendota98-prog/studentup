@@ -841,12 +841,45 @@ function studentup_ui_te_map() {
 /**
  * gettext filter — 'studentup' domain only.
  */
+/**
+ * 1.9.150 — NAVIGATION IN ENGLISH (owner, v364): category tiles, header/mega
+ * menu, phone drawer, bottom nav, hero links and category names stay English;
+ * article content and section UI stay Telugu. Option `nav_english` (default ON).
+ */
+function studentup_nav_english() {
+	static $on = null;
+	if ( null === $on ) {
+		$on = ! is_admin() && function_exists( 'studentup_opt' ) && (bool) studentup_opt( 'nav_english', '1' );
+	}
+	return $on;
+}
+
+/** Strings that belong to navigation chrome (kept English when nav_english is ON). */
+function studentup_nav_strings() {
+	static $set = null;
+	if ( null === $set ) {
+		$set = array_fill_keys( array(
+			'Home', 'Jobs', 'Scholarship', 'Scholarships', 'Alerts', 'Search', 'Menu', 'Main menu', 'Close menu',
+			'Explore by Category', 'All sections', 'Breaking News', 'Latest Jobs', 'Today’s updates', 'Today',
+			'TS Govt Jobs', 'AP Govt Jobs', 'Central Jobs', 'Central Govt Jobs', 'Software Jobs', 'Private Jobs',
+			'Hall Tickets', 'Results', 'Daily Quiz', 'Live Exams', 'Walk-in Jobs', 'Internships', 'Success Stories',
+			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
+			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
+			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App',
+		), true );
+	}
+	return $set;
+}
+
 function studentup_ui_gettext( $translation, $text, $domain ) {
 	if ( 'studentup' !== $domain || is_admin() ) {
 		return $translation;
 	}
 	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
 		return $translation;
+	}
+	if ( studentup_nav_english() && isset( studentup_nav_strings()[ $text ] ) ) {
+		return $text;
 	}
 	$map = studentup_ui_te_map();
 	return isset( $map[ $text ] ) ? $map[ $text ] : $translation;
@@ -911,7 +944,7 @@ function studentup_ui_te_label( $text ) {
 }
 
 function studentup_ui_te_term( $term ) {
-	if ( is_admin() || ! ( $term instanceof WP_Term ) ) {
+	if ( is_admin() || ! ( $term instanceof WP_Term ) || studentup_nav_english() ) {
 		return $term;
 	}
 	if ( in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) ) {
@@ -922,6 +955,9 @@ function studentup_ui_te_term( $term ) {
 add_filter( 'get_term', 'studentup_ui_te_term', 20 );
 
 function studentup_ui_te_menu_items( $items ) {
+	if ( studentup_nav_english() ) {
+		return $items;
+	}
 	if ( is_admin() || ! is_array( $items ) ) {
 		return $items;
 	}
@@ -965,6 +1001,9 @@ add_filter( 'date_i18n', 'studentup_ui_te_date', 10, 2 );
 function studentup_ui_te_page_title( $title, $post_id = 0 ) {
 	if ( $post_id instanceof WP_Post ) {
 		$post_id = $post_id->ID;
+	}
+	if ( studentup_nav_english() && isset( studentup_nav_strings()[ trim( (string) $title ) ] ) ) {
+		return $title;
 	}
 	if ( is_admin() || ! $post_id || 'page' !== get_post_type( $post_id ) ) {
 		return $title;

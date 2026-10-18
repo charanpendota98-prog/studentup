@@ -111,7 +111,7 @@ function studentup_mobile_main_menu() {
 			esc_attr( isset( $row['cls'] ) ? $row['cls'] : '' ),
 			esc_url( $row['url'] ),
 			studentup_ui_icon( $row['icon'], 18 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG.
-			esc_html( translate( $row['lab'], 'studentup' ) ),
+			esc_html( ( studentup_nav_english() ? $row['lab'] : translate( $row['lab'], 'studentup' ) ) ),
 			'' , // v268: hints owner ki avasaram ledu — eppudu render cheyyamu
 			studentup_ui_icon( 'chevron', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG.
 		);

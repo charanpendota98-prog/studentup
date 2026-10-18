@@ -350,3 +350,11 @@ small,.tag,.su-scard-tag,.su-scard-hot,.su-scard-vac,.su-scard-urgent,.mlabel,.q
   body.su-has-applybar #su-totop{ bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
 }
 .su-scard-hot svg{vertical-align:-1px;margin-right:2px}
+/* 1.9.150 — English navigation: tile labels are one line now → uniform weight/size,
+   same height for every tile, no clamping artefacts. */
+.su-catrail .su-cat b{font-weight:700 !important;font-size:13px !important;letter-spacing:0;min-height:1.4em !important;-webkit-line-clamp:2}
+@media (max-width:640px){.su-catrail .su-cat b{font-size:12px !important}}
+.su-catrail .su-cat.on b,.su-catrail .su-cat[aria-current] b{font-weight:800 !important}
+/* equal tile rows + phone rail tab shape */
+.su-catrail{grid-auto-rows:1fr}
+@media (max-width:640px){.su-tab{width:22px !important;height:44px !important;border-radius:12px 0 0 12px !important}}
