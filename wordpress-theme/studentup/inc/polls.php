@@ -420,21 +420,19 @@ function studentup_daily_poll( $args = array() ) {
 	}
 	?>
 	<section class="su-poll" id="su-poll-<?php echo esc_attr( $id ); ?>" data-su-poll="<?php echo esc_attr( $id ); ?>" aria-label="<?php esc_attr_e( 'Reader poll', 'studentup' ); ?>">
-		<p class="su-poll-kick"><?php echo esc_html( (string) $args['kicker'] ); ?></p>
+		<p class="su-poll-kick"><?php echo esc_html( translate( (string) $args['kicker'], 'studentup' ) ); ?></p>
 		<h3><?php echo esc_html( translate( (string) $poll['q'], 'studentup' ) ); ?></h3>
+		<?php if ( $total > 0 ) : ?>
 		<p class="su-poll-sub">
 			<?php
-			if ( $total > 0 ) {
-				printf(
-					/* translators: %s: vote count. */
-					esc_html__( '%s readers voted — tap an option to see live results.', 'studentup' ),
-					esc_html( number_format_i18n( $total ) )
-				);
-			} else {
-				esc_html_e( 'Be the first to vote — results show as soon as people answer.', 'studentup' );
-			}
+			printf(
+				/* translators: %s: vote count. */
+				esc_html__( '%s readers voted — tap an option to see live results.', 'studentup' ),
+				esc_html( number_format_i18n( $total ) )
+			);
 			?>
 		</p>
+		<?php endif; ?>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="su-poll-form" data-su-poll-form>
 			<input type="hidden" name="action" value="studentup_poll_vote">

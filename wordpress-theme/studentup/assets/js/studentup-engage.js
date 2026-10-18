@@ -53,31 +53,6 @@
     var picked = saved.picked || {};
     var score = 0;
 
-    /* Exam filter pills */
-    var examTabs = $$(".su-qtab");
-    if (examTabs.length) {
-      examTabs.forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          examTabs.forEach(function (b) {
-            b.classList.remove("active");
-            b.setAttribute("aria-selected", "false");
-          });
-          btn.classList.add("active");
-          btn.setAttribute("aria-selected", "true");
-          var targetExam = (btn.getAttribute("data-exam") || "all").toLowerCase();
-          qs.forEach(function (fs) {
-            var ex = (fs.getAttribute("data-exam") || "all").toLowerCase().split(",");
-            if (targetExam === "all" || ex.indexOf(targetExam) !== -1 || ex.indexOf("all") !== -1) {
-              fs.style.display = "";
-            } else {
-              fs.style.display = "none";
-            }
-          });
-          paintChips();
-        });
-      });
-    }
-
     /* v274: question navigator — jump to any question, answered state live */
     var jumpBox = $("[data-su-quiz-jump]");
     var chipEls = [];
@@ -92,23 +67,43 @@
         chipEls = $$(".su-q-chip", jumpBox);
         chipEls.forEach(function (el) {
           el.addEventListener("click", function () {
-            var fs = qs[parseInt(el.getAttribute("data-j"), 10) || 0];
-            if (fs && fs.scrollIntoView) fs.scrollIntoView({ behavior: "smooth", block: "center" });
+            show(parseInt(el.getAttribute("data-j"), 10) || 0);
           });
         });
       }
       chipEls.forEach(function (el, i) {
         var fs = qs[i];
         if (!fs) return;
-        el.classList.remove("cur", "done", "miss");
-        if (fs.style.display === "none") { el.style.display = "none"; return; }
-        el.style.display = "";
+        el.classList.remove("cur", "done", "miss", "now");
+        if (i === cur) el.classList.add("now");
         if ($(".su-opt.wrong", fs)) el.classList.add("miss");
         else if ($(".su-opt.right", fs)) el.classList.add("done");
         else el.classList.add("cur");
+        el.setAttribute("aria-selected", i === cur ? "true" : "false");
       });
     }
 
+    /* v353: one question at a time (stepper) — compact card, game feel */
+    var cur = 0;
+    var sec = form.closest ? form.closest(".su-quiz") : null;
+    var prevBtn = $("[data-su-quiz-prev]");
+    var nextBtn = $("[data-su-quiz-next]");
+    var nextLabel = nextBtn ? nextBtn.textContent : "";
+    if (sec) sec.classList.add("js-step");
+    function show(i) {
+      cur = Math.max(0, Math.min(total - 1, i));
+      qs.forEach(function (fs, k) { fs.classList.toggle("is-cur", k === cur); });
+      var answered = picked[qs[cur].getAttribute("data-i")] !== undefined;
+      if (prevBtn) prevBtn.hidden = cur === 0;
+      if (restart) restart.hidden = !Object.keys(picked).length;
+      if (nextBtn) {
+        nextBtn.hidden = !answered || cur === total - 1;
+        nextBtn.textContent = nextLabel;
+      }
+      paintChips();
+    }
+    if (prevBtn) prevBtn.addEventListener("click", function () { show(cur - 1); });
+    if (nextBtn) nextBtn.addEventListener("click", function () { show(cur + 1); var f = $(".su-opt", qs[cur]); if (f && f.focus) f.focus({ preventScroll: true }); });
     paintChips();
     if (checkBtn) checkBtn.hidden = true; /* JS unte submit avasaram ledu */
 
@@ -145,6 +140,9 @@
         done++;
       });
       paintScore();
+      var firstOpen = 0;
+      for (var k = 0; k < total; k++) { if (picked[qs[k].getAttribute("data-i")] === undefined) { firstOpen = k; break; } if (k === total - 1) firstOpen = k; }
+      show(firstOpen);
       if (done === total) finish();
     }
 
@@ -199,7 +197,7 @@
       mark(fs, chosen);
       store("su_quiz_" + todayKey(), { picked: picked, score: score });
       paintScore();
-      paintChips();
+      show(cur);
       if (Object.keys(picked).length === total) finish();
     }
 
@@ -231,7 +229,6 @@
     });
 
     if (restart) {
-      restart.hidden = false;
       restart.addEventListener("click", function () {
         picked = {};
         score = 0;
@@ -252,7 +249,7 @@
         if (share) share.hidden = true;
         if (streakEl) streakEl.hidden = true;
         paintScore();
-        paintChips();
+        show(0);
         var done = $(".su-quiz-done");
         if (done) done.remove();
         var first = $(".su-opt", form);

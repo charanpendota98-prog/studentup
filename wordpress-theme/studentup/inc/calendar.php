@@ -101,7 +101,8 @@ function studentup_calendar_page_render() {
 		. '</div>';
 
 	if ( ! $total ) {
-		return $head . '<p>' . esc_html__( 'No last dates are confirmed yet. Dates appear here only after the official notification is published - we never estimate a deadline.', 'studentup' ) . '</p>';
+		// v353: "0 notifications open" count line is noise — empty-state sentence only.
+		return '<p>' . esc_html__( 'No last dates are confirmed yet. Dates appear here only after the official notification is published - we never estimate a deadline.', 'studentup' ) . '</p>';
 	}
 
 	$by_month = array();

@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<p><?php echo studentup_ui_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Spotted a mistake? Tell us at', 'studentup' ); ?> <a href="mailto:<?php echo esc_attr( studentup_contact_email() ); ?>"><?php echo esc_html( studentup_contact_email() ); ?></a></p>
 			</div>
 			<div>
-				<h3>Categories</h3>
+				<h3><?php esc_html_e( 'Categories', 'studentup' ); ?></h3>
 				<ul>
 					<?php
 					foreach ( array_slice( studentup_most_used(), 0, 5 ) as $m ) :
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</ul>
 			</div>
 			<div>
-				<h3>Other links</h3>
+				<h3><?php esc_html_e( 'Other links', 'studentup' ); ?></h3>
 				<?php
 				// v308 NEAT: menu unte menu mattrame; lekapote policy fallback list. Mundu rendu render ayyi
 				// (About Us + About us, Privacy Policy + Privacy policy ...) prathi link 2 sarlu kanipinchedi.

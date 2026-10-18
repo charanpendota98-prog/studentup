@@ -336,7 +336,7 @@ add_filter( 'the_content', function ( $content ) {
 		return $content;
 	}
 	$row  = studentup_org_map()[ $slug ];
-	$link = ' · <a class="su-org-link" href="' . esc_url( studentup_org_page_url( $slug ) ) . '">' . esc_html( $row[0] ) . ' updates</a>';
+	$link = ' · <a class="su-org-link" href="' . esc_url( studentup_org_page_url( $slug ) ) . '">' . esc_html( sprintf( /* translators: %s: organisation */ __( '%s updates', 'studentup' ), $row[0] ) ) . '</a>';
 	if ( false !== strpos( $content, 'su-parent-link' ) ) {
 		return preg_replace( '/(<p class="su-parent-link">.*?)(<\/p>)/s', '$1' . str_replace( '$', '\$', $link ) . '$2', $content, 1 );
 	}

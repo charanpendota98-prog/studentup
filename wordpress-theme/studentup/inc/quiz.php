@@ -434,12 +434,12 @@ function studentup_daily_quiz( $args = array() ) {
 	// v286: share link = clean short URL studentup.in/quiz (studentup_quiz_short_redirect() → real quiz).
 	$su_quiz_url = home_url( '/quiz' );
 	?>
-	<section class="su-quiz" id="<?php echo esc_attr( (string) $args['id'] ); ?>" data-su-quiz-url="<?php echo esc_url( $su_quiz_url ); ?>" aria-label="<?php esc_attr_e( 'Daily quiz', 'studentup' ); ?>">
+	<section class="su-quiz su-quiz-v2" id="<?php echo esc_attr( (string) $args['id'] ); ?>" data-su-quiz-url="<?php echo esc_url( $su_quiz_url ); ?>" aria-label="<?php esc_attr_e( 'Daily quiz', 'studentup' ); ?>">
 		<div class="su-quiz-card">
 			<div class="su-quiz-head">
 				<div>
-					<p class="su-quiz-kick"><?php echo esc_html( (string) $args['kicker'] ); ?> · <?php echo esc_html( date_i18n( 'M j, Y' ) ); ?></p>
-					<h2><?php echo esc_html( (string) $args['heading'] ); ?></h2>
+					<p class="su-quiz-kick"><?php echo esc_html( translate( (string) $args['kicker'], 'studentup' ) ); ?> · <?php echo esc_html( date_i18n( 'M j, Y' ) ); ?></p>
+					<h2><?php echo esc_html( translate( (string) $args['heading'], 'studentup' ) ); ?></h2>
 				</div>
 				<div class="su-quiz-score" role="status" aria-live="polite">
 					<b data-su-quiz-score><?php echo esc_html( (string) $score ); ?></b><span>/ <?php echo esc_html( (string) count( $qs ) ); ?></span>
@@ -447,16 +447,7 @@ function studentup_daily_quiz( $args = array() ) {
 			</div>
 			<div class="su-quiz-bar"><i data-su-quiz-bar style="width:<?php echo esc_attr( (string) ( $answered ? $pct : 0 ) ); ?>%"></i></div>
 
-			<div class="su-quiz-exams" role="tablist" aria-label="Select target exam">
-				<button type="button" class="su-qtab active" data-exam="all" role="tab" aria-selected="true">All Exams (Daily 20+ Qs)</button>
-				<button type="button" class="su-qtab" data-exam="tspsc" role="tab" aria-selected="false">TSPSC (Group 1-4 / Police)</button>
-				<button type="button" class="su-qtab" data-exam="appsc" role="tab" aria-selected="false">APPSC / DSC</button>
-				<button type="button" class="su-qtab" data-exam="ssc" role="tab" aria-selected="false">SSC (CGL · CHSL · GD)</button>
-				<button type="button" class="su-qtab" data-exam="banking" role="tab" aria-selected="false">Banking (IBPS · SBI)</button>
-				<button type="button" class="su-qtab" data-exam="rrb" role="tab" aria-selected="false">Railways (RRB NTPC)</button>
-			</div>
-
-			<div class="su-q-jump" data-su-quiz-jump role="tablist" aria-label="Jump to question"></div>
+			<div class="su-q-jump" data-su-quiz-jump role="tablist" aria-label="<?php esc_attr_e( 'Jump to question', 'studentup' ); ?>"></div>
 			<form method="post" class="su-quiz-form" data-su-quiz-form>
 				<?php wp_nonce_field( 'su_quiz_submit', 'su_quiz_nonce' ); ?>
 				<input type="hidden" name="su_quiz_submitted" value="1">
@@ -467,7 +458,15 @@ function studentup_daily_quiz( $args = array() ) {
 					?>
 					<fieldset class="su-q" data-c="<?php echo esc_attr( (string) $right ); ?>" data-i="<?php echo esc_attr( (string) $i ); ?>" data-exam="<?php echo esc_attr( (string) ( $q['exam'] ?? 'all' ) ); ?>">
 						<legend class="su-q-title"><span class="su-q-n"><?php echo esc_html( (string) ( $i + 1 ) ); ?></span> <?php echo esc_html( (string) $q['q'] ); ?></legend>
-						<div class="su-q-opts">
+						<?php
+						$su_short = true;
+						foreach ( (array) $q['a'] as $su_t ) {
+							if ( mb_strlen( (string) $su_t ) > 12 ) {
+								$su_short = false;
+							}
+						}
+						?>
+						<div class="<?php echo esc_attr( $su_short ? 'su-q-opts is-short' : 'su-q-opts' ); ?>">
 							<?php foreach ( (array) $q['a'] as $ai => $txt ) : ?>
 								<?php
 								$cls = 'su-opt';
@@ -495,10 +494,12 @@ function studentup_daily_quiz( $args = array() ) {
 					</fieldset>
 				<?php endforeach; ?>
 				<div class="su-quiz-foot">
-					<button type="submit" class="su-quiz-restart" data-su-quiz-check><?php echo studentup_ui_icon( 'check', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Check answers</button>
-					<button type="button" class="su-quiz-restart" data-su-quiz-restart hidden><?php echo studentup_ui_icon( 'refresh', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Restart</button>
+					<button type="submit" class="su-quiz-restart" data-su-quiz-check><?php echo studentup_ui_icon( 'check', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Check answers', 'studentup' ); ?></button>
+					<button type="button" class="su-quiz-restart su-quiz-prev" data-su-quiz-prev hidden>← <?php esc_html_e( 'Previous', 'studentup' ); ?></button>
+					<button type="button" class="su-quiz-more su-quiz-next" data-su-quiz-next hidden><?php esc_html_e( 'Next question', 'studentup' ); ?> →</button>
+					<button type="button" class="su-quiz-restart" data-su-quiz-restart hidden><?php echo studentup_ui_icon( 'refresh', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Restart', 'studentup' ); ?></button>
 					<a class="su-quiz-more su-quiz-share" data-su-quiz-share rel="nofollow noopener" target="_blank"
-						href="<?php echo esc_url( 'https://wa.me/?text=' . $share ); ?>" hidden><?php echo studentup_ui_icon( 'upload', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Share my score</a>
+						href="<?php echo esc_url( 'https://wa.me/?text=' . $share ); ?>" hidden><?php echo studentup_ui_icon( 'upload', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Share my score', 'studentup' ); ?></a>
 					<span class="su-quiz-streak" data-su-quiz-streak hidden></span>
 					<?php if ( $more ) : ?>
 						<a class="su-quiz-more" href="<?php echo esc_url( $more ); ?>"><?php esc_html_e( 'More practice questions', 'studentup' ); ?> →</a>

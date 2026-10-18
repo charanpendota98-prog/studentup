@@ -4,7 +4,7 @@ import fs from 'node:fs';
 const { handler } = await boot();
 fs.mkdirSync('/tmp/wp/out', { recursive: true });
 for (const p of process.argv.slice(2)) {
-  const t = Date.now(); const r = await get(handler, 'http://localhost' + p);
+  const t = Date.now(); const r = await get(handler, 'http://localhost:8099' + p);
   const name = p.replace(/[^a-z0-9]+/gi, '_') + '.html';
   fs.writeFileSync('/tmp/wp/out/' + name, r.text);
   console.log(r.httpStatusCode, (Date.now() - t) + 'ms', r.text.length + 'b', p);

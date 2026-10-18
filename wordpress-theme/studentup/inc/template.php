@@ -193,8 +193,8 @@ $label = $terms ? $terms[0]->name : 'Update';
 				$su_share_title = rawurlencode( get_the_title() );
 				$su_share_url   = rawurlencode( get_permalink() );
 				?>
-				<a class="su-card-wa" href="https://wa.me/?text=<?php echo esc_attr( $su_share_title . '%20' . $su_share_url ); ?>" target="_blank" rel="noopener" title="Share on WhatsApp">
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg> Share
+				<a class="su-card-wa" href="https://wa.me/?text=<?php echo esc_attr( $su_share_title . '%20' . $su_share_url ); ?>" target="_blank" rel="noopener" title="<?php esc_attr_e( 'Share on WhatsApp', 'studentup' ); ?>">
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg> <?php esc_html_e( 'Share', 'studentup' ); ?>
 				</a>
 				<?php echo studentup_save_button( 0, 'su-save-card' ); // v92: 🔖 save-for-later (escaped in helper) ?>
 				<?php if ( function_exists( 'studentup_tool_buttons' ) ) : ?>
@@ -226,9 +226,12 @@ function studentup_reading_time( $post_id = 0 ) {
  */
 function studentup_trust_note() {
 	$email = (string) get_option( 'admin_email', '' );
-	echo '<div class="trustnote">' . studentup_ui_icon( 'check', 13 ) . ' This article was checked against official sources and written in simple language. '
-		. 'If you spot a mistake, ' . esc_html( $email ) . ' — we correct it within 24 hours. '
-		. 'Always confirm deadlines and numbers in the official notification.</div>';
+	echo '<div class="trustnote">' . studentup_ui_icon( 'check', 13 ) . ' ' // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
+		. esc_html( sprintf(
+			/* translators: %s: corrections email */
+			__( 'This article was checked against official sources and written in simple language. If you spot a mistake, %s — we correct it within 24 hours. Always confirm deadlines and numbers in the official notification.', 'studentup' ),
+			$email
+		) ) . '</div>';
 }
 
 /**
@@ -448,7 +451,7 @@ function studentup_breadcrumbs() {
 		}
 		// v1.9.126: Rank Math breadcrumbs module OFF (default) → theme trail below.
 	}
-	$out = '<a href="' . esc_url( home_url( '/' ) ) . '">Home</a>';
+	$out = '<a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'studentup' ) . '</a>';
 	if ( is_singular() ) {
 		$cats = get_the_category();
 		if ( $cats ) {
@@ -456,7 +459,12 @@ function studentup_breadcrumbs() {
 		}
 		$out .= ' › ' . esc_html( wp_trim_words( get_the_title(), 8, '…' ) );
 	} elseif ( is_archive() ) {
-		$out .= ' › ' . esc_html( wp_strip_all_tags( get_the_archive_title() ) );
+		// v353: "Category: Jobs" prefix → plain term name (prefix is noise in a trail).
+		$crumb = is_category() || is_tag() || is_tax() ? single_term_title( '', false ) : '';
+		if ( '' === (string) $crumb ) {
+			$crumb = wp_strip_all_tags( get_the_archive_title() );
+		}
+		$out .= ' › ' . esc_html( $crumb );
 	}
 	return $out;
 }
