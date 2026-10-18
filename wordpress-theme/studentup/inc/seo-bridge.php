@@ -446,6 +446,7 @@ add_action(
 						array(
 							'theme'      => 'studentup',
 							'version'    => defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
+							'contract'   => defined( 'STUDENTUP_CONTRACT' ) ? STUDENTUP_CONTRACT : 0,
 							'seo_bridge' => true,
 							'rankmath'   => defined( 'RANK_MATH_VERSION' ) || class_exists( 'RankMath' ),
 							'adsense'    => (bool) get_option( 'studentup_adsense_client', '' ),

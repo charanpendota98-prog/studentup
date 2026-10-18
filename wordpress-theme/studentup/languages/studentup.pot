@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.147\n"
+"Project-Id-Version: StudentUp 1.9.148\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 msgid "%1$d updates from the last %2$d days, grouped by date: notifications, last dates, results, hall tickets — Telugu. Updated every day."
 msgstr ""
 
-#: functions.php:530
+#: functions.php:531
 #: inc/apply.php:210
 #: inc/engage.php:163
 msgid "%d days left"
@@ -221,7 +221,7 @@ msgstr ""
 msgid "Any qualification"
 msgstr ""
 
-#: functions.php:533
+#: functions.php:534
 msgid "Anyone with this qualification can apply"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr ""
 msgid "Closes today"
 msgstr ""
 
-#: functions.php:529
+#: functions.php:530
 msgid "Closes tomorrow"
 msgstr ""
 
@@ -447,7 +447,7 @@ msgstr ""
 msgid "Closing in 30 days"
 msgstr ""
 
-#: functions.php:531
+#: functions.php:532
 #: inc/qual-filter.php:538
 #: inc/qual-filter.php:593
 #: page-opportunities.php:49
@@ -582,11 +582,11 @@ msgstr ""
 msgid "Deadline"
 msgstr ""
 
-#: functions.php:532
+#: functions.php:533
 msgid "Deadline is close — check now"
 msgstr ""
 
-#: functions.php:527
+#: functions.php:528
 #: inc/qual-filter.php:393
 msgid "Deadline passed"
 msgstr ""
@@ -1029,7 +1029,7 @@ msgstr ""
 msgid "Last day"
 msgstr ""
 
-#: functions.php:528
+#: functions.php:529
 #: inc/engage.php:158
 #: inc/slider.php:75
 #: inc/today.php:188
@@ -1076,7 +1076,7 @@ msgstr ""
 msgid "Latest Notifications"
 msgstr ""
 
-#: functions.php:526
+#: functions.php:527
 #: inc/search-smart.php:188
 msgid "Latest on StudentUp"
 msgstr ""
@@ -1275,11 +1275,11 @@ msgstr ""
 msgid "No more than 3 links in one comment."
 msgstr ""
 
-#: functions.php:524
+#: functions.php:525
 msgid "No posts found — press Enter to see the full search page"
 msgstr ""
 
-#: functions.php:522
+#: functions.php:523
 msgid "No posts in this section yet — coming soon."
 msgstr ""
 
@@ -1851,7 +1851,7 @@ msgstr ""
 msgid "Search tools"
 msgstr ""
 
-#: functions.php:523
+#: functions.php:524
 msgid "Searching…"
 msgstr ""
 
@@ -1859,7 +1859,7 @@ msgstr ""
 msgid "See all"
 msgstr ""
 
-#: functions.php:525
+#: functions.php:526
 msgid "See all results"
 msgstr ""
 
@@ -1983,7 +1983,7 @@ msgstr ""
 msgid "Something is missing"
 msgstr ""
 
-#: functions.php:521
+#: functions.php:522
 msgid "Soon"
 msgstr ""
 
@@ -2290,7 +2290,7 @@ msgstr ""
 msgid "Updated:"
 msgstr ""
 
-#: functions.php:520
+#: functions.php:521
 msgid "updates"
 msgstr ""
 
