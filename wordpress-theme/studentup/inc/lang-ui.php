@@ -865,7 +865,7 @@ function studentup_nav_strings() {
 			'Hall Tickets', 'Results', 'Daily Quiz', 'Live Exams', 'Walk-in Jobs', 'Internships', 'Success Stories',
 			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
-			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App',
+			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'WEB APP', 'Follow us', 'Install', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
 		), true );
 	}
 	return $set;
@@ -1002,8 +1002,8 @@ function studentup_ui_te_page_title( $title, $post_id = 0 ) {
 	if ( $post_id instanceof WP_Post ) {
 		$post_id = $post_id->ID;
 	}
-	if ( studentup_nav_english() && isset( studentup_nav_strings()[ trim( (string) $title ) ] ) ) {
-		return $title;
+	if ( studentup_nav_english() ) {
+		return $title; // page titles are navigation (menus, footer, crumbs) → English.
 	}
 	if ( is_admin() || ! $post_id || 'page' !== get_post_type( $post_id ) ) {
 		return $title;

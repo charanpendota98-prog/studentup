@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							continue;
 						}
 						?>
-						<li><a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo esc_html( translate( $m['label'], 'studentup' ) ); ?></a></li>
+						<li><a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo esc_html( studentup_nav_english() ? $m['label'] : translate( $m['label'], 'studentup' ) ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			</div>
@@ -77,13 +77,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<a class="su-socb-ig" href="<?php echo esc_url( $su_ft['instagram'] ); ?>" target="_blank" rel="noopener" aria-label="<?php esc_attr_e( 'Instagram', 'studentup' ); ?>"><?php echo studentup_social_icon( 'instagram', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
 					<a class="su-socb-yt" href="<?php echo esc_url( $su_ft['youtube'] ); ?>" target="_blank" rel="noopener" aria-label="<?php esc_attr_e( 'YouTube', 'studentup' ); ?>"><?php echo studentup_social_icon( 'youtube', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
 				</div>
-				<p><?php esc_html_e( 'Daily updates free ga — join avvandi.', 'studentup' ); ?></p>
 			</div>
 		</div>
 		<div class="footer-bottom">
 			<span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?> — <?php esc_html_e( 'All rights reserved.', 'studentup' ); ?></span>
 			<?php // v283: owner — footer lo disclaimer sentence vaddu (Disclaimer page + policy links unnayi). ?>
-			<?php studentup_tg_join_block( 'footer' ); // v91: Telegram join chip (private channel override supported) ?>
 		</div>
 	</div>
 </footer>
@@ -114,7 +112,7 @@ if ( studentup_opt( 'sticky_ad', '0' ) ) :
 // Click: Android/Chrome lo install prompt, iPhone/desktop lo device-wise steps.
 if ( studentup_opt( 'pwa', '1' ) && studentup_opt( 'install_prompt', '1' ) ) :
 	?>
-	<button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Download App', 'studentup' ); ?> <span class="ibadge"><?php echo esc_html__( 'WEB APP', 'studentup' ); ?></span></button>
+	<div class="su-installwrap" id="su-installwrap"><button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Download App', 'studentup' ); ?> <span class="ibadge"><?php echo esc_html__( 'WEB APP', 'studentup' ); ?></span></button><button type="button" class="su-installwrap-x" id="installbtn-x" aria-label="<?php esc_attr_e( 'Close', 'studentup' ); ?>">&#x2715;</button></div>
 	<div class="installsheet" id="installhint" hidden role="dialog" aria-modal="true" aria-labelledby="isheet-title">
 		<h3 id="isheet-title"><?php esc_html_e( 'Install StudentUp as a web app', 'studentup' ); ?></h3>
 		<p class="isub"><?php esc_html_e( 'One-tap access · visited pages can stay available offline. No native APK download is required.', 'studentup' ); ?></p>

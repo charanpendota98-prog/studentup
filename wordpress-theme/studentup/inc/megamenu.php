@@ -94,8 +94,8 @@ function studentup_mega_groups() {
 		array(
 			'title' => 'Telangana & Andhra Pradesh',
 			'items' => array(
-				studentup_mega_item( 'TS Government Jobs', $cat( 'ts-jobs' ), 'TSPSC · Police · Gurukul', 'bank' ),
-				studentup_mega_item( 'AP Government Jobs', $cat( 'ap-jobs' ), 'APPSC · Police · DSC · Secretariat', 'bank' ),
+				studentup_mega_item( 'TS Govt Jobs', $cat( 'ts-jobs' ), 'TSPSC · Police · Gurukul', 'bank' ),
+				studentup_mega_item( 'AP Govt Jobs', $cat( 'ap-jobs' ), 'APPSC · Police · DSC · Secretariat', 'bank' ),
 				studentup_mega_item( 'Jobs by qualification', studentup_mega_home_url( 'qualsplit' ), '10th · Inter · Degree · PG', 'school' ),
 			),
 		),

@@ -358,3 +358,21 @@ small,.tag,.su-scard-tag,.su-scard-hot,.su-scard-vac,.su-scard-urgent,.mlabel,.q
 /* equal tile rows + phone rail tab shape */
 .su-catrail{grid-auto-rows:1fr}
 @media (max-width:640px){.su-tab{width:22px !important;height:44px !important;border-radius:12px 0 0 12px !important}}
+
+/* 1.9.151 — owner fixes: bottom nav is PHONE-ONLY (≤640px), opaque, flush with safe-area;
+   floating Download-App pill has a ✕; footer social icons crisp + even. */
+@media (min-width:641px){.su-bnav{display:none !important}body{padding-bottom:0 !important}body.su-has-applybar{padding-bottom:70px !important}}
+@media (max-width:640px){.su-bnav{background:#fff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;
+  left:8px !important;right:8px !important;bottom:calc(8px + env(safe-area-inset-bottom, 0px)) !important;border:1px solid rgba(15,23,42,.08) !important;box-shadow:0 10px 30px rgba(15,23,42,.18) !important}
+  body.dark .su-bnav{background:#0e1b31 !important;border-color:rgba(255,255,255,.1) !important}
+  .su-bnav a,.su-bnav button{min-height:52px !important}.su-bnav .su-bnav-lb{font-size:11.5px !important;font-weight:800 !important}}
+.su-installwrap{position:fixed;left:14px;bottom:18px;z-index:36;display:flex;align-items:center;gap:6px}
+.su-installwrap[hidden]{display:none !important}
+.su-installwrap .installbtn{position:static !important;left:auto !important;bottom:auto !important}
+.su-installwrap-x{width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(15,23,42,.72);color:#fff;font-size:13px;line-height:1;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(6px)}
+.su-installwrap-x:hover{background:#0f172a}
+@media (max-width:640px){.su-installwrap{display:none !important}}
+.su-ft-soc{gap:10px !important;align-items:center}.su-ft-soc a{width:42px !important;height:42px !important;flex:0 0 42px;box-shadow:0 4px 12px rgba(2,8,23,.3) !important}
+.su-ft-soc a svg{width:20px !important;height:20px !important;display:block}
+.footer h3{letter-spacing:.06em}
+body.su-appbar-on .su-installwrap{display:none !important}
