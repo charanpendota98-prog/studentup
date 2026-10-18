@@ -15,6 +15,17 @@
   "use strict";
   var D = window.STUDENTUP_PWA || {};
   var btn = document.getElementById("installbtn");
+  /* 1.9.151: floating "Download App" pill gets a ✕ — closed for this session */
+  (function () {
+    var wrap = document.getElementById("su-installwrap"), x = document.getElementById("installbtn-x");
+    if (!wrap || !x) return;
+    try { if (sessionStorage.getItem("su-installwrap-hide") === "1") { wrap.hidden = true; } } catch (e) {}
+    x.addEventListener("click", function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      wrap.hidden = true;
+      try { sessionStorage.setItem("su-installwrap-hide", "1"); } catch (e) {}
+    });
+  })();
   var sheet = document.getElementById("installhint");
   var nowBtn = document.getElementById("installnow");
   var closeBtn = document.getElementById("installclose");

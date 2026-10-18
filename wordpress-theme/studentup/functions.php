@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.150' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.151' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -122,8 +122,8 @@ require_once get_template_directory() . '/inc/mobile-menu.php'; // v229: phone d
 function studentup_most_used() {
 	/* v173: icon values = studentup_ui_icon() keys (emoji kadu — pro SVG). */
 	return array(
-		array( 'slug' => 'ts-jobs', 'label' => 'TS Government Jobs', 'icon' => 'bank', 'hint' => '' ),
-		array( 'slug' => 'ap-jobs', 'label' => 'AP Government Jobs', 'icon' => 'city', 'hint' => '' ),
+		array( 'slug' => 'ts-jobs', 'label' => 'TS Govt Jobs', 'icon' => 'bank', 'hint' => '' ),
+		array( 'slug' => 'ap-jobs', 'label' => 'AP Govt Jobs', 'icon' => 'city', 'hint' => '' ),
 		array( 'slug' => 'central-jobs', 'label' => 'Central Govt Jobs', 'icon' => 'flag', 'hint' => '' ),
 		array( 'slug' => 'hall-tickets', 'label' => 'Hall Tickets', 'icon' => 'ticket', 'hint' => '' ),
 		array( 'slug' => 'results', 'label' => 'Results', 'icon' => 'award', 'hint' => '' ),

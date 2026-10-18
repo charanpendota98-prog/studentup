@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.150\n"
+"Project-Id-Version: StudentUp 1.9.151\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -105,11 +105,11 @@ msgstr ""
 msgid "Add this post to compare"
 msgstr ""
 
-#: footer.php:122
+#: footer.php:120
 msgid "Add to Home screen"
 msgstr ""
 
-#: footer.php:123
+#: footer.php:121
 msgid "Add to Home Screen"
 msgstr ""
 
@@ -170,7 +170,7 @@ msgstr ""
 msgid "All qualifications"
 msgstr ""
 
-#: footer.php:84
+#: footer.php:83
 msgid "All rights reserved."
 msgstr ""
 
@@ -399,11 +399,12 @@ msgstr ""
 msgid "Click Here"
 msgstr ""
 
-#: footer.php:124
+#: footer.php:122
 msgid "click the install icon in the address bar"
 msgstr ""
 
-#: footer.php:107
+#: footer.php:105
+#: footer.php:115
 #: header.php:98
 #: inc/engage.php:223
 #: inc/notify.php:259
@@ -502,7 +503,7 @@ msgstr ""
 msgid "Compare up to three posts."
 msgstr ""
 
-#: footer.php:124
+#: footer.php:122
 msgid "Computer:"
 msgstr ""
 
@@ -552,10 +553,6 @@ msgstr ""
 
 #: front-page.php:52
 msgid "Daily Quiz — 5 easy questions, share your score"
-msgstr ""
-
-#: footer.php:80
-msgid "Daily updates free ga — join avvandi."
 msgstr ""
 
 #: header.php:82
@@ -637,7 +634,7 @@ msgstr ""
 msgid "Doubts & Answers"
 msgstr ""
 
-#: footer.php:117
+#: footer.php:115
 #: header.php:143
 msgid "Download App"
 msgstr ""
@@ -840,7 +837,7 @@ msgstr ""
 msgid "Guides verified from official sources"
 msgstr ""
 
-#: footer.php:93
+#: footer.php:91
 msgid "Hide social icons"
 msgstr ""
 
@@ -889,7 +886,7 @@ msgid "Increase font size"
 msgstr ""
 
 #: footer.php:77
-#: footer.php:96
+#: footer.php:94
 msgid "Instagram"
 msgstr ""
 
@@ -897,15 +894,15 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
-#: footer.php:122
+#: footer.php:120
 msgid "Install app"
 msgstr ""
 
-#: footer.php:127
+#: footer.php:125
 msgid "Install now"
 msgstr ""
 
-#: footer.php:119
+#: footer.php:117
 msgid "Install StudentUp as a web app"
 msgstr ""
 
@@ -1043,7 +1040,7 @@ msgstr ""
 msgid "Last-date information is taken from the reviewed article. Always open the article and verify the official notification before applying."
 msgstr ""
 
-#: footer.php:128
+#: footer.php:126
 msgid "Later"
 msgstr ""
 
@@ -1356,7 +1353,7 @@ msgstr ""
 msgid "One online form filled, checked and returned as a PDF"
 msgstr ""
 
-#: footer.php:120
+#: footer.php:118
 msgid "One-tap access · visited pages can stay available offline. No native APK download is required."
 msgstr ""
 
@@ -1938,7 +1935,7 @@ msgstr ""
 msgid "Share this with your friends"
 msgstr ""
 
-#: footer.php:99
+#: footer.php:97
 msgid "Show social icons"
 msgstr ""
 
@@ -1974,7 +1971,7 @@ msgstr ""
 msgid "Social"
 msgstr ""
 
-#: footer.php:92
+#: footer.php:90
 msgid "Social media"
 msgstr ""
 
@@ -2133,7 +2130,7 @@ msgid "Telangana · Andhra Pradesh district news"
 msgstr ""
 
 #: footer.php:76
-#: footer.php:95
+#: footer.php:93
 #: page-post-news.php:63
 msgid "Telegram"
 msgstr ""
@@ -2366,7 +2363,7 @@ msgstr ""
 msgid "We verify"
 msgstr ""
 
-#: footer.php:117
+#: footer.php:115
 msgid "WEB APP"
 msgstr ""
 
@@ -2383,7 +2380,7 @@ msgid "What you get"
 msgstr ""
 
 #: footer.php:75
-#: footer.php:94
+#: footer.php:92
 #: page-post-news.php:60
 msgid "WhatsApp"
 msgstr ""
@@ -2450,7 +2447,7 @@ msgid "Your question (Telugu or English)"
 msgstr ""
 
 #: footer.php:78
-#: footer.php:97
+#: footer.php:95
 msgid "YouTube"
 msgstr ""
 
