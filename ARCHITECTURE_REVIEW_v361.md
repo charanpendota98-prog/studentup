@@ -131,3 +131,9 @@ Measured on the rig (phone 390 / laptop 1366):
 4. Bot least-privilege WP user (30 min) · 5. `state.db` + `.env` backups (1 h) · 6. Per-template CSS bundles
 (1 day, biggest UX win) · 7. mu-plugin extraction (3 days) · 8. `main.py` split (3 days) · 9. CSP report-only
 (1 day) · 10. GSC feedback loop (1 week).
+
+---
+### Update v362 (shipped)
+Debt items 3, 4 and 5 from §11 are done: heartbeat + failure budget + draft watchdog (`autoblog/ops.py`),
+drafts-only `studentup_bot` role + privilege notice (`inc/ops.php`), nightly `state.db` backups, contract
+version on `/theme-info` checked by the bot. Remaining: per-template CSS bundles, mu-plugin extraction, `main.py` split, CSP, GSC loop.

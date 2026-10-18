@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.147' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.148' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -111,6 +111,7 @@ require_once get_template_directory() . '/inc/author-profile.php'; // v195: Pers
 require_once get_template_directory() . '/inc/contentclean.php'; // v213: stray plugin block placeholders (Blocksy search) + empty shells strip
 require_once get_template_directory() . '/inc/calendar.php';
 require_once get_template_directory() . '/inc/measure.php';
+require_once get_template_directory() . '/inc/ops.php';      // v1.9.148: drafts-only bot role + app-password privilege notice + contract version
 require_once get_template_directory() . '/inc/trust.php';    // v227: reviews + case studies + team + map + response time + thank-you (#23 #24 #26 #27 #31 #33)  // v226: GA4 tag + Clarity + lead events + LocalBusiness schema (launch checklist #6 #7 #8 #19)   // v196: exam calendar + .ics export + Event schema
 require_once get_template_directory() . '/inc/mobile-menu.php'; // v229: phone drawer MAIN MENU (home · TS · AP · central · walkin · software · private · hall tickets · results · breaking · quiz)
 
