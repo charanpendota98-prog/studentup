@@ -87,6 +87,9 @@ function studentup_ui_te_map() {
 		'Main menu' => 'ప్రధాన మెనూ',
 		'Skip to content' => 'కంటెంట్‌కు వెళ్లండి',
 		// /today/ page (v1.9.134).
+		'All' => 'అన్నీ',
+		'Recently viewed' => 'మీరు ఇటీవల చూసినవి',
+		'Filter by section' => 'విభాగం వారీగా ఫిల్టర్',
 		'Sunday' => 'ఆదివారం',
 		'Monday' => 'సోమవారం',
 		'Tuesday' => 'మంగళవారం',

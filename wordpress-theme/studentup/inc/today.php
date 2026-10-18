@@ -202,7 +202,7 @@ function studentup_today_list() {
 		foreach ( $g['posts'] as $p ) {
 			$cats = get_the_category( $p->ID );
 			$cat  = $cats ? $cats[0] : null;
-			echo '<li>';
+			echo '<li data-cat="' . esc_attr( $cat ? $cat->slug : '' ) . '">';
 			echo '<a class="su-today-t" href="' . esc_url( get_permalink( $p ) ) . '">' . esc_html( wp_strip_all_tags( get_the_title( $p ) ) ) . '</a>';
 			echo '<span class="su-today-meta">';
 			if ( $cat ) {
@@ -218,6 +218,83 @@ function studentup_today_list() {
 	}
 	echo '</div>';
 }
+
+
+/**
+ * Category filter chips — built only from categories actually present on the page.
+ * Client-side (no reload); hash #cat=slug keeps the filter shareable.
+ */
+function studentup_today_filters() {
+	global $wp_query;
+	$counts = array();
+	$names  = array();
+	foreach ( (array) $wp_query->posts as $p ) {
+		$cats = get_the_category( $p->ID );
+		if ( ! $cats ) {
+			continue;
+		}
+		$counts[ $cats[0]->slug ] = ( $counts[ $cats[0]->slug ] ?? 0 ) + 1;
+		$names[ $cats[0]->slug ]  = $cats[0]->name;
+	}
+	if ( count( $counts ) < 2 ) {
+		return;
+	}
+	arsort( $counts );
+	echo '<div class="su-today-filters" role="tablist" aria-label="' . esc_attr__( 'Filter by section', 'studentup' ) . '">';
+	echo '<button type="button" class="is-on" data-f="" role="tab" aria-selected="true">' . esc_html__( 'All', 'studentup' ) . ' <span>' . esc_html( number_format_i18n( count( $wp_query->posts ) ) ) . '</span></button>';
+	foreach ( $counts as $slug => $n ) {
+		echo '<button type="button" data-f="' . esc_attr( $slug ) . '" role="tab" aria-selected="false">' . esc_html( $names[ $slug ] ) . ' <span>' . esc_html( number_format_i18n( $n ) ) . '</span></button>';
+	}
+	echo '</div>';
+}
+
+add_action( 'wp_footer', function () {
+	if ( ! studentup_is_today_page() ) {
+		return;
+	}
+	?>
+<script id="su-today-js">(function(){var w=document.querySelector(".su-today-filters");if(!w)return;var bs=[].slice.call(w.querySelectorAll("button"));function ap(f){bs.forEach(function(b){var on=b.getAttribute("data-f")===f;b.classList.toggle("is-on",on);b.setAttribute("aria-selected",on?"true":"false")});[].slice.call(document.querySelectorAll(".su-today-day")).forEach(function(d){var n=0;[].slice.call(d.querySelectorAll("li[data-cat]")).forEach(function(li){var s=!f||li.getAttribute("data-cat")===f;li.hidden=!s;if(s)n++});d.hidden=!n;var c=d.querySelector("h2 span");if(c)c.textContent=n})}
+bs.forEach(function(b){b.addEventListener("click",function(){var f=b.getAttribute("data-f");ap(f);try{history.replaceState(null,"",f?"#cat="+f:location.pathname)}catch(e){}})});var m=/#cat=([a-z0-9-]+)/.exec(location.hash);if(m&&bs.some(function(b){return b.getAttribute("data-f")===m[1]}))ap(m[1]);})();</script>
+	<?php
+}, 30 );
+
+/* ------------------------------------------------- v1.9.135: WP sample content */
+
+/**
+ * WordPress ships a "Hello world!" post (slug hello-world) and a sample page;
+ * on a fresh install they leak into every list, sidebar, related grid and the
+ * sitemap. Hide the sample post from all front-end post queries until the
+ * owner deletes it — real content only (nothing else is touched).
+ */
+function studentup_sample_post_id() {
+	$id = get_transient( 'studentup_hello_world_id' );
+	if ( false === $id ) {
+		$p  = get_page_by_path( 'hello-world', OBJECT, 'post' );
+		$id = ( $p && 'publish' === $p->post_status ) ? (int) $p->ID : 0;
+		set_transient( 'studentup_hello_world_id', $id, HOUR_IN_SECONDS );
+	}
+	return (int) $id;
+}
+
+// pre_get_posts runs even for get_posts() (suppress_filters only skips SQL filters).
+add_action( 'pre_get_posts', function ( $q ) {
+	if ( is_admin() || ! ( $q instanceof WP_Query ) || $q->is_singular() ) {
+		return;
+	}
+	$pt = $q->get( 'post_type' );
+	if ( $pt && 'post' !== $pt && 'any' !== $pt && ! ( is_array( $pt ) && in_array( 'post', $pt, true ) ) ) {
+		return;
+	}
+	$id = studentup_sample_post_id();
+	if ( ! $id ) {
+		return;
+	}
+	$not = array_map( 'intval', (array) $q->get( 'post__not_in' ) );
+	$not[] = $id;
+	$q->set( 'post__not_in', array_unique( $not ) );
+}, 5 );
+add_action( 'deleted_post', function () { delete_transient( 'studentup_hello_world_id' ); } );
+add_action( 'save_post', function () { delete_transient( 'studentup_hello_world_id' ); } );
 
 /* ------------------------------------------------------------ entry points */
 

@@ -22,7 +22,7 @@ get_header();
 			the_post();
 			?>
 			<div class="crumbs"><?php echo wp_kses_post( studentup_breadcrumbs() ); ?></div>
-			<article <?php post_class( 'article' ); ?>>
+			<article <?php post_class( 'article' ); ?> data-id="<?php echo (int) get_the_ID(); ?>">
 				<div class="article-head">
 					<h1><?php the_title(); ?></h1>
 					<div class="article-meta">
@@ -224,6 +224,7 @@ get_header();
 					)
 				);
 			}
+			echo '<aside id="su-recent" class="su-recent" hidden data-l="' . esc_attr__( 'Recently viewed', 'studentup' ) . '"></aside>'; // v1.9.135: device-local, JS fills only when ≥2 items
 			if ( $su_picks ) {
 				echo '<div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2></div></div><div class="newsgrid">';
 				$su_i = 0;

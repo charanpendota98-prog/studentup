@@ -2668,3 +2668,16 @@ body.dark .su-kf-apply{background:#2563eb}
 .su-today-dl.is-hot{color:#b91c1c}
 body.dark .su-today-day h2 span{background:#152137}
 @media (min-width:981px){.su-today-day li{flex-direction:row;align-items:baseline;justify-content:space-between;gap:16px}.su-today-t{flex:1}.su-today-t:hover{color:var(--su-g2,#7c3aed)}.su-today-meta{flex:0 0 auto;justify-content:flex-end}}
+
+/* v1.9.135 — today filters + recently viewed */
+.su-today-filters{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.su-today-filters button{appearance:none;border:1px solid var(--su-line,#e5e7eb);background:var(--su-card,#fff);color:var(--su-ink,#0f172a);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:700;min-height:34px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.su-today-filters button span{font-size:11px;font-weight:700;color:var(--su-mute,#64748b);background:var(--su-soft,#f1f5f9);border-radius:999px;padding:1px 7px}
+.su-today-filters button.is-on{background:var(--su-g2,#7c3aed);border-color:var(--su-g2,#7c3aed);color:#fff}
+.su-today-filters button.is-on span{background:rgba(255,255,255,.22);color:#fff}
+.su-recent{margin:14px 0 18px;padding:12px 14px;border:1px solid var(--su-line,#e5e7eb);border-radius:14px;background:var(--su-card,#fff)}
+.su-recent h3{margin:0 0 6px;font-size:14px;font-weight:800}
+.su-recent ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.su-recent li a{display:inline-block;max-width:100%;border:1px solid var(--su-line,#e5e7eb);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--su-ink,#0f172a);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.su-recent li a{max-width:100%;white-space:normal}}
+@media (min-width:981px){.su-recent li a:hover,.su-today-filters button:hover{border-color:var(--su-g2,#7c3aed)}}
