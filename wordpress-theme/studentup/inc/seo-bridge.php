@@ -199,7 +199,7 @@ function studentup_seo_fallback_head() {
 		// v177: WP default tagline ("Just another WordPress site") OG card ki useless —
 		// brand fallback (live site tagline set cheyakapoina share card beautiful ga).
 		if ( '' === trim( (string) $desc ) || 'Just another WordPress site' === $desc ) {
-			$desc = 'Telangana & AP students ki jobs, scholarships, results, hall tickets — okate place lo anni updates';
+			$desc = function_exists( 'studentup_home_seo_description' ) ? studentup_home_seo_description() : 'తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు ఉద్యోగాలు, స్కాలర్‌షిప్‌లు, ఫలితాలు, హాల్ టికెట్లు — అన్నీ ఒకే చోట'; // v1.9.141 Telugu
 		}
 		// v1.9.119: every category/tag page carried the SAME site description
 		// (duplicate meta descriptions). Term description, else a unique line
@@ -216,7 +216,7 @@ function studentup_seo_fallback_head() {
 					foreach ( array_slice( (array) $wp_query->posts, 0, 3 ) as $tp ) {
 						$titles[] = wp_strip_all_tags( get_the_title( $tp ) );
 					}
-					$desc = $term->name . ' — latest updates';
+					$desc = $term->name . ' — తాజా అప్‌డేట్లు';
 					if ( $titles ) {
 						$desc .= ': ' . implode( ' · ', $titles );
 					}
@@ -229,7 +229,7 @@ function studentup_seo_fallback_head() {
 	}
 	// v1.9.119: pages without excerpt (Daily Quiz etc.) had NO description at all.
 	if ( '' === trim( (string) $desc ) && is_singular() ) {
-		$desc = wp_strip_all_tags( get_the_title() ) . ' — ' . wp_strip_all_tags( get_bloginfo( 'name' ) ) . ': Telangana & AP students ki jobs, results, scholarships updates.';
+		$desc = wp_strip_all_tags( get_the_title() ) . ' — ' . wp_strip_all_tags( get_bloginfo( 'name' ) ) . ': తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు ఉద్యోగాలు, ఫలితాలు, స్కాలర్‌షిప్ అప్‌డేట్లు.';
 	}
 	$desc = trim( wp_strip_all_tags( (string) $desc ) );
 	if ( '' !== $desc ) {

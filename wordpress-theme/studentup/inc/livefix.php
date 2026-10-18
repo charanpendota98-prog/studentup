@@ -248,12 +248,58 @@ function studentup_livefix_rm_page_description( $desc ) {
 	$slug = (string) get_post_field( 'post_name', get_queried_object_id() );
 	$site = wp_strip_all_tags( get_bloginfo( 'name' ) );
 	$map  = array(
-		'daily-quiz'     => 'Daily Telugu quiz for govt exam preparation — 5 new reasoning/aptitude/GK questions every day, instant score, streak and WhatsApp status share. Free on ' . $site . '.',
-		'post-your-news' => 'Mee district/college news, job updates or exam info ' . $site . ' ki pampandi — editorial team verify chesi publish chestundi. Spam/ads vaddu.',
+		'daily-quiz'     => 'ప్రభుత్వ ఉద్యోగ పరీక్షల కోసం రోజువారీ తెలుగు క్విజ్ — ప్రతిరోజూ 5 కొత్త రీజనింగ్/ఆప్టిట్యూడ్/GK ప్రశ్నలు, వెంటనే స్కోర్, స్ట్రీక్, WhatsApp స్టేటస్ షేర్. ' . $site . ' లో ఉచితం.',
+		'post-your-news' => 'మీ జిల్లా/కాలేజీ వార్తలు, ఉద్యోగ అప్‌డేట్లు లేదా పరీక్ష సమాచారం ' . $site . ' కు పంపండి — ఎడిటోరియల్ టీమ్ ధృవీకరించి ప్రచురిస్తుంది. స్పామ్/ప్రకటనలు వద్దు.',
+		'latest-jobs'    => 'తేదీలతో ఉన్న యాక్టివ్ ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు ఒకే చోట — చివరి తేదీ, అర్హత, అధికారిక దరఖాస్తు లింక్. తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థుల కోసం ' . $site . '.',
 	);
 	if ( isset( $map[ $slug ] ) ) {
 		return $map[ $slug ];
 	}
-	return wp_strip_all_tags( get_the_title() ) . ' — ' . $site . ': Telangana & AP students ki jobs, results, scholarships updates Telugu lo.';
+	return wp_strip_all_tags( get_the_title() ) . ' — ' . $site . ': తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు ఉద్యోగాలు, ఫలితాలు, స్కాలర్‌షిప్ అప్‌డేట్లు తెలుగులో.';
 }
 add_filter( 'rank_math/frontend/description', 'studentup_livefix_rm_page_description', 97 );
+
+/**
+ * v1.9.141 — Home page title/description safety net.
+ *
+ * Rank Math home title default = "%sitename% %sep% %sitedesc%": tagline khali
+ * unte title "StudentUp -" ga (trailing separator) vastundi, description khali
+ * unte og:description/meta description asalu raavu — home = most important URL.
+ * Owner RM lo set cheste adi ye win avutundi (khali unnappude fallback).
+ */
+function studentup_home_seo_tagline() {
+	return (string) apply_filters( 'studentup_home_seo_tagline', __( 'ప్రభుత్వ ఉద్యోగాలు, ఫలితాలు, అడ్మిట్ కార్డులు — తెలుగులో', 'studentup' ) );
+}
+function studentup_home_seo_description() {
+	$site = wp_strip_all_tags( get_bloginfo( 'name' ) );
+	return (string) apply_filters(
+		'studentup_home_seo_description',
+		sprintf(
+			/* translators: %s: site name */
+			__( '%s — తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు తాజా ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు, ఫలితాలు, అడ్మిట్ కార్డులు, స్కాలర్‌షిప్‌లు, డైలీ క్విజ్ — ప్రతిరోజూ తెలుగులో.', 'studentup' ),
+			$site
+		)
+	);
+}
+function studentup_livefix_home_title( $title ) {
+	if ( ! ( is_front_page() || is_home() ) || is_paged() ) {
+		return $title;
+	}
+	$t    = trim( wp_strip_all_tags( (string) $title ) );
+	$site = trim( wp_strip_all_tags( get_bloginfo( 'name' ) ) );
+	$bare = ( '' === $t ) || ( 0 === strcasecmp( $t, $site ) ) || preg_match( '/[\-\x{2013}\x{2014}|:\x{00B7}\x{2022}]$/u', $t );
+	if ( ! $bare ) {
+		return $title;
+	}
+	return $site . ' — ' . studentup_home_seo_tagline();
+}
+add_filter( 'rank_math/frontend/title', 'studentup_livefix_home_title', 96 );
+add_filter( 'pre_get_document_title', 'studentup_livefix_home_title', 96 );
+
+function studentup_livefix_home_description( $desc ) {
+	if ( '' !== trim( (string) $desc ) || ! ( is_front_page() || is_home() ) ) {
+		return $desc;
+	}
+	return studentup_home_seo_description();
+}
+add_filter( 'rank_math/frontend/description', 'studentup_livefix_home_description', 96 );

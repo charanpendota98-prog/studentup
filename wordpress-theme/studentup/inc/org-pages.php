@@ -182,7 +182,7 @@ function studentup_org_page_desc( $slug ) {
 	foreach ( array_slice( (array) $wp_query->posts, 0, 2 ) as $p ) {
 		$titles[] = wp_strip_all_tags( get_the_title( $p ) );
 	}
-	$d = sprintf( '%s (%s) — %d updates Telugu lo: notifications, last dates, results, hall tickets, official link.', $row[0], $row[1], $n );
+	$d = sprintf( '%s (%s) — %d అప్‌డేట్లు తెలుగులో: నోటిఫికేషన్లు, చివరి తేదీలు, ఫలితాలు, హాల్ టికెట్లు, అధికారిక లింక్.', $row[0], $row[1], $n ); // v1.9.141 Telugu
 	if ( $titles ) {
 		$d .= ' Latest: ' . implode( ' · ', $titles ) . '.';
 	}

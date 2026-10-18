@@ -30,8 +30,8 @@ get_header();
 		endwhile;
 		?>
 		<p class="su-thanks-next">
-			<a class="bluebtn" href="<?php echo esc_url( home_url( '/' ) ); ?>">Back to home</a>
-			<a class="su-cta" href="<?php echo esc_url( home_url( '/daily-quiz/' ) ); ?>">Try today&rsquo;s quiz</a>
+			<a class="bluebtn" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Back to home', 'studentup' ); ?></a>
+			<a class="su-cta" href="<?php echo esc_url( home_url( '/daily-quiz/' ) ); ?>"><?php esc_html_e( 'Try today’s quiz', 'studentup' ); ?></a>
 		</p>
 	</article>
 </main>

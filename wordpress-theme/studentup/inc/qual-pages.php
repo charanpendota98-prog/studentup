@@ -131,7 +131,7 @@ function studentup_qual_page_desc( $slug ) {
 	foreach ( array_slice( (array) $wp_query->posts, 0, 2 ) as $p ) {
 		$titles[] = wp_strip_all_tags( get_the_title( $p ) );
 	}
-	$d = sprintf( '%s qualification tho apply cheyyagala %d govt job notifications — TS & AP. Last date, vacancies, official apply link okate chota.', studentup_qual_page_label( $slug ), $n );
+	$d = sprintf( '%s అర్హతతో దరఖాస్తు చేయగల %d ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు — TS & AP. చివరి తేదీ, ఖాళీలు, అధికారిక దరఖాస్తు లింక్ ఒకే చోట.', studentup_qual_page_label( $slug ), $n ); // v1.9.141 Telugu
 	if ( $titles ) {
 		$d .= ' Latest: ' . implode( ' · ', $titles ) . '.';
 	}

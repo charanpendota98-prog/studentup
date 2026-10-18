@@ -20,7 +20,7 @@ get_header();
 		<div class="sectionhead">
 			<div>
 				<h1><?php the_title(); ?></h1>
-				<p>Rendu leda ekkuva notifications ni okesari compare cheyandi — salary, age limit, qualification, vacancies, last date.</p>
+				<p><?php esc_html_e( 'రెండు లేదా ఎక్కువ నోటిఫికేషన్లను ఒకేసారి పోల్చండి — జీతం, వయో పరిమితి, అర్హత, ఖాళీలు, చివరి తేదీ.', 'studentup' ); ?></p>
 			</div>
 		</div>
 		<?php

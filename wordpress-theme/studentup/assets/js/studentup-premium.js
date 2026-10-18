@@ -111,9 +111,9 @@
 
     Array.prototype.forEach.call(btns, function (b) {
       b.addEventListener("click", function () {
-        if (!supported) { say("Ee browser notifications support cheyyadu — WhatsApp/Telegram join cheyandi."); return; }
+        if (!supported) { say("ఈ బ్రౌజర్ నోటిఫికేషన్లను సపోర్ట్ చేయదు — WhatsApp/Telegram లో జాయిన్ అవ్వండి."); return; }
         if (localStorage.getItem("su_push_on") === "1" && Notification.permission === "granted") {
-          localStorage.setItem("su_push_on", "0"); sync(); say("Alerts turned off."); return;
+          localStorage.setItem("su_push_on", "0"); sync(); say("అలర్ట్‌లు ఆఫ్ చేశాం."); return;
         }
         Notification.requestPermission().then(function (p) {
           if (p === "granted") {
@@ -122,7 +122,7 @@
             notify("StudentUp alerts ON", "Kotha job/result post ayina vent ne ikkade alert vastundi.", location.href);
             poll();
           } else {
-            say("Notifications blocked — browser settings lo allow cheyandi, leda Telegram join cheyandi.");
+            say("నోటిఫికేషన్లు బ్లాక్ అయ్యాయి — బ్రౌజర్ సెట్టింగ్స్‌లో అనుమతించండి, లేదా Telegram లో జాయిన్ అవ్వండి.");
           }
         });
       });
@@ -201,7 +201,7 @@
       host.classList.add("su-rail-host");
       r.setAttribute("tabindex", "0");
       r.setAttribute("role", "group");
-      r.setAttribute("aria-label", "Scrollable cards - swipe or use arrow keys");
+      r.setAttribute("aria-label", "స్క్రోల్ అయ్యే కార్డులు — స్వైప్ చేయండి లేదా బాణం కీలు వాడండి");
 
       function step() {
         var c = r.firstElementChild;
@@ -425,7 +425,7 @@
     tt = document.createElement("button");
     tt.id = "su-totop";
     tt.type = "button";
-    tt.setAttribute("aria-label", "Back to top");
+    tt.setAttribute("aria-label", "పైకి వెళ్లండి");
     tt.innerHTML = "&#8593;";
     document.body.appendChild(tt);
     tt.addEventListener("click", function () {
@@ -749,7 +749,7 @@
         else { host.appendChild(st); }
       }
       if (q) {
-        st.innerHTML = "Showing results for <b>" + escT(q) + '</b><button type="button" class="su-fclear">✕ Clear</button>';
+        st.innerHTML = "<b>" + escT(q) + '</b> కోసం ఫలితాలు<button type="button" class="su-fclear">✕ క్లియర్</button>';
         st.hidden = false;
       } else {
         st.hidden = true;
@@ -951,8 +951,8 @@
   function ev(name) { try { window.gtag && gtag("event", "share_select", { method: name }); } catch (e) {} }
   function build() {
     pop = document.createElement("div"); pop.className = "su-sharepop"; pop.setAttribute("role", "toolbar"); pop.setAttribute("aria-label", "Share selection");
-    pop.innerHTML = '<a class="su-sp-wa" target="_blank" rel="noopener" aria-label="Share on WhatsApp">' + WA + '</a>' +
-      '<a class="su-sp-tg" target="_blank" rel="noopener" aria-label="Share on Telegram">' + TG + '</a>' +
+    pop.innerHTML = '<a class="su-sp-wa" target="_blank" rel="noopener" aria-label="WhatsApp లో షేర్ చేయండి">' + WA + '</a>' +
+      '<a class="su-sp-tg" target="_blank" rel="noopener" aria-label="Telegram లో షేర్ చేయండి">' + TG + '</a>' +
       '<button type="button" class="su-sp-cp" aria-label="Copy quote">' + CP + '</button>';
     document.body.appendChild(pop);
     pop.addEventListener("mousedown", function (e) { e.preventDefault(); });
