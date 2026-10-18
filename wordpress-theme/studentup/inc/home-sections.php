@@ -51,7 +51,7 @@ function studentup_home_sectionwise( $exclude = 0, $heading = '' ) {
 		return;
 	}
 	?>
-	<section class="su-secwise" aria-label="Latest by section">
+	<section class="su-secwise" aria-label="<?php echo esc_attr__( 'Latest by section', 'studentup' ); ?>">
 		<div class="qsplit-head"><h2><?php echo esc_html( $heading ? $heading : 'విభాగాల వారీగా తాజా అప్‌డేట్స్' ); ?></h2></div>
 		<div class="su-secwise-grid">
 			<?php foreach ( $cols as $c ) : ?>
@@ -84,7 +84,7 @@ function studentup_home_orgdir() {
 		return;
 	}
 	?>
-	<section class="su-orgdir" aria-label="Updates by organisation">
+	<section class="su-orgdir" aria-label="<?php echo esc_attr__( 'Updates by organisation', 'studentup' ); ?>">
 		<div class="qsplit-head"><h2>సంస్థల వారీగా (TSPSC · APPSC · SSC · RRB …)</h2></div>
 		<?php echo wp_kses_post( $links ); ?>
 	</section>

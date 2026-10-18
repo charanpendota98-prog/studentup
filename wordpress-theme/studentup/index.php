@@ -48,7 +48,7 @@ get_header();
 			<?php endif; ?>
 		</div>
 
-		<nav class="sectionhead" aria-label="Pages">
+		<nav class="sectionhead" aria-label="<?php echo esc_attr__( 'Pages', 'studentup' ); ?>">
 			<div><?php echo wp_kses_post( paginate_links() ?? '' ); // v173 REAL FIX: single page unte paginate_links() NULL → wp_kses_post(null) PHP 8.1+ fatal ?></div>
 		</nav>
 	</div>

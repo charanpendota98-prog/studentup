@@ -27,16 +27,16 @@ function studentup_reader_toolbar() {
 	$minutes = max( 1, (int) ceil( $words / 150 ) );
 
 	?>
-	<div class="su-reader-bar" aria-label="Reading options">
+	<div class="su-reader-bar" aria-label="<?php echo esc_attr__( 'Reading options', 'studentup' ); ?>">
 		<div class="su-rb-left">
 			<span class="su-rb-time"><?php echo studentup_ui_icon( 'clock', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( sprintf( __( '%d min read', 'studentup' ), (int) $minutes ) ); ?></span>
 		</div>
 		<div class="su-rb-right">
 			<span class="su-rb-label"><?php esc_html_e( 'Text Size:', 'studentup' ); ?></span>
-			<div class="su-font-sizer" role="group" aria-label="Font size controls">
-				<button type="button" class="su-fz-btn" data-su-font="small" title="Small text" aria-label="Decrease font size">A-</button>
-				<button type="button" class="su-fz-btn is-active" data-su-font="normal" title="Normal text" aria-label="Reset font size">A</button>
-				<button type="button" class="su-fz-btn" data-su-font="large" title="Large text" aria-label="Increase font size">A+</button>
+			<div class="su-font-sizer" role="group" aria-label="<?php echo esc_attr__( 'Font size controls', 'studentup' ); ?>">
+				<button type="button" class="su-fz-btn" data-su-font="small" title="<?php echo esc_attr__( 'Small text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Decrease font size', 'studentup' ); ?>">A-</button>
+				<button type="button" class="su-fz-btn is-active" data-su-font="normal" title="<?php echo esc_attr__( 'Normal text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Reset font size', 'studentup' ); ?>">A</button>
+				<button type="button" class="su-fz-btn" data-su-font="large" title="<?php echo esc_attr__( 'Large text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Increase font size', 'studentup' ); ?>">A+</button>
 			</div>
 		</div>
 	</div>
@@ -58,7 +58,7 @@ function studentup_community_pulse_card() {
 	$tg_link = ! empty( $socials['telegram'] ) ? $socials['telegram'] : 'https://t.me/studentup_in';
 
 	?>
-	<section class="su-community-card" aria-label="Join Student Community">
+	<section class="su-community-card" aria-label="<?php echo esc_attr__( 'Join Student Community', 'studentup' ); ?>">
 		<div class="su-comm-head">
 			<h3 class="su-comm-title">Instant Job Alerts & Exam Updates</h3>
 		</div>

@@ -29,7 +29,7 @@ function studentup_stories( $limit = 8 ) {
 	}
 	$total = count( $rows );
 	?>
-	<section class="su-stories" aria-label="Quick story cards">
+	<section class="su-stories" aria-label="<?php echo esc_attr__( 'Quick story cards', 'studentup' ); ?>">
 		<div class="su-stories-rail">
 			<?php foreach ( $rows as $i => $r ) : ?>
 				<?php
@@ -64,10 +64,10 @@ function studentup_stories( $limit = 8 ) {
 						<a class="su-story-cta" href="<?php echo esc_url( $r['link'] ); ?>">Full details →</a>
 					</div>
 					<?php if ( $i + 1 < $total ) : ?>
-						<a class="su-story-next" href="#su-story-<?php echo (int) ( $i + 2 ); ?>" aria-label="Next card">›</a>
+						<a class="su-story-next" href="#su-story-<?php echo (int) ( $i + 2 ); ?>" aria-label="<?php echo esc_attr__( 'Next card', 'studentup' ); ?>">›</a>
 					<?php endif; ?>
 					<?php if ( $i > 0 ) : ?>
-						<a class="su-story-prev" href="#su-story-<?php echo (int) $i; ?>" aria-label="Previous card">‹</a>
+						<a class="su-story-prev" href="#su-story-<?php echo (int) $i; ?>" aria-label="<?php echo esc_attr__( 'Previous card', 'studentup' ); ?>">‹</a>
 					<?php endif; ?>
 				</article>
 			<?php endforeach; ?>

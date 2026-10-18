@@ -33,7 +33,7 @@ function studentup_video_ad_slot() {
 	}
 
 	?>
-	<div class="su-video-ad-container su-ad-reserved" style="min-height:200px" data-su-height="200" aria-label="Featured Media Unit">
+	<div class="su-video-ad-container su-ad-reserved" style="min-height:200px" data-su-height="200" aria-label="<?php echo esc_attr__( 'Featured Media Unit', 'studentup' ); ?>">
 		<aside class="su-video-ad-box">
 			<div class="su-ad-kicker">SPONSORED MEDIA</div>
 			<ins class="adsbygoogle"

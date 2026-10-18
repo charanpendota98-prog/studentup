@@ -34,7 +34,7 @@ function studentup_status_card_generator() {
 		data-qual="<?php echo esc_attr( $qual ? $qual : 'Degree / Inter / 10th' ); ?>"
 		data-last-date="<?php echo esc_attr( $last_date ? $last_date : 'Apply Immediately' ); ?>"
 		data-site="studentup.in"
-		aria-label="WhatsApp Status Card Generator">
+		aria-label="<?php echo esc_attr__( 'WhatsApp Status Card Generator', 'studentup' ); ?>">
 		<div class="su-status-content">
 			<span class="su-status-badge"><?php echo studentup_ui_icon( 'bell', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Viral Status Generator</span>
 			<h4 class="su-status-title">WhatsApp Status Card (1-Click Download)</h4>

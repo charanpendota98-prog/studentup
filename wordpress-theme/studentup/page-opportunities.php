@@ -21,7 +21,7 @@ $total = count( $rows );
 ?>
 <main id="main" class="su-op-board-page" data-su-opportunities data-su-op-total="<?php echo esc_attr( $total ); ?>">
 	<div class="wrap">
-		<nav class="su-breadcrumbs" aria-label="Breadcrumb">
+		<nav class="su-breadcrumbs" aria-label="<?php echo esc_attr__( 'Breadcrumb', 'studentup' ); ?>">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'studentup' ); ?></a><span aria-hidden="true">›</span><span><?php esc_html_e( 'Latest active opportunities', 'studentup' ); ?></span>
 		</nav>
 		<section class="su-op-hero" aria-labelledby="su-op-title">
@@ -50,7 +50,7 @@ $total = count( $rows );
 			</div>
 		</section>
 		<div class="su-op-no-results" data-su-op-no-results hidden><?php esc_html_e( 'No matching active opportunities found. Try another keyword or category.', 'studentup' ); ?></div>
-		<div class="su-op-jump" aria-label="Opportunity sections">
+		<div class="su-op-jump" aria-label="<?php echo esc_attr__( 'Opportunity sections', 'studentup' ); ?>">
 			<?php foreach ( $sections as $key => $section ) : ?>
 				<?php if ( empty( $groups[ $key ] ) ) { continue; } ?>
 				<a href="#su-<?php echo esc_attr( $key ); ?>"><?php echo studentup_ui_icon( $section['icon'], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( $section['label'] ); ?></a>

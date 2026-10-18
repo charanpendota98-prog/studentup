@@ -39,7 +39,7 @@ function studentup_smart_recirculation_box() {
 	}
 
 	?>
-	<section class="su-recirc-wrap" aria-label="Trending and High-Intent Recommendations">
+	<section class="su-recirc-wrap" aria-label="<?php echo esc_attr__( 'Trending and High-Intent Recommendations', 'studentup' ); ?>">
 		<div class="su-recirc-head">
 			<span class="su-recirc-icon" aria-hidden="true"><?php echo studentup_ui_icon( 'bolt', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 			<h3 class="su-recirc-title">Trending & Related Notifications</h3>

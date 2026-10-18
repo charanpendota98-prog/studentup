@@ -283,7 +283,7 @@ function studentup_latest_ticker() {
 	if ( ! $items ) {
 		return;
 	}
-	echo '<div class="tickerwrap su-lticker" aria-label="Latest jobs — scrolling list">';
+	echo '<div class="tickerwrap su-lticker" aria-label="' . esc_attr__( 'Latest jobs — scrolling list', 'studentup' ) . '">';
 	echo '<div class="wrap trow">';
 	echo '<span class="tlabel tlabel-blue"><i aria-hidden="true"></i>' . esc_html__( 'Latest Jobs', 'studentup' ) . '</span>';
 	echo '<div class="tclip"><div class="tmove">';

@@ -256,7 +256,7 @@ function studentup_notify_public_banner() {
 			?>
 			<div class="su-notify su-notify-critical" role="alert" data-code="<?php echo esc_attr( $item['code'] ); ?>">
 				<span class="su-notify-msg"><?php echo studentup_ui_icon( $sevs['critical'], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( $item['message'] ); ?></span>
-				<button type="button" class="su-notify-close" aria-label="Close"><?php echo studentup_ui_icon( 'close', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+				<button type="button" class="su-notify-close" aria-label="<?php echo esc_attr__( 'Close', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 			</div>
 			<?php
 		}

@@ -122,7 +122,7 @@ function studentup_trending_today() {
 		return;
 	}
 	?>
-	<div class="su-trend" aria-label="Trending today">
+	<div class="su-trend" aria-label="<?php echo esc_attr__( 'Trending today', 'studentup' ); ?>">
 		<span class="su-trend-tag"><?php echo studentup_ui_icon( 'bolt', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Trending today</span>
 		<div class="su-trend-list">
 			<?php
@@ -153,7 +153,7 @@ function studentup_job_finder() {
 	}
 	$quals = studentup_qual_terms();
 	?>
-	<section class="su-finder" id="job-match" aria-label="AI job match and eligibility checker">
+	<section class="su-finder" id="job-match" aria-label="<?php echo esc_attr__( 'AI job match and eligibility checker', 'studentup' ); ?>">
 		<div class="su-finder-head">
 			<div>
 				<p class="su-finder-kick"><?php echo studentup_ui_icon( 'person', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> AI JOB MATCH · ELIGIBILITY CHECKER</p>
@@ -205,7 +205,7 @@ function studentup_salary_calc() {
 		return;
 	}
 	?>
-	<section class="su-calc" id="salary-calculator" aria-label="Salary calculator">
+	<section class="su-calc" id="salary-calculator" aria-label="<?php echo esc_attr__( 'Salary calculator', 'studentup' ); ?>">
 		<div class="su-calc-head">
 			<h2><?php echo studentup_ui_icon( 'wallet', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> In-hand salary calculator</h2>
 			<p>Basic pay + DA + HRA + TA − deductions. Formula open ga undi — mee notification numbers pettandi.</p>
@@ -250,7 +250,7 @@ function studentup_job_calendar() {
 		}
 	);
 	?>
-	<section class="su-cal" id="job-calendar" aria-label="Job calendar">
+	<section class="su-cal" id="job-calendar" aria-label="<?php echo esc_attr__( 'Job calendar', 'studentup' ); ?>">
 		<div class="su-cal-head">
 			<h2><?php echo studentup_ui_icon( 'calendar', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Job calendar — last dates</h2>
 			<span><?php echo esc_html( date_i18n( 'F Y' ) ); ?> onwards</span>

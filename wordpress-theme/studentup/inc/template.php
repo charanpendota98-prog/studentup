@@ -184,7 +184,8 @@ $label = $terms ? $terms[0]->name : 'Update';
 				// migిలాయి.
 				?>
 			</div>
-			<h3><a href="<?php the_permalink(); ?>" style="color:inherit"><?php the_title(); ?></a></h3>
+			<?php $su_card_h = ( is_archive() || is_search() || is_home() ) ? 'h2' : 'h3'; // v1.9.143: archive h1 → card h2 (no heading skip). ?>
+			<<?php echo tag_escape( $su_card_h ); ?>><a href="<?php the_permalink(); ?>" style="color:inherit"><?php the_title(); ?></a></<?php echo tag_escape( $su_card_h ); ?>>
 			<p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 20, '…' ) ); ?></p>
 			<div class="newsfoot">
 				<a class="su-readmore" href="<?php the_permalink(); ?>"><?php echo esc_html__( 'Read more', 'studentup' ) . ' →'; ?></a>
@@ -499,7 +500,7 @@ function studentup_subcat_chips( $cat_id ) {
 	if ( ! $kids ) {
 		return;
 	}
-	echo '<nav class="su-subcats" aria-label="Subcategories">';
+	echo '<nav class="su-subcats" aria-label="' . esc_attr__( 'Subcategories', 'studentup' ) . '">';
 	foreach ( $kids as $kid ) {
 		printf(
 			'<a href="%s">%s</a>',

@@ -145,7 +145,7 @@ function studentup_render_featured_partner_ad( $place ) {
 	}
 	studentup_ad_count( true );
 	echo '<div class="su-ad-reserved su-partner-ad-reserved" style="min-height:320px" data-su-height="320">';
-	echo '<aside class="su-ad su-ad-partner" aria-label="Sponsored college partner content">';
+	echo '<aside class="su-ad su-ad-partner" aria-label="' . esc_attr__( 'Sponsored college partner content', 'studentup' ) . '">';
 	echo '<div class="su-ad-kicker">SPONSORED · COLLEGE PARTNER</div>';
 	if ( $ad['image'] ) {
 		echo '<a class="su-ad-partner-media" href="' . esc_url( $ad['link'] ) . '" target="_blank" rel="noopener">';
@@ -304,7 +304,7 @@ function studentup_ad( $place = 'mid' ) {
 	echo '<div class="su-ad-reserved" style="min-height:' . (int) $height . 'px" data-su-height="' . (int) $height . '">';
 	// v1.9.114: house blocks = StudentUp's own sections. Never "SPONSORED"/"Advertisement"
 	// labels without a real paid partner (owner rule: no fake sponsored).
-	echo '<aside class="' . esc_attr( $cls ) . '" aria-label="StudentUp section">';
+	echo '<aside class="' . esc_attr( $cls ) . '" aria-label="' . esc_attr__( 'StudentUp section', 'studentup' ) . '">';
 	echo '<div class="su-ad-kicker">STUDENTUP · మా సేవ</div>';
 	if ( 'leaderboard' === $place ) {
 		echo '<div class="su-ad-leader-body"><div>';
@@ -477,7 +477,7 @@ function studentup_ad_multiplex() {
 		return;
 	}
 	studentup_ad_count( true );
-	echo '<div class="su-ad-reserved su-ad-multiplex" style="min-height:300px" data-su-height="300" aria-label="Advertisement">';
+	echo '<div class="su-ad-reserved su-ad-multiplex" style="min-height:300px" data-su-height="300" aria-label="' . esc_attr__( 'Advertisement', 'studentup' ) . '">';
 	echo '<div class="su-ad-kicker">' . esc_html__( 'Advertisement', 'studentup' ) . '</div>';
 	printf(
 		'<ins class="adsbygoogle" style="display:block" data-ad-client="%1$s" data-ad-slot="%2$s" data-ad-format="autorelaxed"></ins>',

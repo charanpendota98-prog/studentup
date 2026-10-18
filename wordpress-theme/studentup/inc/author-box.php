@@ -64,7 +64,7 @@ function studentup_author_box() {
 	$icon_url  = get_site_icon_url( 64 );
 
 	?>
-	<section class="su-author-box" itemprop="author" itemscope itemtype="https://schema.org/Person" aria-label="About the Author">
+	<section class="su-author-box" itemprop="author" itemscope itemtype="https://schema.org/Person" aria-label="<?php echo esc_attr__( 'About the Author', 'studentup' ); ?>">
 		<div class="su-ab-left">
 			<div class="su-ab-avatar">
 				<?php if ( $avatar && wp_http_validate_url( $avatar ) ) : ?>
@@ -78,7 +78,7 @@ function studentup_author_box() {
 						<span>CP</span>
 					</div>
 				<?php endif; ?>
-				<span class="su-ab-verified-badge" title="Author" aria-label="Author"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
+				<span class="su-ab-verified-badge" title="Author" aria-label="<?php echo esc_attr__( 'Author', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 			</div>
 		</div>
 

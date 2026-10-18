@@ -255,7 +255,7 @@ function studentup_qual_pages_links( $current = '' ) {
 	if ( '' === $out ) {
 		return '';
 	}
-	return '<nav class="su-qual-links" aria-label="Jobs by qualification">' . $out . '</nav>';
+	return '<nav class="su-qual-links" aria-label="' . esc_attr__( 'Jobs by qualification', 'studentup' ) . '">' . $out . '</nav>';
 }
 
 // Jobs board (/latest-jobs/) + qual pages print this row (template hook).

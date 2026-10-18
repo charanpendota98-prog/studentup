@@ -34,7 +34,7 @@ function studentup_compare_table( $limit = 12 ) {
 	}
 	$states = array( 'ts' => 'Telangana', 'ap' => 'Andhra Pradesh', 'central' => 'Central', 'other' => '—' );
 	?>
-	<section class="su-cmp" aria-label="Compare notifications">
+	<section class="su-cmp" aria-label="<?php echo esc_attr__( 'Compare notifications', 'studentup' ); ?>">
 		<div class="su-cmp-scroll">
 			<table class="su-cmp-table">
 				<thead>

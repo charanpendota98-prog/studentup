@@ -391,7 +391,7 @@ function studentup_org_pages_links( $current = '' ) {
 			. ( $slug === $current ? ' class="on" aria-current="page"' : '' ) . '>'
 			. esc_html( $map[ $slug ][0] ) . '</a>';
 	}
-	return '<nav class="su-qual-links su-org-links" aria-label="Updates by organisation">' . $out . '</nav>';
+	return '<nav class="su-qual-links su-org-links" aria-label="' . esc_attr__( 'Updates by organisation', 'studentup' ) . '">' . $out . '</nav>';
 }
 add_action( 'studentup_org_links_row', function () {
 	echo studentup_org_pages_links( studentup_org_page_slug() ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped inside

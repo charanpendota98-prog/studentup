@@ -526,7 +526,7 @@ function studentup_qual_bar() {
 	$terms   = studentup_qual_terms();
 	$icons   = studentup_qual_icons();
 	$current = studentup_qual_current();
-	echo '<form class="qrow qualform" method="get" action="' . esc_url( home_url( '/' ) ) . '" aria-label="Jobs by qualification" data-icons="' . esc_attr( wp_json_encode( $icons, JSON_UNESCAPED_UNICODE ) ) . '">';
+	echo '<form class="qrow qualform" method="get" action="' . esc_url( home_url( '/' ) ) . '" aria-label="' . esc_attr__( 'Jobs by qualification', 'studentup' ) . '" data-icons="' . esc_attr( wp_json_encode( $icons, JSON_UNESCAPED_UNICODE ) ) . '">';
 	echo '<label class="catlabel qualabel" for="qualsel">' . studentup_ui_icon( 'school', 14 ) . ' ' . esc_html__( 'Your qualification:', 'studentup' ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 	echo '<select id="qualsel" class="qualsel" name="qual">';
 	echo '<option value="all"' . selected( $current, 'all', false ) . '>' . esc_html__( 'All qualifications', 'studentup' ) . '</option>';

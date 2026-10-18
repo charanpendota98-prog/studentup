@@ -67,7 +67,7 @@ function studentup_hero_premium() {
 		return;
 	}
 	?>
-	<section class="su-hero" aria-label="StudentUp search and quick links">
+	<section class="su-hero" aria-label="<?php echo esc_attr__( 'StudentUp search and quick links', 'studentup' ); ?>">
 		<div class="wrap su-hero-in">
 			<?php /* v201: demo (preview/worldclass) hero ne — visible H1 (page lo okkate H1). */ ?>
 			<h1 class="screen-reader-text"><?php esc_html_e( 'Government Jobs, Results & Notifications', 'studentup' ); ?></h1>
@@ -147,7 +147,7 @@ function studentup_hot_jobs( $limit = 10 ) {
 		return;
 	}
 	?>
-	<section class="su-hot" aria-label="Top hot jobs today">
+	<section class="su-hot" aria-label="<?php echo esc_attr__( 'Top hot jobs today', 'studentup' ); ?>">
 		<div class="su-hot-head">
 			<h2><?php echo studentup_ui_icon( 'bolt', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Top <?php echo esc_html( (int) $limit ); ?> hot jobs today</h2>
 			<a href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>">All active jobs →</a>
@@ -246,7 +246,7 @@ function studentup_scholarship_strip() {
 		)
 	); // no_found_rows: pagination ledu → extra SELECT FOUND_ROWS avasaram ledu.
 	?>
-	<section class="su-schol" aria-label="Scholarships">
+	<section class="su-schol" aria-label="<?php echo esc_attr__( 'Scholarships', 'studentup' ); ?>">
 		<div class="su-schol-head">
 			<h2><?php echo studentup_ui_icon( 'school', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Scholarships open now</h2>
 			<a href="<?php echo esc_url( get_category_link( $term ) ); ?>">See all scholarships →</a>
@@ -280,7 +280,7 @@ function studentup_alerts_card() {
 	}
 	$soc = studentup_social_links();
 	?>
-	<section class="su-alerts" id="alerts" aria-label="Instant job alerts">
+	<section class="su-alerts" id="alerts" aria-label="<?php echo esc_attr__( 'Instant job alerts', 'studentup' ); ?>">
 		<div class="su-alerts-in">
 			<div class="su-alerts-copy">
 				<h2><?php echo studentup_ui_icon( 'bell', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Get every update as a notification</h2>
@@ -309,7 +309,7 @@ function studentup_bottom_nav() {
 	$jobs_u = $jobs ? get_category_link( $jobs ) : home_url( '/#jobs' );
 	$sch_u  = $schol ? get_category_link( $schol ) : home_url( '/#jobs' );
 	?>
-	<nav class="su-bnav" aria-label="Quick navigation">
+	<nav class="su-bnav" aria-label="<?php echo esc_attr__( 'Quick navigation', 'studentup' ); ?>">
 		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="<?php echo is_front_page() ? 'on' : ''; ?>"><?php echo studentup_ui_icon( 'home', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?><span class="su-bnav-lb"><?php esc_html_e( 'Home', 'studentup' ); ?></span></a>
 		<a href="<?php echo esc_url( $jobs_u ); ?>"><?php echo studentup_ui_icon( 'work', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?><span class="su-bnav-lb"><?php esc_html_e( 'Jobs', 'studentup' ); ?></span></a>
 		<a href="<?php echo esc_url( $sch_u ); ?>"><?php echo studentup_ui_icon( 'school', 21 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?><span class="su-bnav-lb"><?php esc_html_e( 'Scholarship', 'studentup' ); ?></span></a>
@@ -533,7 +533,7 @@ function studentup_category_rail() {
 		return;   // golden rule: data ledu ante render cheyyaku.
 	}
 	?>
-	<section class="su-catwrap is-start" aria-label="Explore by Category">
+	<section class="su-catwrap is-start" aria-label="<?php echo esc_attr__( 'Explore by Category', 'studentup' ); ?>">
 		<div class="su-cathead">
 			<b><?php esc_html_e( 'Explore by Category', 'studentup' ); ?></b>
 			<a class="su-viewall" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php esc_html_e( 'All sections', 'studentup' ); ?> &rarr;</a>

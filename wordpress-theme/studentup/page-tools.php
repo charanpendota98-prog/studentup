@@ -23,7 +23,7 @@ get_header();
 ?>
 <main id="main">
 	<div class="wrap">
-		<div class="hero hero-slim" aria-label="Page title">
+		<div class="hero hero-slim" aria-label="<?php echo esc_attr__( 'Page title', 'studentup' ); ?>">
 			<h1>
 				<?php
 				if ( have_posts() ) {

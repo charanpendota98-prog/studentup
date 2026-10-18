@@ -130,14 +130,14 @@ get_header();
 				<?php /* v307: second share row removed — studentup_share_bar() (content filter) already renders WhatsApp/Telegram/Copy. */ ?>
 
 				<?php if ( has_tag() ) : ?>
-					<div class="su-tags" aria-label="Tags"><?php echo studentup_ui_icon( 'tag', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php the_tags( '', ' · ', '' ); ?></div>
+					<div class="su-tags" aria-label="<?php echo esc_attr__( 'Tags', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'tag', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php the_tags( '', ' · ', '' ); ?></div>
 				<?php endif; ?>
 
 				<?php studentup_author_box(); ?>
 
 				<?php studentup_trust_note(); ?>
 
-				<nav class="post-nav" aria-label="More posts">
+				<nav class="post-nav" aria-label="<?php echo esc_attr__( 'More posts', 'studentup' ); ?>">
 					<span class="post-nav-prev"><?php previous_post_link( '%link', '← %title' ); ?></span>
 					<span class="post-nav-next"><?php next_post_link( '%link', '%title →' ); ?></span>
 				</nav>
