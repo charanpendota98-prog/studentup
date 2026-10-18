@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.146\n"
+"Project-Id-Version: StudentUp 1.9.147\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -1303,7 +1303,7 @@ msgstr ""
 msgid "No saved posts yet. Tap Save on any card to keep it here."
 msgstr ""
 
-#: inc/webpush.php:237
+#: inc/webpush.php:258
 msgid "No thanks"
 msgstr ""
 
@@ -2421,7 +2421,7 @@ msgstr ""
 msgid "Write your comment"
 msgstr ""
 
-#: inc/webpush.php:236
+#: inc/webpush.php:257
 msgid "Yes, alert cheyandi"
 msgstr ""
 

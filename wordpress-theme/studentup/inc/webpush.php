@@ -132,6 +132,27 @@ function studentup_push_subscribe( $req ) {
 	if ( ! $ok || strlen( $endpoint ) > 500 || '' === $p256dh || '' === $auth ) {
 		return new WP_Error( 'su_push_bad', 'Bad subscription', array( 'status' => 400 ) );
 	}
+	// v1.9.147 (security review): public endpoint had no rate limit or table cap —
+	// a script could insert unlimited rows (DB bloat + push-fanout cost).
+	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0.0.0.0';
+	$rl  = 'su_push_rl_' . substr( wp_hash( $ip ), 0, 24 );
+	$hit = (int) get_transient( $rl );
+	if ( $hit >= 5 ) {
+		return new WP_Error( 'su_push_rate', 'Too many requests', array( 'status' => 429 ) );
+	}
+	set_transient( $rl, $hit + 1, 10 * MINUTE_IN_SECONDS );
+	if ( strlen( $p256dh ) > 200 || strlen( $auth ) > 100 || ! preg_match( '#^https://#', $endpoint ) ) {
+		return new WP_Error( 'su_push_bad', 'Bad subscription', array( 'status' => 400 ) );
+	}
+	$cap   = (int) apply_filters( 'studentup_push_max_subscribers', 200000 );
+	$total = (int) get_transient( 'su_push_total' );
+	if ( ! $total ) {
+		$total = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . $wpdb->prefix . STUDENTUP_PUSH_TABLE ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		set_transient( 'su_push_total', max( 1, $total ), 5 * MINUTE_IN_SECONDS );
+	}
+	if ( $total >= $cap ) {
+		return new WP_Error( 'su_push_full', 'Subscriber limit reached', array( 'status' => 503 ) );
+	}
 
 	$table = $wpdb->prefix . STUDENTUP_PUSH_TABLE;
 	// phpcs:disable WordPress.DB.DirectDatabaseQuery
