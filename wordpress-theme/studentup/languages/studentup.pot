@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.145\n"
+"Project-Id-Version: StudentUp 1.9.146\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -802,6 +802,7 @@ msgstr ""
 msgid "Full details"
 msgstr ""
 
+#: inc/slider.php:208
 #: inc/slider.php:209
 msgid "Full details & Apply"
 msgstr ""
@@ -1593,6 +1594,7 @@ msgid "Read details"
 msgstr ""
 
 #: inc/template.php:191
+#: inc/template.php:191
 msgid "Read more"
 msgstr ""
 
@@ -1927,6 +1929,8 @@ msgid "Share my score"
 msgstr ""
 
 #: inc/slider.php:213
+#: inc/slider.php:213
+#: inc/template.php:197
 #: inc/template.php:197
 msgid "Share on WhatsApp"
 msgstr ""

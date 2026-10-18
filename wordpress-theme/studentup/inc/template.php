@@ -188,13 +188,13 @@ $label = $terms ? $terms[0]->name : 'Update';
 			<<?php echo tag_escape( $su_card_h ); ?>><a href="<?php the_permalink(); ?>" style="color:inherit"><?php the_title(); ?></a></<?php echo tag_escape( $su_card_h ); ?>>
 			<p><?php echo esc_html( wp_trim_words( get_the_excerpt(), 20, '…' ) ); ?></p>
 			<div class="newsfoot">
-				<a class="su-readmore" href="<?php the_permalink(); ?>"><?php echo esc_html__( 'Read more', 'studentup' ) . ' →'; ?></a>
+				<a class="su-readmore" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr( get_the_title() . ' — ' . __( 'Read more', 'studentup' ) ); ?>"><?php echo esc_html__( 'Read more', 'studentup' ) . ' →'; ?></a>
 
 				<?php
 				$su_share_title = rawurlencode( get_the_title() );
 				$su_share_url   = rawurlencode( get_permalink() );
 				?>
-				<a class="su-card-wa" href="https://wa.me/?text=<?php echo esc_attr( $su_share_title . '%20' . $su_share_url ); ?>" target="_blank" rel="noopener" title="<?php esc_attr_e( 'Share on WhatsApp', 'studentup' ); ?>">
+				<a class="su-card-wa" href="https://wa.me/?text=<?php echo esc_attr( $su_share_title . '%20' . $su_share_url ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( get_the_title() . ' — ' . __( 'Share on WhatsApp', 'studentup' ) ); ?>" title="<?php esc_attr_e( 'Share on WhatsApp', 'studentup' ); ?>">
 					<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg> <?php esc_html_e( 'Share', 'studentup' ); ?>
 				</a>
 				<?php echo studentup_save_button( 0, 'su-save-card' ); // v92: 🔖 save-for-later (escaped in helper) ?>

@@ -9,7 +9,7 @@
 --fs-xl:clamp(19px,.92rem + 1.11vw,26px);
 --fs-2xl:clamp(22px,1rem + 1.67vw,33px);
 --lh-tight:1.22;--lh-head:1.32;--lh-body:1.75;--lh-ui:1.4}
-:root{--navy:#0f2e62;--blue:#2463b7;--orange:#ed8a32;--ink:#162235;--muted:#64748b;
+:root{--navy:#0f2e62;--blue:#2463b7;--orange:#ed8a32;--ink:#162235;--muted:#596577;
 --line:#e5ebf4;--soft:#f5f8fc;--card:#fff;--bg:#f7f9fd;--green:#168451;--red:#b91c1c;
 --shadow:0 18px 45px rgba(15,46,98,.11);--orange-ink:#c2410c}
 *{box-sizing:border-box}
@@ -460,7 +460,7 @@ body.dark .su-ws-radar-item a{color:#e8f0ff}
 :root{
   --navy:#0b2447; --navy-2:#123a6b; --blue:#1f5fbf; --blue-ink:#1b4f9c;
   --orange:#f08a24; --orange-2:#c2620d;
-  --ink:#0f1a2b; --ink-2:#31405a; --muted:#64748b;
+  --ink:#0f1a2b; --ink-2:#31405a; --muted:#596577;
   --line:#e6ecf6; --line-2:#d5e0f0; --soft:#f3f7fd; --card:#fff; --bg:#f6f9fd;
   --green:#0f7a4a; --red:#c02626; --gold:#9a5b06;
   --r-sm:10px; --r:14px; --r-lg:18px; --r-xl:24px;

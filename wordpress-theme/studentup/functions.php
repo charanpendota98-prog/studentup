@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.145' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.146' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -562,6 +562,11 @@ function studentup_defer_scripts( $tag, $handle ) {
 		'studentup-reader',
 		'studentup-opportunities',
 		'studentup-workspace',
+		// v1.9.146: the last four parser-blocking footer scripts (self-contained, no inline deps).
+		'studentup-engage',
+		'studentup-status',
+		'studentup-menu',
+		'studentup-slider',
 	);
 	if ( in_array( $handle, $defer, true ) && false !== strpos( $tag, ' src=' ) ) {
 		$tag = str_replace( ' src=', ' defer src=', $tag );
@@ -569,6 +574,16 @@ function studentup_defer_scripts( $tag, $handle ) {
 	return $tag;
 }
 add_filter( 'script_loader_tag', 'studentup_defer_scripts', 10, 2 );
+
+/**
+ * v1.9.146: `html.su-boot` flag (one statement, before any CSS) so progressive-
+ * enhancement widgets can pre-collapse to their JS layout without a layout
+ * shift (daily-quiz stepper measured CLS 0.083 → ~0). No-JS keeps full markup.
+ */
+function studentup_js_flag() {
+	echo '<script>document.documentElement.classList.add("su-boot")</script>' . "\n";
+}
+add_action( 'wp_head', 'studentup_js_flag', 0 );
 
 /**
  * Remove WordPress payload that this theme does not need on ordinary public
