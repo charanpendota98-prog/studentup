@@ -242,7 +242,11 @@ function studentup_livefix_rm_og_image( $url ) {
  * post_content is empty (Daily Quiz, Post your news, Latest Jobs page…).
  */
 function studentup_livefix_rm_page_description( $desc ) {
-	if ( '' !== trim( (string) $desc ) || ! is_page() ) {
+	if ( ! is_page() ) {
+		return $desc;
+	}
+	// v1.9.145: a too-short description (e.g. 'Daily Quiz page.' from placeholder content) is as bad as none.
+	if ( mb_strlen( trim( (string) $desc ) ) >= 50 ) {
 		return $desc;
 	}
 	$slug = (string) get_post_field( 'post_name', get_queried_object_id() );

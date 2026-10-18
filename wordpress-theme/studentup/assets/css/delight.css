@@ -299,3 +299,23 @@ body.su-breaking-section .qualtags{ display:none !important; }/* ===============
 .su-quiz-v2 .su-q-n{ display:none !important; }.su-quiz-v2 .su-quiz-head{ display:flex !important; flex-direction:row !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; }.su-quiz-v2 .su-quiz-score{ width:auto !important; min-width:0 !important; padding:6px 12px !important; border-radius:999px !important; display:inline-flex !important; align-items:baseline !important; gap:3px !important; flex:0 0 auto !important; }.su-quiz-v2 .su-quiz-score b{ display:inline !important; font-size:18px !important; }.su-quiz-v2 .su-quiz-foot .su-quiz-more:not(.su-quiz-next){ width:auto; margin-left:auto; }.su-quiz-v2 .su-quiz-head{ flex-wrap:nowrap !important; }.su-quiz-v2 .su-quiz-head > div:first-child{ min-width:0; flex:1 1 auto; }@media (max-width:640px){.su-quiz-v2 .su-quiz-foot .su-quiz-more:not(.su-quiz-next){ margin-right:52px; } }/* breadcrumb separators had no breathing room (హోమ్›…) */
 .su-breadcrumbs > span[aria-hidden="true"]{ margin:0 6px; opacity:.6; }/* bottom nav labels (Telugu): small,one line */
 .su-bnav .su-bnav-lb{ font-size:10.5px !important; line-height:1.15 !important; white-space:nowrap; letter-spacing:0; }
+
+/* ===== v1.9.145 READABILITY + TAP-TARGET GUARD (deep audit) =====
+   Telugu script below 12px is not legible on phones; audit found 10–11.5px on
+   36 small/meta nodes + chips. Floor every chip/label/meta at 12px. */
+small,.tag,.su-scard-tag,.su-scard-hot,.su-scard-vac,.su-scard-urgent,.mlabel,.qbadge,.su-quiz-kick,
+.su-kf-l,.su-applychip,.su-applyfact,.su-ic-badge,.su-rb-label,.su-pdf-note,.su-ab-policies,
+.su-bnav .su-bnav-lb{ font-size:12px !important; }
+.su-ab-policies{ line-height:1.6; }
+/* Interactive targets ≥24px high (WCAG 2.5.8) without visual bloat: inline
+   links grow their hit-box via padding and pull back with negative margin. */
+.footer-grid a,.crumbs a,.su-breadcrumbs a,.su-toc a,.su-ab-policies a,.su-today-cat,.su-today-t{
+  display:inline-block; min-height:24px; padding-top:4px; padding-bottom:4px; margin-top:-4px; margin-bottom:-4px; box-sizing:border-box; }
+.su-toc li a{ display:block; }
+.su-social .su-close{ min-width:28px; min-height:28px; display:inline-flex; align-items:center; justify-content:center; }
+.newsbody p a,.scard p a,.newsbody li a{ padding:3px 0; }
+.su-sdot{ background-clip:content-box; padding:8px 8px; box-sizing:content-box; width:8px; height:8px; }
+.su-sdot.on{ width:22px; }
+.su-scard-meta,.su-scard-meta span,.su-scard-acts-row a,.su-hero-acts a,.su-brkdd-head span,.su-slider-title-wrap span,
+.su-install-cta span,.su-hdr-saved span{ font-size:12px !important; }
+.newsfoot a,.su-tool-btn span,.tagrow span,.tagrow .tag,.su-closing-list li span,.su-cov > span:not(:first-child){ font-size:12px !important; }

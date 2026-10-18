@@ -273,7 +273,7 @@ function studentup_ui_te_map() {
 		'Friday' => 'శుక్రవారం',
 		'Saturday' => 'శనివారం',
 		'Today’s updates — jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ — ఉద్యోగాలు, Results, Hall Tickets',
-		'Today’s updates (%s) — latest jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ (%s) — తాజా ఉద్యోగాలు, Results, Hall Tickets',
+		'Today’s updates (%s) — latest jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ (%s) — ఉద్యోగాలు, Results, Hall Tickets',
 		'%1$d updates from the last %2$d days, grouped by date: notifications, last dates, results, hall tickets — Telugu. Updated every day.' => 'గత %2$d రోజుల్లో %1$d అప్‌డేట్స్, తేదీల వారీగా: నోటిఫికేషన్లు, చివరి తేదీలు, Results, Hall Tickets — తెలుగులో. ప్రతిరోజూ అప్‌డేట్.',
 		'Today’s updates'                         => 'ఈరోజు అప్‌డేట్స్',
 		'Today'                                   => 'ఈరోజు',
