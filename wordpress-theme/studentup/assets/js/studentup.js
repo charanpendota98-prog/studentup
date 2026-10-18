@@ -320,7 +320,7 @@
   var rail = document.getElementById("surail"), railTab = document.getElementById("sutab"),
       railClose = document.getElementById("suclose");
   if (rail && railTab) {
-    var SU_AUTOHIDE = false, SU_SHOW = 9000, SU_CYCLE = 300000, SU_HOVER = 3500, suHideT = null, suCycleT = null;
+    var SU_AUTOHIDE = !!(window.matchMedia && window.matchMedia("(max-width:640px)").matches), SU_SHOW = 9000, SU_CYCLE = 300000, SU_HOVER = 3500, suHideT = null, suCycleT = null;
     var SU_DISMISS_KEY = "su_social_dismissed";
 
     var suShow = function () {

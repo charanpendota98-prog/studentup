@@ -76,13 +76,13 @@ function studentup_slider_pill( $post_id ) {
 			/* translators: %s: number of days left. */
 			: sprintf( _n( '%s Day Left', '%s Days Left', $left, 'studentup' ), number_format_i18n( $left ) );
 		// v281: ≤2 days → pulse class (CSS only; reduced-motion safe).
-		return '<span class="su-scard-urgent' . ( $left <= 2 ? ' is-hot' : '' ) . '">⏳ ' . esc_html( $text ) . '</span>';
+		return '<span class="su-scard-urgent' . ( $left <= 2 ? ' is-hot' : '' ) . '"><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> ' . esc_html( $text ) . '</span>';
 	}
 
 	$published = (int) get_post_time( 'U', true, $post_id );
 	$hours     = (int) floor( ( (int) current_time( 'timestamp' ) - $published ) / HOUR_IN_SECONDS ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp
 	if ( $hours >= 0 && $hours < 48 ) {
-		return '<span class="su-scard-hot">🔥 ' . esc_html__( 'New', 'studentup' ) . '</span>';
+		return '<span class="su-scard-hot"><svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="currentColor"><path d="M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 1-3s0 3 2 3c1 0 1-1 1-2 0-3-2-4 1-8z"/></svg> ' . esc_html__( 'New', 'studentup' ) . '</span>';
 	}
 	return '';
 }

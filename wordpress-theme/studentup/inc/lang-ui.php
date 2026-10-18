@@ -104,9 +104,11 @@ function studentup_ui_te_map() {
 		'Corrections & Updates' => 'సవరణలు & అప్‌డేట్లు',
 		'Daily Quiz & Polls' => 'డైలీ క్విజ్ & పోల్స్',
 		'Post Your News' => 'మీ వార్త పంపండి',
+		'Exam & Application Calendar' => 'పరీక్ష & దరఖాస్తు క్యాలెండర్',
+		'Thank You' => 'ధన్యవాదాలు',
 		'Exam Calendar' => 'పరీక్షల క్యాలెండర్',
 		'Internet Center' => 'ఇంటర్నెట్ సెంటర్',
-		'SSC · 10th' => 'SSC · 10వ తరగతి',
+		'SSC · 10th' => '10వ తరగతి',
 		'Inter (10+2)' => 'ఇంటర్ (10+2)',
 		'Diploma' => 'డిప్లొమా',
 		'Degree' => 'డిగ్రీ',
@@ -303,7 +305,7 @@ function studentup_ui_te_map() {
 		'active update' => 'యాక్టివ్ అప్‌డేట్',
 		'Find the right opportunity' => 'మీకు సరిపోయే అవకాశం వెతకండి',
 		'Search title' => 'టైటిల్ వెతకండి',
-		'Try SSC, software, scholarship…' => 'SSC, software, scholarship… అని ప్రయత్నించండి',
+		'Try SSC, software, scholarship…' => 'TSPSC, సాఫ్ట్‌వేర్, స్కాలర్‌షిప్…',
 		'Category' => 'విభాగం',
 		'All categories' => 'అన్ని విభాగాలు',
 		'Any deadline' => 'ఏ తేదీ అయినా',
@@ -686,10 +688,14 @@ function studentup_ui_te_map() {
 		'Open comparison'                         => 'పోలిక చూడండి',
 		'Select at least two posts to compare.'   => 'పోల్చడానికి కనీసం 2 పోస్టులు ఎంచుకోండి.',
 		'Important Links'                         => 'ముఖ్యమైన లింకులు',
-		'Apply Online (Official)'                 => 'Apply Online (Official)',
-		'Official Website'                        => 'Official Website',
-		'Official Notification'                   => 'Official Notification',
-		'Official Notification (PDF)'             => 'Official Notification (PDF)',
+		'Apply Online (Official)'                 => 'అధికారిక అప్లై లింక్',
+		'Apply online'                            => 'అప్లై చేయండి',
+		'Download Hall Ticket'                    => 'హాల్ టికెట్ డౌన్‌లోడ్',
+		'View Result'                             => 'రిజల్ట్ చూడండి',
+		'Open Official Portal'                    => 'అధికారిక పోర్టల్ తెరవండి',
+		'Official Website'                        => 'అధికారిక వెబ్‌సైట్',
+		'Official Notification'                   => 'అధికారిక నోటిఫికేషన్',
+		'Official Notification (PDF)'             => 'అధికారిక నోటిఫికేషన్ (PDF)',
 		'Click Here'                              => 'తెరవండి',
 		'Apply Now'                               => 'దరఖాస్తు చేయండి',
 		'Job alerts on Telegram'                  => 'Telegram లో జాబ్ అలర్ట్స్',
@@ -950,3 +956,20 @@ function studentup_ui_te_date( $date, $format = '' ) {
 add_filter( 'get_the_date', 'studentup_ui_te_date', 10, 2 );
 add_filter( 'get_the_modified_date', 'studentup_ui_te_date', 10, 2 );
 add_filter( 'date_i18n', 'studentup_ui_te_date', 10, 2 );
+
+/**
+ * 1.9.149 — setup pages are created with English titles ("Daily Quiz & Polls",
+ * "Post Your News"); the front end must show them in Telugu like every other
+ * label. Pages only (posts keep their own titles), front end only.
+ */
+function studentup_ui_te_page_title( $title, $post_id = 0 ) {
+	if ( $post_id instanceof WP_Post ) {
+		$post_id = $post_id->ID;
+	}
+	if ( is_admin() || ! $post_id || 'page' !== get_post_type( $post_id ) ) {
+		return $title;
+	}
+	return studentup_ui_te_label( $title );
+}
+add_filter( 'the_title', 'studentup_ui_te_page_title', 10, 2 );
+add_filter( 'single_post_title', 'studentup_ui_te_page_title', 10, 2 );

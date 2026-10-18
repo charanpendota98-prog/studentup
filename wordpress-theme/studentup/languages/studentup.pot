@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.148\n"
+"Project-Id-Version: StudentUp 1.9.149\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +30,7 @@ msgstr ""
 msgid "%s articles"
 msgstr ""
 
+#: inc/qual-pages.php:253
 #: inc/qual-pages.php:300
 msgid "%s Jobs"
 msgstr ""
@@ -87,8 +88,8 @@ msgid "active update"
 msgstr ""
 
 #: inc/student-tools.php:100
-#: page-opportunities.php:33
-#: page-opportunities.php:43
+#: page-opportunities.php:32
+#: page-opportunities.php:39
 msgid "active updates"
 msgstr ""
 
@@ -151,7 +152,7 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: page-opportunities.php:47
+#: page-opportunities.php:43
 msgid "All categories"
 msgstr ""
 
@@ -210,14 +211,14 @@ msgstr ""
 msgid "Answer with the official source. Only answered questions go into QAPage schema."
 msgstr ""
 
-#: page-opportunities.php:49
+#: page-opportunities.php:45
 msgid "Any deadline"
 msgstr ""
 
 #: inc/smart.php:168
 #: inc/workspace.php:113
 #: inc/workspace.php:190
-#: page-opportunities.php:48
+#: page-opportunities.php:44
 msgid "Any qualification"
 msgstr ""
 
@@ -349,7 +350,7 @@ msgstr ""
 msgid "Categories"
 msgstr ""
 
-#: page-opportunities.php:47
+#: page-opportunities.php:43
 msgid "Category"
 msgstr ""
 
@@ -443,14 +444,14 @@ msgstr ""
 msgid "Closing in 3 days"
 msgstr ""
 
-#: page-opportunities.php:49
+#: page-opportunities.php:45
 msgid "Closing in 30 days"
 msgstr ""
 
 #: functions.php:532
 #: inc/qual-filter.php:538
 #: inc/qual-filter.php:593
-#: page-opportunities.php:49
+#: page-opportunities.php:45
 msgid "Closing in 7 days"
 msgstr ""
 
@@ -561,7 +562,7 @@ msgstr ""
 msgid "Dark mode"
 msgstr ""
 
-#: page-opportunities.php:49
+#: page-opportunities.php:45
 msgid "Date not announced"
 msgstr ""
 
@@ -578,7 +579,7 @@ msgid "days left"
 msgstr ""
 
 #: inc/workspace.php:124
-#: page-opportunities.php:49
+#: page-opportunities.php:45
 msgid "Deadline"
 msgstr ""
 
@@ -752,7 +753,7 @@ msgstr ""
 msgid "Filter tools by category"
 msgstr ""
 
-#: page-opportunities.php:42
+#: page-opportunities.php:38
 msgid "Find the right opportunity"
 msgstr ""
 
@@ -848,6 +849,8 @@ msgstr ""
 #: inc/template.php:404
 #: inc/template.php:455
 #: page-opportunities.php:25
+#: page-post-news.php:36
+#: page-quiz.php:28
 msgid "Home"
 msgstr ""
 
@@ -1036,7 +1039,7 @@ msgstr ""
 msgid "Last day today"
 msgstr ""
 
-#: page-opportunities.php:76
+#: page-opportunities.php:72
 msgid "Last-date information is taken from the reviewed article. Always open the article and verify the official notification before applying."
 msgstr ""
 
@@ -1239,7 +1242,7 @@ msgstr ""
 msgid "Next tool"
 msgstr ""
 
-#: page-opportunities.php:74
+#: page-opportunities.php:70
 msgid "No active verified opportunities are available right now. Please check again after the next update."
 msgstr ""
 
@@ -1263,7 +1266,7 @@ msgstr ""
 msgid "No last dates are confirmed yet. Dates appear here only after the official notification is published - we never estimate a deadline."
 msgstr ""
 
-#: page-opportunities.php:52
+#: page-opportunities.php:48
 msgid "No matching active opportunities found. Try another keyword or category."
 msgstr ""
 
@@ -1357,10 +1360,6 @@ msgstr ""
 msgid "One-tap access · visited pages can stay available offline. No native APK download is required."
 msgstr ""
 
-#: inc/pwa.php:309
-msgid "One-tap install · new job alerts direct ga"
-msgstr ""
-
 #: inc/apply.php:206
 msgid "Only %d days left"
 msgstr ""
@@ -1395,7 +1394,7 @@ msgstr ""
 msgid "Open the saved page"
 msgstr ""
 
-#: page-opportunities.php:53
+#: page-opportunities.php:49
 msgid "Opportunity sections"
 msgstr ""
 
@@ -1564,7 +1563,7 @@ msgstr ""
 #: inc/personal.php:34
 #: inc/workspace.php:141
 #: inc/workspace.php:188
-#: page-opportunities.php:48
+#: page-opportunities.php:44
 msgid "Qualification"
 msgstr ""
 
@@ -1843,7 +1842,7 @@ msgstr ""
 msgid "Search this site"
 msgstr ""
 
-#: page-opportunities.php:46
+#: page-opportunities.php:42
 msgid "Search title"
 msgstr ""
 
@@ -1855,7 +1854,7 @@ msgstr ""
 msgid "Searching…"
 msgstr ""
 
-#: page-opportunities.php:64
+#: page-opportunities.php:60
 msgid "See all"
 msgstr ""
 
@@ -2180,10 +2179,6 @@ msgstr ""
 msgid "This is optional."
 msgstr ""
 
-#: page-opportunities.php:38
-msgid "This list updates from published StudentUp posts. Verified last dates are shown, expired notices are hidden automatically, and an unavailable date is shown as <strong>Not announced</strong> — never guessed."
-msgstr ""
-
 #: inc/doubts.php:105
 msgid "This page cannot take questions."
 msgstr ""
@@ -2237,7 +2232,7 @@ msgstr ""
 msgid "Trending today"
 msgstr ""
 
-#: page-opportunities.php:46
+#: page-opportunities.php:42
 msgid "Try SSC, software, scholarship…"
 msgstr ""
 
@@ -2251,10 +2246,6 @@ msgstr ""
 
 #: inc/cta.php:29
 msgid "TS &amp; AP"
-msgstr ""
-
-#: page-opportunities.php:31
-msgid "TS, AP, Central, software, private, walk-in, job mela, scholarship, results and hall-ticket updates in one clean list."
 msgstr ""
 
 #: inc/today.php:158
