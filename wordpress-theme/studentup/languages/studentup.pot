@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.144\n"
+"Project-Id-Version: StudentUp 1.9.145\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -46,7 +46,7 @@ msgstr ""
 msgid "%s updates"
 msgstr ""
 
-#: inc/livefix.php:279
+#: inc/livefix.php:283
 msgid "%s — తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు తాజా ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు, ఫలితాలు, అడ్మిట్ కార్డులు, స్కాలర్‌షిప్‌లు, డైలీ క్విజ్ — ప్రతిరోజూ తెలుగులో."
 msgstr ""
 
@@ -2484,7 +2484,7 @@ msgstr ""
 msgid "ట్యాప్ చేస్తే WhatsApp తెరుచుకుంటుంది — వెంటనే స్పందన"
 msgstr ""
 
-#: inc/livefix.php:271
+#: inc/livefix.php:275
 msgid "ప్రభుత్వ ఉద్యోగాలు, ఫలితాలు, అడ్మిట్ కార్డులు — తెలుగులో"
 msgstr ""
 

@@ -394,7 +394,7 @@ function studentup_opportunities_is_route() {
 }
 
 function studentup_opportunities_seo_title() {
-	return 'Latest Govt Jobs 2026 — Active Notifications for TS & AP (Last Dates) — ' . wp_strip_all_tags( get_bloginfo( 'name' ) );
+	return 'Latest Govt Jobs 2026 — TS & AP (Last Dates) — ' . wp_strip_all_tags( get_bloginfo( 'name' ) );
 }
 
 function studentup_opportunities_seo_desc() {
@@ -421,7 +421,7 @@ add_filter( 'studentup_seo_list_url', function ( $url ) {
 	return studentup_opportunities_is_route() ? studentup_opportunity_board_url() : $url;
 } );
 add_filter( 'studentup_seo_list_title', function ( $t ) {
-	return studentup_opportunities_is_route() ? 'Latest Govt Jobs 2026 — Active Notifications for TS & AP' : $t;
+	return studentup_opportunities_is_route() ? 'Latest Govt Jobs 2026 — TS & AP (Last Dates)' : $t;
 } );
 add_filter( 'studentup_seo_list_desc', function ( $d ) {
 	return studentup_opportunities_is_route() ? studentup_opportunities_seo_desc() : $d;

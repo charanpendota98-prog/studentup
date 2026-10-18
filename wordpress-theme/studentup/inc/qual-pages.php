@@ -115,7 +115,7 @@ add_filter( 'template_include', 'studentup_qual_pages_template' );
 
 function studentup_qual_page_h1( $slug ) {
 	/* translators: %s qualification label */
-	return sprintf( '%s Govt Jobs %s — Telangana & AP Notifications', studentup_qual_page_label( $slug ), gmdate( 'Y' ) );
+	return sprintf( '%s Govt Jobs %s — TS & AP Notifications', studentup_qual_page_label( $slug ), gmdate( 'Y' ) );
 }
 
 function studentup_qual_page_title( $slug ) {

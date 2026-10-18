@@ -228,12 +228,15 @@ function studentup_seo_fallback_head() {
 		$img = '';
 	}
 	// v1.9.119: pages without excerpt (Daily Quiz etc.) had NO description at all.
+	if ( is_page() && mb_strlen( trim( (string) $desc ) ) < 50 && function_exists( 'studentup_livefix_rm_page_description' ) ) {
+		$desc = studentup_livefix_rm_page_description( $desc );
+	}
 	if ( '' === trim( (string) $desc ) && is_singular() ) {
 		$desc = wp_strip_all_tags( get_the_title() ) . ' — ' . wp_strip_all_tags( get_bloginfo( 'name' ) ) . ': తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు ఉద్యోగాలు, ఫలితాలు, స్కాలర్‌షిప్ అప్‌డేట్లు.';
 	}
 	$desc = trim( wp_strip_all_tags( (string) $desc ) );
 	if ( '' !== $desc ) {
-		echo '<meta name="description" content="' . esc_attr( mb_substr( $desc, 0, 160 ) ) . '">' . "\n";
+		echo '<meta name="description" content="' . esc_attr( studentup_seo_trim( $desc, 158 ) ) . '">' . "\n";
 		echo '<meta property="og:description" content="' . esc_attr( mb_substr( $desc, 0, 200 ) ) . '">' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( mb_substr( $desc, 0, 200 ) ) . '">' . "\n";
 	}
@@ -516,3 +519,43 @@ function studentup_feed_content( $content ) {
 	return $out;
 }
 add_filter( 'the_content_feed', 'studentup_feed_content', 20 );
+
+/**
+ * v1.9.145 SEO GUARD — one place that keeps every description ≤158 chars at a
+ * word boundary (no mid-word cuts) and every document title ≤65 chars by
+ * dropping only the " — Brand" suffix when needed. Applies to the theme's own
+ * head output AND to Rank Math's frontend filters (priority 100 = last).
+ */
+function studentup_seo_trim( $text, $max = 158 ) {
+	$text = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $text ) ) );
+	if ( mb_strlen( $text ) <= $max ) {
+		return $text;
+	}
+	$cut = mb_substr( $text, 0, $max );
+	$sp  = max( mb_strrpos( $cut, ' ' ), mb_strrpos( $cut, '،' ) );
+	if ( false !== $sp && $sp > $max * 0.6 ) {
+		$cut = mb_substr( $cut, 0, $sp );
+	}
+	return rtrim( $cut, " ,·—-:;" ) . '…';
+}
+function studentup_seo_title_guard( $title ) {
+	$title = trim( (string) $title );
+	if ( mb_strlen( $title ) <= 65 ) {
+		return $title;
+	}
+	$brand = wp_strip_all_tags( get_bloginfo( 'name' ) );
+	foreach ( array( ' — ' . $brand, ' | ' . $brand, ' - ' . $brand, ' – ' . $brand ) as $suf ) {
+		if ( '' !== $brand && mb_substr( $title, -mb_strlen( $suf ) ) === $suf ) {
+			return trim( mb_substr( $title, 0, -mb_strlen( $suf ) ) );
+		}
+	}
+	return $title;
+}
+add_filter( 'rank_math/frontend/description', function ( $d ) {
+	return '' === trim( (string) $d ) ? $d : studentup_seo_trim( $d, 158 );
+}, 100 );
+add_filter( 'rank_math/frontend/title', 'studentup_seo_title_guard', 100 );
+add_filter( 'pre_get_document_title', function ( $t ) {
+	return '' === (string) $t ? $t : studentup_seo_title_guard( $t );
+}, 100 );
+add_filter( 'document_title', 'studentup_seo_title_guard', 100 );
