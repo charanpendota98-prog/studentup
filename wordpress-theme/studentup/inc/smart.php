@@ -123,7 +123,7 @@ function studentup_trending_today() {
 	}
 	?>
 	<div class="su-trend" aria-label="<?php echo esc_attr__( 'Trending today', 'studentup' ); ?>">
-		<span class="su-trend-tag"><?php echo studentup_ui_icon( 'bolt', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Trending today</span>
+		<span class="su-trend-tag"><?php echo studentup_ui_icon( 'bolt', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Trending today', 'studentup' ); ?></span>
 		<div class="su-trend-list">
 			<?php
 			while ( $q->have_posts() ) :
@@ -165,7 +165,7 @@ function studentup_job_finder() {
 		<form class="su-finder-form" data-su-finder='<?php echo esc_attr( wp_json_encode( $data ) ); ?>' onsubmit="return false">
 			<label>Qualification
 				<select data-su-f-qual>
-					<option value="">Any qualification</option>
+					<option value=""><?php echo esc_html__( 'Any qualification', 'studentup' ); ?></option>
 					<?php foreach ( $quals as $slug => $label ) : ?>
 						<option value="<?php echo esc_attr( $slug ); ?>"><?php echo esc_html( $label ); ?></option>
 					<?php endforeach; ?>
@@ -173,19 +173,19 @@ function studentup_job_finder() {
 			</label>
 			<label>State
 				<select data-su-f-state>
-					<option value="">All India</option>
+					<option value=""><?php echo esc_html__( 'All India', 'studentup' ); ?></option>
 					<option value="ts">Telangana</option>
-					<option value="ap">Andhra Pradesh</option>
+					<option value="ap"><?php echo esc_html__( 'Andhra Pradesh', 'studentup' ); ?></option>
 					<option value="central">Central / All India</option>
 				</select>
 			</label>
-			<label>Your age
+			<label><?php echo esc_html__( 'Your age', 'studentup' ); ?>
 				<input type="number" min="14" max="60" inputmode="numeric" placeholder="e.g. 25" data-su-f-age>
 			</label>
 			<label>Show
 				<select data-su-f-sort>
-					<option value="last">Closing soon first</option>
-					<option value="new">Newest first</option>
+					<option value="last"><?php echo esc_html__( 'Closing soon first', 'studentup' ); ?></option>
+					<option value="new"><?php echo esc_html__( 'Newest first', 'studentup' ); ?></option>
 				</select>
 			</label>
 			<button type="button" class="su-finder-reset" data-su-f-reset><?php echo studentup_ui_icon( 'refresh', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Reset</button>
@@ -207,7 +207,7 @@ function studentup_salary_calc() {
 	?>
 	<section class="su-calc" id="salary-calculator" aria-label="<?php echo esc_attr__( 'Salary calculator', 'studentup' ); ?>">
 		<div class="su-calc-head">
-			<h2><?php echo studentup_ui_icon( 'wallet', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> In-hand salary calculator</h2>
+			<h2><?php echo studentup_ui_icon( 'wallet', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'In-hand salary calculator', 'studentup' ); ?></h2>
 			<p>Basic pay + DA + HRA + TA − deductions. Formula open ga undi — mee notification numbers pettandi.</p>
 		</div>
 		<form class="su-calc-form" onsubmit="return false">
@@ -287,8 +287,8 @@ function studentup_state_switch() {
 	<div class="su-statebar" data-su-state-bar>
 		<span><?php echo studentup_ui_icon( 'pin', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Your state:</span>
 		<button type="button" data-su-state="ts">Telangana</button>
-		<button type="button" data-su-state="ap">Andhra Pradesh</button>
-		<button type="button" data-su-state="central">All India</button>
+		<button type="button" data-su-state="ap"><?php echo esc_html__( 'Andhra Pradesh', 'studentup' ); ?></button>
+		<button type="button" data-su-state="central"><?php echo esc_html__( 'All India', 'studentup' ); ?></button>
 	</div>
 	<?php
 }
@@ -357,13 +357,13 @@ function studentup_popular_searches() {
 	);
 	?>
 	<section class="su-popsearch" aria-labelledby="su-popsearch-title">
-		<h2 id="su-popsearch-title" class="su-popsearch-title">Popular searches</h2>
+		<h2 id="su-popsearch-title" class="su-popsearch-title"><?php echo esc_html__( 'Popular searches', 'studentup' ); ?></h2>
 		<ul class="su-popsearch-list">
 			<?php foreach ( studentup_most_used() as $su_m ) : ?>
 				<?php $su_term = studentup_used_term( $su_m['slug'] ); ?>
 				<?php if ( $su_term ) : ?>
 					<li><a class="su-pop su-pop-cat" href="<?php echo esc_url( get_category_link( $su_term ) ); ?>">
-						<span class="su-pop-ico" aria-hidden="true"><?php echo studentup_ui_icon( $su_m['icon'], 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><?php echo esc_html( $su_m['label'] ); ?></a></li>
+						<span class="su-pop-ico" aria-hidden="true"><?php echo studentup_ui_icon( $su_m['icon'], 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><?php echo esc_html( translate( $su_m['label'], 'studentup' ) ); ?></a></li>
 				<?php endif; ?>
 			<?php endforeach; ?>
 			<?php foreach ( $queries as $su_q ) : ?>

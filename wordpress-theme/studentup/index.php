@@ -27,7 +27,7 @@ get_header();
 					}
 					?>
 				</h1>
-				<p>Guides verified from official sources</p>
+				<p><?php echo esc_html__( 'Guides verified from official sources', 'studentup' ); ?></p>
 			</div>
 		</div>
 

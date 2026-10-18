@@ -116,14 +116,14 @@ studentup_breaking_ticker();
 	}
 	?>
 	<?php echo function_exists( 'studentup_breaking_mobile_block' ) ? studentup_breaking_mobile_block() : ''; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped inside. ?>
-	<div class="mlabel">Explore</div>
+	<div class="mlabel"><?php esc_html_e( 'Explore', 'studentup' ); ?></div>
 	<a href="<?php echo esc_url( home_url( '/?s=' ) ); ?>"><?php echo studentup_ui_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Search</a>
 	<a class="su-mobile-board-link" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php echo studentup_ui_icon( 'board' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Latest active jobs', 'studentup' ); ?></a>
 	<?php if ( function_exists( 'studentup_saved_on' ) && studentup_saved_on() ) : ?>
 		<a href="#" class="su-msaved" data-su-saved-open><?php echo studentup_ui_icon( 'bookmark' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Saved', 'studentup' ); ?></a>
 	<?php endif; ?>
 	<?php if ( function_exists( 'studentup_workspace_on' ) && studentup_workspace_on() && studentup_workspace_url() ) : ?>
-		<a href="<?php echo esc_url( studentup_workspace_url() ); ?>"><?php echo studentup_ui_icon( 'person' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> My Workspace</a>
+		<a href="<?php echo esc_url( studentup_workspace_url() ); ?>"><?php echo studentup_ui_icon( 'person' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'My Workspace', 'studentup' ); ?></a>
 	<?php endif; ?>
 	<?php
 	// v197: quiz + poll ki dedicated page undi (lekapote front-page anchor).
@@ -132,21 +132,21 @@ studentup_breaking_ticker();
 		: '';
 	$su_quiz_url = $su_quiz_url ? $su_quiz_url : home_url( '/#daily-quiz' );
 	?>
-	<a href="<?php echo esc_url( $su_quiz_url ); ?>"><?php echo studentup_ui_icon( 'chart' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Daily Quiz &amp; Polls</a>
+	<a href="<?php echo esc_url( $su_quiz_url ); ?>"><?php echo studentup_ui_icon( 'chart' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Daily Quiz & Polls', 'studentup' ); ?></a>
 	<?php if ( function_exists( 'studentup_tools_enabled' ) && studentup_tools_enabled() ) : // v304: tools OFF (v248) → ee dead #anchor links menu lo vaddu ?>
-	<a href="<?php echo esc_url( home_url( '/#age-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'person' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Age Calculator</a>
-	<a href="<?php echo esc_url( home_url( '/#fee-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'card' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Fee Calculator</a>
-	<a href="<?php echo esc_url( home_url( '/#syllabus-tracker' ) ); ?>"><?php echo studentup_ui_icon( 'book' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Syllabus Tracker</a>
-	<a href="<?php echo esc_url( home_url( '/#salary-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Salary Calculator</a>
+	<a href="<?php echo esc_url( home_url( '/#age-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'person' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Age Calculator', 'studentup' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/#fee-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'card' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Fee Calculator', 'studentup' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/#syllabus-tracker' ) ); ?>"><?php echo studentup_ui_icon( 'book' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Syllabus Tracker', 'studentup' ); ?></a>
+	<a href="<?php echo esc_url( home_url( '/#salary-calculator' ) ); ?>"><?php echo studentup_ui_icon( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Salary Calculator', 'studentup' ); ?></a>
 	<?php endif; ?>
-	<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener" data-su-alerts><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Instant alerts</a>
-	<a href="#" class="su-install-cta" role="button"><?php echo studentup_ui_icon( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Download App <span class="su-mpwa">FREE</span></a>
+	<a href="<?php echo esc_url( studentup_alerts_url() ); ?>" target="_blank" rel="noopener" data-su-alerts><?php echo studentup_ui_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Instant alerts', 'studentup' ); ?></a>
+	<a href="#" class="su-install-cta" role="button"><?php echo studentup_ui_icon( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Download App', 'studentup' ); ?> <span class="su-mpwa">FREE</span></a>
 	<?php
 	// v123: Scholarships mobile menu lo eppudu kanipinchali.
 	$su_schol = studentup_used_term( 'scholarships' );
 	if ( $su_schol ) :
 		?>
-		<a href="<?php echo esc_url( get_category_link( $su_schol ) ); ?>"><?php echo studentup_ui_icon( 'school' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Scholarships</a>
+		<a href="<?php echo esc_url( get_category_link( $su_schol ) ); ?>"><?php echo studentup_ui_icon( 'school' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Scholarships', 'studentup' ); ?></a>
 	<?php endif; ?>
 	<?php if ( function_exists( 'studentup_mega_mobile_groups' ) ) : ?>
 		<div class="mlabel"><?php esc_html_e( 'Browse everything', 'studentup' ); ?></div>
@@ -164,9 +164,9 @@ studentup_breaking_ticker();
 			continue;
 		}
 		?>
-		<a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo studentup_ui_icon( $m['icon'], 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( $m['label'] ); ?></a>
+		<a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo studentup_ui_icon( $m['icon'], 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( translate( $m['label'], 'studentup' ) ); ?></a>
 	<?php endforeach; ?>
-	<div class="mlabel">More</div>
+	<div class="mlabel"><?php esc_html_e( 'More', 'studentup' ); ?></div>
 	<?php
 	if ( has_nav_menu( 'mobile' ) ) {
 		wp_nav_menu(
@@ -179,7 +179,7 @@ studentup_breaking_ticker();
 		);
 	}
 	?>
-	<div class="mlabel">Social</div>
+	<div class="mlabel"><?php esc_html_e( 'Social', 'studentup' ); ?></div>
 	<?php $su_soc = studentup_social_links(); ?>
 	<a class="su-msoc su-msoc-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'whatsapp', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> WhatsApp</a>
 	<a class="su-msoc su-msoc-tg" href="<?php echo esc_url( $su_soc['telegram'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'telegram', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Telegram</a>

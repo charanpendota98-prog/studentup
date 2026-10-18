@@ -50,10 +50,10 @@ function studentup_helpful_box() {
 	$id = (int) get_the_ID();
 	?>
 	<section class="su-helpful" data-post="<?php echo esc_attr( $id ); ?>" data-mail="<?php echo esc_attr( (string) studentup_opt( 'contact_email', 'studentupinformative@gmail.com' ) ); ?>" aria-labelledby="su-helpful-title">
-		<h2 id="su-helpful-title">Was this update helpful?</h2>
+		<h2 id="su-helpful-title"><?php echo esc_html__( 'Was this update helpful?', 'studentup' ); ?></h2>
 		<div class="su-helpful-btns">
-			<button type="button" class="su-help-btn" data-vote="yes"><?php echo studentup_ui_icon( 'thumbup', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Yes, clear</button>
-			<button type="button" class="su-help-btn" data-vote="no"><?php echo studentup_ui_icon( 'thumbdown', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Something is missing</button>
+			<button type="button" class="su-help-btn" data-vote="yes"><?php echo studentup_ui_icon( 'thumbup', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Yes, clear', 'studentup' ); ?></button>
+			<button type="button" class="su-help-btn" data-vote="no"><?php echo studentup_ui_icon( 'thumbdown', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Something is missing', 'studentup' ); ?></button>
 		</div>
 		<p class="su-helpful-note" role="status" aria-live="polite"></p>
 	</section>

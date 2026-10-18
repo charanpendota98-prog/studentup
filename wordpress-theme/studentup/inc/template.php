@@ -430,7 +430,7 @@ function studentup_menu_fallback() {
 			}
 			echo '</ul>';
 		} else {
-			printf( '<a href="%s">%s</a>', esc_url( $it['url'] ), esc_html( $it['label'] ) );
+			printf( '<a href="%s">%s</a>', esc_url( $it['url'] ), esc_html( translate( $it['label'], 'studentup' ) ) );
 		}
 		echo '</li>';
 	}

@@ -45,7 +45,7 @@ function studentup_compare_table( $limit = 12 ) {
 						<th scope="col">Age</th>
 						<th scope="col">Vacancies</th>
 						<th scope="col">Salary</th>
-						<th scope="col">Last date</th>
+						<th scope="col"><?php echo esc_html__( 'Last date', 'studentup' ); ?></th>
 						<th scope="col">Apply</th>
 					</tr>
 				</thead>

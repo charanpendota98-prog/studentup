@@ -67,7 +67,7 @@ function studentup_jobs_table( $limit = 12 ) {
 	?>
 	<section class="su-jobtable" aria-labelledby="su-jobtable-title">
 		<div class="su-jt-head">
-			<h2 id="su-jobtable-title">Latest updates at a glance</h2>
+			<h2 id="su-jobtable-title"><?php echo esc_html__( 'Latest updates at a glance', 'studentup' ); ?></h2>
 			<p><?php /* v209: Eenadu-style short header — pedda caption vaddu, chinna trust line matrame. */ esc_html_e( 'Every last date from official notifications — never guessed.', 'studentup' ); ?></p>
 		</div>
 		<div class="su-jt-scroll">
@@ -76,7 +76,7 @@ function studentup_jobs_table( $limit = 12 ) {
 					<tr>
 						<th scope="col">Post / notification</th>
 						<th scope="col">Qualification</th>
-						<th scope="col">Last date</th>
+						<th scope="col"><?php echo esc_html__( 'Last date', 'studentup' ); ?></th>
 						<th scope="col">Link</th>
 					</tr>
 				</thead>
@@ -99,7 +99,7 @@ function studentup_jobs_table( $limit = 12 ) {
 								<?php if ( $r['last'] ) : ?>
 									<span class="su-jt-date"><?php echo esc_html( wp_date( 'd M Y', strtotime( $r['last'] . ' 12:00:00' ) ) );   /* v209: Eenadu-style date pill */ ?></span>
 								<?php else : ?>
-									<span class="su-jt-na">Not announced</span>
+									<span class="su-jt-na"><?php echo esc_html__( 'Not announced', 'studentup' ); ?></span>
 								<?php endif; ?>
 							</td>
 							<td>

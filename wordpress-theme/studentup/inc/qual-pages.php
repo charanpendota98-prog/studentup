@@ -297,5 +297,5 @@ add_action( 'init', function () {
 // Breadcrumb / archive title on the route ("Archives" → "Degree Jobs").
 add_filter( 'get_the_archive_title', function ( $title ) {
 	$s = studentup_qual_page_slug();
-	return $s ? studentup_qual_page_label( $s ) . ' Jobs' : $title;
+	return $s ? sprintf( __( '%s Jobs', 'studentup' ), studentup_qual_page_label( $s ) ) : $title;
 } );

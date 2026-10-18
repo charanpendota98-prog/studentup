@@ -23,12 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function studentup_qual_terms() {
 	return array(
-		'10th'    => 'SSC · 10th',
-		'inter'   => 'Inter (10+2)',
+		'10th'    => __( 'SSC · 10th', 'studentup' ),
+		'inter'   => __( 'Inter (10+2)', 'studentup' ),
 		'iti'     => 'ITI',
-		'diploma' => 'Diploma',
-		'degree'  => 'Degree',
-		'pg'      => 'PG',
+		'diploma' => __( 'Diploma', 'studentup' ),
+		'degree'  => __( 'Degree', 'studentup' ),
+		'pg'      => __( 'PG', 'studentup' ),
 		'btech'   => 'B.Tech',
 	);
 }
@@ -390,7 +390,7 @@ function studentup_last_date_badge( $post_id = 0 ) {
 	}
 	$left = (int) floor( ( strtotime( $iso . ' 23:59:59' ) - current_time( 'timestamp' ) ) / DAY_IN_SECONDS ); // phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp
 	if ( $left < 0 ) {
-		return '<span class="qbadge done">Deadline passed</span>';
+		return '<span class="qbadge done">' . esc_html__( 'Deadline passed', 'studentup' ) . '</span>';
 	}
 	if ( $left <= 7 ) {
 		$txt = ( 0 === $left ) ? __( 'Last date today', 'studentup' ) : sprintf( _n( '%s Day Left', '%s Days Left', $left, 'studentup' ), number_format_i18n( $left ) );

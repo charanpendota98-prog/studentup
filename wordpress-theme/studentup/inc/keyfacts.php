@@ -42,7 +42,7 @@ function studentup_keyfacts_data( $post_id = 0 ) {
 		}
 		if ( 'studentup_age_min' === $key ) {
 			$mx  = trim( (string) get_post_meta( $post_id, 'studentup_age_max', true ) );
-			$val = $mx ? $val . ' – ' . $mx . ' yrs' : $val . '+ yrs';
+			$val = $mx ? $val . ' – ' . $mx . ' ' . __( 'yrs', 'studentup' ) : $val . '+ ' . __( 'yrs', 'studentup' );
 		}
 		if ( 'studentup_last_date' === $key ) {
 			$ts = strtotime( $val );

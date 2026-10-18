@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							continue;
 						}
 						?>
-						<li><a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo esc_html( $m['label'] ); ?></a></li>
+						<li><a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo esc_html( translate( $m['label'], 'studentup' ) ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			</div>
@@ -114,13 +114,13 @@ if ( studentup_opt( 'sticky_ad', '0' ) ) :
 // Click: Android/Chrome lo install prompt, iPhone/desktop lo device-wise steps.
 if ( studentup_opt( 'pwa', '1' ) && studentup_opt( 'install_prompt', '1' ) ) :
 	?>
-	<button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Download App', 'studentup' ); ?> <span class="ibadge">WEB APP</span></button>
+	<button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Download App', 'studentup' ); ?> <span class="ibadge"><?php echo esc_html__( 'WEB APP', 'studentup' ); ?></span></button>
 	<div class="installsheet" id="installhint" hidden role="dialog" aria-modal="true" aria-labelledby="isheet-title">
 		<h3 id="isheet-title"><?php esc_html_e( 'Install StudentUp as a web app', 'studentup' ); ?></h3>
 		<p class="isub"><?php esc_html_e( 'One-tap access · visited pages can stay available offline. No native APK download is required.', 'studentup' ); ?></p>
 		<ol id="isteps">
 			<li><b>Android (Chrome):</b> ⋮ Menu → <b><?php esc_html_e( 'Install app', 'studentup' ); ?></b> / <b><?php esc_html_e( 'Add to Home screen', 'studentup' ); ?></b></li>
-			<li><b>iPhone (Safari):</b> <b>Share</b> → <b>Add to Home Screen</b> → Add</li>
+			<li><b>iPhone (Safari):</b> <b>Share</b> → <b><?php echo esc_html__( 'Add to Home Screen', 'studentup' ); ?></b> → Add</li>
 			<li><b><?php esc_html_e( 'Computer:', 'studentup' ); ?></b> <?php esc_html_e( 'click the install icon in the address bar', 'studentup' ); ?></li>
 		</ol>
 		<div class="irow">

@@ -26,6 +26,116 @@ function studentup_ui_te_map() {
 		return $map;
 	}
 	$map = array(
+		'TS Police' => 'TS పోలీస్',
+		'AP Jobs' => 'AP ఉద్యోగాలు',
+		'Telangana Jobs' => 'తెలంగాణ ఉద్యోగాలు',
+		'Andhra Pradesh News' => 'ఆంధ్రప్రదేశ్ వార్తలు',
+		'Telangana News' => 'తెలంగాణ వార్తలు',
+		'Social' => 'సోషల్',
+		'Explore' => 'అన్వేషించండి',
+		'About StudentUp' => 'StudentUp గురించి',
+		'Advertise' => 'ప్రకటనలు',
+		'Contact' => 'సంప్రదించండి',
+		'Corrections Log' => 'సవరణల లాగ్',
+		'District News' => 'జిల్లా వార్తలు',
+		'Editorial Team' => 'ఎడిటోరియల్ టీమ్',
+		'Govt Schemes' => 'ప్రభుత్వ పథకాలు',
+		'Minority & overseas' => 'మైనారిటీ & విదేశీ',
+		'Post-matric (Inter · Degree)' => 'పోస్ట్-మెట్రిక్ (ఇంటర్ · డిగ్రీ)',
+		'Pre-matric (Class 9–10)' => 'ప్రీ-మెట్రిక్ (9–10 తరగతులు)',
+		'Previous Quizzes' => 'మునుపటి క్విజ్‌లు',
+		'Scholarships 2026 hub' => 'స్కాలర్‌షిప్‌లు 2026 హబ్',
+		'Terms of Use' => 'వినియోగ నిబంధనలు',
+		'Walk-in Interviews' => 'వాక్-ఇన్ ఇంటర్వ్యూలు',
+		'Verified source feed · fresh items only' => 'ధృవీకరించిన మూలాలు · తాజా అంశాలు మాత్రమే',
+		'WEB APP' => 'వెబ్ యాప్',
+		'Add to Home Screen' => 'హోమ్ స్క్రీన్‌కు జోడించండి',
+		'Reviewed by' => 'సమీక్షించినవారు',
+		'Was this update helpful?' => 'ఈ అప్‌డేట్ ఉపయోగపడిందా?',
+		'Yes, clear' => 'అవును, స్పష్టంగా ఉంది',
+		'Something is missing' => 'ఏదో తక్కువగా ఉంది',
+		'Latest updates at a glance' => 'తాజా అప్‌డేట్లు ఒక్క చూపులో',
+		'Official source' => 'అధికారిక మూలం',
+		'Scholarships open now' => 'ఇప్పుడు తెరిచి ఉన్న స్కాలర్‌షిప్‌లు',
+		'Get every update as a notification' => 'ప్రతి అప్‌డేట్ నోటిఫికేషన్‌గా పొందండి',
+		'Turn on alerts' => 'అలర్ట్‌లు ఆన్ చేయండి',
+		'StudentUp App' => 'StudentUp యాప్',
+		'Key Highlights' => 'ముఖ్యాంశాలు',
+		'Instant Job Alerts & Exam Updates' => 'తక్షణ ఉద్యోగ అలర్ట్‌లు & పరీక్ష అప్‌డేట్లు',
+		'Join WhatsApp Channel' => 'WhatsApp ఛానల్‌లో చేరండి',
+		'Join Telegram Group' => 'Telegram గ్రూప్‌లో చేరండి',
+		'All India' => 'ఆల్ ఇండియా',
+		'Your age' => 'మీ వయసు',
+		'Closing soon first' => 'త్వరలో ముగిసేవి ముందు',
+		'Newest first' => 'కొత్తవి ముందు',
+		'Popular searches' => 'ఎక్కువగా వెతికేవి',
+		'Trending & Related Notifications' => 'ట్రెండింగ్ & సంబంధిత నోటిఫికేషన్లు',
+		'Clear history' => 'హిస్టరీ క్లియర్',
+		'Yes, alert cheyandi' => 'అవును, అలర్ట్ చేయండి',
+		'No thanks' => 'వద్దు',
+		'Guides verified from official sources' => 'అధికారిక మూలాల నుంచి ధృవీకరించిన గైడ్‌లు',
+		'Read details' => 'వివరాలు చదవండి',
+		// v1.9.144 category / menu / qualification / month names.
+		'TS Government Jobs' => 'TS ప్రభుత్వ ఉద్యోగాలు',
+		'AP Government Jobs' => 'AP ప్రభుత్వ ఉద్యోగాలు',
+		'Central Govt Jobs' => 'కేంద్ర ఉద్యోగాలు',
+		'Central Government Jobs' => 'కేంద్ర ప్రభుత్వ ఉద్యోగాలు',
+		'Admit Cards' => 'అడ్మిట్ కార్డులు',
+		'Admit Card' => 'అడ్మిట్ కార్డ్',
+		'Admissions' => 'అడ్మిషన్లు',
+		'Bank Jobs' => 'బ్యాంక్ ఉద్యోగాలు',
+		'Railway Jobs' => 'రైల్వే ఉద్యోగాలు',
+		'Police Jobs' => 'పోలీస్ ఉద్యోగాలు',
+		'Teaching Jobs' => 'టీచింగ్ ఉద్యోగాలు',
+		'Defence Jobs' => 'డిఫెన్స్ ఉద్యోగాలు',
+		'Answer Keys' => 'ఆన్సర్ కీలు',
+		'Answer Key' => 'ఆన్సర్ కీ',
+		'Syllabus' => 'సిలబస్',
+		'Study Material' => 'స్టడీ మెటీరియల్',
+		'Uncategorized' => 'ఇతరాలు',
+		'Education News' => 'విద్యా వార్తలు',
+		'About Us' => 'మా గురించి',
+		'Contact Us' => 'సంప్రదించండి',
+		'Privacy Policy' => 'ప్రైవసీ పాలసీ',
+		'Disclaimer' => 'డిస్‌క్లెయిమర్',
+		'Terms and Conditions' => 'నియమాలు & షరతులు',
+		'Terms & Conditions' => 'నియమాలు & షరతులు',
+		'Editorial Policy' => 'ఎడిటోరియల్ పాలసీ',
+		'Corrections & Updates' => 'సవరణలు & అప్‌డేట్లు',
+		'Daily Quiz & Polls' => 'డైలీ క్విజ్ & పోల్స్',
+		'Post Your News' => 'మీ వార్త పంపండి',
+		'Exam Calendar' => 'పరీక్షల క్యాలెండర్',
+		'Internet Center' => 'ఇంటర్నెట్ సెంటర్',
+		'SSC · 10th' => 'SSC · 10వ తరగతి',
+		'Inter (10+2)' => 'ఇంటర్ (10+2)',
+		'Diploma' => 'డిప్లొమా',
+		'Degree' => 'డిగ్రీ',
+		'PG' => 'పీజీ',
+		'%s Jobs' => '%s ఉద్యోగాలు',
+		'yrs' => 'ఏళ్లు',
+		'January' => 'జనవరి',
+		'February' => 'ఫిబ్రవరి',
+		'March' => 'మార్చి',
+		'April' => 'ఏప్రిల్',
+		'May' => 'మే',
+		'June' => 'జూన్',
+		'July' => 'జూలై',
+		'August' => 'ఆగస్టు',
+		'September' => 'సెప్టెంబర్',
+		'October' => 'అక్టోబర్',
+		'November' => 'నవంబర్',
+		'December' => 'డిసెంబర్',
+		'Jan' => 'జన',
+		'Feb' => 'ఫిబ్ర',
+		'Mar' => 'మార్చి',
+		'Apr' => 'ఏప్రి',
+		'Jun' => 'జూన్',
+		'Jul' => 'జూలై',
+		'Aug' => 'ఆగ',
+		'Sep' => 'సెప్',
+		'Oct' => 'అక్టో',
+		'Nov' => 'నవం',
+		'Dec' => 'డిసెం',
 		// v1.9.143 aria-labels / placeholders.
 		'Pages' => 'పేజీలు',
 		'Close' => 'మూసివేయి',
@@ -779,3 +889,64 @@ function studentup_ui_core_gettext( $translation, $text, $domain ) {
 	return isset( $core[ $text ] ) ? $core[ $text ] : $translation;
 }
 add_filter( 'gettext', 'studentup_ui_core_gettext', 10, 3 );
+
+/**
+ * v1.9.144 — Category/tag names and nav-menu titles are site data (English on
+ * live), not gettext strings. Front-end display passes them through the same
+ * map so cards, breadcrumbs, meta lines and footer menus read in Telugu.
+ */
+function studentup_ui_te_label( $text ) {
+	if ( is_admin() || ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $text;
+	}
+	$map = studentup_ui_te_map();
+	$key = trim( (string) $text );
+	return isset( $map[ $key ] ) ? $map[ $key ] : $text;
+}
+
+function studentup_ui_te_term( $term ) {
+	if ( is_admin() || ! ( $term instanceof WP_Term ) ) {
+		return $term;
+	}
+	if ( in_array( $term->taxonomy, array( 'category', 'post_tag' ), true ) ) {
+		$term->name = studentup_ui_te_label( $term->name );
+	}
+	return $term;
+}
+add_filter( 'get_term', 'studentup_ui_te_term', 20 );
+
+function studentup_ui_te_menu_items( $items ) {
+	if ( is_admin() || ! is_array( $items ) ) {
+		return $items;
+	}
+	foreach ( $items as $it ) {
+		if ( isset( $it->title ) ) {
+			$it->title = studentup_ui_te_label( $it->title );
+		}
+	}
+	return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'studentup_ui_te_menu_items', 5 );
+add_filter( 'wp_get_nav_menu_items', 'studentup_ui_te_menu_items', 5 );
+
+/**
+ * Dates: "October 18, 2026" → "అక్టోబర్ 18, 2026" (month names only; numbers stay).
+ */
+function studentup_ui_te_date( $date, $format = '' ) {
+	if ( '' === (string) $format ) {
+		$format = (string) get_option( 'date_format', 'F j, Y' );
+	}
+	if ( is_admin() || ! is_string( $date ) || ! preg_match( '/[FM]/', (string) $format ) ) {
+		return $date;
+	}
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $date;
+	}
+	$map = studentup_ui_te_map();
+	return preg_replace_callback( '/\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/', function ( $m ) use ( $map ) {
+		return isset( $map[ $m[1] ] ) ? $map[ $m[1] ] : $m[1];
+	}, $date );
+}
+add_filter( 'get_the_date', 'studentup_ui_te_date', 10, 2 );
+add_filter( 'get_the_modified_date', 'studentup_ui_te_date', 10, 2 );
+add_filter( 'date_i18n', 'studentup_ui_te_date', 10, 2 );
