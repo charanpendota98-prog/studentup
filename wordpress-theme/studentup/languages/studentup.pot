@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.139\n"
+"Project-Id-Version: StudentUp 1.9.140\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -434,7 +434,7 @@ msgstr ""
 msgid "Daily current affairs →"
 msgstr ""
 
-#: inc/quiz.php:431
+#: inc/quiz.php:437
 msgid "Daily quiz"
 msgstr ""
 
@@ -471,7 +471,7 @@ msgstr ""
 msgid "Deadlines"
 msgstr ""
 
-#: inc/quiz.php:511
+#: inc/quiz.php:517
 msgid "Decent start. Read the "why" lines once and retry."
 msgstr ""
 
@@ -909,7 +909,7 @@ msgstr ""
 msgid "More %s"
 msgstr ""
 
-#: inc/quiz.php:498
+#: inc/quiz.php:504
 msgid "More practice questions"
 msgstr ""
 
@@ -998,7 +998,7 @@ msgstr ""
 msgid "No more than 3 links in one comment."
 msgstr ""
 
-#: inc/quiz.php:513
+#: inc/quiz.php:519
 msgid "No problem — practice is the point. Try again tomorrow."
 msgstr ""
 
@@ -1531,7 +1531,7 @@ msgstr ""
 msgid "Storage is not available in this browser (private mode?) — saving is off."
 msgstr ""
 
-#: inc/quiz.php:509
+#: inc/quiz.php:515
 msgid "Strong — keep this streak alive tomorrow."
 msgstr ""
 
@@ -1830,7 +1830,7 @@ msgstr ""
 msgid "WhatsApp లో documents పంపండి"
 msgstr ""
 
-#: inc/quiz.php:484
+#: inc/quiz.php:490
 msgid "Why:"
 msgstr ""
 
