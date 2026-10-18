@@ -668,18 +668,22 @@ function studentup_qual_directory() {
 	if ( ! studentup_opt( 'qual_filter', '1' ) || ! is_front_page() ) {
 		return;
 	}
-	$groups = array_merge( array_keys( studentup_qual_terms() ), array( 'closing' ) );
+	// v353: the JS-built per-qualification lists repeated the same posts already shown
+	// in the grid above (owner rule: no duplicate post lists on home) → one neat
+	// row of qualification links (dedicated /jobs/<qual>/ pages) instead.
+	if ( ! function_exists( 'studentup_qual_pages_links' ) ) {
+		return;
+	}
+	$links = studentup_qual_pages_links();
+	if ( '' === $links ) {
+		return;
+	}
 	?>
-	<section class="qualsplit" id="qualsplit" aria-label="Jobs by qualification">
+	<section class="qualsplit" id="qualsplit" aria-label="<?php esc_attr_e( 'Jobs by qualification', 'studentup' ); ?>">
 		<div class="qsplit-head">
 			<h2><?php esc_html_e( 'Browse by qualification', 'studentup' ); ?></h2>
-			<?php // v314: hint line removed (owner rule: no hint texts). ?>
 		</div>
-		<div class="qsplit-grid" id="qsplit">
-			<?php foreach ( $groups as $g ) : ?>
-				<article class="qgroup" data-qgroup="<?php echo esc_attr( $g ); ?>" hidden></article>
-			<?php endforeach; ?>
-		</div>
+		<?php echo wp_kses_post( $links ); ?>
 	</section>
 	<?php
 }

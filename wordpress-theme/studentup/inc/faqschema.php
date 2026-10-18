@@ -46,19 +46,19 @@ function studentup_get_post_faqs( $post_id = 0 ) {
 	if ( 'hallticket' === $kind ) {
 		if ( $last_date ) {
 			$faqs[] = array(
-				'q' => 'Hall Ticket download చేయడానికి చివరి తేదీ ఎప్పుడు?',
-				'a' => 'Hall Ticket download link ' . esc_html( $last_pretty ) . ' వరకు అందుబాటులో ఉంటుంది. చివరి రోజు server load ఉంటుంది కాబట్టి ముందుగానే download చేసుకోండి.',
+				'q' => 'Hall Ticket డౌన్‌లోడ్ చేసుకోవడానికి చివరి తేదీ ఎప్పుడు?',
+				'a' => 'Hall Ticket డౌన్‌లోడ్ లింక్ ' . esc_html( $last_pretty ) . ' వరకు అందుబాటులో ఉంటుంది. చివరి రోజు సర్వర్ రద్దీ ఉంటుంది కాబట్టి ముందుగానే డౌన్‌లోడ్ చేసుకోండి.',
 			);
 		}
 		if ( $apply_url ) {
 			$faqs[] = array(
-				'q' => 'Hall Ticket ఎక్కడ download చేయాలి?',
-				'a' => 'Official portal నుంచి మాత్రమే download చేయండి. ఈ article లో ఇచ్చిన official link ఉపయోగించండి; third-party sites వద్దు.',
+				'q' => 'Hall Ticket ఎక్కడ డౌన్‌లోడ్ చేయాలి?',
+				'a' => 'అధికారిక పోర్టల్ నుంచి మాత్రమే డౌన్‌లోడ్ చేయండి. ఈ ఆర్టికల్‌లో ఇచ్చిన అధికారిక లింక్ ఉపయోగించండి; ఇతర వెబ్‌సైట్లు వద్దు.',
 			);
 		}
 		$faqs[] = array(
-			'q' => 'Hall Ticket download కి ఏ వివరాలు కావాలి?',
-			'a' => 'సాధారణంగా Registration Number మరియు Date of Birth (లేదా Password) కావాలి. Application form copy దగ్గర ఉంచుకోండి.',
+			'q' => 'Hall Ticket డౌన్‌లోడ్‌కు ఏ వివరాలు కావాలి?',
+			'a' => 'సాధారణంగా Registration Number, పుట్టిన తేదీ (లేదా Password) కావాలి. దరఖాస్తు ఫారం కాపీని దగ్గర ఉంచుకోండి.',
 		);
 		return $faqs;
 	}
@@ -66,54 +66,54 @@ function studentup_get_post_faqs( $post_id = 0 ) {
 	if ( 'result' === $kind ) {
 		if ( $apply_url ) {
 			$faqs[] = array(
-				'q' => 'Result ఎక్కడ check చేయాలి?',
-				'a' => 'Official website లో మాత్రమే result check చేయండి. ఈ article లో ఇచ్చిన official result link ఉపయోగించండి.',
+				'q' => 'రిజల్ట్ ఎక్కడ చూడాలి?',
+				'a' => 'అధికారిక వెబ్‌సైట్‌లో మాత్రమే రిజల్ట్ చూడండి. ఈ ఆర్టికల్‌లో ఇచ్చిన అధికారిక రిజల్ట్ లింక్ ఉపయోగించండి.',
 			);
 		}
 		if ( $last_date ) {
 			$faqs[] = array(
-				'q' => 'Result link ఎప్పటి వరకు పనిచేస్తుంది?',
-				'a' => 'Result link ' . esc_html( $last_pretty ) . ' వరకు అందుబాటులో ఉంటుంది. Result copy ని భవిష్యత్తు అవసరాలకు save చేసుకోండి.',
+				'q' => 'రిజల్ట్ లింక్ ఎప్పటి వరకు పనిచేస్తుంది?',
+				'a' => 'రిజల్ట్ లింక్ ' . esc_html( $last_pretty ) . ' వరకు అందుబాటులో ఉంటుంది. రిజల్ట్ కాపీని భవిష్యత్తు అవసరాలకు సేవ్ చేసుకోండి.',
 			);
 		}
 		$faqs[] = array(
-			'q' => 'Result చూసిన తర్వాత ఏం చేయాలి?',
-			'a' => 'Qualify అయితే తదుపరి దశ (Interview / Document Verification) సూచనలను official website లో చూసి certificates సిద్ధంగా ఉంచుకోండి.',
+			'q' => 'రిజల్ట్ చూసిన తర్వాత ఏం చేయాలి?',
+			'a' => 'అర్హత సాధిస్తే తదుపరి దశ (Interview / Document Verification) సూచనలను అధికారిక వెబ్‌సైట్‌లో చూసి సర్టిఫికెట్లు సిద్ధంగా ఉంచుకోండి.',
 		);
 		return $faqs;
 	}
 
 	if ( $last_date ) {
 		$faqs[] = array(
-			'q' => esc_html( $title ) . ' కి Apply చేయడానికి చివరి తేదీ ఎప్పుడు?',
-			'a' => 'Online application submit చేయడానికి చివరి తేదీ ' . esc_html( $last_pretty ) . '. అభ్యర్థులు ముందుగానే apply చేయడం మంచిది.',
+			'q' => esc_html( $title ) . ' దరఖాస్తుకు చివరి తేదీ ఎప్పుడు?',
+			'a' => 'ఆన్‌లైన్ దరఖాస్తు సమర్పించడానికి చివరి తేదీ ' . esc_html( $last_pretty ) . '. అభ్యర్థులు ముందుగానే దరఖాస్తు చేయడం మంచిది.',
 		);
 	}
 
 	if ( $vacancies ) {
 		$faqs[] = array(
-			'q' => 'ఈ recruitment లో మొత్తం ఎన్ని vacancies ఉన్నాయి?',
-			'a' => 'Official notification ప్రకారం మొత్తం ' . esc_html( $vacancies ) . ' posts భర్తీ చేస్తారు.',
+			'q' => 'ఈ నోటిఫికేషన్‌లో మొత్తం ఎన్ని ఖాళీలు ఉన్నాయి?',
+			'a' => 'అధికారిక నోటిఫికేషన్ ప్రకారం మొత్తం ' . esc_html( $vacancies ) . ' పోస్టులు భర్తీ చేస్తారు.',
 		);
 	}
 
 	if ( $qual ) {
 		$faqs[] = array(
-			'q' => 'కనీస Qualification ఏమిటి?',
-			'a' => 'అభ్యర్థులు గుర్తింపు పొందిన board / university నుంచి ' . esc_html( studentup_qual_pretty( $qual ) ) . ' లేదా సమానమైన అర్హత కలిగి ఉండాలి.',
+			'q' => 'కనీస విద్యార్హత ఏమిటి?',
+			'a' => 'అభ్యర్థులు గుర్తింపు పొందిన బోర్డు / యూనివర్సిటీ నుంచి ' . esc_html( studentup_qual_pretty( $qual ) ) . ' లేదా సమానమైన అర్హత కలిగి ఉండాలి.',
 		);
 	}
 
 	if ( $salary ) {
 		$faqs[] = array(
-			'q' => 'ఈ post కి నెల జీతం (Salary) ఎంత?',
-			'a' => 'Government pay rules ప్రకారం సుమారు నెల జీతం ' . esc_html( $salary ) . '.',
+			'q' => 'ఈ పోస్టుకు నెల జీతం ఎంత?',
+			'a' => 'ప్రభుత్వ వేతన నిబంధనల ప్రకారం నెల జీతం సుమారు ' . esc_html( $salary ) . '.',
 		);
 	}
 
 	$faqs[] = array(
-		'q' => 'ఈ recruitment కి Online Apply ఎలా చేయాలి?',
-		'a' => 'అర్హత ఉన్న అభ్యర్థులు official recruitment portal లో online application నింపి, అవసరమైన certificates upload చేసి, చివరి తేదీ లోపు submit చేయాలి.',
+		'q' => 'ఈ నోటిఫికేషన్‌కు ఆన్‌లైన్‌లో ఎలా దరఖాస్తు చేయాలి?',
+		'a' => 'అర్హత ఉన్న అభ్యర్థులు అధికారిక పోర్టల్‌లో ఆన్‌లైన్ దరఖాస్తు నింపి, అవసరమైన సర్టిఫికెట్లు అప్‌లోడ్ చేసి, చివరి తేదీలోపు సమర్పించాలి.',
 	);
 
 	return $faqs;

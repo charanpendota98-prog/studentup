@@ -1068,3 +1068,94 @@ body.dark .su-brk-search input{ color:#e7f0ff; }
 @media (max-width:480px){ .su-pn-steps{ grid-template-columns:1fr !important; display:grid; gap:6px; } .su-pn-steps li{ font-size:13px; } }
 /* breaking section cards = news: no auto-detected qualification tags */
 body.su-breaking-section .qualtags{ display:none !important; }
+
+/* ================================================================
+   v353 — VISUAL QA PASS (headless-browser screenshots, phone 390 + laptop 1366)
+   ================================================================ */
+/* 1) QUIZ: one question at a time (stepper) — compact card instead of 5 stacked questions */
+.su-quiz.js-step .su-q:not(.is-cur){ display:none !important; }
+.su-quiz-v2 .su-quiz-form{ display:block !important; }
+.su-quiz-v2 .su-q{ border:0 !important; padding:2px 0 0 !important; margin:0 !important; background:transparent !important; box-shadow:none !important; }
+.su-quiz-v2 .su-q-title{ font-size:16.5px !important; line-height:1.5 !important; margin:0 0 12px !important; }
+.su-quiz-v2 .su-q-opts{ display:grid !important; grid-template-columns:1fr !important; gap:8px !important; }
+.su-quiz-v2 .su-q-opts.is-short{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+.su-quiz-v2 .su-opt{ min-height:46px !important; border-radius:12px !important; padding:9px 12px !important; }
+.su-quiz-v2 .su-opt-t{ font-weight:700; }
+.su-quiz-v2 .su-quiz-bar{ margin:10px 0 10px !important; height:6px !important; }
+.su-quiz-v2 .su-q-jump{ display:flex !important; gap:6px !important; margin:0 0 12px !important; justify-content:flex-start !important; }
+.su-quiz-v2 .su-q-chip{ width:28px !important; height:28px !important; border-radius:50% !important; font-size:12px !important; }
+.su-quiz-v2 .su-q-chip.now{ box-shadow:0 0 0 2px #fff, 0 0 0 4px #22304a; }
+[data-theme="dark"] .su-quiz-v2 .su-q-chip.now, body.dark .su-quiz-v2 .su-q-chip.now{ box-shadow:0 0 0 2px #0b1220, 0 0 0 4px #9db8ff; }
+.su-quiz-v2 .su-why{ margin-top:10px !important; }
+.su-quiz-v2 .su-quiz-foot{ display:flex !important; flex-wrap:wrap !important; align-items:center !important; justify-content:flex-start !important; gap:8px !important; margin-top:14px !important; padding-top:12px; border-top:1px solid var(--line,#e6edf7); }
+.su-quiz-v2 .su-quiz-next{ margin-left:auto; order:5; min-height:44px; padding:0 18px; border-radius:12px; font-size:14px; font-weight:800; display:inline-flex; align-items:center; gap:6px; }
+.su-quiz-v2 .su-quiz-prev{ order:1; }
+.su-quiz-v2 .su-quiz-foot .su-quiz-restart[data-su-quiz-restart]{ order:2; }
+.su-quiz-v2 .su-quiz-foot .su-quiz-more:not(.su-quiz-next){ order:6; margin-right:0 !important; width:100%; text-align:center; }
+.su-quiz-v2 .su-quiz-streak{ order:3; font-size:12.5px; font-weight:800; color:var(--ink-2,#44536b); }
+.su-quiz-v2 .su-status{ width:100%; order:4; }
+.su-quiz-v2 .su-quiz-head h2{ font-size:17px !important; line-height:1.35 !important; }
+@media (min-width:981px){
+  .su-quiz-v2 .su-quiz-card{ padding:20px 22px !important; }
+  .su-quiz-v2 .su-q-title{ font-size:18px !important; }
+  .su-quiz-v2 .su-q-opts{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .su-quiz-v2 .su-quiz-head h2{ font-size:19px !important; }
+}
+/* 2) CATEGORY TILES: 15 tiles → 5 per row on laptop (3 full rows, no lonely last tile); first tile no fake "active" underline */
+@media (min-width:1080px){ .su-catrail{ grid-template-columns:repeat(5,minmax(0,1fr)) !important; } }
+.su-catrail .su-cat.c1, body.dark .su-catrail .su-cat.c1{ box-shadow:none !important; border-radius:16px !important; }
+/* 3) NO-IMAGE CARDS: designed cover was 120–170px of empty gradient per card → compact */
+@media (max-width:640px){
+  .newsgrid .news:has(> .thumb--auto){ flex-direction:row !important; align-items:stretch !important; min-height:0 !important; }
+  .newsgrid .news:has(> .thumb--auto) .thumb--auto{ width:76px !important; min-width:76px !important; flex:0 0 76px !important; aspect-ratio:auto !important; height:auto !important; min-height:0 !important; }
+  .newsgrid .news:has(> .thumb--auto) .su-cov-cat, .newsgrid .news:has(> .thumb--auto) .su-cov-brand{ display:none !important; }
+  .newsgrid .news:has(> .thumb--auto) .su-cov-mono{ left:0 !important; right:0 !important; top:50% !important; transform:translateY(-50%); text-align:center; font-size:24px !important; }
+  .newsgrid .news:has(> .thumb--auto) .newsbody{ padding:11px 12px 11px !important; gap:6px !important; min-width:0; }
+  .newsgrid .news:has(> .thumb--auto) h3{ font-size:15px !important; line-height:1.38 !important; }
+  .newsgrid .news:has(> .thumb--auto) .tagrow > .tag:not(.qual):first-child{ display:inline-flex !important; }
+}
+@media (min-width:900px){
+  .newsgrid .news:not(.news--lead) .thumb--auto{ height:96px !important; min-height:0 !important; aspect-ratio:auto !important; }
+  .newsgrid .news:not(.news--lead) .thumb--auto .su-cov-mono{ font-size:30px !important; }
+  .news--lead:has(> .thumb--auto) .thumb--auto{ width:34% !important; min-width:34% !important; }
+  .news--lead:has(> .thumb--auto){ min-height:0 !important; }
+}
+/* 4) HEADER NAV (laptop): 14 items wrapped into two ragged lines → tighter + lower-priority items hidden below 1440px (all reachable from tiles) */
+@media (min-width:981px){
+  .nav .menu-primary > li > a{ padding:9px 9px !important; font-size:13px !important; }
+}
+@media (min-width:981px) and (max-width:1439px){
+  .nav .menu-primary > li:nth-child(n+8){ display:none !important; }
+}
+/* 5) FLOATING CLUTTER: install pill duplicates the install bar / bottom nav */
+@media (max-width:640px){ .installbtn{ display:none !important; } }
+body.su-appbar-on .installbtn{ display:none !important; }
+/* 6) INTERNET CENTER band: duplicate Telugu subtitle under the title (hint-text rule) */
+.su-ic-v2 .su-ic-sub{ display:none !important; }
+.su-ic-v2 .su-wa-txt small, .su-ic-v2 .su-ic-foot{ overflow-wrap:anywhere; white-space:normal !important; }
+/* 7) FOOTER (phone): 2 cramped columns + social line clipped by the rail → single column, link lists in 2 columns */
+@media (max-width:640px){
+  .footer-grid{ grid-template-columns:1fr !important; gap:14px !important; }
+  .footer-grid ul, .footer-grid ul.menu{ columns:2 !important; column-gap:16px; }
+  .footer-grid li{ break-inside:avoid; }
+  .footer-grid > div{ padding-right:52px; }
+}
+/* 8) Search box: keyboard "/" hint is meaningless on touch screens */
+@media (max-width:640px){ kbd.su-kbd{ display:none !important; } }
+/* 9) Qualification row on home = plain link chips (no duplicate post lists) */
+.qualsplit .su-qual-links{ display:flex; flex-wrap:wrap; gap:8px; }
+.qualsplit .su-qual-links a{ display:inline-flex; align-items:center; min-height:38px; padding:0 14px; border-radius:999px; border:1px solid var(--line,#e6edf7); background:var(--card,#fff); color:var(--navy,#0b2447); font-size:13.5px; font-weight:800; text-decoration:none; }
+body.dark .qualsplit .su-qual-links a{ background:#131c2e; border-color:#243247; color:#d7e3f8; }
+/* quiz v2 polish: dots row already numbers the question → no second badge; head = one row (title + small score pill) */
+.su-quiz-v2 .su-q-n{ display:none !important; }
+.su-quiz-v2 .su-quiz-head{ display:flex !important; flex-direction:row !important; align-items:center !important; justify-content:space-between !important; gap:10px !important; }
+.su-quiz-v2 .su-quiz-score{ width:auto !important; min-width:0 !important; padding:6px 12px !important; border-radius:999px !important; display:inline-flex !important; align-items:baseline !important; gap:3px !important; flex:0 0 auto !important; }
+.su-quiz-v2 .su-quiz-score b{ display:inline !important; font-size:18px !important; }
+.su-quiz-v2 .su-quiz-foot .su-quiz-more:not(.su-quiz-next){ width:auto; margin-left:auto; }
+.su-quiz-v2 .su-quiz-head{ flex-wrap:nowrap !important; }
+.su-quiz-v2 .su-quiz-head > div:first-child{ min-width:0; flex:1 1 auto; }
+@media (max-width:640px){ .su-quiz-v2 .su-quiz-foot .su-quiz-more:not(.su-quiz-next){ margin-right:52px; } }
+/* breadcrumb separators had no breathing room (హోమ్›…) */
+.su-breadcrumbs > span[aria-hidden="true"]{ margin:0 6px; opacity:.6; }
+/* bottom nav labels (Telugu): small, one line */
+.su-bnav .su-bnav-lb{ font-size:10.5px !important; line-height:1.15 !important; white-space:nowrap; letter-spacing:0; }

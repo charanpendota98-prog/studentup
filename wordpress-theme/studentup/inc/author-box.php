@@ -54,8 +54,8 @@ function studentup_author_meta() {
  */
 function studentup_author_box() {
 	$name      = (string) studentup_opt( 'author_name', 'Charan Pendota' );
-	$exp       = (string) studentup_opt( 'author_experience', 'Senior Education Editor · 5+ Years of Experience' );
-	$bio       = (string) studentup_opt( 'author_bio', 'Charan Pendota is a senior content editor and digital career researcher with 5+ years of experience in Telugu job notifications, exam patterns, and career guidance. At StudentUp, he leads the fact-checking desk, ensuring 100% source-verified information for Telangana and Andhra Pradesh students.' );
+	$exp       = (string) studentup_opt( 'author_experience', __( 'Senior Education Editor · 5+ Years of Experience', 'studentup' ) );
+	$bio       = (string) studentup_opt( 'author_bio', __( 'Charan Pendota is a senior content editor and digital career researcher with 5+ years of experience in Telugu job notifications, exam patterns, and career guidance. At StudentUp, he leads the fact-checking desk, ensuring 100% source-verified information for Telangana and Andhra Pradesh students.', 'studentup' ) );
 	$avatar    = (string) studentup_opt( 'author_avatar_url', '' );
 	$email     = studentup_contact_email();
 	$soc       = function_exists( 'studentup_social_links' ) ? studentup_social_links() : array();
@@ -96,14 +96,14 @@ function studentup_author_box() {
 			<div class="su-ab-footer">
 				<div class="su-ab-trust-pills">
 					<?php if ( $rev ) : ?>
-						<span class="su-ab-pill"><?php echo studentup_ui_icon( 'search', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Reviewed: <?php echo esc_html( $rev ); ?></span>
+						<span class="su-ab-pill"><?php echo studentup_ui_icon( 'search', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Reviewed:', 'studentup' ); ?> <?php echo esc_html( $rev ); ?></span>
 					<?php endif; ?>
 				</div>
 
 				<div class="su-ab-socials">
 					<?php if ( ! empty( $soc['whatsapp_channel'] ) ) : ?>
 						<a href="<?php echo esc_url( $soc['whatsapp_channel'] ); ?>" target="_blank" rel="noopener" class="su-ab-soc wa" title="WhatsApp Channel">
-							<?php echo studentup_social_icon( 'whatsapp', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> WhatsApp Channel
+							<?php echo studentup_social_icon( 'whatsapp', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> WhatsApp <?php esc_html_e( 'Channel', 'studentup' ); ?>
 						</a>
 					<?php elseif ( ! empty( $soc['whatsapp'] ) ) : ?>
 						<a href="<?php echo esc_url( $soc['whatsapp'] ); ?>" target="_blank" rel="noopener" class="su-ab-soc wa" title="WhatsApp">
@@ -131,14 +131,14 @@ function studentup_author_box() {
 
 					<?php if ( $email ) : ?>
 						<a href="mailto:<?php echo esc_attr( $email ); ?>" class="su-ab-soc mail" title="Contact Author">
-							<?php echo studentup_social_icon( 'email', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Contact Email
+							<?php echo studentup_social_icon( 'email', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php esc_html_e( 'Contact Email', 'studentup' ); ?>
 						</a>
 					<?php endif; ?>
 				</div>
 
 				<div class="su-ab-policies" style="font-size:11px;color:#94a3b8;margin-top:6px;">
-					<a href="<?php echo esc_url( home_url( '/editorial-policy/' ) ); ?>" style="color:#64748b;text-decoration:underline;">Editorial policy</a> ·
-					<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" style="color:#64748b;text-decoration:underline;">Report mistakes</a>
+					<a href="<?php echo esc_url( home_url( '/editorial-policy/' ) ); ?>" style="color:#64748b;text-decoration:underline;"><?php esc_html_e( 'Editorial policy', 'studentup' ); ?></a> ·
+					<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" style="color:#64748b;text-decoration:underline;"><?php esc_html_e( 'Report mistakes', 'studentup' ); ?></a>
 				</div>
 			</div>
 		</div>

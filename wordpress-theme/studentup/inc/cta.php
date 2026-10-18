@@ -33,23 +33,23 @@ function studentup_cta_internet_center() {
 		</div>
 
 		<div class="su-ic-body su-ic-te">
-			<p class="su-ic-lead"><?php esc_html_e( 'మీరు jobs apply చేసుకోవటం కోసం ఎక్కడికీ వెళ్లవలసిన అవసరం లేదు. కేవలం మాకు call చేసి, సంబంధించిన documents పంపిస్తే చాలు — అతి తక్కువ ఖర్చులో apply చేసి, filled application PDF మీకు send చేయటం జరుగుతుంది.', 'studentup' ); ?></p>
-			<p class="su-ic-lead2"><?php esc_html_e( 'PDF తో పాటు — study materials, previous papers, మరియు preparation group లో add చేయటం కూడా జరుగుతుంది.', 'studentup' ); ?></p>
+			<p class="su-ic-lead"><?php esc_html_e( 'ఉద్యోగాలకు దరఖాస్తు చేయడానికి ఎక్కడికీ వెళ్లనక్కర్లేదు. మాకు కాల్ చేసి, అవసరమైన డాక్యుమెంట్లు పంపితే చాలు — తక్కువ ఖర్చుతో దరఖాస్తు పూర్తి చేసి, నింపిన అప్లికేషన్ PDF మీకు పంపుతాం.', 'studentup' ); ?></p>
+			<p class="su-ic-lead2"><?php esc_html_e( 'PDF తో పాటు స్టడీ మెటీరియల్స్, పాత పేపర్లు ఇస్తాం; ప్రిపరేషన్ గ్రూప్‌లో కూడా చేర్చుతాం.', 'studentup' ); ?></p>
 		</div>
 
 		<ul class="su-ic-perks su-ic-te">
 			<li><?php echo studentup_ui_icon( 'doc', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Application PDF', 'studentup' ); ?></li>
 			<li><?php echo studentup_ui_icon( 'book', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Materials & previous papers', 'studentup' ); ?></li>
 			<li><?php echo studentup_ui_icon( 'person', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Preparation group', 'studentup' ); ?></li>
-			<li><?php echo studentup_ui_icon( 'wallet', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'అతి తక్కువ charge', 'studentup' ); ?></li>
+			<li><?php echo studentup_ui_icon( 'wallet', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'అతి తక్కువ ఛార్జీ', 'studentup' ); ?></li>
 		</ul>
 
 		<div class="su-ic-actions">
 			<a class="su-wa-box" href="<?php echo esc_url( $soc['whatsapp'] ); ?>" target="_blank" rel="noopener">
 				<span class="su-wa-ico" aria-hidden="true"><?php echo studentup_social_icon( 'whatsapp', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 				<span class="su-wa-txt">
-					<b><?php esc_html_e( 'WhatsApp లో documents పంపండి', 'studentup' ); ?></b>
-					<small><?php esc_html_e( 'Tap చేస్తే మా WhatsApp open అవుతుంది — వెంటనే reply', 'studentup' ); ?></small>
+					<b><?php esc_html_e( 'WhatsApp లో డాక్యుమెంట్లు పంపండి', 'studentup' ); ?></b>
+					<small><?php esc_html_e( 'ట్యాప్ చేస్తే WhatsApp తెరుచుకుంటుంది — వెంటనే స్పందన', 'studentup' ); ?></small>
 				</span>
 			</a>
 			<?php if ( $tel ) : ?>
@@ -60,7 +60,7 @@ function studentup_cta_internet_center() {
 			<?php endif; ?>
 		</div>
 
-		<p class="su-ic-foot su-ic-te"><?php esc_html_e( 'గమనిక: ఇది మా service — official application fee వేరు. Documents మీ అనుమతితోనే వాడతాం.', 'studentup' ); ?></p>
+		<p class="su-ic-foot su-ic-te"><?php esc_html_e( 'గమనిక: ఇది మా సేవ — అధికారిక దరఖాస్తు ఫీజు వేరు. డాక్యుమెంట్లు మీ అనుమతితోనే వాడతాం.', 'studentup' ); ?></p>
 	</section>
 	<?php
 }

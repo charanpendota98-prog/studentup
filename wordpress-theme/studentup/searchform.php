@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 ?>
 <form role="search" method="get" class="chips" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-	<label class="screen-reader-text" for="s">Search</label>
+	<label class="screen-reader-text" for="s"><?php esc_html_e( 'Search', 'studentup' ); ?></label>
 	<input type="search" id="s" name="s" value="<?php echo esc_attr( get_search_query() ); ?>"
-		placeholder="Search job / exam / result…"
+		placeholder="<?php esc_attr_e( 'Search job / exam / result…', 'studentup' ); ?>"
 		style="flex:1;min-width:220px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14px">
-	<button type="submit" class="chip active">Search</button>
+	<button type="submit" class="chip active"><?php esc_html_e( 'Search', 'studentup' ); ?></button>
 </form>

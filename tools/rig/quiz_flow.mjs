@@ -1,0 +1,22 @@
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
+const b = await puppeteer.launch({ args: chromium.args, executablePath: await chromium.executablePath(), headless: true });
+const p = await b.newPage();
+const errs=[]; p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+await p.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+await p.goto('http://localhost:8099/', { waitUntil: 'networkidle0', timeout: 90000 });
+await p.evaluate(() => document.querySelector('#daily-quiz').scrollIntoView());
+const state = async () => p.evaluate(() => { const q=document.querySelector('#daily-quiz'); return { cur: [...q.querySelectorAll('.su-q')].findIndex(f=>f.classList.contains('is-cur')), next: !q.querySelector('[data-su-quiz-next]').hidden, prev: !q.querySelector('[data-su-quiz-prev]').hidden, restart: !q.querySelector('[data-su-quiz-restart]').hidden, score: q.querySelector('[data-su-quiz-score]').textContent, streak: q.querySelector('[data-su-quiz-streak]').textContent, status: !!q.querySelector('.su-status'), share: !q.querySelector('[data-su-quiz-share]').hidden }; });
+console.log('init', JSON.stringify(await state()));
+await p.evaluate(() => document.querySelector('#daily-quiz .su-q.is-cur .su-opt').click());
+await new Promise(r=>setTimeout(r,300));
+console.log('after1', JSON.stringify(await state()));
+await p.screenshot({ path: '/tmp/shots/quiz_answered.png' });
+for (let i=0;i<4;i++){ await p.evaluate(() => document.querySelector('#daily-quiz [data-su-quiz-next]').click()); await new Promise(r=>setTimeout(r,200)); await p.evaluate(() => document.querySelectorAll('#daily-quiz .su-q.is-cur .su-opt')[1].click()); await new Promise(r=>setTimeout(r,200)); }
+console.log('done', JSON.stringify(await state()));
+await p.evaluate(() => document.querySelector('#daily-quiz').scrollIntoView());
+await p.screenshot({ path: '/tmp/shots/quiz_done.png' });
+await p.evaluate(() => document.querySelector('#daily-quiz [data-su-quiz-restart]').click());
+await new Promise(r=>setTimeout(r,200));
+console.log('restart', JSON.stringify(await state()), errs);
+await b.close();

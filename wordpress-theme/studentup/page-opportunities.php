@@ -45,10 +45,9 @@ $total = count( $rows );
 			<div class="su-op-filter-grid">
 				<label><span><?php esc_html_e( 'Search title', 'studentup' ); ?></span><input type="search" data-su-op-search placeholder="<?php esc_attr_e( 'Try SSC, software, scholarship…', 'studentup' ); ?>" autocomplete="off" /></label>
 				<label><span><?php esc_html_e( 'Category', 'studentup' ); ?></span><select data-su-op-section-filter><option value=""><?php esc_html_e( 'All categories', 'studentup' ); ?></option><?php foreach ( $sections as $key => $section ) : ?><option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $section['label'] ); ?></option><?php endforeach; ?></select></label>
-				<label><span>Qualification</span><select data-su-op-qualification><option value=""><?php esc_html_e( 'Any qualification', 'studentup' ); ?></option><option value="10th">10th</option><option value="inter">Inter / 10+2</option><option value="iti">ITI / Diploma</option><option value="degree">Degree</option><option value="pg">PG</option></select></label>
+				<label><span><?php esc_html_e( 'Qualification', 'studentup' ); ?></span><select data-su-op-qualification><option value=""><?php esc_html_e( 'Any qualification', 'studentup' ); ?></option><option value="10th">10th</option><option value="inter">Inter / 10+2</option><option value="iti">ITI / Diploma</option><option value="degree">Degree</option><option value="pg">PG</option></select></label>
 				<label><span><?php esc_html_e( 'Deadline', 'studentup' ); ?></span><select data-su-op-deadline><option value=""><?php esc_html_e( 'Any deadline', 'studentup' ); ?></option><option value="7"><?php esc_html_e( 'Closing in 7 days', 'studentup' ); ?></option><option value="30"><?php esc_html_e( 'Closing in 30 days', 'studentup' ); ?></option><option value="unknown"><?php esc_html_e( 'Date not announced', 'studentup' ); ?></option></select></label>
 			</div>
-			<p class="su-op-filter-note"><?php esc_html_e( 'Search and filters run in your browser. Open the article and confirm the official notification before applying.', 'studentup' ); ?></p>
 		</section>
 		<div class="su-op-no-results" data-su-op-no-results hidden><?php esc_html_e( 'No matching active opportunities found. Try another keyword or category.', 'studentup' ); ?></div>
 		<div class="su-op-jump" aria-label="Opportunity sections">
@@ -62,7 +61,7 @@ $total = count( $rows );
 			<section class="su-op-section" id="su-<?php echo esc_attr( $key ); ?>" aria-labelledby="su-<?php echo esc_attr( $key ); ?>-title">
 				<div class="su-op-section-head">
 					<h2 id="su-<?php echo esc_attr( $key ); ?>-title"><span class="su-sec-ico" aria-hidden="true"><?php echo studentup_ui_icon( $section['icon'], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span> <?php echo esc_html( $section['label'] ); ?></h2>
-					<a href="<?php echo esc_url( home_url( '/?s=' . rawurlencode( $section['label'] ) ) ); ?>">See all →</a>
+					<a href="<?php echo esc_url( home_url( '/?s=' . rawurlencode( $section['label'] ) ) ); ?>"><?php esc_html_e( 'See all', 'studentup' ); ?> →</a>
 				</div>
 				<div class="su-op-list">
 					<?php foreach ( $groups[ $key ] as $row ) : ?>

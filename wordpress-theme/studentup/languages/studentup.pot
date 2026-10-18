@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.141\n"
+"Project-Id-Version: StudentUp 1.9.142\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -36,6 +36,10 @@ msgstr ""
 
 #: inc/polls.php:430
 msgid "%s readers voted — tap an option to see live results."
+msgstr ""
+
+#: inc/org-pages.php:339
+msgid "%s updates"
 msgstr ""
 
 #: inc/livefix.php:279
@@ -116,6 +120,10 @@ msgstr ""
 
 #: inc/workspace.php:121
 msgid "Age limit"
+msgstr ""
+
+#: inc/premium.php:316
+msgid "Alerts"
 msgstr ""
 
 #: inc/today.php:244
@@ -225,7 +233,7 @@ msgstr ""
 msgid "Apply Online (Official)"
 msgstr ""
 
-#: inc/calendar.php:186
+#: inc/calendar.php:187
 msgid "Apply today - last date tomorrow"
 msgstr ""
 
@@ -253,10 +261,6 @@ msgstr ""
 msgid "Back to tools"
 msgstr ""
 
-#: inc/polls.php:434
-msgid "Be the first to vote — results show as soon as people answer."
-msgstr ""
-
 #: inc/nav-breaking.php:92
 #: inc/nav-breaking.php:93
 #: inc/nav-breaking.php:126
@@ -267,7 +271,7 @@ msgstr ""
 msgid "Breaking news by state and district"
 msgstr ""
 
-#: inc/qual-filter.php:675
+#: inc/qual-filter.php:684
 msgid "Browse by qualification"
 msgstr ""
 
@@ -295,6 +299,7 @@ msgstr ""
 msgid "Career"
 msgstr ""
 
+#: footer.php:25
 #: inc/premium.php:600
 msgid "Categories"
 msgstr ""
@@ -310,6 +315,18 @@ msgstr ""
 #: inc/workspace.php:116
 #: inc/workspace.php:206
 msgid "Central"
+msgstr ""
+
+#: inc/author-box.php:106
+msgid "Channel"
+msgstr ""
+
+#: inc/author-box.php:58
+msgid "Charan Pendota is a senior content editor and digital career researcher with 5+ years of experience in Telugu job notifications, exam patterns, and career guidance. At StudentUp, he leads the fact-checking desk, ensuring 100% source-verified information for Telangana and Andhra Pradesh students."
+msgstr ""
+
+#: inc/quiz.php:497
+msgid "Check answers"
 msgstr ""
 
 #: inc/slider.php:225
@@ -424,6 +441,10 @@ msgstr ""
 msgid "Computer:"
 msgstr ""
 
+#: inc/author-box.php:134
+msgid "Contact Email"
+msgstr ""
+
 #: page-internet-center.php:90
 msgid "Contact the center"
 msgstr ""
@@ -501,7 +522,7 @@ msgstr ""
 msgid "Deadlines"
 msgstr ""
 
-#: inc/quiz.php:517
+#: inc/quiz.php:518
 msgid "Decent start. Read the "why" lines once and retry."
 msgstr ""
 
@@ -536,6 +557,10 @@ msgstr ""
 
 #: inc/personal.php:150
 msgid "Downloads a calendar file with an alarm one day before."
+msgstr ""
+
+#: inc/author-box.php:140
+msgid "Editorial policy"
 msgstr ""
 
 #: page-tools.php:61
@@ -678,7 +703,7 @@ msgstr ""
 msgid "Full details & Apply"
 msgstr ""
 
-#: inc/calendar.php:181
+#: inc/calendar.php:182
 msgid "Full details and official apply link"
 msgstr ""
 
@@ -694,7 +719,7 @@ msgstr ""
 msgid "Government application fee, exam fee or any official payment is separate and is never collected by us - you pay the department directly on the official portal."
 msgstr ""
 
-#: inc/calendar.php:167
+#: inc/calendar.php:168
 msgid "Government job & exam last dates"
 msgstr ""
 
@@ -707,7 +732,9 @@ msgid "Hide social icons"
 msgstr ""
 
 #: inc/megamenu.php:357
-#: inc/template.php:400
+#: inc/premium.php:313
+#: inc/template.php:403
+#: inc/template.php:454
 #: page-opportunities.php:25
 msgid "Home"
 msgstr ""
@@ -770,6 +797,14 @@ msgstr ""
 msgid "Job alerts on Telegram"
 msgstr ""
 
+#: inc/premium.php:314
+msgid "Jobs"
+msgstr ""
+
+#: inc/qual-filter.php:682
+msgid "Jobs by qualification"
+msgstr ""
+
 #: inc/cta.php:117
 msgid "Jobs · results · hall tickets — first on WhatsApp / Telegram."
 msgstr ""
@@ -795,11 +830,15 @@ msgstr ""
 msgid "Join WhatsApp"
 msgstr ""
 
+#: inc/quiz.php:450
+msgid "Jump to question"
+msgstr ""
+
 #: inc/keyfacts.php:78
 msgid "Key details"
 msgstr ""
 
-#: inc/calendar.php:180
+#: inc/calendar.php:181
 #: inc/keyfacts.php:31
 msgid "Last date"
 msgstr ""
@@ -808,13 +847,13 @@ msgstr ""
 msgid "Last date over"
 msgstr ""
 
-#: inc/calendar.php:118
+#: inc/calendar.php:119
 #: inc/opportunities.php:324
 #: inc/qual-filter.php:396
 msgid "Last date today"
 msgstr ""
 
-#: inc/calendar.php:128
+#: inc/calendar.php:129
 #: inc/opportunities.php:322
 #: inc/opportunities.php:328
 msgid "Last date:"
@@ -835,7 +874,7 @@ msgstr ""
 msgid "Last day today"
 msgstr ""
 
-#: page-opportunities.php:77
+#: page-opportunities.php:76
 msgid "Last-date information is taken from the reviewed article. Always open the article and verify the official notification before applying."
 msgstr ""
 
@@ -949,7 +988,7 @@ msgstr ""
 msgid "More %s"
 msgstr ""
 
-#: inc/quiz.php:504
+#: inc/quiz.php:505
 msgid "More practice questions"
 msgstr ""
 
@@ -998,11 +1037,15 @@ msgstr ""
 msgid "News"
 msgstr ""
 
+#: inc/quiz.php:499
+msgid "Next question"
+msgstr ""
+
 #: inc/premium.php:434
 msgid "Next tool"
 msgstr ""
 
-#: page-opportunities.php:75
+#: page-opportunities.php:74
 msgid "No active verified opportunities are available right now. Please check again after the next update."
 msgstr ""
 
@@ -1022,11 +1065,11 @@ msgstr ""
 msgid "No exact match."
 msgstr ""
 
-#: inc/calendar.php:104
+#: inc/calendar.php:105
 msgid "No last dates are confirmed yet. Dates appear here only after the official notification is published - we never estimate a deadline."
 msgstr ""
 
-#: page-opportunities.php:53
+#: page-opportunities.php:52
 msgid "No matching active opportunities found. Try another keyword or category."
 msgstr ""
 
@@ -1046,7 +1089,7 @@ msgstr ""
 msgid "No posts in this section yet — coming soon."
 msgstr ""
 
-#: inc/quiz.php:519
+#: inc/quiz.php:520
 msgid "No problem — practice is the point. Try again tomorrow."
 msgstr ""
 
@@ -1152,6 +1195,10 @@ msgstr ""
 msgid "Other days"
 msgstr ""
 
+#: footer.php:39
+msgid "Other links"
+msgstr ""
+
 #: page-internet-center.php:46
 msgid "Our service charge"
 msgstr ""
@@ -1181,7 +1228,7 @@ msgid "Pay"
 msgstr ""
 
 #: inc/cta.php:37
-msgid "PDF తో పాటు — study materials, previous papers, మరియు preparation group లో add చేయటం కూడా జరుగుతుంది."
+msgid "PDF తో పాటు స్టడీ మెటీరియల్స్, పాత పేపర్లు ఇస్తాం; ప్రిపరేషన్ గ్రూప్‌లో కూడా చేర్చుతాం."
 msgstr ""
 
 #: inc/postnews.php:90
@@ -1237,6 +1284,10 @@ msgstr ""
 msgid "Press / to search"
 msgstr ""
 
+#: inc/quiz.php:498
+msgid "Previous"
+msgstr ""
+
 #: page-internet-center.php:40
 msgid "Price list (2026)"
 msgstr ""
@@ -1266,6 +1317,7 @@ msgstr ""
 #: inc/personal.php:34
 #: inc/workspace.php:141
 #: inc/workspace.php:188
+#: page-opportunities.php:48
 msgid "Qualification"
 msgstr ""
 
@@ -1346,8 +1398,16 @@ msgstr ""
 msgid "Reply to %s"
 msgstr ""
 
+#: inc/author-box.php:141
+msgid "Report mistakes"
+msgstr ""
+
 #: inc/personal.php:57
 msgid "Reset my choices"
+msgstr ""
+
+#: inc/quiz.php:500
+msgid "Restart"
 msgstr ""
 
 #: inc/saved.php:307
@@ -1361,6 +1421,10 @@ msgstr ""
 
 #: inc/doubts.php:285
 msgid "Reviewed before publishing. No links, emails or phone numbers."
+msgstr ""
+
+#: inc/author-box.php:99
+msgid "Reviewed:"
 msgstr ""
 
 #: page-tools.php:40
@@ -1416,6 +1480,10 @@ msgstr ""
 msgid "Saved posts"
 msgstr ""
 
+#: inc/premium.php:315
+msgid "Scholarship"
+msgstr ""
+
 #: inc/premium.php:542
 msgid "Scroll left"
 msgstr ""
@@ -1430,6 +1498,9 @@ msgstr ""
 
 #: inc/postnews.php:411
 #: inc/premium.php:82
+#: inc/premium.php:317
+#: searchform.php:14
+#: searchform.php:18
 msgid "Search"
 msgstr ""
 
@@ -1441,12 +1512,12 @@ msgstr ""
 msgid "Search a tool — salary, age, fee, resume…"
 msgstr ""
 
-#: page-opportunities.php:51
-msgid "Search and filters run in your browser. Open the article and confirm the official notification before applying."
-msgstr ""
-
 #: inc/premium.php:387
 msgid "Search cheyandi leda tab tap cheyandi — okka sari lo okka tool, screen clean ga untundi."
+msgstr ""
+
+#: searchform.php:16
+msgid "Search job / exam / result…"
 msgstr ""
 
 #: inc/premium.php:78
@@ -1471,6 +1542,10 @@ msgstr ""
 
 #: functions.php:523
 msgid "Searching…"
+msgstr ""
+
+#: page-opportunities.php:64
+msgid "See all"
 msgstr ""
 
 #: functions.php:525
@@ -1509,6 +1584,10 @@ msgstr ""
 msgid "Send the job or scholarship name on WhatsApp, and ask for the price before paying."
 msgstr ""
 
+#: inc/author-box.php:57
+msgid "Senior Education Editor · 5+ Years of Experience"
+msgstr ""
+
 #: page-internet-center.php:33
 msgid "Separate offline service · Telangana & Andhra Pradesh · run by the same team that publishes this website"
 msgstr ""
@@ -1530,10 +1609,16 @@ msgid "Set your qualification and state once. The list is built on this device -
 msgstr ""
 
 #: inc/slider.php:215
+#: inc/template.php:197
 msgid "Share"
 msgstr ""
 
+#: inc/quiz.php:502
+msgid "Share my score"
+msgstr ""
+
 #: inc/slider.php:213
+#: inc/template.php:196
 msgid "Share on WhatsApp"
 msgstr ""
 
@@ -1603,7 +1688,7 @@ msgstr ""
 msgid "Storage is not available in this browser (private mode?) — saving is off."
 msgstr ""
 
-#: inc/quiz.php:515
+#: inc/quiz.php:516
 msgid "Strong — keep this streak alive tomorrow."
 msgstr ""
 
@@ -1669,8 +1754,9 @@ msgstr ""
 msgid "Syllabus tracker"
 msgstr ""
 
-#: inc/cta.php:52
-msgid "Tap చేస్తే మా WhatsApp open అవుతుంది — వెంటనే reply"
+#: inc/toc.php:76
+#: inc/toc.php:77
+msgid "Table of contents"
 msgstr ""
 
 #: inc/workspace.php:114
@@ -1699,7 +1785,7 @@ msgstr ""
 msgid "Text Size:"
 msgstr ""
 
-#: inc/polls.php:463
+#: inc/polls.php:461
 msgid "Thanks — your vote is counted."
 msgstr ""
 
@@ -1718,6 +1804,10 @@ msgstr ""
 
 #: author.php:63
 msgid "The StudentUp editorial team — honest articles for Telangana & Andhra Pradesh students, based on official sources."
+msgstr ""
+
+#: inc/template.php:232
+msgid "This article was checked against official sources and written in simple language. If you spot a mistake, %s — we correct it within 24 hours. Always confirm deadlines and numbers in the official notification."
 msgstr ""
 
 #: page-internet-center.php:36
@@ -1845,7 +1935,7 @@ msgstr ""
 msgid "View saved here"
 msgstr ""
 
-#: inc/polls.php:461
+#: inc/polls.php:459
 msgid "Vote"
 msgstr ""
 
@@ -1911,10 +2001,10 @@ msgid "WhatsApp updates"
 msgstr ""
 
 #: inc/cta.php:51
-msgid "WhatsApp లో documents పంపండి"
+msgid "WhatsApp లో డాక్యుమెంట్లు పంపండి"
 msgstr ""
 
-#: inc/quiz.php:490
+#: inc/quiz.php:489
 msgid "Why:"
 msgstr ""
 
@@ -1951,11 +2041,19 @@ msgid "YouTube"
 msgstr ""
 
 #: inc/cta.php:44
-msgid "అతి తక్కువ charge"
+msgid "అతి తక్కువ ఛార్జీ"
+msgstr ""
+
+#: inc/cta.php:36
+msgid "ఉద్యోగాలకు దరఖాస్తు చేయడానికి ఎక్కడికీ వెళ్లనక్కర్లేదు. మాకు కాల్ చేసి, అవసరమైన డాక్యుమెంట్లు పంపితే చాలు — తక్కువ ఖర్చుతో దరఖాస్తు పూర్తి చేసి, నింపిన అప్లికేషన్ PDF మీకు పంపుతాం."
 msgstr ""
 
 #: inc/cta.php:63
-msgid "గమనిక: ఇది మా service — official application fee వేరు. Documents మీ అనుమతితోనే వాడతాం."
+msgid "గమనిక: ఇది మా సేవ — అధికారిక దరఖాస్తు ఫీజు వేరు. డాక్యుమెంట్లు మీ అనుమతితోనే వాడతాం."
+msgstr ""
+
+#: inc/cta.php:52
+msgid "ట్యాప్ చేస్తే WhatsApp తెరుచుకుంటుంది — వెంటనే స్పందన"
 msgstr ""
 
 #: inc/livefix.php:271
@@ -1964,10 +2062,6 @@ msgstr ""
 
 #: inc/jobtable.php:118
 msgid "మరిన్ని — View all notifications"
-msgstr ""
-
-#: inc/cta.php:36
-msgid "మీరు jobs apply చేసుకోవటం కోసం ఎక్కడికీ వెళ్లవలసిన అవసరం లేదు. కేవలం మాకు call చేసి, సంబంధించిన documents పంపిస్తే చాలు — అతి తక్కువ ఖర్చులో apply చేసి, filled application PDF మీకు send చేయటం జరుగుతుంది."
 msgstr ""
 
 #: page-compare.php:23
