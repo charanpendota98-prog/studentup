@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.140\n"
+"Project-Id-Version: StudentUp 1.9.141\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,7 @@ msgstr ""
 msgid "%1$d updates from the last %2$d days, grouped by date: notifications, last dates, results, hall tickets — Telugu. Updated every day."
 msgstr ""
 
+#: functions.php:530
 #: inc/apply.php:210
 #: inc/engage.php:163
 msgid "%d days left"
@@ -35,6 +36,10 @@ msgstr ""
 
 #: inc/polls.php:430
 msgid "%s readers voted — tap an option to see live results."
+msgstr ""
+
+#: inc/livefix.php:279
+msgid "%s — తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థులకు తాజా ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు, ఫలితాలు, అడ్మిట్ కార్డులు, స్కాలర్‌షిప్‌లు, డైలీ క్విజ్ — ప్రతిరోజూ తెలుగులో."
 msgstr ""
 
 #: inc/engage.php:160
@@ -178,6 +183,10 @@ msgstr ""
 msgid "Any qualification"
 msgstr ""
 
+#: functions.php:533
+msgid "Anyone with this qualification can apply"
+msgstr ""
+
 #: page-internet-center.php:61
 msgid "Application + document pack"
 msgstr ""
@@ -228,8 +237,16 @@ msgstr ""
 msgid "Ask question"
 msgstr ""
 
+#: inc/audioreader.php:42
+msgid "Audio Article Reader"
+msgstr ""
+
 #: author.php:69
 msgid "Author website / profile"
+msgstr ""
+
+#: page-thank-you.php:33
+msgid "Back to home"
 msgstr ""
 
 #: inc/premium.php:440
@@ -341,6 +358,10 @@ msgstr ""
 msgid "Closes today"
 msgstr ""
 
+#: functions.php:529
+msgid "Closes tomorrow"
+msgstr ""
+
 #: inc/search-smart.php:175
 msgid "Closest matches"
 msgstr ""
@@ -353,6 +374,7 @@ msgstr ""
 msgid "Closing in 30 days"
 msgstr ""
 
+#: functions.php:531
 #: inc/qual-filter.php:538
 #: inc/qual-filter.php:593
 #: page-opportunities.php:49
@@ -465,6 +487,14 @@ msgstr ""
 #: inc/workspace.php:124
 #: page-opportunities.php:49
 msgid "Deadline"
+msgstr ""
+
+#: functions.php:532
+msgid "Deadline is close — check now"
+msgstr ""
+
+#: functions.php:527
+msgid "Deadline passed"
 msgstr ""
 
 #: inc/premium.php:372
@@ -652,6 +682,10 @@ msgstr ""
 msgid "Full details and official apply link"
 msgstr ""
 
+#: 404.php:22
+msgid "Go to home →"
+msgstr ""
+
 #: inc/slider.php:232
 msgid "Go to slide %d"
 msgstr ""
@@ -794,6 +828,7 @@ msgstr ""
 msgid "Last day"
 msgstr ""
 
+#: functions.php:528
 #: inc/engage.php:158
 #: inc/slider.php:75
 #: inc/today.php:188
@@ -832,6 +867,7 @@ msgstr ""
 msgid "Latest Notifications"
 msgstr ""
 
+#: functions.php:526
 #: inc/search-smart.php:188
 msgid "Latest on StudentUp"
 msgstr ""
@@ -870,6 +906,10 @@ msgstr ""
 
 #: inc/audioreader.php:46
 msgid "Listen to Article"
+msgstr ""
+
+#: inc/audioreader.php:44
+msgid "Listen to audio summary"
 msgstr ""
 
 #: inc/slider.php:178
@@ -998,6 +1038,14 @@ msgstr ""
 msgid "No more than 3 links in one comment."
 msgstr ""
 
+#: functions.php:524
+msgid "No posts found — press Enter to see the full search page"
+msgstr ""
+
+#: functions.php:522
+msgid "No posts in this section yet — coming soon."
+msgstr ""
+
 #: inc/quiz.php:519
 msgid "No problem — practice is the point. Try again tomorrow."
 msgstr ""
@@ -1116,6 +1164,10 @@ msgstr ""
 msgid "Page %d"
 msgstr ""
 
+#: 404.php:19
+msgid "Page not found"
+msgstr ""
+
 #: author.php:99
 msgid "Pages"
 msgstr ""
@@ -1147,6 +1199,10 @@ msgstr ""
 
 #: inc/doubts.php:113
 msgid "Please write your question in a few more words."
+msgstr ""
+
+#: 404.php:34
+msgid "Popular categories"
 msgstr ""
 
 #: comments.php:61
@@ -1413,6 +1469,14 @@ msgstr ""
 msgid "Search tools"
 msgstr ""
 
+#: functions.php:523
+msgid "Searching…"
+msgstr ""
+
+#: functions.php:525
+msgid "See all results"
+msgstr ""
+
 #: inc/student-tools.php:114
 msgid "Select at least two posts to compare."
 msgstr ""
@@ -1505,6 +1569,10 @@ msgstr ""
 msgid "Social media"
 msgstr ""
 
+#: functions.php:521
+msgid "Soon"
+msgstr ""
+
 #: inc/opportunities.php:334
 msgid "Source checked"
 msgstr ""
@@ -1525,6 +1593,10 @@ msgstr ""
 #: inc/workspace.php:143
 #: inc/workspace.php:201
 msgid "State"
+msgstr ""
+
+#: inc/audioreader.php:56
+msgid "Stop audio"
 msgstr ""
 
 #: inc/saved.php:299
@@ -1640,6 +1712,10 @@ msgstr ""
 msgid "Thanks! Your question is waiting for review."
 msgstr ""
 
+#: 404.php:20
+msgid "The link may have changed — search below or go to the home page."
+msgstr ""
+
 #: author.php:63
 msgid "The StudentUp editorial team — honest articles for Telangana & Andhra Pradesh students, based on official sources."
 msgstr ""
@@ -1692,6 +1768,10 @@ msgstr ""
 msgid "Try SSC, software, scholarship…"
 msgstr ""
 
+#: page-thank-you.php:34
+msgid "Try today’s quiz"
+msgstr ""
+
 #: inc/premium.php:409
 msgid "Try “salary”, “age” leda “resume”."
 msgstr ""
@@ -1731,6 +1811,10 @@ msgstr ""
 
 #: page-corrections.php:48
 msgid "Updated:"
+msgstr ""
+
+#: functions.php:520
+msgid "updates"
 msgstr ""
 
 #: page-today.php:21
@@ -1874,6 +1958,10 @@ msgstr ""
 msgid "గమనిక: ఇది మా service — official application fee వేరు. Documents మీ అనుమతితోనే వాడతాం."
 msgstr ""
 
+#: inc/livefix.php:271
+msgid "ప్రభుత్వ ఉద్యోగాలు, ఫలితాలు, అడ్మిట్ కార్డులు — తెలుగులో"
+msgstr ""
+
 #: inc/jobtable.php:118
 msgid "మరిన్ని — View all notifications"
 msgstr ""
@@ -1882,6 +1970,14 @@ msgstr ""
 msgid "మీరు jobs apply చేసుకోవటం కోసం ఎక్కడికీ వెళ్లవలసిన అవసరం లేదు. కేవలం మాకు call చేసి, సంబంధించిన documents పంపిస్తే చాలు — అతి తక్కువ ఖర్చులో apply చేసి, filled application PDF మీకు send చేయటం జరుగుతుంది."
 msgstr ""
 
+#: page-compare.php:23
+msgid "రెండు లేదా ఎక్కువ నోటిఫికేషన్లను ఒకేసారి పోల్చండి — జీతం, వయో పరిమితి, అర్హత, ఖాళీలు, చివరి తేదీ."
+msgstr ""
+
 #: inc/cta.php:30
 msgid "విద్యార్థుల ఇంటర్నెట్ సెంటర్"
+msgstr ""
+
+#: inc/compare-page.php:75
+msgid "“—” అంటే ఆ వివరం ఇంకా అధికారికంగా ధృవీకరించలేదు — నోటిఫికేషన్‌లో చూడండి. సంఖ్యలు మేము ప్రచురించిన డేటా నుంచే వస్తాయి."
 msgstr ""

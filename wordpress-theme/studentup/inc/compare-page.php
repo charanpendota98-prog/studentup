@@ -72,7 +72,7 @@ function studentup_compare_table( $limit = 12 ) {
 				</tbody>
 			</table>
 		</div>
-		<p class="su-finder-note">"—" ante aa detail inka official ga confirm kaledu — notification lo chudandi. Numbers manam publish chesina data nunche vastayi.</p>
+		<p class="su-finder-note"><?php esc_html_e( '“—” అంటే ఆ వివరం ఇంకా అధికారికంగా ధృవీకరించలేదు — నోటిఫికేషన్‌లో చూడండి. సంఖ్యలు మేము ప్రచురించిన డేటా నుంచే వస్తాయి.', 'studentup' ); ?></p>
 	</section>
 	<?php
 }

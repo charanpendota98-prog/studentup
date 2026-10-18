@@ -42,10 +42,10 @@
 
     function ageVerdict(row, age) {
       if (!age) return null;
-      if (!row.amin && !row.amax) return { ok: null, text: "Age limit not published — check the notification" };
+      if (!row.amin && !row.amax) return { ok: null, text: "వయో పరిమితి ప్రచురించలేదు — నోటిఫికేషన్ చూడండి" };
       var lo = row.amin || 0, hi = row.amax || 99;
-      if (age >= lo && age <= hi) return { ok: true, text: "Eligible by age (" + lo + "–" + hi + ")" };
-      return { ok: false, text: "Age limit " + lo + "–" + hi + " — not eligible" };
+      if (age >= lo && age <= hi) return { ok: true, text: "వయస్సు ప్రకారం అర్హులు (" + lo + "–" + hi + ")" };
+      return { ok: false, text: "వయో పరిమితి " + lo + "–" + hi + " — అర్హత లేదు" };
     }
 
     function render() {
@@ -77,7 +77,7 @@
           (r.img ? '<a class="su-fthumb" href="' + esc(r.link) + '"><img src="' + esc(r.img) + '" alt="" loading="lazy"></a>' : "") +
           '<div class="su-fbody"><h3><a href="' + esc(r.link) + '">' + esc(r.title) + "</a></h3>" +
           '<div class="su-fmeta">' +
-            '<span class="su-pill su-pill-amber">' + I.calendar + " " + esc(r.last || "Date in notification") + "</span>" +
+            '<span class="su-pill su-pill-amber">' + I.calendar + " " + esc(r.last || "తేదీ నోటిఫికేషన్‌లో") + "</span>" +
             (r.pay ? '<span class="su-pill su-pill-green">' + I.wallet + " " + esc(r.pay) + "</span>" : "") +
             (r.vac ? '<span class="su-pill">' + I.card + " " + esc(r.vac) + " posts</span>" : "") +
             (r.days != null && r.days >= 0 ? '<span class="su-pill' + (r.days <= 3 ? " su-pill-hot" : "") + '">' + I.clock + " " + r.days + "d left</span>" : "") +

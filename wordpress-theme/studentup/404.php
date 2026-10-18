@@ -16,10 +16,10 @@ get_header();
 	<div class="wrap">
 		<article class="article" style="text-align:center">
 			<h1 style="font-size:56px;margin:0;color:var(--orange)">404</h1>
-			<h2 style="color:var(--navy)">Page not found</h2>
-			<p style="color:var(--muted)">The link may have changed — search below or go to the home page.</p>
+			<h2 style="color:var(--navy)"><?php esc_html_e( 'Page not found', 'studentup' ); ?></h2>
+			<p style="color:var(--muted)"><?php esc_html_e( 'The link may have changed — search below or go to the home page.', 'studentup' ); ?></p>
 			<?php get_search_form(); ?>
-			<p><a class="bluebtn" href="<?php echo esc_url( home_url( '/' ) ); ?>">Go to home →</a></p>
+			<p><a class="bluebtn" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Go to home →', 'studentup' ); ?></a></p>
 			<?php
 			// v80 (P28): popular categories + latest posts — 404 nunchi recovery.
 			$su_pop = get_categories(
@@ -31,7 +31,7 @@ get_header();
 				)
 			);
 			if ( $su_pop ) {
-				echo '<nav class="su-subcats su-404cats" aria-label="Popular categories">';
+				echo '<nav class="su-subcats su-404cats" aria-label="' . esc_attr__( 'Popular categories', 'studentup' ) . '">';
 				foreach ( $su_pop as $su_c ) {
 					printf(
 						'<a href="%s">%s</a>',

@@ -398,7 +398,7 @@ function studentup_opportunities_seo_title() {
 }
 
 function studentup_opportunities_seo_desc() {
-	return 'Telangana & Andhra Pradesh students kosam currently open government job notifications — last date, qualification, official apply link okate list lo. Expired notices automatic ga hide avutayi.';
+	return 'తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థుల కోసం ప్రస్తుతం ఓపెన్‌లో ఉన్న ప్రభుత్వ ఉద్యోగ నోటిఫికేషన్లు — చివరి తేదీ, అర్హత, అధికారిక దరఖాస్తు లింక్ ఒకే జాబితాలో. గడువు ముగిసినవి ఆటోమేటిక్‌గా తొలగిపోతాయి.'; // v1.9.141 Telugu
 }
 
 add_filter( 'pre_get_document_title', function ( $title ) {

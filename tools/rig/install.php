@@ -40,7 +40,7 @@ foreach ( $posts as $p ) {
 	if ( $p[4] ) { update_post_meta( $id, 'studentup_source_url', 'https://www.' . strtolower( $p[4] ) . '.gov.in/' ); update_post_meta( $id, 'studentup_org_url', 'https://www.' . strtolower( $p[4] ) . '.gov.in/' ); }
 	if ( $p[2] === 'jobs' || $p[2] === 'software-jobs' || $p[2] === 'walk-in-jobs' || $p[2] === 'internships' ) { wp_set_object_terms( $id, 'TSPSC' === $p[4] ? 'tspsc' : strtolower( $p[4] ), 'post_tag', true ); }
 }
-foreach ( array( 'daily-quiz' => 'Daily Quiz', 'latest-jobs' => 'Latest Jobs', 'post-your-news' => 'Post Your News', 'about' => 'About', 'contact' => 'Contact', 'privacy-policy' => 'Privacy Policy' ) as $slug => $title ) {
+foreach ( array( 'daily-quiz' => 'Daily Quiz', 'latest-jobs' => 'Latest Jobs', 'post-your-news' => 'Post Your News', 'about' => 'About', 'contact' => 'Contact', 'privacy-policy' => 'Privacy Policy', 'corrections' => 'Corrections', 'exam-calendar' => 'Exam Calendar', 'internet-center' => 'Internet Center', 'compare' => 'Compare', 'saved' => 'Saved', 'quiz' => 'Quiz', 'thank-you' => 'Thank You', 'success-stories' => 'Success Stories' ) as $slug => $title ) {
 	if ( get_page_by_path( $slug ) ) { continue; }
 	wp_insert_post( array( 'post_title' => $title, 'post_name' => $slug, 'post_status' => 'publish', 'post_type' => 'page', 'post_content' => '<p>' . $title . ' పేజీ.</p>', 'post_author' => 1 ) );
 }

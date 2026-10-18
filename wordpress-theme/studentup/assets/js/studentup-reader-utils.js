@@ -345,7 +345,7 @@
     if (!box || !btn || !canvas) return;
 
     btn.addEventListener("click", function () {
-      btn.textContent = "Generating status image…";
+      btn.textContent = "స్టేటస్ ఇమేజ్ తయారవుతోంది…";
       btn.disabled = true;
 
       var ctx = canvas.getContext("2d");
@@ -459,10 +459,10 @@
         link.download = "studentup-job-status.png";
         link.href = canvas.toDataURL("image/png");
         link.click();
-        btn.textContent = "Status Image Downloaded";
+        btn.textContent = "స్టేటస్ ఇమేజ్ డౌన్‌లోడ్ అయింది";
         btn.disabled = false;
         setTimeout(function () {
-          btn.textContent = "Download Status Image";
+          btn.textContent = "స్టేటస్ ఇమేజ్ డౌన్‌లోడ్";
         }, 4000);
       }, 500);
     });
@@ -568,7 +568,7 @@
     function resetUI() {
       isPlaying = false;
       isPaused = false;
-      if (label) label.textContent = "Listen to Article";
+      if (label) label.textContent = "ఆర్టికల్ వినండి";
       if (icon) icon.innerHTML = ICO.speaker;
       if (waves) waves.style.display = "none";
       if (ctrls) ctrls.style.display = "none";
@@ -595,20 +595,20 @@
         window.speechSynthesis.speak(utterance);
         isPlaying = true;
         isPaused = false;
-        label.textContent = "Pause";
+        label.textContent = "పాజ్";
         icon.innerHTML = ICO.pause;
         waves.style.display = "inline-flex";
         ctrls.style.display = "flex";
       } else if (isPlaying && !isPaused) {
         window.speechSynthesis.pause();
         isPaused = true;
-        label.textContent = "Resume";
+        label.textContent = "కొనసాగించు";
         icon.innerHTML = ICO.play;
         waves.style.display = "none";
       } else if (isPlaying && isPaused) {
         window.speechSynthesis.resume();
         isPaused = false;
-        label.textContent = "Pause";
+        label.textContent = "పాజ్";
         icon.innerHTML = ICO.pause;
         waves.style.display = "inline-flex";
       }

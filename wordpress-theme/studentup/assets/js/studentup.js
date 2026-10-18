@@ -19,6 +19,8 @@
   };
   "use strict";
   var S = window.STUDENTUP || {};
+  var T = S.i18n || {};
+  function tDays(n) { return (T.daysleft || "%d days left").replace("%d", n); }
 
   /* ---------- dark mode ---------- */
   var themeBtn = document.getElementById("theme");
@@ -123,10 +125,10 @@
     var row = card.querySelector(".tagrow") || foot;
     var b = document.createElement("span");
     /* v281: tiered urgency (real last-date only) — red ≤2d · amber ≤7d · green ≤14d. */
-    if (left < 0) { b.className = "qbadge done"; b.textContent = "Deadline passed"; }
-    else if (left <= 2) { b.className = "qbadge hot"; b.textContent = (left === 0 ? "Last day today" : left === 1 ? "Closes tomorrow" : "2 days left"); }
-    else if (left <= 7) { b.className = "qbadge soon"; b.textContent = left + " days left"; }
-    else if (left <= 14) { b.className = "qbadge open"; b.textContent = left + " days left"; }
+    if (left < 0) { b.className = "qbadge done"; b.textContent = T.passed || "Deadline passed"; }
+    else if (left <= 2) { b.className = "qbadge hot"; b.textContent = (left === 0 ? (T.lastday || "Last day today") : left === 1 ? (T.tomorrow || "Closes tomorrow") : tDays(2)); }
+    else if (left <= 7) { b.className = "qbadge soon"; b.textContent = tDays(left); }
+    else if (left <= 14) { b.className = "qbadge open"; b.textContent = tDays(left); }
     else { return; }
     row.appendChild(b);
   }
@@ -192,18 +194,18 @@
       });
       if (!items.length) { g.hidden = true; g.innerHTML = ""; return; }
       var h = document.createElement("h3");
-      h.innerHTML = (key === "closing" ? I.clock + " Closing in 7 days" : (QUAL_LABELS[key] || key)) +
+      h.innerHTML = (key === "closing" ? I.clock + " " + (T.closing7 || "Closing in 7 days") : (QUAL_LABELS[key] || key)) +
         ' <span class="qgnum">' + items.length + "</span>";
       var sub = document.createElement("p");
       sub.className = "qgsub";
-      sub.textContent = key === "closing" ? "Deadline is close — check now" : "Anyone with this qualification can apply";
+      sub.textContent = key === "closing" ? (T.closesub || "Deadline is close — check now") : (T.qualsub || "Anyone with this qualification can apply");
       var ul = document.createElement("ul");
       items.slice(0, 6).forEach(function (card) {
         var a = card.querySelector("h3 a") || card.querySelector("a");
         if (!a) return;
         var left = daysLeft(card);
         var meta = (left !== null && left >= 0 && left <= 7)
-          ? (left === 0 ? "Last day today" : left + " days left") : "";
+          ? (left === 0 ? (T.lastday || "Last day today") : tDays(left)) : "";
         var li = document.createElement("li");
         var link = document.createElement("a");
         link.href = a.getAttribute("href") || a.href;
@@ -566,10 +568,10 @@
       }).filter(function (r) { return r.title && r.url !== "#"; });
     }
     function showLatest() {
-      if (latest) { if (latest.length) render(latest, "", "Latest on StudentUp"); return; }
+      if (latest) { if (latest.length) render(latest, "", T.latest || "Latest on StudentUp"); return; }
       fetch(rest + "posts?per_page=6&_fields=title,link,type")
         .then(function (r) { return r.ok ? r.json() : []; })
-        .then(function (rows) { latest = mapRows(rows); if (!(sin.value || "").trim() && latest.length && document.activeElement === sin) render(latest, "", "Latest on StudentUp"); })
+        .then(function (rows) { latest = mapRows(rows); if (!(sin.value || "").trim() && latest.length && document.activeElement === sin) render(latest, "", T.latest || "Latest on StudentUp"); })
         .catch(function () { latest = []; });
     }
     function run(q) {
