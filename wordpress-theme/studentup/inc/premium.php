@@ -497,22 +497,37 @@ function studentup_category_rail() {
 	 * Idi category kaadu, theme lo ne unna quiz block/page, anduke
 	 * studentup_used_term() gate avasaram ledu. Quiz OFF unte card raadu.
 	 */
-	if ( studentup_opt( 'daily_quiz', '1' ) ) {
-		$su_quiz_page = get_page_by_path( 'daily-quiz' );
-		if ( ! $su_quiz_page ) {
-			$su_quiz_page = get_page_by_path( 'quiz' );
-		}
-		$rows[] = array(
+	// v1.9.137 (owner): Quiz tile ALWAYS present (not gated on the home block option)
+	// and placed right after Results — most-tapped practice entry; Live Exams tile
+	// next to it (exam platform URL from Settings → StudentUp → live_exam_url; empty = no tile).
+	$su_quiz_page = get_page_by_path( 'daily-quiz' );
+	if ( ! $su_quiz_page ) {
+		$su_quiz_page = get_page_by_path( 'quiz' );
+	}
+	$su_practice = array(
+		array(
 			'slug' => 'daily-quiz',
 			'icon' => 'quiz',
 			'lab'  => 'Daily Quiz',
-			'hint' => '5 Q · roju',
+			'hint' => '',
 			'n'    => 5,
 			'url'  => ( $su_quiz_page && 'publish' === get_post_status( $su_quiz_page ) )
 				? get_permalink( $su_quiz_page )
 				: home_url( '/#daily-quiz' ),
-		);
+		),
+	);
+	$su_exam_url = function_exists( 'studentup_live_exam_url' ) ? studentup_live_exam_url() : '';
+	if ( $su_exam_url ) {
+		$su_practice[] = array( 'slug' => 'live-exam', 'icon' => 'exam', 'lab' => 'Live Exams', 'hint' => '', 'n' => 0, 'url' => $su_exam_url, 'ext' => 1 );
 	}
+	$su_at = count( $rows );
+	foreach ( $rows as $su_k => $su_r ) {
+		if ( 'results' === $su_r['slug'] ) {
+			$su_at = $su_k + 1;
+			break;
+		}
+	}
+	array_splice( $rows, $su_at, 0, $su_practice );
 
 	if ( ! $rows ) {
 		return;   // golden rule: data ledu ante render cheyyaku.
@@ -531,9 +546,9 @@ function studentup_category_rail() {
 				<?php $su_i = 0; ?>
 				<?php foreach ( $rows as $r ) : ?>
 					<?php $su_i++; ?>
-					<a role="listitem" class="su-cat c<?php echo (int) $su_i; ?>" href="<?php echo esc_url( $r['url'] ); ?>">
+					<a role="listitem" class="su-cat c<?php echo (int) $su_i; ?><?php echo ! empty( $r['ext'] ) ? ' su-cat-live' : ''; ?>" href="<?php echo esc_url( $r['url'] ); ?>"<?php echo ! empty( $r['ext'] ) ? ' rel="noopener"' : ''; ?>>
 						<span class="su-cat-ic" aria-hidden="true"><?php echo studentup_cat_icon( $r['icon'], 30 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
-						<b><?php echo esc_html( $r['lab'] ); ?></b>
+						<b><?php echo esc_html( translate( $r['lab'], 'studentup' ) ); ?></b>
 						<?php // v282: owner — icon + name matrame; hint text + count tiles meeda vaddu. ?>
 					</a>
 				<?php endforeach; ?>

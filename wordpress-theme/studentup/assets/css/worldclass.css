@@ -2681,3 +2681,7 @@ body.dark .su-today-day h2 span{background:#152137}
 .su-recent li a{display:inline-block;max-width:100%;border:1px solid var(--su-line,#e5e7eb);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--su-ink,#0f172a);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:640px){.su-recent li a{max-width:100%;white-space:normal}}
 @media (min-width:981px){.su-recent li a:hover,.su-today-filters button:hover{border-color:var(--su-g2,#7c3aed)}}
+
+/* v1.9.137 — Live Exams tile: small LIVE dot so the external exam app is recognisable */
+.su-cat-live{position:relative}
+.su-cat-live::after{content:"LIVE";position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.04em;color:#fff;background:#dc2626;border-radius:999px;padding:1px 5px;line-height:1.3}
