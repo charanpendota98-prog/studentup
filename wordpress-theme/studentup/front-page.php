@@ -132,7 +132,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 			<?php if ( $su_is_p2 ) : ?>
 				<a class="su-viewall" href="<?php echo esc_url( home_url( '/' ) ); ?>">← Newest updates</a>
 			<?php else : ?>
-				<a class="su-viewall" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php esc_html_e( 'All active sections', 'studentup' ); ?> →</a>
+				<a class="su-viewall" href="<?php echo esc_url( function_exists( 'studentup_today_url' ) ? studentup_today_url() : studentup_opportunity_board_url() ); ?>"><?php esc_html_e( 'Date-wise updates', 'studentup' ); ?> →</a>
 			<?php endif; ?>
 		</div>
 

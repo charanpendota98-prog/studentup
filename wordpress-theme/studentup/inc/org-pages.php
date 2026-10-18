@@ -288,6 +288,39 @@ function studentup_org_page_schema() {
 }
 add_action( 'wp_head', 'studentup_org_page_schema', 8 );
 
+/**
+ * v1.9.136: ids of other posts about the same organisation as $post_id
+ * (title alias match — the same rule the /org/ pages use). Newest first.
+ *
+ * @param int   $post_id Current post.
+ * @param int   $limit   Max ids.
+ * @param int[] $exclude Extra ids to skip.
+ * @return int[]
+ */
+function studentup_org_related_ids( $post_id, $limit = 2, $exclude = array() ) {
+	$slug = studentup_org_from_title( get_the_title( $post_id ) );
+	if ( '' === $slug ) {
+		return array();
+	}
+	$args = array(
+		'fields'                => 'ids',
+		'post_type'             => 'post',
+		'post_status'           => 'publish',
+		'posts_per_page'        => (int) $limit,
+		'post__not_in'          => array_merge( array( (int) $post_id ), array_map( 'intval', (array) $exclude ) ),
+		'ignore_sticky_posts'   => true,
+		'no_found_rows'         => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'studentup_org_aliases' => studentup_org_map()[ $slug ][3],
+	);
+	if ( function_exists( 'studentup_breaking_term_ids' ) ) {
+		$args['category__not_in'] = array_map( 'intval', (array) studentup_breaking_term_ids() );
+	}
+	$q = new WP_Query( $args );
+	return array_map( 'intval', (array) $q->posts );
+}
+
 /* --------------------------------------------------------- internal links */
 
 /**
