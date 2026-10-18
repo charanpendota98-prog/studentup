@@ -86,7 +86,7 @@
       if (!chipEls.length) {
         jumpBox.innerHTML = qs
           .map(function (fs, i) {
-            return '<button type="button" class="su-q-chip" data-j="' + i + '" aria-label="Question ' + (i + 1) + '">' + (i + 1) + "</button>";
+            return '<button type="button" class="su-q-chip" data-j="' + i + '" aria-label="ప్రశ్న ' + (i + 1) + '">' + (i + 1) + "</button>";
           })
           .join("");
         chipEls = $$(".su-q-chip", jumpBox);
@@ -172,11 +172,11 @@
       var st = streak();
       if (streakEl) {
         streakEl.hidden = false;
-        streakEl.textContent = "🔥 " + st.n + "-day streak · best " + st.best;
+        streakEl.textContent = "🔥 " + st.n + " రోజుల స్ట్రీక్ · బెస్ట్ " + st.best;
       }
       if (share) {
         var txt =
-          "I scored " + score + "/" + total + " in today's StudentUp Daily Quiz. Practice free: " +
+          "ఈరోజు StudentUp డైలీ క్విజ్‌లో నా స్కోర్ " + score + "/" + total + ". మీరూ ఉచితంగా ఆడండి: " +
           location.origin + "/";
         share.href = "https://wa.me/?text=" + encodeURIComponent(txt);
         /* v282: status card module (studentup-status.js) — name + score card + quiz link; old link = fallback only */
@@ -304,7 +304,7 @@
       var voteBtn = $("[data-su-poll-vote]", form);
       if (voteBtn) voteBtn.remove();
       var hint = foot ? $("span", foot) : null;
-      if (hint) hint.textContent = "Thanks — your vote is counted.";
+      if (hint) hint.textContent = "ధన్యవాదాలు — మీ ఓటు లెక్కలోకి వచ్చింది.";
       if (foot && total > 0) {
         var t = foot.querySelector("[data-su-total]");
         if (!t) {
