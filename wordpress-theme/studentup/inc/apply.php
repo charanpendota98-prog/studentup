@@ -96,11 +96,11 @@ function studentup_apply_cta( $post_id = 0 ) {
 		foreach ( $labels as $slug => $info ) {
 			$term = studentup_used_term( $slug );
 			if ( $term && in_array( (int) $term->term_id, $ids, true ) ) {
-				return array( 'label' => $info[0], 'kind' => $info[1] );
+				return array( 'label' => function_exists( 'studentup_ui_te_label' ) ? studentup_ui_te_label( $info[0] ) : $info[0], 'kind' => $info[1] );
 			}
 		}
 	}
-	return array( 'label' => 'Apply online', 'kind' => 'job' );
+	return array( 'label' => function_exists( 'studentup_ui_te_label' ) ? studentup_ui_te_label( 'Apply online' ) : 'Apply online', 'kind' => 'job' );
 }
 
 /**

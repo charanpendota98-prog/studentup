@@ -28,15 +28,11 @@ $total = count( $rows );
 			<div>
 				<p class="su-op-kicker">STUDENTUP · <?php esc_html_e( 'LIVE LIST', 'studentup' ); ?></p>
 				<h1 id="su-op-title"><?php esc_html_e( 'Latest Jobs & Student Opportunities', 'studentup' ); ?></h1>
-				<p><?php esc_html_e( 'TS, AP, Central, software, private, walk-in, job mela, scholarship, results and hall-ticket updates in one clean list.', 'studentup' ); ?></p>
 			</div>
 			<div class="su-op-count"><strong><?php echo esc_html( number_format_i18n( $total ) ); ?></strong><span><?php esc_html_e( 'active updates', 'studentup' ); ?></span></div>
 		</section>
 		<?php do_action( 'studentup_qual_links_row' ); // v1.9.122: /jobs/<qualification>/ landing pages ?>
 		<?php do_action( 'studentup_org_links_row' ); // v1.9.123: /org/<organisation>/ ?>
-		<div class="su-op-notice" role="note">
-			<?php echo studentup_ui_icon( 'check', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo wp_kses( __( 'This list updates from published StudentUp posts. Verified last dates are shown, expired notices are hidden automatically, and an unavailable date is shown as <strong>Not announced</strong> — never guessed.', 'studentup' ), array( 'strong' => array() ) ); ?>
-		</div>
 		<section class="su-op-filters" aria-labelledby="su-op-filter-title">
 			<div class="su-op-filter-heading">
 				<h2 id="su-op-filter-title"><?php esc_html_e( 'Find the right opportunity', 'studentup' ); ?></h2>

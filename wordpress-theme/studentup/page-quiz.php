@@ -25,7 +25,7 @@ get_header();
 		the_post();
 		?>
 		<nav class="crumbs" aria-label="<?php echo esc_attr__( 'Breadcrumb', 'studentup' ); ?>">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a> › <?php the_title(); ?>
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'studentup' ); ?></a> › <?php the_title(); ?>
 		</nav>
 		<h1 class="su-quizpage-title"><?php the_title(); ?></h1>
 		<?php /* v308: page intro sentence teesesam (hint-text rule). */ ?>

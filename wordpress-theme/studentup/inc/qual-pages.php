@@ -250,7 +250,7 @@ function studentup_qual_pages_links( $current = '' ) {
 		}
 		$out .= '<a href="' . esc_url( studentup_qual_page_url( $slug ) ) . '"'
 			. ( $slug === $current ? ' class="on" aria-current="page"' : '' ) . '>'
-			. esc_html( $label ) . ' Jobs</a>';
+			. esc_html( sprintf( __( '%s Jobs', 'studentup' ), $label ) ) . '</a>';
 	}
 	if ( '' === $out ) {
 		return '';
