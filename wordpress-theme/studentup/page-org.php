@@ -20,7 +20,7 @@ get_header();
 		<div class="sectionhead">
 			<div>
 				<h1><?php echo esc_html( studentup_org_page_h1( $su_oslug ) ); ?></h1>
-				<p><?php echo esc_html( $su_orow[1] ); ?> · <a href="<?php echo esc_url( $su_orow[2] ); ?>" target="_blank" rel="noopener nofollow">Official Website</a></p>
+				<p><?php echo esc_html( $su_orow[1] ); ?> · <a href="<?php echo esc_url( $su_orow[2] ); ?>" target="_blank" rel="noopener nofollow"><?php echo esc_html__( 'Official Website', 'studentup' ); ?></a></p>
 			</div>
 			<a class="su-viewall" href="<?php echo esc_url( function_exists( 'studentup_opportunity_board_url' ) ? studentup_opportunity_board_url() : home_url( '/' ) ); ?>">All jobs →</a>
 		</div>

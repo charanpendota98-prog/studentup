@@ -146,8 +146,8 @@ function studentup_for_you() {
 	?>
 	<section class="su-foryou" data-su-foryou hidden aria-label="<?php echo esc_attr__( 'Picked for you', 'studentup' ); ?>">
 		<div class="su-hot-head">
-			<h2><?php echo studentup_ui_icon( 'bolt', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Picked for you</h2>
-			<button type="button" class="su-foryou-clear" data-su-foryou-clear>Clear history</button>
+			<h2><?php echo studentup_ui_icon( 'bolt', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Picked for you', 'studentup' ); ?></h2>
+			<button type="button" class="su-foryou-clear" data-su-foryou-clear><?php echo esc_html__( 'Clear history', 'studentup' ); ?></button>
 		</div>
 		<div class="su-foryou-grid" data-su-foryou-grid></div>
 		<p class="su-finder-note">Mee browser lo chusina sections batti — ee list mee device lo ne untundi, server ki pampinchamu.</p>

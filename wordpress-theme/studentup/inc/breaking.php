@@ -177,8 +177,8 @@ function studentup_breaking_section() {
 	}
 	$items = studentup_breaking_items( 6 );
 	echo '<section class="breaking" id="breaking" aria-labelledby="breaking-title">';
-	echo '<div class="brkhead"><span class="brkicon" aria-hidden="true">' . studentup_ui_icon( 'bolt', 15 ) . '</span><span class="brkdot" aria-hidden="true"></span><h2 id="breaking-title">Breaking News</h2>';
-	echo '<span class="brklive">Verified source feed · fresh items only</span></div>';
+	echo '<div class="brkhead"><span class="brkicon" aria-hidden="true">' . studentup_ui_icon( 'bolt', 15 ) . '</span><span class="brkdot" aria-hidden="true"></span><h2 id="breaking-title">' . esc_html__( 'Breaking News', 'studentup' ) . '</h2>';
+	echo '<span class="brklive">' . esc_html__( 'Verified source feed · fresh items only', 'studentup' ) . '</span></div>';
 	if ( ! $items ) {
 		echo '<p class="brkempty">No new verified breaking updates right now. Official announcements appear here only after the source and date are checked.</p>';
 	} else {

@@ -93,7 +93,7 @@ function studentup_hero_premium() {
 				<?php foreach ( studentup_hero_actions() as $a ) : ?>
 					<?php $su_cls = 'su-hact' . ( $a['tone'] ? ( 'breaking' === $a['tone'] ? ' su-hact--breaking' : ' su-t-' . $a['tone'] ) : '' ); ?>
 					<a class="<?php echo esc_attr( $su_cls ); ?>" href="<?php echo esc_url( $a['url'] ); ?>">
-						<span aria-hidden="true"><?php echo studentup_ui_icon( esc_html( $a['icn'] ), 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><?php echo esc_html( $a['label'] ); ?>
+						<span aria-hidden="true"><?php echo studentup_ui_icon( esc_html( $a['icn'] ), 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><?php echo esc_html( __( $a['label'], 'studentup' ) ); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText ?>
 					</a>
 				<?php endforeach; ?>
 			</div>
@@ -248,7 +248,7 @@ function studentup_scholarship_strip() {
 	?>
 	<section class="su-schol" aria-label="<?php echo esc_attr__( 'Scholarships', 'studentup' ); ?>">
 		<div class="su-schol-head">
-			<h2><?php echo studentup_ui_icon( 'school', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Scholarships open now</h2>
+			<h2><?php echo studentup_ui_icon( 'school', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Scholarships open now', 'studentup' ); ?></h2>
 			<a href="<?php echo esc_url( get_category_link( $term ) ); ?>">See all scholarships →</a>
 		</div>
 		<?php if ( $q->have_posts() ) : ?>
@@ -283,11 +283,11 @@ function studentup_alerts_card() {
 	<section class="su-alerts" id="alerts" aria-label="<?php echo esc_attr__( 'Instant job alerts', 'studentup' ); ?>">
 		<div class="su-alerts-in">
 			<div class="su-alerts-copy">
-				<h2><?php echo studentup_ui_icon( 'bell', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Get every update as a notification</h2>
-				<p>Kotha job, result, hall ticket post chesina vent<span>a</span>ne — mee phone lo alert. Free, ekkada signup avasaram ledu.</p>
+				<h2><?php echo studentup_ui_icon( 'bell', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Get every update as a notification', 'studentup' ); ?></h2>
+				<p><?php esc_html_e( 'కొత్త జాబ్, రిజల్ట్, హాల్ టికెట్ పోస్ట్ చేసిన వెంటనే మీ ఫోన్‌కు అలర్ట్. ఉచితం, సైన్అప్ అవసరం లేదు.', 'studentup' ); ?></p>
 			</div>
 			<div class="su-alerts-btns">
-				<button type="button" class="su-alert-on" data-su-push><?php echo studentup_ui_icon( 'bell', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Turn on alerts</button>
+				<button type="button" class="su-alert-on" data-su-push><?php echo studentup_ui_icon( 'bell', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Turn on alerts', 'studentup' ); ?></button>
 				<a class="su-alert-wa" href="<?php echo esc_url( $soc['whatsapp'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'whatsapp', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> WhatsApp</a>
 				<a class="su-alert-tg" href="<?php echo esc_url( $soc['telegram'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'telegram', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Telegram</a>
 			</div>

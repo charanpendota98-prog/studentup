@@ -40,7 +40,7 @@ function studentup_author_meta() {
 		<span><?php echo studentup_ui_icon( 'person', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <strong itemprop="name"><?php echo esc_html( $name ); ?></strong></span>
 		<?php if ( $rev ) : ?>
 			<?php if ( $who ) : ?>
-				<span>Reviewed by <strong itemprop="reviewedBy"><?php echo esc_html( $who ); ?></strong> · <time itemprop="dateModified" datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>"><?php echo esc_html( get_the_modified_date() ); ?></time></span>
+				<span><?php echo esc_html__( 'Reviewed by', 'studentup' ); ?> <strong itemprop="reviewedBy"><?php echo esc_html( $who ); ?></strong> · <time itemprop="dateModified" datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>"><?php echo esc_html( get_the_modified_date() ); ?></time></span>
 			<?php else : ?>
 				<span><?php esc_html_e( 'Sources verified:', 'studentup' ); ?> <time itemprop="dateModified" datetime="<?php echo esc_attr( get_the_modified_date( 'c' ) ); ?>"><?php echo esc_html( $rev ); ?></time></span>
 			<?php endif; ?>

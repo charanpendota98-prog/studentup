@@ -45,7 +45,7 @@ function studentup_personal_picks() {
 				<label for="su-you-state"><?php esc_html_e( 'State', 'studentup' ); ?></label>
 				<select id="su-you-state">
 					<option value="ts" selected>Telangana</option>
-					<option value="ap">Andhra Pradesh</option>
+					<option value="ap"><?php echo esc_html__( 'Andhra Pradesh', 'studentup' ); ?></option>
 					<option value="central">Central / All India</option>
 				</select>
 			</div>

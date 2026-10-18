@@ -233,8 +233,8 @@ function studentup_push_prompt() {
 			bar = document.createElement('div');
 			bar.className = 'su-push-bar';
 			bar.innerHTML = '<span class="su-push-txt">' + CFG.icon + ' Kotha jobs &amp; results alerts kavala?</span>'
-				+ '<button type="button" class="su-push-yes">Yes, alert cheyandi</button>'
-				+ '<button type="button" class="su-push-no">No thanks</button>';   /* v305 FIX: PHP concat JS lo undedi → SyntaxError → bar eppudu kanipinchaledu */
+				+ '<button type="button" class="su-push-yes"><?php echo esc_html__( 'Yes, alert cheyandi', 'studentup' ); ?></button>'
+				+ '<button type="button" class="su-push-no"><?php echo esc_html__( 'No thanks', 'studentup' ); ?></button>';   /* v305 FIX: PHP concat JS lo undedi → SyntaxError → bar eppudu kanipinchaledu */
 			document.body.appendChild(bar);
 			bar.querySelector('.su-push-yes').addEventListener('click', subscribe);
 			bar.querySelector('.su-push-no').addEventListener('click', function () {

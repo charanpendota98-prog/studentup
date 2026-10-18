@@ -29,7 +29,6 @@ function studentup_cta_internet_center() {
 				<h2 id="su-ic-title"><?php esc_html_e( 'Students Internet Center', 'studentup' ); ?> <span class="su-ic-badge"><?php esc_html_e( 'TS &amp; AP', 'studentup' ); ?></span></h2>
 				<p class="su-ic-sub su-ic-te"><?php esc_html_e( 'విద్యార్థుల ఇంటర్నెట్ సెంటర్', 'studentup' ); ?></p>
 			</div>
-			<span class="su-ic-live"><span class="su-ic-dot" aria-hidden="true"></span><?php esc_html_e( 'Open today', 'studentup' ); ?></span>
 		</div>
 
 		<div class="su-ic-body su-ic-te">

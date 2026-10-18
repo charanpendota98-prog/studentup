@@ -331,7 +331,7 @@ function studentup_opportunity_render_card( $row ) {
 				<p class="su-op-updated"><?php esc_html_e( 'Updated', 'studentup' ); ?> <?php echo esc_html( wp_date( 'd M Y', $updated ) ); ?></p>
 			<?php endif; ?>
 			<?php if ( ! empty( $row['source_url'] ) ) : ?>
-				<p class="su-op-source"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Source checked', 'studentup' ); ?><?php echo ! empty( $row['source_checked'] ) ? ' ' . esc_html( wp_date( 'd M Y', strtotime( $row['source_checked'] . ' 12:00:00' ) ) ) : ''; ?> · <a href="<?php echo esc_url( $row['source_url'] ); ?>" target="_blank" rel="noopener noreferrer">Official source</a></p>
+				<p class="su-op-source"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Source checked', 'studentup' ); ?><?php echo ! empty( $row['source_checked'] ) ? ' ' . esc_html( wp_date( 'd M Y', strtotime( $row['source_checked'] . ' 12:00:00' ) ) ) : ''; ?> · <a href="<?php echo esc_url( $row['source_url'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html__( 'Official source', 'studentup' ); ?></a></p>
 			<?php endif; ?>
 		</div>
 		<div class="su-op-actions">

@@ -306,7 +306,7 @@ function studentup_app_bar() {
 	<div class="su-appbar" id="su-appbar" hidden>
 		<div class="su-appbar-in">
 			<span class="su-appbar-mark" aria-hidden="true">SU</span>
-			<div class="su-appbar-tx"><strong>StudentUp App</strong><small><?php esc_html_e( 'One-tap install · new job alerts direct ga', 'studentup' ); ?></small></div>
+			<div class="su-appbar-tx"><strong><?php echo esc_html__( 'StudentUp App', 'studentup' ); ?></strong><small><?php esc_html_e( 'One-tap install · new job alerts direct ga', 'studentup' ); ?></small></div>
 			<button type="button" class="su-appbar-go su-install-cta"><?php echo esc_html__( 'Install', 'studentup' ); ?></button>
 			<button type="button" class="su-appbar-x" aria-label="<?php echo esc_attr__( 'Close install banner', 'studentup' ); ?>">✕</button>
 		</div>

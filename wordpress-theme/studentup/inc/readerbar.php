@@ -60,14 +60,14 @@ function studentup_community_pulse_card() {
 	?>
 	<section class="su-community-card" aria-label="<?php echo esc_attr__( 'Join Student Community', 'studentup' ); ?>">
 		<div class="su-comm-head">
-			<h3 class="su-comm-title">Instant Job Alerts & Exam Updates</h3>
+			<h3 class="su-comm-title"><?php echo esc_html__( 'Instant Job Alerts & Exam Updates', 'studentup' ); ?></h3>
 		</div>
 		<div class="su-comm-buttons">
 			<a href="<?php echo esc_url( $wa_link ); ?>" target="_blank" rel="noopener" class="su-comm-btn su-comm-wa">
-				<?php echo studentup_social_icon( 'whatsapp', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Join WhatsApp Channel
+				<?php echo studentup_social_icon( 'whatsapp', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html__( 'Join WhatsApp Channel', 'studentup' ); ?>
 			</a>
 			<a href="<?php echo esc_url( $tg_link ); ?>" target="_blank" rel="noopener" class="su-comm-btn su-comm-tg">
-				<?php echo studentup_social_icon( 'telegram', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> Join Telegram Group
+				<?php echo studentup_social_icon( 'telegram', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> <?php echo esc_html__( 'Join Telegram Group', 'studentup' ); ?>
 			</a>
 		</div>
 	</section>

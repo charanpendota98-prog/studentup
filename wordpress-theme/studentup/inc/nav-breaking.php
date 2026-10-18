@@ -98,7 +98,7 @@ function studentup_breaking_nav_li() {
 	foreach ( $items as $it ) {
 		$h .= '<li class="menu-item" role="none"><a role="menuitem" href="' . esc_url( $it['url'] ) . '">'
 			. '<span class="su-mega-ic">' . studentup_ui_icon( 'bolt', 16 ) . '</span>'
-			. '<span class="su-mega-t">' . esc_html( $it['title'] )
+			. '<span class="su-mega-t">' . esc_html( translate( $it['title'], 'studentup' ) )
 			. '<small>' . esc_html( $it['meta'] ) . '</small></span></a></li>';
 	}
 	$h .= '<li class="menu-item su-brkdd-foot" role="none"><a class="su-brkdd-cta" href="' . esc_url( $url ) . '">'
@@ -127,7 +127,7 @@ function studentup_breaking_mobile_block() {
 	foreach ( $items as $it ) {
 		$h .= '<a class="su-mbrk" href="' . esc_url( $it['url'] ) . '">'
 			. studentup_ui_icon( 'bolt', 16 )
-			. '<span class="su-mbrk-t">' . esc_html( $it['title'] )
+			. '<span class="su-mbrk-t">' . esc_html( translate( $it['title'], 'studentup' ) )
 			. '<small>' . esc_html( $it['meta'] ) . '</small></span></a>';
 	}
 	$h .= '<a class="su-mbrk-all" href="' . esc_url( $url ) . '">'

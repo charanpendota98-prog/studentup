@@ -59,7 +59,7 @@ function studentup_mega_home_url( $anchor = '' ) {
  */
 function studentup_mega_item( $label, $url, $desc, $icon = 'arrow' ) {
 	// v1.9.133: descriptions pass through gettext so inc/lang-ui.php can show Telugu chrome.
-	return array( 'label' => $label, 'url' => $url, 'desc' => ( '' !== $desc ? translate( $desc, 'studentup' ) : '' ), 'icon' => $icon );
+	return array( 'label' => translate( $label, 'studentup' ), 'url' => $url, 'desc' => ( '' !== $desc ? translate( $desc, 'studentup' ) : '' ), 'icon' => $icon );
 }
 
 /**
@@ -370,12 +370,12 @@ function studentup_mega_render( $groups, $home ) {
 			esc_url( (string) $g['url'] ),
 			esc_attr( $key ),
 			studentup_ui_icon( $ic, 16 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-			esc_html( (string) $g['label'] )
+			esc_html( translate( (string) $g['label'], 'studentup' ) )
 		);
 		printf(
 			'<ul class="sub-menu" id="su-mega-%s" data-su-mega aria-label="%s">',
 			esc_attr( $key ),
-			esc_attr( (string) $g['label'] )
+			esc_attr( translate( (string) $g['label'], 'studentup' ) )
 		);
 		foreach ( $g['cols'] as $col ) {
 			echo '<li class="su-mega-col menu-item" role="none">';
@@ -389,7 +389,7 @@ function studentup_mega_render( $groups, $home ) {
 					. '<span class="su-mega-t">%s<small>%s</small></span></a></li>',
 					esc_url( (string) $it['url'] ),
 					studentup_ui_icon( (string) $it['icon'], 18 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-					esc_html( (string) $it['label'] ),
+					esc_html( translate( (string) $it['label'], 'studentup' ) ),
 					esc_html( (string) $it['desc'] )
 				);
 			}
@@ -428,7 +428,7 @@ function studentup_mega_mobile_accordion( $g, $is_new = false ) {
 		'<details class="mgroup"%s><summary>%s<span>%s</span>%s</summary><div class="mgroup-body">',
 		$is_new ? ' open' : '',
 		studentup_ui_icon( (string) ( $g['icon'] ?? 'arrow' ), 16 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-		esc_html( (string) $g['label'] ),
+		esc_html( translate( (string) $g['label'], 'studentup' ) ),
 		studentup_ui_icon( 'chevron', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 	);
 	foreach ( $g['items'] as $it ) {
