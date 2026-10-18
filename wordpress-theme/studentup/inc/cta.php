@@ -39,7 +39,7 @@ function studentup_cta_internet_center() {
 
 		<ul class="su-ic-perks su-ic-te">
 			<li><?php echo studentup_ui_icon( 'doc', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Application PDF', 'studentup' ); ?></li>
-			<li><?php echo studentup_ui_icon( 'book', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Materials &amp; previous papers', 'studentup' ); ?></li>
+			<li><?php echo studentup_ui_icon( 'book', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Materials & previous papers', 'studentup' ); ?></li>
 			<li><?php echo studentup_ui_icon( 'person', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Preparation group', 'studentup' ); ?></li>
 			<li><?php echo studentup_ui_icon( 'wallet', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'అతి తక్కువ charge', 'studentup' ); ?></li>
 		</ul>

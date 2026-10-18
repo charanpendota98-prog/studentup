@@ -421,7 +421,7 @@ function studentup_daily_poll( $args = array() ) {
 	?>
 	<section class="su-poll" id="su-poll-<?php echo esc_attr( $id ); ?>" data-su-poll="<?php echo esc_attr( $id ); ?>" aria-label="<?php esc_attr_e( 'Reader poll', 'studentup' ); ?>">
 		<p class="su-poll-kick"><?php echo esc_html( (string) $args['kicker'] ); ?></p>
-		<h3><?php echo esc_html( (string) $poll['q'] ); ?></h3>
+		<h3><?php echo esc_html( translate( (string) $poll['q'], 'studentup' ) ); ?></h3>
 		<p class="su-poll-sub">
 			<?php
 			if ( $total > 0 ) {
@@ -451,7 +451,7 @@ function studentup_daily_poll( $args = array() ) {
 						<span class="su-poll-bar" data-su-bar style="width:<?php echo esc_attr( (string) ( $voted ? $pct : 0 ) ); ?>%"></span>
 						<input type="radio" name="su_poll_opt" value="<?php echo esc_attr( (string) $i ); ?>"<?php echo esc_attr( $voted ? ' disabled' : '' ); ?>>
 						<span class="su-poll-radio" aria-hidden="true"></span>
-						<span class="su-poll-lbl"><?php echo esc_html( (string) $txt ); ?></span>
+						<span class="su-poll-lbl"><?php echo esc_html( translate( (string) $txt, 'studentup' ) ); ?></span>
 						<span class="su-poll-pct" data-su-pct><?php echo esc_html( $voted ? $pct . '%' : '' ); ?></span>
 					</label>
 				<?php endforeach; ?>

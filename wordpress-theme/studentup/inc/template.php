@@ -217,7 +217,8 @@ function studentup_reading_time( $post_id = 0 ) {
 	$words   = str_word_count( wp_strip_all_tags( (string) get_post_field( 'post_content', $post_id ) ) );
 	$words   = max( $words, mb_strlen( wp_strip_all_tags( (string) get_post_field( 'post_content', $post_id ) ) ) / 6 );
 	$minutes = max( 2, (int) ceil( $words / 220 ) );
-	return $minutes . ' min read';
+	/* translators: %d: minutes */
+	return sprintf( __( '%d min read', 'studentup' ), $minutes );
 }
 
 /**
@@ -412,15 +413,15 @@ function studentup_menu_fallback() {
 			printf(
 				'<a href="%s" aria-haspopup="true" aria-expanded="false">%s</a>',
 				esc_url( $it['url'] ),
-				esc_html( $it['label'] )
+				esc_html( translate( $it['label'], 'studentup' ) )
 			);
 			echo '<ul class="sub-menu">';
 			foreach ( $it['children'] as $ch ) {
 				printf(
 					'<li class="menu-item"><a href="%s">%s%s</a></li>',
 					esc_url( $ch['url'] ),
-					esc_html( $ch['label'] ),
-					( ! empty( $ch['desc'] ) ? '<small>' . esc_html( $ch['desc'] ) . '</small>' : '' )
+					esc_html( translate( $ch['label'], 'studentup' ) ),
+					( ! empty( $ch['desc'] ) ? '<small>' . esc_html( translate( $ch['desc'], 'studentup' ) ) . '</small>' : '' )
 				);
 			}
 			echo '</ul>';

@@ -118,7 +118,7 @@ studentup_breaking_ticker();
 	<?php echo function_exists( 'studentup_breaking_mobile_block' ) ? studentup_breaking_mobile_block() : ''; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped inside. ?>
 	<div class="mlabel">Explore</div>
 	<a href="<?php echo esc_url( home_url( '/?s=' ) ); ?>"><?php echo studentup_ui_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Search</a>
-	<a class="su-mobile-board-link" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php echo studentup_ui_icon( 'board' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Latest active jobs</a>
+	<a class="su-mobile-board-link" href="<?php echo esc_url( studentup_opportunity_board_url() ); ?>"><?php echo studentup_ui_icon( 'board' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Latest active jobs', 'studentup' ); ?></a>
 	<?php if ( function_exists( 'studentup_saved_on' ) && studentup_saved_on() ) : ?>
 		<a href="#" class="su-msaved" data-su-saved-open><?php echo studentup_ui_icon( 'bookmark' ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html__( 'Saved', 'studentup' ); ?></a>
 	<?php endif; ?>

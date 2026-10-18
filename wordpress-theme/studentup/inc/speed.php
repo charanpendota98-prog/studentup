@@ -128,7 +128,7 @@ function studentup_command_palette() {
 				<kbd>Esc</kbd>
 			</div>
 			<div class="su-cmdk-list" id="su-cmdk-list" role="listbox" data-su-cmdk-links='<?php echo esc_attr( wp_json_encode( $links ) ); ?>'></div>
-			<div class="su-cmdk-foot"><span>↑↓ navigate · ↵ open</span><span>Ctrl/⌘ + K</span></div>
+			<div class="su-cmdk-foot"><span>↑↓ <?php esc_html_e( 'navigate', 'studentup' ); ?> · ↵ <?php esc_html_e( 'open', 'studentup' ); ?></span><span>Ctrl/⌘ + K</span></div>
 		</div>
 	</div>
 	<?php

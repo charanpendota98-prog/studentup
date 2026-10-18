@@ -55,7 +55,7 @@ function studentup_tg_join_block( $context = 'footer' ) {
 			href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener"
 			aria-label="<?php esc_attr_e( 'Join our Telegram channel', 'studentup' ); ?>">
 			<?php echo studentup_social_icon( 'telegram', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>
-			<span>Join our Telegram channel</span>
+			<span><?php esc_html_e( 'Join our Telegram channel', 'studentup' ); ?></span>
 		</a>
 		<?php
 	} catch ( Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement

@@ -97,6 +97,7 @@ function studentup_tools_assets() {
 			STUDENTUP_VERSION,
 			true
 		);
+		wp_localize_script( 'studentup-opportunities', 'STUDENTUP_OPS', array( 'i18n' => array( 'one' => __( 'active update', 'studentup' ), 'many' => __( 'active updates', 'studentup' ) ) ) ); // v1.9.139
 	}
 	wp_localize_script(
 		'studentup-reader',
