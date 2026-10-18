@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.142\n"
+"Project-Id-Version: StudentUp 1.9.143\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +22,7 @@ msgid "%d days left"
 msgstr ""
 
 #: inc/readerbar.php:32
-#: inc/template.php:221
+#: inc/template.php:222
 msgid "%d min read"
 msgstr ""
 
@@ -70,6 +70,10 @@ msgstr ""
 msgid "A reader correction is published publicly with the updated date."
 msgstr ""
 
+#: inc/author-box.php:67
+msgid "About the Author"
+msgstr ""
+
 #: inc/workspace.php:170
 msgid "Active jobs board"
 msgstr ""
@@ -104,6 +108,7 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
+#: inc/ads.php:480
 #: inc/ads.php:481
 msgid "Advertisement"
 msgstr ""
@@ -120,6 +125,10 @@ msgstr ""
 
 #: inc/workspace.php:121
 msgid "Age limit"
+msgstr ""
+
+#: inc/smart.php:156
+msgid "AI job match and eligibility checker"
 msgstr ""
 
 #: inc/premium.php:316
@@ -249,6 +258,10 @@ msgstr ""
 msgid "Audio Article Reader"
 msgstr ""
 
+#: inc/author-box.php:81
+msgid "Author"
+msgstr ""
+
 #: author.php:69
 msgid "Author website / profile"
 msgstr ""
@@ -259,6 +272,12 @@ msgstr ""
 
 #: inc/premium.php:440
 msgid "Back to tools"
+msgstr ""
+
+#: page-opportunities.php:24
+#: page-post-news.php:35
+#: page-quiz.php:27
+msgid "Breadcrumb"
 msgstr ""
 
 #: inc/nav-breaking.php:92
@@ -297,6 +316,10 @@ msgstr ""
 
 #: inc/premium.php:371
 msgid "Career"
+msgstr ""
+
+#: inc/trust.php:161
+msgid "Case studies"
 msgstr ""
 
 #: footer.php:25
@@ -353,7 +376,10 @@ msgstr ""
 msgid "click the install icon in the address bar"
 msgstr ""
 
+#: footer.php:107
+#: header.php:98
 #: inc/engage.php:223
+#: inc/notify.php:259
 #: inc/saved.php:211
 #: inc/upnext.php:140
 msgid "Close"
@@ -365,6 +391,10 @@ msgstr ""
 
 #: inc/pwa.php:311
 msgid "Close install banner"
+msgstr ""
+
+#: header.php:110
+msgid "Close menu"
 msgstr ""
 
 #: inc/workspace.php:127
@@ -429,6 +459,10 @@ msgstr ""
 msgid "Compare"
 msgstr ""
 
+#: inc/compare-page.php:37
+msgid "Compare notifications"
+msgstr ""
+
 #: inc/student-tools.php:65
 msgid "Compare posts"
 msgstr ""
@@ -489,6 +523,10 @@ msgstr ""
 msgid "Daily updates free ga — join avvandi."
 msgstr ""
 
+#: header.php:82
+msgid "Dark mode"
+msgstr ""
+
 #: page-opportunities.php:49
 msgid "Date not announced"
 msgstr ""
@@ -524,6 +562,10 @@ msgstr ""
 
 #: inc/quiz.php:518
 msgid "Decent start. Read the "why" lines once and retry."
+msgstr ""
+
+#: inc/readerbar.php:37
+msgid "Decrease font size"
 msgstr ""
 
 #: inc/opportunities.php:338
@@ -629,8 +671,13 @@ msgstr ""
 msgid "Exams"
 msgstr ""
 
+#: inc/premium.php:536
 #: inc/premium.php:538
 msgid "Explore by Category"
+msgstr ""
+
+#: inc/videoplayer.php:36
+msgid "Featured Media Unit"
 msgstr ""
 
 #: inc/keyfacts.php:29
@@ -663,6 +710,10 @@ msgstr ""
 
 #: footer.php:72
 msgid "Follow us"
+msgstr ""
+
+#: inc/readerbar.php:36
+msgid "Font size controls"
 msgstr ""
 
 #: page-internet-center.php:56
@@ -733,8 +784,8 @@ msgstr ""
 
 #: inc/megamenu.php:357
 #: inc/premium.php:313
-#: inc/template.php:403
-#: inc/template.php:454
+#: inc/template.php:404
+#: inc/template.php:455
 #: page-opportunities.php:25
 msgid "Home"
 msgstr ""
@@ -768,7 +819,12 @@ msgstr ""
 msgid "In-hand salary calculator"
 msgstr ""
 
+#: inc/readerbar.php:39
+msgid "Increase font size"
+msgstr ""
+
 #: footer.php:77
+#: footer.php:96
 msgid "Instagram"
 msgstr ""
 
@@ -788,6 +844,10 @@ msgstr ""
 msgid "Install StudentUp as a web app"
 msgstr ""
 
+#: inc/premium.php:283
+msgid "Instant job alerts"
+msgstr ""
+
 #: inc/saved.php:306
 #: inc/workspace.php:133
 msgid "Interview"
@@ -797,11 +857,17 @@ msgstr ""
 msgid "Job alerts on Telegram"
 msgstr ""
 
+#: inc/smart.php:253
+msgid "Job calendar"
+msgstr ""
+
 #: inc/premium.php:314
 msgid "Jobs"
 msgstr ""
 
+#: inc/qual-filter.php:529
 #: inc/qual-filter.php:682
+#: inc/qual-pages.php:258
 msgid "Jobs by qualification"
 msgstr ""
 
@@ -822,6 +888,10 @@ msgstr ""
 msgid "Join our Telegram channel"
 msgstr ""
 
+#: inc/readerbar.php:61
+msgid "Join Student Community"
+msgstr ""
+
 #: inc/cta.php:120
 msgid "Join Telegram"
 msgstr ""
@@ -836,6 +906,10 @@ msgstr ""
 
 #: inc/keyfacts.php:78
 msgid "Key details"
+msgstr ""
+
+#: inc/readerbar.php:39
+msgid "Large text"
 msgstr ""
 
 #: inc/calendar.php:181
@@ -890,6 +964,10 @@ msgstr ""
 msgid "Latest active opportunities"
 msgstr ""
 
+#: inc/home-sections.php:54
+msgid "Latest by section"
+msgstr ""
+
 #: inc/breaking.php:288
 msgid "Latest Jobs"
 msgstr ""
@@ -900,6 +978,10 @@ msgstr ""
 
 #: inc/slider.php:175
 msgid "Latest Jobs Sliding Track"
+msgstr ""
+
+#: inc/breaking.php:286
+msgid "Latest jobs — scrolling list"
 msgstr ""
 
 #: inc/slider.php:158
@@ -963,12 +1045,18 @@ msgstr ""
 msgid "LIVE LIST"
 msgstr ""
 
+#: header.php:63
 #: inc/mobile-menu.php:106
+#: inc/mobile-menu.php:107
 msgid "Main menu"
 msgstr ""
 
 #: inc/cta.php:42
 msgid "Materials & previous papers"
+msgstr ""
+
+#: header.php:83
+msgid "Menu"
 msgstr ""
 
 #: inc/today.php:158
@@ -986,6 +1074,10 @@ msgstr ""
 
 #: inc/important-links.php:58
 msgid "More %s"
+msgstr ""
+
+#: single.php:140
+msgid "More posts"
 msgstr ""
 
 #: inc/quiz.php:505
@@ -1035,6 +1127,10 @@ msgstr ""
 
 #: inc/nav-breaking.php:96
 msgid "News"
+msgstr ""
+
+#: inc/stories.php:67
+msgid "Next card"
 msgstr ""
 
 #: inc/quiz.php:499
@@ -1107,6 +1203,10 @@ msgstr ""
 
 #: inc/saved.php:214
 msgid "No saved posts yet. Tap Save on any card to keep it here."
+msgstr ""
+
+#: inc/readerbar.php:38
+msgid "Normal text"
 msgstr ""
 
 #: inc/opportunities.php:328
@@ -1191,6 +1291,10 @@ msgstr ""
 msgid "Open today"
 msgstr ""
 
+#: page-opportunities.php:53
+msgid "Opportunity sections"
+msgstr ""
+
 #: archive.php:56
 msgid "Other days"
 msgstr ""
@@ -1199,8 +1303,16 @@ msgstr ""
 msgid "Other links"
 msgstr ""
 
+#: inc/trust.php:243
+msgid "Our location"
+msgstr ""
+
 #: page-internet-center.php:46
 msgid "Our service charge"
+msgstr ""
+
+#: inc/trust.php:197
+msgid "Our team"
 msgstr ""
 
 #: inc/firstrun.php:146
@@ -1215,7 +1327,17 @@ msgstr ""
 msgid "Page not found"
 msgstr ""
 
+#: front-page.php:93
+#: page-tools.php:26
+msgid "Page title"
+msgstr ""
+
+#: archive.php:106
 #: author.php:99
+#: index.php:51
+#: page-org.php:42
+#: page-qual.php:40
+#: search.php:56
 msgid "Pages"
 msgstr ""
 
@@ -1236,6 +1358,10 @@ msgstr ""
 msgid "Photo / Video"
 msgstr ""
 
+#: inc/speed.php:147
+msgid "Picked for you"
+msgstr ""
+
 #: inc/doubts.php:116
 msgid "Please keep the question under 600 characters."
 msgstr ""
@@ -1254,6 +1380,10 @@ msgstr ""
 
 #: comments.php:61
 msgid "Post comment"
+msgstr ""
+
+#: front-page.php:211
+msgid "Post pages"
 msgstr ""
 
 #: inc/saved.php:298
@@ -1286,6 +1416,10 @@ msgstr ""
 
 #: inc/quiz.php:498
 msgid "Previous"
+msgstr ""
+
+#: inc/stories.php:70
+msgid "Previous card"
 msgstr ""
 
 #: page-internet-center.php:40
@@ -1325,11 +1459,24 @@ msgstr ""
 msgid "Questions are closed right now."
 msgstr ""
 
+#: inc/premium.php:312
+msgid "Quick navigation"
+msgstr ""
+
+#: inc/speed.php:123
+#: inc/speed.php:127
+msgid "Quick search"
+msgstr ""
+
+#: inc/stories.php:32
+msgid "Quick story cards"
+msgstr ""
+
 #: inc/workspace.php:233
 msgid "Quick tools"
 msgstr ""
 
-#: inc/template.php:190
+#: inc/template.php:191
 msgid "Read more"
 msgstr ""
 
@@ -1343,6 +1490,10 @@ msgstr ""
 
 #: inc/polls.php:422
 msgid "Reader poll"
+msgstr ""
+
+#: inc/readerbar.php:30
+msgid "Reading options"
 msgstr ""
 
 #: page-internet-center.php:37
@@ -1402,6 +1553,10 @@ msgstr ""
 msgid "Report mistakes"
 msgstr ""
 
+#: inc/readerbar.php:38
+msgid "Reset font size"
+msgstr ""
+
 #: inc/personal.php:57
 msgid "Reset my choices"
 msgstr ""
@@ -1433,6 +1588,10 @@ msgstr ""
 
 #: inc/keyfacts.php:28
 msgid "Salary"
+msgstr ""
+
+#: inc/smart.php:208
+msgid "Salary calculator"
 msgstr ""
 
 #: inc/today.php:158
@@ -1484,6 +1643,10 @@ msgstr ""
 msgid "Scholarship"
 msgstr ""
 
+#: inc/premium.php:249
+msgid "Scholarships"
+msgstr ""
+
 #: inc/premium.php:542
 msgid "Scroll left"
 msgstr ""
@@ -1496,6 +1659,7 @@ msgstr ""
 msgid "Scrolling latest jobs carousel"
 msgstr ""
 
+#: header.php:81
 #: inc/postnews.php:411
 #: inc/premium.php:82
 #: inc/premium.php:317
@@ -1520,6 +1684,18 @@ msgstr ""
 msgid "Search job / exam / result…"
 msgstr ""
 
+#: header.php:92
+msgid "Search jobs, exams, results, scholarships…"
+msgstr ""
+
+#: inc/speed.php:127
+msgid "Search jobs, results, scholarships… (Esc to close)"
+msgstr ""
+
+#: header.php:94
+msgid "Search results"
+msgstr ""
+
 #: inc/premium.php:78
 msgid "Search StudentUp"
 msgstr ""
@@ -1530,6 +1706,10 @@ msgstr ""
 
 #: inc/postnews.php:405
 msgid "Search Telangana / Andhra news…"
+msgstr ""
+
+#: header.php:92
+msgid "Search this site"
 msgstr ""
 
 #: page-opportunities.php:46
@@ -1609,7 +1789,7 @@ msgid "Set your qualification and state once. The list is built on this device -
 msgstr ""
 
 #: inc/slider.php:215
-#: inc/template.php:197
+#: inc/template.php:198
 msgid "Share"
 msgstr ""
 
@@ -1618,7 +1798,7 @@ msgid "Share my score"
 msgstr ""
 
 #: inc/slider.php:213
-#: inc/template.php:196
+#: inc/template.php:197
 msgid "Share on WhatsApp"
 msgstr ""
 
@@ -1638,6 +1818,10 @@ msgstr ""
 msgid "Single application form"
 msgstr ""
 
+#: header.php:109
+msgid "Site menu"
+msgstr ""
+
 #: header.php:50
 msgid "Skip to content"
 msgstr ""
@@ -1648,6 +1832,10 @@ msgstr ""
 
 #: inc/slider.php:185
 msgid "Slide Right"
+msgstr ""
+
+#: inc/readerbar.php:37
+msgid "Small text"
 msgstr ""
 
 #: footer.php:92
@@ -1664,6 +1852,10 @@ msgstr ""
 
 #: inc/author-box.php:45
 msgid "Sources verified:"
+msgstr ""
+
+#: inc/ads.php:148
+msgid "Sponsored college partner content"
 msgstr ""
 
 #: inc/sponsorhub.php:34
@@ -1694,6 +1886,10 @@ msgstr ""
 
 #: inc/doubts.php:151
 msgid "Student"
+msgstr ""
+
+#: inc/trust.php:66
+msgid "Student reviews"
 msgstr ""
 
 #: inc/premium.php:413
@@ -1729,8 +1925,20 @@ msgstr ""
 msgid "StudentUp publishes government job, result, hall ticket and scholarship updates for Telangana and Andhra Pradesh students. This page names who writes and verifies them."
 msgstr ""
 
+#: inc/premium.php:70
+msgid "StudentUp search and quick links"
+msgstr ""
+
+#: inc/ads.php:307
+msgid "StudentUp section"
+msgstr ""
+
 #: inc/doubts.php:364
 msgid "StudentUp — Doubt answer"
+msgstr ""
+
+#: inc/template.php:503
+msgid "Subcategories"
 msgstr ""
 
 #: inc/postnews.php:89
@@ -1759,6 +1967,10 @@ msgstr ""
 msgid "Table of contents"
 msgstr ""
 
+#: single.php:133
+msgid "Tags"
+msgstr ""
+
 #: inc/workspace.php:114
 #: inc/workspace.php:204
 msgid "Telangana"
@@ -1769,6 +1981,7 @@ msgid "Telangana · Andhra Pradesh district news"
 msgstr ""
 
 #: footer.php:76
+#: footer.php:95
 #: page-post-news.php:63
 msgid "Telegram"
 msgstr ""
@@ -1806,7 +2019,7 @@ msgstr ""
 msgid "The StudentUp editorial team — honest articles for Telangana & Andhra Pradesh students, based on official sources."
 msgstr ""
 
-#: inc/template.php:232
+#: inc/template.php:233
 msgid "This article was checked against official sources and written in simple language. If you spot a mistake, %s — we correct it within 24 hours. Always confirm deadlines and numbers in the official notification."
 msgstr ""
 
@@ -1852,6 +2065,18 @@ msgstr ""
 
 #: inc/today.php:89
 msgid "Today’s updates — jobs, results, hall tickets"
+msgstr ""
+
+#: inc/premium.php:150
+msgid "Top hot jobs today"
+msgstr ""
+
+#: inc/smartrecirc.php:42
+msgid "Trending and High-Intent Recommendations"
+msgstr ""
+
+#: inc/smart.php:125
+msgid "Trending today"
 msgstr ""
 
 #: page-opportunities.php:46
@@ -1905,6 +2130,11 @@ msgstr ""
 
 #: functions.php:520
 msgid "updates"
+msgstr ""
+
+#: inc/home-sections.php:87
+#: inc/org-pages.php:394
+msgid "Updates by organisation"
 msgstr ""
 
 #: page-today.php:21
@@ -1988,8 +2218,13 @@ msgid "What you get"
 msgstr ""
 
 #: footer.php:75
+#: footer.php:94
 #: page-post-news.php:60
 msgid "WhatsApp"
+msgstr ""
+
+#: inc/statuscard.php:37
+msgid "WhatsApp Status Card Generator"
 msgstr ""
 
 #: page-internet-center.php:93
@@ -2024,6 +2259,7 @@ msgstr ""
 msgid "Your 5 today"
 msgstr ""
 
+#: inc/doubts.php:278
 #: inc/doubts.php:279
 msgid "Your name (optional)"
 msgstr ""
@@ -2037,6 +2273,7 @@ msgid "Your question (Telugu or English)"
 msgstr ""
 
 #: footer.php:78
+#: footer.php:97
 msgid "YouTube"
 msgstr ""
 

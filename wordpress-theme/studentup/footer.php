@@ -91,10 +91,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php $su_soc = studentup_social_links(); // v304 FIX: header.php lo define ayina $su_soc footer template scope lo undadu → rail hrefs khali ayyevi (live bug). ?>
 <nav class="su-social" id="surail" aria-label="<?php esc_attr_e( 'Social media', 'studentup' ); ?>">
 	<button type="button" class="su-close" id="suclose" aria-label="<?php esc_attr_e( 'Hide social icons', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
-	<a class="su-soc su-socb-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener" aria-label="WhatsApp"><?php echo studentup_social_icon( 'whatsapp', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
-	<a class="su-soc su-socb-tg" href="<?php echo esc_url( $su_soc['telegram'] ); ?>" target="_blank" rel="noopener" aria-label="Telegram"><?php echo studentup_social_icon( 'telegram', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
-	<a class="su-soc su-socb-ig" href="<?php echo esc_url( $su_soc['instagram'] ); ?>" target="_blank" rel="noopener" aria-label="Instagram"><?php echo studentup_social_icon( 'instagram', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
-	<a class="su-soc su-socb-yt" href="<?php echo esc_url( $su_soc['youtube'] ); ?>" target="_blank" rel="noopener" aria-label="YouTube"><?php echo studentup_social_icon( 'youtube', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
+	<a class="su-soc su-socb-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr__( 'WhatsApp', 'studentup' ); ?>"><?php echo studentup_social_icon( 'whatsapp', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
+	<a class="su-soc su-socb-tg" href="<?php echo esc_url( $su_soc['telegram'] ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr__( 'Telegram', 'studentup' ); ?>"><?php echo studentup_social_icon( 'telegram', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
+	<a class="su-soc su-socb-ig" href="<?php echo esc_url( $su_soc['instagram'] ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr__( 'Instagram', 'studentup' ); ?>"><?php echo studentup_social_icon( 'instagram', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
+	<a class="su-soc su-socb-yt" href="<?php echo esc_url( $su_soc['youtube'] ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr__( 'YouTube', 'studentup' ); ?>"><?php echo studentup_social_icon( 'youtube', 19 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
 </nav>
 <button type="button" class="su-tab" id="sutab" aria-label="<?php esc_attr_e( 'Show social icons', 'studentup' ); ?>">‹</button>
 
@@ -104,7 +104,7 @@ if ( studentup_opt( 'sticky_ad', '0' ) ) :
 	?>
 	<script>document.body.classList.add('su-has-stickyad');</script>
 	<div class="su-stickyad" id="su-stickyad">
-		<button type="button" class="su-sticky-close" aria-label="Close"><?php echo studentup_ui_icon( 'close', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+		<button type="button" class="su-sticky-close" aria-label="<?php echo esc_attr__( 'Close', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 		<?php studentup_ad( 'anchor' ); ?>
 	</div>
 <?php endif; ?>

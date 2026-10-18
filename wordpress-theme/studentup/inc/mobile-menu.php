@@ -104,7 +104,7 @@ function studentup_mobile_main_menu() {
 		return;
 	}
 	echo '<div class="mlabel">' . esc_html__( 'Main menu', 'studentup' ) . '</div>';
-	echo '<nav class="su-mmain" aria-label="Main menu">';
+	echo '<nav class="su-mmain" aria-label="' . esc_attr__( 'Main menu', 'studentup' ) . '">';
 	foreach ( $rows as $row ) {
 		printf(
 			'<a class="su-mmain-a %1$s" href="%2$s">%3$s<span class="su-mmain-t">%4$s%5$s</span>%6$s</a>',

@@ -120,11 +120,11 @@ function studentup_command_palette() {
 	}
 	$links[] = array( 'i' => studentup_cmdk_icon( 'bolt' ), 't' => 'Daily Quiz', 'u' => ( function_exists( 'studentup_mega_page_url' ) && studentup_mega_page_url( array( 'daily-quiz', 'quiz' ) ) ) ? studentup_mega_page_url( array( 'daily-quiz', 'quiz' ) ) : home_url( '/#daily-quiz' ) );
 	?>
-	<div class="su-cmdk" id="su-cmdk" hidden role="dialog" aria-modal="true" aria-label="Quick search">
+	<div class="su-cmdk" id="su-cmdk" hidden role="dialog" aria-modal="true" aria-label="<?php echo esc_attr__( 'Quick search', 'studentup' ); ?>">
 		<div class="su-cmdk-box">
 			<div class="su-cmdk-top">
 				<span aria-hidden="true">⌘</span>
-				<input type="search" id="su-cmdk-input" placeholder="Search jobs, results, scholarships… (Esc to close)" autocomplete="off" spellcheck="false" aria-label="Quick search">
+				<input type="search" id="su-cmdk-input" placeholder="<?php echo esc_attr__( 'Search jobs, results, scholarships… (Esc to close)', 'studentup' ); ?>" autocomplete="off" spellcheck="false" aria-label="<?php echo esc_attr__( 'Quick search', 'studentup' ); ?>">
 				<kbd>Esc</kbd>
 			</div>
 			<div class="su-cmdk-list" id="su-cmdk-list" role="listbox" data-su-cmdk-links='<?php echo esc_attr( wp_json_encode( $links ) ); ?>'></div>
@@ -144,7 +144,7 @@ function studentup_for_you() {
 		return;
 	}
 	?>
-	<section class="su-foryou" data-su-foryou hidden aria-label="Picked for you">
+	<section class="su-foryou" data-su-foryou hidden aria-label="<?php echo esc_attr__( 'Picked for you', 'studentup' ); ?>">
 		<div class="su-hot-head">
 			<h2><?php echo studentup_ui_icon( 'bolt', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Picked for you</h2>
 			<button type="button" class="su-foryou-clear" data-su-foryou-clear>Clear history</button>

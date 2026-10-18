@@ -60,7 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</a>
 		<?php endif; ?>
 
-		<nav class="nav" aria-label="Main menu">
+		<nav class="nav" aria-label="<?php echo esc_attr__( 'Main menu', 'studentup' ); ?>">
 			<?php
 			wp_nav_menu(
 				array(
@@ -78,9 +78,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php if ( studentup_saved_on() ) : ?>
 				<button type="button" class="iconbtn su-hdr-saved" data-su-saved-open aria-expanded="false" aria-controls="su-saved-panel" aria-label="<?php echo esc_attr__( 'Saved posts', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'bookmark', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?><span class="su-saved-count" data-su-saved-count hidden>0</span></button>
 			<?php endif; ?>
-			<button type="button" class="iconbtn" id="searchbtn" aria-label="Search" aria-expanded="false" aria-controls="searchpanel"><?php echo studentup_ui_icon( 'search', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
-			<button type="button" class="iconbtn" id="theme" aria-label="Dark mode" aria-pressed="false"><?php echo studentup_ui_icon( 'moon', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
-			<button type="button" class="menubtn" id="menubtn" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><?php echo studentup_ui_icon( 'menu', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+			<button type="button" class="iconbtn" id="searchbtn" aria-label="<?php echo esc_attr__( 'Search', 'studentup' ); ?>" aria-expanded="false" aria-controls="searchpanel"><?php echo studentup_ui_icon( 'search', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+			<button type="button" class="iconbtn" id="theme" aria-label="<?php echo esc_attr__( 'Dark mode', 'studentup' ); ?>" aria-pressed="false"><?php echo studentup_ui_icon( 'moon', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+			<button type="button" class="menubtn" id="menubtn" aria-label="<?php echo esc_attr__( 'Menu', 'studentup' ); ?>" aria-expanded="false" aria-controls="mpanel"><?php echo studentup_ui_icon( 'menu', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 		</div>
 	</div>
 	<div class="searchpanel" id="searchpanel" hidden>
@@ -89,13 +89,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<form class="spanel-form" role="search" method="get" action="<?php echo esc_url( home_url( '/' ) ); ?>" autocomplete="off">
 				<div class="su-livesearch" role="combobox" aria-expanded="false" aria-haspopup="listbox" aria-owns="su-sres">
 					<input id="qtop" type="search" name="s" autocomplete="off" value="<?php echo esc_attr( get_search_query() ); ?>"
-						placeholder="Search jobs, exams, results, scholarships…" aria-label="Search this site"
+						placeholder="<?php echo esc_attr__( 'Search jobs, exams, results, scholarships…', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Search this site', 'studentup' ); ?>"
 						aria-autocomplete="list" aria-controls="su-sres" spellcheck="false">
-					<div class="su-sres" id="su-sres" role="listbox" aria-label="Search results" hidden></div>
+					<div class="su-sres" id="su-sres" role="listbox" aria-label="<?php echo esc_attr__( 'Search results', 'studentup' ); ?>" hidden></div>
 				</div>
 				<button type="submit" class="bluebtn">Search</button>
 			</form>
-			<button type="button" class="iconbtn" id="searchclose" aria-label="Close"><?php echo studentup_ui_icon( 'close', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
+			<button type="button" class="iconbtn" id="searchclose" aria-label="<?php echo esc_attr__( 'Close', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button>
 		</div>
 	</div>
 </header>
@@ -106,8 +106,8 @@ studentup_breaking_ticker();
 ?>
 
 <div class="mbackdrop" id="mbackdrop" aria-hidden="true"></div>
-<div class="mpanel" id="mpanel" role="dialog" aria-label="Site menu" aria-modal="true" aria-hidden="true">
-	<div class="mpanel-head"><strong>StudentUp</strong><button type="button" id="mpanelclose" aria-label="Close menu"><?php echo studentup_ui_icon( 'close', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button></div>
+<div class="mpanel" id="mpanel" role="dialog" aria-label="<?php echo esc_attr__( 'Site menu', 'studentup' ); ?>" aria-modal="true" aria-hidden="true">
+	<div class="mpanel-head"><strong>StudentUp</strong><button type="button" id="mpanelclose" aria-label="<?php echo esc_attr__( 'Close menu', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></button></div>
 	<?php
 	// v229: drawer open cheyyagane MODATI block = main menu. Breaking headlines
 	// deeni kinda — owner: "menu lo anni neat ga kanipinchali".

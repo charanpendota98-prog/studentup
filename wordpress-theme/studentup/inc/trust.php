@@ -63,7 +63,7 @@ function studentup_reviews_shortcode() {
 	if ( ! $rows ) {
 		return ''; // reviews ledu → box ledu. Khali box kanna emi leka povadam better.
 	}
-	$out = '<section class="su-reviews" aria-label="Student reviews"><div class="su-reviews-grid">';
+	$out = '<section class="su-reviews" aria-label="' . esc_attr__( 'Student reviews', 'studentup' ) . '"><div class="su-reviews-grid">';
 	foreach ( $rows as $r ) {
 		$name  = isset( $r['name'] ) ? (string) $r['name'] : '';
 		$text  = isset( $r['text'] ) ? (string) $r['text'] : '';
@@ -158,7 +158,7 @@ function studentup_case_studies_shortcode() {
 	if ( ! $rows ) {
 		return '';
 	}
-	$out = '<section class="su-cases" aria-label="Case studies"><div class="su-cases-grid">';
+	$out = '<section class="su-cases" aria-label="' . esc_attr__( 'Case studies', 'studentup' ) . '"><div class="su-cases-grid">';
 	foreach ( $rows as $c ) {
 		$title  = isset( $c['title'] ) ? (string) $c['title'] : '';
 		$result = isset( $c['result'] ) ? (string) $c['result'] : '';
@@ -194,7 +194,7 @@ function studentup_team_shortcode() {
 	if ( ! $rows ) {
 		return '';
 	}
-	$out = '<section class="su-team" aria-label="Our team"><div class="su-team-grid">';
+	$out = '<section class="su-team" aria-label="' . esc_attr__( 'Our team', 'studentup' ) . '"><div class="su-team-grid">';
 	foreach ( $rows as $m ) {
 		$name = isset( $m['name'] ) ? (string) $m['name'] : '';
 		if ( '' === $name ) {
@@ -240,7 +240,7 @@ function studentup_map_shortcode() {
 	$query = rawurlencode( $full );
 	$embed = 'https://www.google.com/maps?q=' . $query . '&output=embed';
 	$dirs  = 'https://www.google.com/maps/dir/?api=1&destination=' . $query;
-	$out   = '<section class="su-map" aria-label="Our location">';
+	$out   = '<section class="su-map" aria-label="' . esc_attr__( 'Our location', 'studentup' ) . '">';
 	$out  .= '<iframe title="' . esc_attr( $full ) . '" src="' . esc_url( $embed )
 		. '" width="100%" height="280" style="border:0;border-radius:14px" '
 		. 'loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>';

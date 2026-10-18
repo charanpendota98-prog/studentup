@@ -90,7 +90,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 
 <?php if ( $su_is_p2 ) : ?>
 	<?php /* Page 1 lo H1 = hero title (premium.php). Pagination pages ki mattrame ikkada H1. */ ?>
-	<section class="hero hero-slim" aria-label="Page title">
+	<section class="hero hero-slim" aria-label="<?php echo esc_attr__( 'Page title', 'studentup' ); ?>">
 		<h1 class="screen-reader-text">
 			<?php
 			printf(
@@ -208,7 +208,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 		</div>
 		<p class="nores" id="nores"><?php esc_html_e( 'Nothing for this filter — open the "All" tab and try again.', 'studentup' ); ?></p>
 
-		<nav class="sectionhead" aria-label="Post pages">
+		<nav class="sectionhead" aria-label="<?php echo esc_attr__( 'Post pages', 'studentup' ); ?>">
 			<div>
 				<?php
 				$su_total = (int) $su_q->max_num_pages;

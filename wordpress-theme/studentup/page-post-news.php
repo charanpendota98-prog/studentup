@@ -32,7 +32,7 @@ $su_wall   = function_exists( 'studentup_postnews_approved' ) ? studentup_postne
 	while ( have_posts() ) :
 		the_post();
 		?>
-		<nav class="crumbs" aria-label="Breadcrumb">
+		<nav class="crumbs" aria-label="<?php echo esc_attr__( 'Breadcrumb', 'studentup' ); ?>">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a> › <?php the_title(); ?>
 		</nav>
 		<h1 class="su-pn-title"><?php the_title(); ?></h1>

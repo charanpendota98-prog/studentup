@@ -275,7 +275,7 @@ function studentup_doubts_block( $content ) {
 		. esc_html__( 'Your question (Telugu or English)', 'studentup' ) . '</label>'
 		. '<textarea id="su-doubt-q-' . esc_attr( $post_id ) . '" name="su_doubt_q" rows="3" maxlength="600" required '
 		. 'placeholder="' . esc_attr__( 'Example: BC-B category ki age relaxation enta?', 'studentup' ) . '"></textarea>'
-		. '<input type="text" name="su_doubt_name" maxlength="40" placeholder="'
+		. '<input type="text" name="su_doubt_name" maxlength="40" aria-label="' . esc_attr__( 'Your name (optional)', 'studentup' ) . '" placeholder="'
 		. esc_attr__( 'Your name (optional)', 'studentup' ) . '" />'
 		// honeypot — screen readers ki kuda hidden, bots matrame nimputayi
 		. '<input type="text" name="su_doubt_hp" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="su-doubt-hp" />'

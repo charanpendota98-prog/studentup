@@ -39,7 +39,7 @@ get_header();
 			?>
 		</div>
 		<?php studentup_ad( 'mid' ); ?>
-		<nav class="sectionhead" aria-label="Pages"><div><?php echo wp_kses_post( paginate_links() ?? '' ); ?></div></nav>
+		<nav class="sectionhead" aria-label="<?php echo esc_attr__( 'Pages', 'studentup' ); ?>"><div><?php echo wp_kses_post( paginate_links() ?? '' ); ?></div></nav>
 			</div><!-- /.su-main -->
 			<?php get_sidebar(); ?>
 		</div><!-- /.su-layout -->
