@@ -319,3 +319,18 @@ small,.tag,.su-scard-tag,.su-scard-hot,.su-scard-vac,.su-scard-urgent,.mlabel,.q
 .su-scard-meta,.su-scard-meta span,.su-scard-acts-row a,.su-hero-acts a,.su-brkdd-head span,.su-slider-title-wrap span,
 .su-install-cta span,.su-hdr-saved span{ font-size:12px !important; }
 .newsfoot a,.su-tool-btn span,.tagrow span,.tagrow .tag,.su-closing-list li span,.su-cov > span:not(:first-child){ font-size:12px !important; }
+
+/* ===== v1.9.146 CONTRAST (WCAG AA 4.5:1 measured on the rig) ===== */
+.su-rb-time,.su-rb-label,.su-ab-pill{ color:#334155 !important; }
+.su-op-updated,.su-doubt-hint,.su-doubt-empty,time,.su-today-time{ color:#596577; }
+.su-msoc-wa{ background:#0f7a5a !important; }   /* white on WhatsApp #25d366 was 2.0:1 */
+.su-msoc-tg{ background:#0e6fa6 !important; }   /* white on #229ed9 was 2.6:1 */
+.su-msoc-yt{ background:#c4001d !important; }
+.su-msoc-ig{ background:linear-gradient(45deg,#b4541f,#b13a2a,#a81c33,#9a1a4e,#8a1468) !important; }
+/* v1.9.146 CLS: quiz stepper shows one question; pre-collapse before engage.js runs */
+.su-boot .su-quiz-v2:not(.js-step) .su-q:not(:first-of-type){ display:none !important; }
+/* v1.9.146 CLS: question-jump chips are injected by JS — reserve their row so the poll below never jumps */
+.su-boot .su-q-jump:empty{ min-height:28px; }
+.su-boot .su-quiz-v2:not(.js-step) [data-su-quiz-check]{ visibility:hidden; }
+/* v1.9.146 CLS root cause: stale 700px intrinsic placeholder (pre-stepper) → 327px jump on first paint */
+.su-quiz.su-quiz-v2{ contain-intrinsic-size:auto 400px; }

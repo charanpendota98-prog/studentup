@@ -445,6 +445,38 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 			$v = $lang;
 		}
 	} );
+	// v1.9.146: Google's required fields — publisher Organization needs url + logo,
+	// every Article/NewsArticle needs an image. Fallbacks: custom logo → site icon →
+	// theme brand card; post image → auto OG card → brand card.
+	$brand = get_template_directory_uri() . '/assets/og-default.png';
+	foreach ( $data as $k => $node ) {
+		if ( ! is_array( $node ) || empty( $node['@type'] ) ) {
+			continue;
+		}
+		$types = (array) $node['@type'];
+		if ( in_array( 'Organization', $types, true ) ) {
+			if ( empty( $node['url'] ) ) {
+				$data[ $k ]['url'] = $home;
+			}
+			if ( empty( $node['logo'] ) ) {
+				$logo = has_custom_logo() ? wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' ) : '';
+				if ( ! $logo ) {
+					$logo = get_site_icon_url( 512 );
+				}
+				$data[ $k ]['logo'] = array( '@type' => 'ImageObject', 'url' => $logo ? $logo : $brand );
+			}
+		}
+		if ( array_intersect( array( 'Article', 'NewsArticle', 'BlogPosting' ), $types ) && empty( $node['image'] ) ) {
+			$img = '';
+			if ( is_singular() ) {
+				$img = get_the_post_thumbnail_url( get_queried_object_id(), 'full' );
+				if ( ! $img && function_exists( 'studentup_og_url' ) ) {
+					$img = studentup_og_url( get_queried_object_id() );
+				}
+			}
+			$data[ $k ]['image'] = $img ? $img : $brand;
+		}
+	}
 	return $data;
 }
 add_filter( 'rank_math/json_ld', 'studentup_rm_jsonld', 100, 2 ); // after Rank Math's connect_schema_entities (99)

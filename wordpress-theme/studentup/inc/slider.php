@@ -205,12 +205,12 @@ function studentup_latest_notifications( $args = array() ) {
 							<h3><a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a></h3>
 							<?php echo studentup_slider_meta( $post->ID ); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped inside. ?>
 							<div class="su-scard-acts-row">
-								<a class="su-scard-act" href="<?php echo esc_url( $link ); ?>">
+								<a class="su-scard-act" href="<?php echo esc_url( $link ); ?>" aria-label="<?php echo esc_attr( $title . ' — ' . __( 'Full details & Apply', 'studentup' ) ); ?>">
 									<span><?php esc_html_e( 'Full details & Apply', 'studentup' ); ?></span>
 									<span aria-hidden="true">→</span>
 								</a>
 								<a class="su-card-wa" href="<?php echo esc_url( 'https://wa.me/?text=' . rawurlencode( $share ) ); ?>"
-									target="_blank" rel="noopener" title="<?php esc_attr_e( 'Share on WhatsApp', 'studentup' ); ?>">
+									target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $title . ' — ' . __( 'Share on WhatsApp', 'studentup' ) ); ?>" title="<?php esc_attr_e( 'Share on WhatsApp', 'studentup' ); ?>">
 									<?php echo studentup_social_icon( 'whatsapp', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG. ?>
 									<?php esc_html_e( 'Share', 'studentup' ); ?>
 								</a>
