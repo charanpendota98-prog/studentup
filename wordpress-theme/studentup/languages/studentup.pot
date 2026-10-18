@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.134\n"
+"Project-Id-Version: StudentUp 1.9.135\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -92,6 +92,10 @@ msgstr ""
 
 #: inc/workspace.php:121
 msgid "Age limit"
+msgstr ""
+
+#: inc/today.php:244
+msgid "All"
 msgstr ""
 
 #: front-page.php:135
@@ -517,6 +521,10 @@ msgstr ""
 
 #: inc/firstrun.php:148
 msgid "Fees, documents and eligibility for any government application are always as per the official notification."
+msgstr ""
+
+#: inc/today.php:243
+msgid "Filter by section"
 msgstr ""
 
 #: inc/premium.php:400
@@ -1106,6 +1114,11 @@ msgstr ""
 
 #: inc/saved.php:303
 msgid "Recently read"
+msgstr ""
+
+#: page-today.php:26
+#: single.php:227
+msgid "Recently viewed"
 msgstr ""
 
 #: inc/megamenu.php:402

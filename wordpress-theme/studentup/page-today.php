@@ -22,6 +22,8 @@ get_header();
 			</div>
 			<a class="su-viewall" href="<?php echo esc_url( function_exists( 'studentup_opportunity_board_url' ) ? studentup_opportunity_board_url() : home_url( '/' ) ); ?>"><?php esc_html_e( 'All deadlines', 'studentup' ); ?> &rarr;</a>
 		</div>
+		<?php studentup_today_filters(); ?>
+		<aside id="su-recent" class="su-recent" hidden data-l="<?php esc_attr_e( 'Recently viewed', 'studentup' ); ?>"></aside>
 		<?php studentup_today_list(); ?>
 		<?php studentup_ad( 'mid' ); ?>
 			</div><!-- /.su-main -->

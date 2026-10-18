@@ -12,11 +12,11 @@
   function ga(n, p) { try { if (window.gtag) window.gtag("event", n, p || {}); } catch (e) {} }
   function ago(ms) {
     var m = Math.round(ms / 60000);
-    if (m < 60) return m <= 1 ? "just now" : m + " min ago";
+    if (m < 60) return m <= 1 ? "ఇప్పుడే" : m + " నిమిషాల క్రితం";
     var h = Math.round(m / 60);
-    if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+    if (h < 24) return h + " గంటల క్రితం";
     var d = Math.round(h / 24);
-    return d + (d === 1 ? " day ago" : " days ago");
+    return d + " రోజుల క్రితం";
   }
 
   /* ---------- 1) home: new since last visit ---------- */
@@ -37,8 +37,7 @@
     var a = document.createElement("a");
     a.className = "su-since";
     a.href = "#" + (fresh[0].id || "grid");
-    a.innerHTML = '<span class="su-since-dot" aria-hidden="true"></span><span class="su-since-t"><b>' + fresh.length + " new update" + (fresh.length > 1 ? "s" : "") +
-      "</b> since your last visit <small>(" + ago(now - prev) + ")</small></span><i aria-hidden=\"true\">→</i>";
+    a.innerHTML = '<span class="su-since-dot" aria-hidden="true"></span><span class="su-since-t"><b>' + fresh.length + " కొత్త అప్‌డేట్స్</b> మీ చివరి సందర్శన తర్వాత <small>(" + ago(now - prev) + ")</small></span><i aria-hidden=\"true\">→</i>";
     a.addEventListener("click", function (ev) {
       ev.preventDefault();
       fresh[0].scrollIntoView({ behavior: "smooth", block: "center" });
@@ -62,7 +61,7 @@
       var chip = document.createElement("button");
       chip.type = "button";
       chip.className = "su-cont";
-      chip.innerHTML = '<span class="su-cont-bar" aria-hidden="true"><i style="width:' + saved + '%"></i></span>Continue reading · ' + saved + "%" +
+      chip.innerHTML = '<span class="su-cont-bar" aria-hidden="true"><i style="width:' + saved + '%"></i></span>చదవడం కొనసాగించండి · ' + saved + "%" +
         '<span class="su-cont-x" aria-label="Dismiss">×</span>';
       chip.addEventListener("click", function (ev) {
         if (ev.target && ev.target.className === "su-cont-x") { chip.remove(); return; }
@@ -89,4 +88,33 @@
 
   function init() { sinceLastVisit(); continueReading(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
+
+  /* ---------- 3) v1.9.135: recently viewed (device-local, max 6) ---------- */
+  function recentViewed() {
+    var KEY = "su_recent", list = [];
+    try { list = JSON.parse(LS.getItem(KEY) || "[]"); } catch (e) { list = []; }
+    if (!Array.isArray(list)) list = [];
+    var art = $("article.su-article[data-id]") || $("article[data-id]");
+    var cur = art ? String(art.getAttribute("data-id")) : "";
+    if (cur) {
+      var h1 = $("h1"); var title = h1 ? h1.textContent.trim() : document.title;
+      list = list.filter(function (x) { return x && String(x.i) !== cur; });
+      list.unshift({ i: cur, t: title.slice(0, 120), u: location.pathname, ts: Date.now() });
+      list = list.slice(0, 6);
+      try { LS.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    var host = $("#su-recent");
+    if (!host) return;
+    var show = list.filter(function (x) { return x && String(x.i) !== cur && x.u && x.t; }).slice(0, 5);
+    if (show.length < 2) return;
+    var ul = document.createElement("ul");
+    show.forEach(function (x) {
+      var li = document.createElement("li"), a = document.createElement("a");
+      a.href = x.u; a.textContent = x.t; li.appendChild(a); ul.appendChild(li);
+    });
+    var h = document.createElement("h3"); h.textContent = host.getAttribute("data-l") || "మీరు ఇటీవల చూసినవి";
+    host.appendChild(h); host.appendChild(ul); host.hidden = false;
+    ga("su_recent_shown", { n: show.length });
+  }
+  try { recentViewed(); } catch (e) {}
 })();
