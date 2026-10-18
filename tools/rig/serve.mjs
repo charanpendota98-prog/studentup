@@ -27,10 +27,12 @@ http.createServer((req, res) => {
       const r = await handler.request({ url: 'http://localhost:8099' + req.url, method: req.method, headers: hdr, body: body || undefined });
       const h = {}; for (const [k, v] of Object.entries(r.headers || {})) h[k] = Array.isArray(v) ? v.join(', ') : v;
       if (!h['content-type']) h['content-type'] = 'text/html; charset=utf-8';
-      for (const k of Object.keys(h)) if (typeof h[k] === 'string') h[k] = h[k].split('http://localhost:8099').join(origin);
+      // Host-agnostic: emit ROOT-RELATIVE URLs (works for localhost, the Arena https proxy
+      // and any Host header the proxy forwards — no mixed-content, no guessed origin).
+      for (const k of Object.keys(h)) if (typeof h[k] === 'string') h[k] = h[k].split('http://localhost:8099').join('');
       let out = Buffer.from(r.bytes);
-      if (TEXT.test(h['content-type']) && origin !== 'http://localhost:8099') {
-        out = Buffer.from(out.toString('utf8').split('http://localhost:8099').join(origin).split('http:\\/\\/localhost:8099').join(origin.replace(/\//g, '\\/')));
+      if (TEXT.test(h['content-type'])) {
+        out = Buffer.from(out.toString('utf8').split('http://localhost:8099').join('').split('http:\\/\\/localhost:8099').join(''));
       }
       delete h['content-length'];
       res.writeHead(r.httpStatusCode, h); res.end(out);
