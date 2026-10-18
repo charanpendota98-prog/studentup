@@ -393,7 +393,7 @@ function studentup_last_date_badge( $post_id = 0 ) {
 		return '<span class="qbadge done">Deadline passed</span>';
 	}
 	if ( $left <= 7 ) {
-		$txt = ( 0 === $left ) ? 'Last day today' : $left . ' days left';
+		$txt = ( 0 === $left ) ? __( 'Last date today', 'studentup' ) : sprintf( _n( '%s Day Left', '%s Days Left', $left, 'studentup' ), number_format_i18n( $left ) );
 		return '<span class="qbadge soon">' . studentup_ui_icon( 'clock', 11 ) . ' ' . esc_html( $txt ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 	}
 	return '';

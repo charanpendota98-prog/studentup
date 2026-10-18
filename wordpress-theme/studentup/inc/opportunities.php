@@ -319,25 +319,25 @@ function studentup_opportunity_render_card( $row ) {
 			<?php if ( '' !== $row['last_date'] ) : ?>
 				<?php $date_class = 'su-op-date' . ( ( null !== $days && $days <= 7 ) ? ' is-soon' : '' ); ?>
 				<p class="<?php echo esc_attr( $date_class ); ?>">
-					<?php echo studentup_ui_icon( 'calendar', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Last date: <strong><?php echo esc_html( wp_date( 'd M Y', strtotime( $row['last_date'] . ' 12:00:00' ) ) ); ?></strong>
+					<?php echo studentup_ui_icon( 'calendar', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Last date:', 'studentup' ); ?> <strong><?php echo esc_html( wp_date( 'd M Y', strtotime( $row['last_date'] . ' 12:00:00' ) ) ); ?></strong>
 					<?php if ( null !== $days ) : ?>
-						<span><?php echo esc_html( 0 === $days ? 'Last day today' : $days . ' days left' ); ?></span>
+						<span><?php echo esc_html( 0 === $days ? __( 'Last date today', 'studentup' ) : sprintf( _n( '%s Day Left', '%s Days Left', $days, 'studentup' ), number_format_i18n( $days ) ) ); ?></span>
 					<?php endif; ?>
 				</p>
 			<?php else : ?>
-				<p class="su-op-date is-unknown"><?php echo studentup_ui_icon( 'calendar', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Last date: <strong>Not announced</strong></p>
+				<p class="su-op-date is-unknown"><?php echo studentup_ui_icon( 'calendar', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Last date:', 'studentup' ); ?> <strong><?php esc_html_e( 'Not announced', 'studentup' ); ?></strong></p>
 			<?php endif; ?>
 			<?php if ( $updated ) : ?>
-				<p class="su-op-updated">Updated <?php echo esc_html( wp_date( 'd M Y', $updated ) ); ?></p>
+				<p class="su-op-updated"><?php esc_html_e( 'Updated', 'studentup' ); ?> <?php echo esc_html( wp_date( 'd M Y', $updated ) ); ?></p>
 			<?php endif; ?>
 			<?php if ( ! empty( $row['source_url'] ) ) : ?>
-				<p class="su-op-source"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Source checked<?php echo ! empty( $row['source_checked'] ) ? ' ' . esc_html( wp_date( 'd M Y', strtotime( $row['source_checked'] . ' 12:00:00' ) ) ) : ''; ?> · <a href="<?php echo esc_url( $row['source_url'] ); ?>" target="_blank" rel="noopener noreferrer">Official source</a></p>
+				<p class="su-op-source"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Source checked', 'studentup' ); ?><?php echo ! empty( $row['source_checked'] ) ? ' ' . esc_html( wp_date( 'd M Y', strtotime( $row['source_checked'] . ' 12:00:00' ) ) ) : ''; ?> · <a href="<?php echo esc_url( $row['source_url'] ); ?>" target="_blank" rel="noopener noreferrer">Official source</a></p>
 			<?php endif; ?>
 		</div>
 		<div class="su-op-actions">
-			<a class="su-op-open" href="<?php echo esc_url( $row['link'] ); ?>" aria-label="Open <?php echo esc_attr( $row['title'] ); ?>">Details&nbsp;→</a>
+			<a class="su-op-open" href="<?php echo esc_url( $row['link'] ); ?>" aria-label="<?php echo esc_attr( $row['title'] ); ?>"><?php esc_html_e( 'Details', 'studentup' ); ?>&nbsp;→</a>
 			<?php if ( ! empty( $row['apply_url'] ) ) : ?>
-				<a class="su-op-apply" href="<?php echo esc_url( $row['apply_url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="Open official application link for <?php echo esc_attr( $row['title'] ); ?>">Official Apply</a>
+				<a class="su-op-apply" href="<?php echo esc_url( $row['apply_url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr__( 'Apply Online (Official)', 'studentup' ); ?> — <?php echo esc_attr( $row['title'] ); ?>"><?php esc_html_e( 'Official Apply', 'studentup' ); ?></a>
 			<?php endif; ?>
 			<?php if ( function_exists( 'studentup_save_button' ) ) : ?>
 				<?php echo wp_kses_post( studentup_save_button( $row['id'], 'su-save-opportunity' ) ); ?>

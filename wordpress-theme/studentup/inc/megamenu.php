@@ -435,8 +435,8 @@ function studentup_mega_mobile_accordion( $g, $is_new = false ) {
 		printf(
 			'<a href="%s"><span class="mgroup-t">%s</span><small>%s</small></a>',
 			esc_url( (string) $it['url'] ),
-			esc_html( (string) $it['label'] ),
-			esc_html( (string) $it['desc'] )
+			esc_html( translate( (string) $it['label'], 'studentup' ) ),
+			esc_html( translate( (string) $it['desc'], 'studentup' ) )
 		);
 	}
 	echo '</div></details>';

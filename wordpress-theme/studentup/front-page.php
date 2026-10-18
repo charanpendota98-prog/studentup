@@ -49,7 +49,7 @@ $su_is_p2 = $su_paged > 1;
 <?php if ( ! $su_is_p2 ) : ?>
 <div class="su-home-grid su-home-grid--solo">
 	<div class="hg-q">
-		<?php studentup_daily_quiz( array( 'id' => 'daily-quiz', 'heading' => 'Daily Quiz — 5 easy questions, share your score' ) ); ?>
+		<?php studentup_daily_quiz( array( 'id' => 'daily-quiz', 'heading' => __( 'Daily Quiz — 5 easy questions, share your score', 'studentup' ) ) ); ?>
 		<?php if ( function_exists( 'studentup_postnews_cta' ) ) { studentup_postnews_cta(); } // v294: readers send stories/photos/district news → we approve → we post. ?>
 	</div>
 </div>
@@ -157,7 +157,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 				set_transient( 'su_today_count', $su_today_n, 10 * MINUTE_IN_SECONDS );
 			}
 			if ( $su_today_n > 0 ) {
-				$su_day_url = get_day_link( (int) current_time( 'Y' ), (int) current_time( 'm' ), (int) current_time( 'd' ) );
+				$su_day_url = function_exists( 'studentup_today_url' ) ? studentup_today_url() : get_day_link( (int) current_time( 'Y' ), (int) current_time( 'm' ), (int) current_time( 'd' ) ); // v1.9.139: date archive 301s (SEO disables it) → /today/
 				echo '<a class="su-today" href="' . esc_url( $su_day_url ) . '"><span class="su-today-dot" aria-hidden="true"></span><b>'
 					. esc_html( sprintf( _n( '%d update posted today', '%d updates posted today', $su_today_n, 'studentup' ), $su_today_n ) )
 					. '</b><i aria-hidden="true">→</i></a>';

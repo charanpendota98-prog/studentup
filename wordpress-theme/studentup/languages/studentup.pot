@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.138\n"
+"Project-Id-Version: StudentUp 1.9.139\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,11 @@ msgstr ""
 #: inc/apply.php:210
 #: inc/engage.php:163
 msgid "%d days left"
+msgstr ""
+
+#: inc/readerbar.php:32
+#: inc/template.php:221
+msgid "%d min read"
 msgstr ""
 
 #: author.php:45
@@ -60,6 +65,16 @@ msgstr ""
 msgid "Active jobs board"
 msgstr ""
 
+#: inc/student-tools.php:100
+msgid "active update"
+msgstr ""
+
+#: inc/student-tools.php:100
+#: page-opportunities.php:33
+#: page-opportunities.php:43
+msgid "active updates"
+msgstr ""
+
 #: inc/slotlab.php:87
 msgid "Ad slot A/B test is running"
 msgstr ""
@@ -72,7 +87,11 @@ msgstr ""
 msgid "Add this post to compare"
 msgstr ""
 
-#: inc/student-tools.php:109
+#: footer.php:122
+msgid "Add to Home screen"
+msgstr ""
+
+#: inc/student-tools.php:110
 msgid "Added"
 msgstr ""
 
@@ -98,6 +117,10 @@ msgstr ""
 msgid "All"
 msgstr ""
 
+#: page-opportunities.php:47
+msgid "All categories"
+msgstr ""
+
 #: front-page.php:74
 #: page-today.php:23
 msgid "All deadlines"
@@ -105,6 +128,10 @@ msgstr ""
 
 #: inc/qual-filter.php:532
 msgid "All qualifications"
+msgstr ""
+
+#: footer.php:84
+msgid "All rights reserved."
 msgstr ""
 
 #: inc/saved.php:302
@@ -141,8 +168,13 @@ msgstr ""
 msgid "Answer with the official source. Only answered questions go into QAPage schema."
 msgstr ""
 
+#: page-opportunities.php:49
+msgid "Any deadline"
+msgstr ""
+
 #: inc/workspace.php:113
 #: inc/workspace.php:190
+#: page-opportunities.php:48
 msgid "Any qualification"
 msgstr ""
 
@@ -180,6 +212,7 @@ msgid "Apply Online"
 msgstr ""
 
 #: inc/keyfacts.php:80
+#: inc/opportunities.php:340
 msgid "Apply Online (Official)"
 msgstr ""
 
@@ -249,6 +282,10 @@ msgstr ""
 msgid "Categories"
 msgstr ""
 
+#: page-opportunities.php:47
+msgid "Category"
+msgstr ""
+
 #: inc/premium.php:545
 msgid "Category shortcuts"
 msgstr ""
@@ -276,6 +313,10 @@ msgstr ""
 
 #: inc/important-links.php:79
 msgid "Click Here"
+msgstr ""
+
+#: footer.php:124
+msgid "click the install icon in the address bar"
 msgstr ""
 
 #: inc/engage.php:223
@@ -308,8 +349,13 @@ msgstr ""
 msgid "Closing in 3 days"
 msgstr ""
 
+#: page-opportunities.php:49
+msgid "Closing in 30 days"
+msgstr ""
+
 #: inc/qual-filter.php:538
 #: inc/qual-filter.php:593
+#: page-opportunities.php:49
 msgid "Closing in 7 days"
 msgstr ""
 
@@ -340,7 +386,7 @@ msgid "Comments are closed."
 msgstr ""
 
 #: inc/student-tools.php:53
-#: inc/student-tools.php:108
+#: inc/student-tools.php:109
 msgid "Compare"
 msgstr ""
 
@@ -348,8 +394,12 @@ msgstr ""
 msgid "Compare posts"
 msgstr ""
 
-#: inc/student-tools.php:110
+#: inc/student-tools.php:111
 msgid "Compare up to three posts."
+msgstr ""
+
+#: footer.php:124
+msgid "Computer:"
 msgstr ""
 
 #: page-internet-center.php:90
@@ -388,8 +438,16 @@ msgstr ""
 msgid "Daily quiz"
 msgstr ""
 
+#: front-page.php:52
+msgid "Daily Quiz — 5 easy questions, share your score"
+msgstr ""
+
 #: footer.php:80
 msgid "Daily updates free ga — join avvandi."
+msgstr ""
+
+#: page-opportunities.php:49
+msgid "Date not announced"
 msgstr ""
 
 #: front-page.php:135
@@ -405,6 +463,7 @@ msgid "days left"
 msgstr ""
 
 #: inc/workspace.php:124
+#: page-opportunities.php:49
 msgid "Deadline"
 msgstr ""
 
@@ -414,6 +473,10 @@ msgstr ""
 
 #: inc/quiz.php:511
 msgid "Decent start. Read the "why" lines once and retry."
+msgstr ""
+
+#: inc/opportunities.php:338
+msgid "Details"
 msgstr ""
 
 #: inc/search-smart.php:154
@@ -435,6 +498,10 @@ msgstr ""
 
 #: inc/doubts.php:290
 msgid "Doubts & Answers"
+msgstr ""
+
+#: footer.php:117
+msgid "Download App"
 msgstr ""
 
 #: inc/personal.php:150
@@ -531,6 +598,10 @@ msgstr ""
 msgid "Filter tools by category"
 msgstr ""
 
+#: page-opportunities.php:42
+msgid "Find the right opportunity"
+msgstr ""
+
 #: inc/firstrun.php:283
 msgid "Five fresh practice questions every morning with explained answers, plus one reader poll. Free, no login, and nothing about you is stored."
 msgstr ""
@@ -602,7 +673,8 @@ msgid "Hide social icons"
 msgstr ""
 
 #: inc/megamenu.php:357
-#: inc/template.php:399
+#: inc/template.php:400
+#: page-opportunities.php:25
 msgid "Home"
 msgstr ""
 
@@ -643,8 +715,16 @@ msgstr ""
 msgid "Install"
 msgstr ""
 
+#: footer.php:122
+msgid "Install app"
+msgstr ""
+
 #: footer.php:127
 msgid "Install now"
+msgstr ""
+
+#: footer.php:119
+msgid "Install StudentUp as a web app"
 msgstr ""
 
 #: inc/saved.php:306
@@ -669,6 +749,7 @@ msgid "Join our channels"
 msgstr ""
 
 #: inc/telegram.php:56
+#: inc/telegram.php:58
 msgid "Join our Telegram channel"
 msgstr ""
 
@@ -694,10 +775,14 @@ msgid "Last date over"
 msgstr ""
 
 #: inc/calendar.php:118
+#: inc/opportunities.php:324
+#: inc/qual-filter.php:396
 msgid "Last date today"
 msgstr ""
 
 #: inc/calendar.php:128
+#: inc/opportunities.php:322
+#: inc/opportunities.php:328
 msgid "Last date:"
 msgstr ""
 
@@ -715,8 +800,28 @@ msgstr ""
 msgid "Last day today"
 msgstr ""
 
+#: page-opportunities.php:77
+msgid "Last-date information is taken from the reviewed article. Always open the article and verify the official notification before applying."
+msgstr ""
+
+#: footer.php:128
+msgid "Later"
+msgstr ""
+
+#: header.php:121
+msgid "Latest active jobs"
+msgstr ""
+
+#: page-opportunities.php:25
+msgid "Latest active opportunities"
+msgstr ""
+
 #: inc/breaking.php:288
 msgid "Latest Jobs"
+msgstr ""
+
+#: page-opportunities.php:30
+msgid "Latest Jobs & Student Opportunities"
 msgstr ""
 
 #: inc/slider.php:175
@@ -775,12 +880,16 @@ msgstr ""
 msgid "Live job alerts"
 msgstr ""
 
+#: page-opportunities.php:29
+msgid "LIVE LIST"
+msgstr ""
+
 #: inc/mobile-menu.php:106
 msgid "Main menu"
 msgstr ""
 
 #: inc/cta.php:42
-msgid "Materials &amp; previous papers"
+msgid "Materials & previous papers"
 msgstr ""
 
 #: inc/today.php:158
@@ -821,6 +930,10 @@ msgstr ""
 msgid "My Workspace"
 msgstr ""
 
+#: inc/speed.php:131
+msgid "navigate"
+msgstr ""
+
 #: inc/slider.php:85
 msgid "New"
 msgstr ""
@@ -849,7 +962,11 @@ msgstr ""
 msgid "Next tool"
 msgstr ""
 
-#: inc/student-tools.php:112
+#: page-opportunities.php:75
+msgid "No active verified opportunities are available right now. Please check again after the next update."
+msgstr ""
+
+#: inc/student-tools.php:113
 msgid "No confirmed date is available for this post."
 msgstr ""
 
@@ -867,6 +984,10 @@ msgstr ""
 
 #: inc/calendar.php:104
 msgid "No last dates are confirmed yet. Dates appear here only after the official notification is published - we never estimate a deadline."
+msgstr ""
+
+#: page-opportunities.php:53
+msgid "No matching active opportunities found. Try another keyword or category."
 msgstr ""
 
 #: inc/workspace.php:122
@@ -897,8 +1018,16 @@ msgstr ""
 msgid "No saved posts yet. Tap Save on any card to keep it here."
 msgstr ""
 
+#: inc/opportunities.php:328
+msgid "Not announced"
+msgstr ""
+
 #: front-page.php:209
 msgid "Nothing for this filter — open the "All" tab and try again."
+msgstr ""
+
+#: inc/opportunities.php:340
+msgid "Official Apply"
 msgstr ""
 
 #: inc/important-links.php:45
@@ -925,6 +1054,10 @@ msgstr ""
 msgid "One online form filled, checked and returned as a PDF"
 msgstr ""
 
+#: footer.php:120
+msgid "One-tap access · visited pages can stay available offline. No native APK download is required."
+msgstr ""
+
 #: inc/pwa.php:309
 msgid "One-tap install · new job alerts direct ga"
 msgstr ""
@@ -935,6 +1068,10 @@ msgstr ""
 
 #: inc/firstrun.php:147
 msgid "Only for that offline service, documents are shared on WhatsApp at"
+msgstr ""
+
+#: inc/speed.php:131
+msgid "open"
 msgstr ""
 
 #: inc/nav-breaking.php:105
@@ -1133,7 +1270,7 @@ msgstr ""
 msgid "Remind me in the browser too"
 msgstr ""
 
-#: inc/student-tools.php:111
+#: inc/student-tools.php:112
 msgid "Reminder file downloaded. Add it to your calendar."
 msgstr ""
 
@@ -1248,6 +1385,10 @@ msgstr ""
 msgid "Search a tool — salary, age, fee, resume…"
 msgstr ""
 
+#: page-opportunities.php:51
+msgid "Search and filters run in your browser. Open the article and confirm the official notification before applying."
+msgstr ""
+
 #: inc/premium.php:387
 msgid "Search cheyandi leda tab tap cheyandi — okka sari lo okka tool, screen clean ga untundi."
 msgstr ""
@@ -1264,11 +1405,15 @@ msgstr ""
 msgid "Search Telangana / Andhra news…"
 msgstr ""
 
+#: page-opportunities.php:46
+msgid "Search title"
+msgstr ""
+
 #: inc/premium.php:392
 msgid "Search tools"
 msgstr ""
 
-#: inc/student-tools.php:113
+#: inc/student-tools.php:114
 msgid "Select at least two posts to compare."
 msgstr ""
 
@@ -1358,6 +1503,10 @@ msgstr ""
 
 #: footer.php:92
 msgid "Social media"
+msgstr ""
+
+#: inc/opportunities.php:334
+msgid "Source checked"
 msgstr ""
 
 #: inc/author-box.php:45
@@ -1499,6 +1648,10 @@ msgstr ""
 msgid "This is optional."
 msgstr ""
 
+#: page-opportunities.php:38
+msgid "This list updates from published StudentUp posts. Verified last dates are shown, expired notices are hidden automatically, and an unavailable date is shown as <strong>Not announced</strong> — never guessed."
+msgstr ""
+
 #: inc/doubts.php:105
 msgid "This page cannot take questions."
 msgstr ""
@@ -1535,12 +1688,20 @@ msgstr ""
 msgid "Today’s updates — jobs, results, hall tickets"
 msgstr ""
 
+#: page-opportunities.php:46
+msgid "Try SSC, software, scholarship…"
+msgstr ""
+
 #: inc/premium.php:409
 msgid "Try “salary”, “age” leda “resume”."
 msgstr ""
 
 #: inc/cta.php:29
 msgid "TS &amp; AP"
+msgstr ""
+
+#: page-opportunities.php:31
+msgid "TS, AP, Central, software, private, walk-in, job mela, scholarship, results and hall-ticket updates in one clean list."
 msgstr ""
 
 #: inc/today.php:158
@@ -1558,6 +1719,10 @@ msgstr ""
 
 #: inc/upnext.php:91
 msgid "Up next — read this too"
+msgstr ""
+
+#: inc/opportunities.php:331
+msgid "Updated"
 msgstr ""
 
 #: inc/engage.php:35

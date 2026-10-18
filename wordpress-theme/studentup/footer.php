@@ -81,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 		<div class="footer-bottom">
-			<span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?> — All rights reserved.</span>
+			<span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?> — <?php esc_html_e( 'All rights reserved.', 'studentup' ); ?></span>
 			<?php // v283: owner — footer lo disclaimer sentence vaddu (Disclaimer page + policy links unnayi). ?>
 			<?php studentup_tg_join_block( 'footer' ); // v91: Telegram join chip (private channel override supported) ?>
 		</div>
@@ -114,18 +114,18 @@ if ( studentup_opt( 'sticky_ad', '0' ) ) :
 // Click: Android/Chrome lo install prompt, iPhone/desktop lo device-wise steps.
 if ( studentup_opt( 'pwa', '1' ) && studentup_opt( 'install_prompt', '1' ) ) :
 	?>
-	<button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Download App <span class="ibadge">WEB APP</span></button>
+	<button type="button" class="installbtn su-install-cta" aria-controls="installhint" aria-expanded="false" id="installbtn"><?php echo studentup_ui_icon( 'download', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Download App', 'studentup' ); ?> <span class="ibadge">WEB APP</span></button>
 	<div class="installsheet" id="installhint" hidden role="dialog" aria-modal="true" aria-labelledby="isheet-title">
-		<h3 id="isheet-title">Install StudentUp as a web app</h3>
-		<p class="isub">One-tap access · visited pages can stay available offline. No native APK download is required.</p>
+		<h3 id="isheet-title"><?php esc_html_e( 'Install StudentUp as a web app', 'studentup' ); ?></h3>
+		<p class="isub"><?php esc_html_e( 'One-tap access · visited pages can stay available offline. No native APK download is required.', 'studentup' ); ?></p>
 		<ol id="isteps">
-			<li><b>Android (Chrome):</b> ⋮ Menu → <b>Install app</b> / <b>Add to Home screen</b></li>
-			<li><b>iPhone (Safari):</b> tap <b>Share</b> → <b>Add to Home Screen</b> → Add</li>
-			<li><b>Computer:</b> click the install icon in the address bar</li>
+			<li><b>Android (Chrome):</b> ⋮ Menu → <b><?php esc_html_e( 'Install app', 'studentup' ); ?></b> / <b><?php esc_html_e( 'Add to Home screen', 'studentup' ); ?></b></li>
+			<li><b>iPhone (Safari):</b> <b>Share</b> → <b>Add to Home Screen</b> → Add</li>
+			<li><b><?php esc_html_e( 'Computer:', 'studentup' ); ?></b> <?php esc_html_e( 'click the install icon in the address bar', 'studentup' ); ?></li>
 		</ol>
 		<div class="irow">
 			<button type="button" class="installok" id="installnow"><?php esc_html_e( 'Install now', 'studentup' ); ?></button>
-			<button type="button" class="installclose" id="installclose">Later</button>
+			<button type="button" class="installclose" id="installclose"><?php esc_html_e( 'Later', 'studentup' ); ?></button>
 		</div>
 	</div>
 <?php endif; ?>

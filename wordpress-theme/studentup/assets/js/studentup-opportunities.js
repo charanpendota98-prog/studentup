@@ -38,7 +38,7 @@
       group.hidden = !hasVisible;
     });
     if (empty) empty.hidden = visible !== 0;
-    if (result) result.textContent = visible + (visible === 1 ? " active update" : " active updates");
+    var L = (window.STUDENTUP_OPS && STUDENTUP_OPS.i18n) || {}; if (result) result.textContent = visible + " " + (visible === 1 ? (L.one || "active update") : (L.many || "active updates"));
   }
 
   [search, section, qualification, deadline].forEach(function (control) {
