@@ -84,7 +84,7 @@ function studentup_tools_assets() {
 	// (studentup-tools.js) tools page lo mattrame load avutundi.
 	wp_enqueue_script(
 		'studentup-reader',
-		get_template_directory_uri() . '/assets/js/studentup-reader-utils.js',
+		studentup_js_url( 'assets/js/studentup-reader-utils.js' ),
 		array(),
 		STUDENTUP_VERSION,
 		true
@@ -92,7 +92,7 @@ function studentup_tools_assets() {
 	if ( get_query_var( 'studentup_opportunities' ) ) {
 		wp_enqueue_script(
 			'studentup-opportunities',
-			get_template_directory_uri() . '/assets/js/studentup-opportunities.js',
+			studentup_js_url( 'assets/js/studentup-opportunities.js' ),
 			array( 'studentup-reader' ),
 			STUDENTUP_VERSION,
 			true
