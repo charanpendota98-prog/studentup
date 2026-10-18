@@ -351,7 +351,12 @@
     try {
       var dismissed = parseInt(localStorage.getItem(SU_DISMISS_KEY) || "0", 10);
       var elapsed = Date.now() - dismissed;
-      if (dismissed && elapsed < SU_CYCLE) {
+      if (SU_AUTOHIDE) {
+        /* 1.9.150 phone: owner rule "overlap avoddu" — start tucked into the tab
+           (one tap opens); desktop keeps the always-visible rail. */
+        suHide(false);
+        suRestart();
+      } else if (dismissed && elapsed < SU_CYCLE) {
         suHide(false);
         setTimeout(function () { suShow(); suRestart(); }, SU_CYCLE - elapsed);
       } else {
