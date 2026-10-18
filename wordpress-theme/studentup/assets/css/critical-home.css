@@ -974,3 +974,5 @@ html, body{ overflow-x:hidden; }
   .usedcard .ui{ width:34px; height:34px; border-radius:10px }
   .usedcard b{ font-size:12.5px; line-height:1.25 }
   .usedcard .ucount{ right:6px }}
+.su-cat-live{position:relative}
+.su-cat-live::after{content:"LIVE";position:absolute;top:6px;right:6px;font-size:9px;font-weight:800;letter-spacing:.04em;color:#fff;background:#dc2626;border-radius:999px;padding:1px 5px;line-height:1.3}

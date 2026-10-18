@@ -88,6 +88,7 @@ function studentup_ui_te_map() {
 		'Skip to content' => 'కంటెంట్‌కు వెళ్లండి',
 		// /today/ page (v1.9.134).
 		'All' => 'అన్నీ',
+		'Timed mock tests · instant rank' => 'టైమ్‌డ్ మాక్ టెస్టులు · వెంటనే ర్యాంక్',
 		'Date-wise updates' => 'తేదీల వారీగా అప్‌డేట్స్',
 		'Recently viewed' => 'మీరు ఇటీవల చూసినవి',
 		'Filter by section' => 'విభాగం వారీగా ఫిల్టర్',

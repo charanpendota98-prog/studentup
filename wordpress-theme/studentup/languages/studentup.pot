@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.136\n"
+"Project-Id-Version: StudentUp 1.9.137\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr ""
 msgid "All saved posts removed."
 msgstr ""
 
-#: inc/premium.php:524
+#: inc/premium.php:539
 msgid "All sections"
 msgstr ""
 
@@ -245,11 +245,11 @@ msgstr ""
 msgid "Career"
 msgstr ""
 
-#: inc/premium.php:585
+#: inc/premium.php:600
 msgid "Categories"
 msgstr ""
 
-#: inc/premium.php:530
+#: inc/premium.php:545
 msgid "Category shortcuts"
 msgstr ""
 
@@ -507,7 +507,7 @@ msgstr ""
 msgid "Exams"
 msgstr ""
 
-#: inc/premium.php:523
+#: inc/premium.php:538
 msgid "Explore by Category"
 msgstr ""
 
@@ -771,11 +771,11 @@ msgstr ""
 msgid "LIVE"
 msgstr ""
 
-#: inc/premium.php:582
+#: inc/premium.php:597
 msgid "Live job alerts"
 msgstr ""
 
-#: inc/mobile-menu.php:96
+#: inc/mobile-menu.php:106
 msgid "Main menu"
 msgstr ""
 
@@ -1223,11 +1223,11 @@ msgstr ""
 msgid "Saved posts"
 msgstr ""
 
-#: inc/premium.php:527
+#: inc/premium.php:542
 msgid "Scroll left"
 msgstr ""
 
-#: inc/premium.php:541
+#: inc/premium.php:556
 msgid "Scroll right"
 msgstr ""
 
@@ -1572,7 +1572,7 @@ msgstr ""
 msgid "Updates from the last %d days. Older posts are in each section."
 msgstr ""
 
-#: inc/premium.php:579
+#: inc/premium.php:594
 msgid "Updates today"
 msgstr ""
 

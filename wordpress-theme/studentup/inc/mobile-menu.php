@@ -69,6 +69,13 @@ function studentup_mobile_main_rows() {
 			'lab'  => 'Daily Quiz',
 			'hint' => '',
 		),
+		array(
+			'slug' => '',
+			'url'  => function_exists( 'studentup_live_exam_url' ) ? studentup_live_exam_url() : '',
+			'icon' => 'exam',
+			'lab'  => 'Live Exams',
+			'hint' => '',
+		),
 	);
 
 	$out = array();
@@ -79,6 +86,9 @@ function studentup_mobile_main_rows() {
 				continue;   // category ledu → khaali archive ki link vaddu.
 			}
 			$row['url'] = get_category_link( $term );
+		}
+		if ( empty( $row['url'] ) ) {
+			continue;   // v1.9.137: URL-less entries (Live Exams with empty option) never render.
 		}
 		$out[] = $row;
 	}

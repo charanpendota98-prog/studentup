@@ -106,6 +106,7 @@ function studentup_option_fields() {
 				'social_whatsapp'  => array( 'WhatsApp number', 'text', '9182739312', '10-digit mobile — +91 avasaram ledu (example: 9182739312)' ),
 				'whatsapp_channel_url' => array( 'WhatsApp Channel URL (Follow link)', 'text', '', 'Example: https://whatsapp.com/channel/... (WhatsApp channel link marithe ikkada update cheyandi)' ),
 				'social_telegram'  => array( 'Telegram', 'text', 'studentup_in', 't.me/<idi> — channel username' ),
+				'live_exam_url'    => array( 'Live Exams platform URL (v1.9.137)', 'text', 'https://exams.studentup.in/', 'Exam subdomain/app link — tile + menu entries. Khali unte Live Exams entries render kaavu.' ),
 				'telegram_channel_url' => array( 'Telegram channel URL override (v91)', 'text', '', 'PRIVATE channel aithe full invite link (https://t.me/+AbCd…); khali unte username t.me link use avutundi' ),
 				'social_instagram' => array( 'Instagram', 'text', 'studentup.in', 'instagram.com/<idi>' ),
 				'social_linkedin'  => array( 'LinkedIn editorial profile', 'text', '', 'Full https://www.linkedin.com/in/... URL or profile username' ),
