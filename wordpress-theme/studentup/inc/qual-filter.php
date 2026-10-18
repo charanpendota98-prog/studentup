@@ -162,6 +162,45 @@ function studentup_detect_qual( $post_id = 0, $post = null ) {
  * @param int $post_id post id.
  * @return string final value.
  */
+/**
+ * v1.9.136: other posts with the same qualification that are still OPEN
+ * (real future studentup_last_date), closing soonest first.
+ *
+ * @param int   $post_id Current post.
+ * @param int   $limit   Max ids.
+ * @param int[] $exclude Ids to skip.
+ * @return int[]
+ */
+function studentup_qual_related_ids( $post_id, $limit = 2, $exclude = array() ) {
+	$labels = studentup_qual_labels( (int) $post_id, 1 );
+	$qual   = $labels ? (string) array_key_first( $labels ) : '';
+	if ( '' === $qual || $limit < 1 ) {
+		return array();
+	}
+	$args = array(
+		'fields'                 => 'ids',
+		'post_type'              => 'post',
+		'post_status'            => 'publish',
+		'posts_per_page'         => (int) $limit,
+		'post__not_in'           => array_merge( array( (int) $post_id ), array_map( 'intval', (array) $exclude ) ),
+		'ignore_sticky_posts'    => true,
+		'no_found_rows'          => true,
+		'update_post_term_cache' => false,
+		'meta_key'               => 'studentup_last_date', // phpcs:ignore WordPress.DB.SlowDBQuery
+		'orderby'                => 'meta_value',
+		'order'                  => 'ASC',
+		'meta_query'             => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+			array( 'key' => 'studentup_qual', 'value' => $qual, 'compare' => 'LIKE' ),
+			array( 'key' => 'studentup_last_date', 'value' => current_time( 'Y-m-d' ), 'compare' => '>=' ), // Y-m-d sorts lexically — no CAST needed
+		),
+	);
+	if ( function_exists( 'studentup_breaking_term_ids' ) ) {
+		$args['category__not_in'] = array_map( 'intval', (array) studentup_breaking_term_ids() );
+	}
+	$q = new WP_Query( $args );
+	return array_map( 'intval', (array) $q->posts );
+}
+
 function studentup_qual_assign( $post_id ) {
 	$post = get_post( $post_id );
 	if ( ! $post || 'revision' === $post->post_type ) {

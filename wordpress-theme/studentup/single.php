@@ -168,18 +168,26 @@ get_header();
 			// cross-category same-topic, (3) same-category latest fill — 4 cards
 			// (phone lo 2x2 neat grid). Ids-only light queries, count vaddu.
 			$su_picks = array();
-			if ( $su_cat && $su_tags ) {
-				$su_picks = get_posts(
+			// v1.9.136 step 0: same ORGANISATION (title alias match, real relation) — a TSPSC reader
+			// wants other TSPSC notices first; then same QUALIFICATION with an open last date.
+			if ( function_exists( 'studentup_org_related_ids' ) ) {
+				$su_picks = studentup_org_related_ids( get_the_ID(), 2 );
+			}
+			if ( count( $su_picks ) < 4 && function_exists( 'studentup_qual_related_ids' ) ) {
+				$su_picks = array_merge( $su_picks, studentup_qual_related_ids( get_the_ID(), 4 - count( $su_picks ), $su_picks ) );
+			}
+			if ( count( $su_picks ) < 4 && $su_cat && $su_tags ) {
+				$su_picks = array_merge( $su_picks, get_posts(
 					array(
 						'fields'              => 'ids',
-						'posts_per_page'      => 4,
+						'posts_per_page'      => 4 - count( $su_picks ),
 						'category__in'        => $su_cat,
 						'tag__in'             => $su_tags,
-						'post__not_in'        => array( get_the_ID() ),
+						'post__not_in'        => array_merge( array( get_the_ID() ), $su_picks ),
 						'ignore_sticky_posts' => true,
 						'no_found_rows'       => true, // v69 perf: count query vaddu
 					)
-				);
+				) );
 			}
 			if ( count( $su_picks ) < 4 && $su_tags ) {
 				$su_picks = array_merge(

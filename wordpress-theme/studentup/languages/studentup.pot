@@ -2,7 +2,7 @@
 # This file is distributed under the GNU GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: StudentUp 1.9.135\n"
+"Project-Id-Version: StudentUp 1.9.136\n"
 "Report-Msgid-Bugs-To: https://studentup.in/\n"
 "POT-Creation-Date: 2026-01-01 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -98,16 +98,12 @@ msgstr ""
 msgid "All"
 msgstr ""
 
-#: front-page.php:135
-msgid "All active sections"
-msgstr ""
-
 #: front-page.php:74
 #: page-today.php:23
 msgid "All deadlines"
 msgstr ""
 
-#: inc/qual-filter.php:493
+#: inc/qual-filter.php:532
 msgid "All qualifications"
 msgstr ""
 
@@ -221,7 +217,7 @@ msgstr ""
 msgid "Breaking news by state and district"
 msgstr ""
 
-#: inc/qual-filter.php:636
+#: inc/qual-filter.php:675
 msgid "Browse by qualification"
 msgstr ""
 
@@ -312,8 +308,8 @@ msgstr ""
 msgid "Closing in 3 days"
 msgstr ""
 
-#: inc/qual-filter.php:499
-#: inc/qual-filter.php:554
+#: inc/qual-filter.php:538
+#: inc/qual-filter.php:593
 msgid "Closing in 7 days"
 msgstr ""
 
@@ -394,6 +390,10 @@ msgstr ""
 
 #: footer.php:80
 msgid "Daily updates free ga — join avvandi."
+msgstr ""
+
+#: front-page.php:135
+msgid "Date-wise updates"
 msgstr ""
 
 #: inc/author-profile.php:118
@@ -804,7 +804,7 @@ msgstr ""
 msgid "More practice questions"
 msgstr ""
 
-#: inc/org-pages.php:310
+#: inc/org-pages.php:343
 #: inc/seo-max.php:190
 msgid "More updates:"
 msgstr ""
@@ -1117,7 +1117,7 @@ msgid "Recently read"
 msgstr ""
 
 #: page-today.php:26
-#: single.php:227
+#: single.php:235
 msgid "Recently viewed"
 msgstr ""
 
@@ -1689,7 +1689,7 @@ msgstr ""
 msgid "Your name (optional)"
 msgstr ""
 
-#: inc/qual-filter.php:491
+#: inc/qual-filter.php:530
 msgid "Your qualification:"
 msgstr ""
 
