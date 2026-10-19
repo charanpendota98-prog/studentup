@@ -101,6 +101,29 @@ function studentup_card_monogram( $label ) {
 	return $mono;
 }
 
+/**
+ * 1.9.152 — category → outline icon key for designed covers (replaces the "JO"
+ * monogram, which read like a bug). Slug keywords, never guessed from title.
+ *
+ * @param WP_Term|null $term Primary category.
+ * @return string studentup_cat_icon() key.
+ */
+function studentup_card_icon_key( $term ) {
+	$slug = $term instanceof WP_Term ? $term->slug : '';
+	$map  = array(
+		'software' => 'laptop', 'walk' => 'walk', 'intern' => 'work', 'private' => 'building',
+		'central' => 'flag', 'scholar' => 'school', 'result' => 'award', 'hall' => 'ticket', 'admit' => 'ticket',
+		'quiz' => 'quiz', 'current' => 'news', 'breaking' => 'bolt', 'news' => 'news', 'success' => 'trophy',
+		'exam' => 'exam', 'ap-' => 'city', 'andhra' => 'city', 'ts-' => 'bank', 'telangana' => 'bank', 'job' => 'work',
+	);
+	foreach ( $map as $needle => $icon ) {
+		if ( '' !== $slug && false !== strpos( $slug, $needle ) ) {
+			return $icon;
+		}
+	}
+	return 'work';
+}
+
 function studentup_card( $idx = 0 ) {
 	$cat   = studentup_card_cat();
 	$terms = get_the_category();
@@ -158,7 +181,7 @@ $label = $terms ? $terms[0]->name : 'Update';
 			// purathana version post title ni plain text box lo print chesedi, adi wireframe la kanipinchedi. ?>
 			<a class="thumb thumb--auto <?php echo esc_attr( $tone ); ?>" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
 				<span class="su-cov">
-					<b class="su-cov-mono"><?php echo esc_html( studentup_card_monogram( $label ) ); ?></b>
+					<b class="su-cov-mono su-cov-ico"><?php echo studentup_cat_icon( studentup_card_icon_key( $terms ? $terms[0] : null ), 34 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></b>
 					<span class="su-cov-cat"><?php echo esc_html( $label ); ?></span>
 					<span class="su-cov-brand">StudentUp</span>
 				</span>
