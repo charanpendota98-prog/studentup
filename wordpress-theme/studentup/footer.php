@@ -15,26 +15,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <footer class="footer">
 	<div class="wrap">
-		<div class="footer-grid">
+		<div class="footer-grid su-ft-v372">
 			<div>
 				<h3><?php bloginfo( 'name' ); ?></h3>
 				<p><?php esc_html_e( 'Jobs, scholarships, results and exam updates for students.', 'studentup' ); ?></p>
 				<p><?php echo studentup_ui_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Spotted a mistake? Tell us at', 'studentup' ); ?> <a href="mailto:<?php echo esc_attr( studentup_contact_email() ); ?>"><?php echo esc_html( studentup_contact_email() ); ?></a></p>
 			</div>
-			<div>
-				<h3><?php esc_html_e( 'Categories', 'studentup' ); ?></h3>
-				<ul>
-					<?php
-					foreach ( array_slice( studentup_most_used(), 0, 5 ) as $m ) :
-						$term = studentup_used_term( $m['slug'] );   // v89: alias-aware
-						if ( ! $term ) {
-							continue;
-						}
-						?>
-						<li><a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo esc_html( studentup_nav_english() ? $m['label'] : translate( $m['label'], 'studentup' ) ); ?></a></li>
+			<?php
+			// v372: Eenadu-Pratibha-style categorized link grid (owner reference). Links only —
+			// no counts/subtitles. Columns render only when the category really exists.
+			$su_ft_cols = array(
+				'Jobs'           => array( 'ts-jobs', 'ap-jobs', 'central-jobs', 'private-jobs', 'software-jobs', 'walkin-jobs', 'internships' ),
+				'Exams & More'   => array( 'hall-tickets', 'results', 'upcoming-exams', 'admissions', 'scholarships', 'govt-schemes', 'current-affairs', 'success-stories', 'daily-quiz' ),
+			);
+			$su_ft_labels = array();
+			foreach ( studentup_most_used() as $m ) {
+				$su_ft_labels[ $m['slug'] ] = $m['label'];
+			}
+			$su_ft_labels += array( 'upcoming-exams' => 'Upcoming Exams', 'admissions' => 'Admissions', 'govt-schemes' => 'Govt Schemes', 'daily-quiz' => 'Daily Quiz' );
+			foreach ( $su_ft_cols as $su_ft_h => $su_ft_slugs ) :
+				$su_ft_links = array();
+				foreach ( $su_ft_slugs as $su_ft_slug ) {
+					$su_ft_term = studentup_used_term( $su_ft_slug );
+					if ( ! $su_ft_term ) {
+						continue;
+					}
+					$su_ft_lbl = isset( $su_ft_labels[ $su_ft_slug ] ) ? $su_ft_labels[ $su_ft_slug ] : $su_ft_term->name;
+					$su_ft_links[ get_category_link( $su_ft_term ) ] = studentup_nav_english() ? $su_ft_lbl : translate( $su_ft_lbl, 'studentup' );
+				}
+				if ( ! $su_ft_links ) {
+					continue;
+				}
+				?>
+			<div class="su-ft-col">
+				<h3><?php echo esc_html( studentup_nav_english() ? $su_ft_h : translate( $su_ft_h, 'studentup' ) ); ?></h3>
+				<ul class="su-ft-list">
+					<?php foreach ( $su_ft_links as $su_ft_url => $su_ft_txt ) : ?>
+					<li><a href="<?php echo esc_url( $su_ft_url ); ?>"><?php echo esc_html( $su_ft_txt ); ?></a></li>
 					<?php endforeach; ?>
 				</ul>
 			</div>
+			<?php endforeach; ?>
 			<div>
 				<h3><?php esc_html_e( 'Other links', 'studentup' ); ?></h3>
 				<?php
