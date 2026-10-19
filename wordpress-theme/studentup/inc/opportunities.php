@@ -335,7 +335,7 @@ function studentup_opportunity_render_card( $row ) {
 			<?php endif; ?>
 		</div>
 		<div class="su-op-actions">
-			<a class="su-op-open" href="<?php echo esc_url( $row['link'] ); ?>" aria-label="<?php echo esc_attr( $row['title'] ); ?>"><?php esc_html_e( 'Details', 'studentup' ); ?>&nbsp;→</a>
+			<a class="su-op-open" href="<?php echo esc_url( $row['link'] ); ?>" aria-label="<?php echo esc_attr( __( 'Details', 'studentup' ) . ' — ' . $row['title'] ); ?>"><?php esc_html_e( 'Details', 'studentup' ); ?>&nbsp;→</a>
 			<?php if ( ! empty( $row['apply_url'] ) ) : ?>
 				<a class="su-op-apply" href="<?php echo esc_url( $row['apply_url'] ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr__( 'Apply Online (Official)', 'studentup' ); ?> — <?php echo esc_attr( $row['title'] ); ?>"><?php esc_html_e( 'Official Apply', 'studentup' ); ?></a>
 			<?php endif; ?>

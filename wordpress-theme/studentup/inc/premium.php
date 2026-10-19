@@ -542,11 +542,11 @@ function studentup_category_rail() {
 			<button class="su-catnav su-catnav--l" type="button" aria-label="<?php esc_attr_e( 'Scroll left', 'studentup' ); ?>" tabindex="-1">
 				<?php echo studentup_ui_icon( 'chevron', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?>
 			</button>
-			<div class="su-catrail" role="list" tabindex="0" aria-label="<?php esc_attr_e( 'Category shortcuts', 'studentup' ); ?>">
+			<div class="su-catrail" tabindex="0" aria-label="<?php esc_attr_e( 'Category shortcuts', 'studentup' ); ?>">
 				<?php $su_i = 0; ?>
 				<?php foreach ( $rows as $r ) : ?>
 					<?php $su_i++; ?>
-					<a role="listitem" class="su-cat c<?php echo (int) $su_i; ?><?php echo ! empty( $r['ext'] ) ? ' su-cat-live' : ''; ?>" href="<?php echo esc_url( $r['url'] ); ?>"<?php echo ! empty( $r['ext'] ) ? ' rel="noopener"' : ''; ?>>
+					<a class="su-cat c<?php echo (int) $su_i; ?><?php echo ! empty( $r['ext'] ) ? ' su-cat-live' : ''; ?>" href="<?php echo esc_url( $r['url'] ); ?>"<?php echo ! empty( $r['ext'] ) ? ' rel="noopener"' : ''; ?>>
 						<span class="su-cat-ic" aria-hidden="true"><?php echo studentup_cat_icon( $r['icon'], 30 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 						<b><?php echo esc_html( ( studentup_nav_english() ? $r['lab'] : translate( $r['lab'], 'studentup' ) ) ); ?></b>
 						<?php // v282: owner — icon + name matrame; hint text + count tiles meeda vaddu. ?>

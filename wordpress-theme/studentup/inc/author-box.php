@@ -78,7 +78,7 @@ function studentup_author_box() {
 						<span>CP</span>
 					</div>
 				<?php endif; ?>
-				<span class="su-ab-verified-badge" title="Author" aria-label="<?php echo esc_attr__( 'Author', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
+				<span class="su-ab-verified-badge" role="img" title="Author" aria-label="<?php echo esc_attr__( 'Author', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 			</div>
 		</div>
 

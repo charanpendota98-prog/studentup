@@ -85,10 +85,10 @@ function studentup_postnews_cta() {
 			<span class="su-postnews-ic" aria-hidden="true"><?php echo studentup_ui_icon( 'upload', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span>
 			<h2 id="su-postnews-h"><?php esc_html_e( 'Post your news', 'studentup' ); ?></h2>
 		</div>
-		<div class="su-postnews-tiles" role="list">
-			<a role="listitem" href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'trophy', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'Success story', 'studentup' ); ?></b></a>
-			<a role="listitem" href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'upload', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'Photo / Video', 'studentup' ); ?></b></a>
-			<a role="listitem" href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'pin', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'District update', 'studentup' ); ?></b></a>
+		<div class="su-postnews-tiles">
+			<a href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'trophy', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'Success story', 'studentup' ); ?></b></a>
+			<a href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'upload', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'Photo / Video', 'studentup' ); ?></b></a>
+			<a href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><span aria-hidden="true"><?php echo studentup_ui_icon( 'pin', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span><b><?php esc_html_e( 'District update', 'studentup' ); ?></b></a>
 		</div>
 		<a class="su-postnews-btn" href="<?php echo esc_url( $url ); ?>" data-su-ev="postnews_open"><?php esc_html_e( 'Send now', 'studentup' ); ?> <?php echo studentup_ui_icon( 'arrow', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></a>
 	</section>
@@ -422,10 +422,10 @@ function studentup_breaking_section_nav() {
 		<?php if ( $state instanceof WP_Term ) : ?>
 			<?php $dists = get_terms( array( 'taxonomy' => 'category', 'parent' => (int) $state->term_id, 'hide_empty' => false, 'orderby' => 'name' ) ); ?>
 			<?php if ( ! is_wp_error( $dists ) && $dists ) : ?>
-				<div class="su-brk-dists" role="list" data-su-brk-dists>
+				<div class="su-brk-dists" data-su-brk-dists>
 					<?php foreach ( $dists as $d ) : ?>
 						<?php $on = 'district' === $level && (int) $d->term_id === (int) $term->term_id; ?>
-						<a role="listitem" class="<?php echo esc_attr( $on ? 'su-brk-dist is-on' : 'su-brk-dist' ); ?>" href="<?php echo esc_url( get_category_link( $d ) ); ?>"<?php if ( $on ) : ?> aria-current="page"<?php endif; ?>><?php echo esc_html( $d->name ); ?></a>
+						<a class="<?php echo esc_attr( $on ? 'su-brk-dist is-on' : 'su-brk-dist' ); ?>" href="<?php echo esc_url( get_category_link( $d ) ); ?>"<?php if ( $on ) : ?> aria-current="page"<?php endif; ?>><?php echo esc_html( $d->name ); ?></a>
 					<?php endforeach; ?>
 				</div>
 				<p class="su-brk-nomatch" data-su-brk-nomatch hidden><?php esc_html_e( 'No district with that name — press Search to look inside the news.', 'studentup' ); ?></p>

@@ -34,9 +34,9 @@ function studentup_reader_toolbar() {
 		<div class="su-rb-right">
 			<span class="su-rb-label"><?php esc_html_e( 'Text Size:', 'studentup' ); ?></span>
 			<div class="su-font-sizer" role="group" aria-label="<?php echo esc_attr__( 'Font size controls', 'studentup' ); ?>">
-				<button type="button" class="su-fz-btn" data-su-font="small" title="<?php echo esc_attr__( 'Small text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Decrease font size', 'studentup' ); ?>">A-</button>
-				<button type="button" class="su-fz-btn is-active" data-su-font="normal" title="<?php echo esc_attr__( 'Normal text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Reset font size', 'studentup' ); ?>">A</button>
-				<button type="button" class="su-fz-btn" data-su-font="large" title="<?php echo esc_attr__( 'Large text', 'studentup' ); ?>" aria-label="<?php echo esc_attr__( 'Increase font size', 'studentup' ); ?>">A+</button>
+				<button type="button" class="su-fz-btn" data-su-font="small" title="<?php echo esc_attr__( 'Small text', 'studentup' ); ?>">A-</button>
+				<button type="button" class="su-fz-btn is-active" data-su-font="normal" title="<?php echo esc_attr__( 'Normal text', 'studentup' ); ?>">A</button>
+				<button type="button" class="su-fz-btn" data-su-font="large" title="<?php echo esc_attr__( 'Large text', 'studentup' ); ?>">A+</button>
 			</div>
 		</div>
 	</div>

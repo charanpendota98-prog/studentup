@@ -391,3 +391,14 @@ body.su-appbar-on .su-installwrap{display:none !important}
 @media (min-width:641px){body.su-has-applybar .su-installwrap{bottom:84px}}
 @media (min-width:900px){body.su-has-applybar .su-appbar{bottom:84px}}
 @media (min-width:641px) and (max-width:899px){body.su-has-applybar .su-appbar{bottom:84px}}
+/* 1.9.154 — accessibility (axe clean): drawer not focusable while closed; contrast fixes */
+.mpanel:not(.open){visibility:hidden;transition:right .25s ease,visibility 0s linear .25s}
+.mpanel.open{visibility:visible}
+.ibadge{background:#b45309 !important;color:#fff !important}
+.yt,.su-soc a.yt,.su-ab-links a.yt{background:#c00000 !important;color:#fff !important}
+.su-quiz-score span{color:#475569 !important;opacity:1 !important}
+.su-today-filters button span{color:#334155 !important;background:#e2e8f0 !important}
+.su-today-filters button.is-on span{background:#fff !important;color:#4c1d95 !important}
+.su-today-day h2 span,.su-today-group h2 span{color:#334155 !important;background:#e2e8f0 !important}
+.su-pn-wa{background:#128c4a !important;color:#fff !important}
+.su-pn-tg{background:#0b78b3 !important;color:#fff !important}
