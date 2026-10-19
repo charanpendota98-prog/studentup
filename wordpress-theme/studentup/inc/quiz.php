@@ -447,7 +447,7 @@ function studentup_daily_quiz( $args = array() ) {
 			</div>
 			<div class="su-quiz-bar"><i data-su-quiz-bar style="width:<?php echo esc_attr( (string) ( $answered ? $pct : 0 ) ); ?>%"></i></div>
 
-			<div class="su-q-jump" data-su-quiz-jump role="tablist" aria-label="<?php esc_attr_e( 'Jump to question', 'studentup' ); ?>"></div>
+			<div class="su-q-jump" data-su-quiz-jump role="group" aria-label="<?php esc_attr_e( 'Jump to question', 'studentup' ); ?>"></div>
 			<form method="post" class="su-quiz-form" data-su-quiz-form>
 				<?php wp_nonce_field( 'su_quiz_submit', 'su_quiz_nonce' ); ?>
 				<input type="hidden" name="su_quiz_submitted" value="1">

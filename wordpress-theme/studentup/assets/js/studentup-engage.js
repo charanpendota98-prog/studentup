@@ -79,7 +79,7 @@
         if ($(".su-opt.wrong", fs)) el.classList.add("miss");
         else if ($(".su-opt.right", fs)) el.classList.add("done");
         else el.classList.add("cur");
-        el.setAttribute("aria-selected", i === cur ? "true" : "false");
+        if (i === cur) { el.setAttribute("aria-current", "step"); } else { el.removeAttribute("aria-current"); }
       });
     }
 
