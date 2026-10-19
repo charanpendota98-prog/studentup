@@ -487,6 +487,9 @@ function studentup_breadcrumbs() {
 		$crumb = is_category() || is_tag() || is_tax() ? single_term_title( '', false ) : '';
 		if ( '' === (string) $crumb ) {
 			$crumb = wp_strip_all_tags( get_the_archive_title() );
+			if ( is_author() && function_exists( 'studentup_opt' ) ) {
+				$crumb = (string) studentup_opt( 'author_name', 'Charan Pendota' ); // 1.9.157: not "Author: admin"
+			}
 		}
 		$out .= ' › ' . esc_html( $crumb );
 	}

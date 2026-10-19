@@ -19,8 +19,15 @@ $su_author = get_queried_object();
 $su_id     = $su_author instanceof WP_User ? (int) $su_author->ID : (int) get_the_author_meta( 'ID' );
 $su_name   = $su_author instanceof WP_User ? $su_author->display_name : get_the_author_meta( 'display_name', $su_id );
 $su_bio    = $su_author instanceof WP_User ? $su_author->description : get_the_author_meta( 'description', $su_id );
-$su_name   = $su_name ?: 'Charan Pendota';
-$su_bio    = $su_bio ?: 'Charan Pendota is a content writer and digital marketing editor with 6+ years of experience in content writing. At StudentUp, he focuses on clear, source-backed education and career information for Telangana and Andhra Pradesh students.';
+// 1.9.157: one editorial identity everywhere — same name/bio/avatar/role as the post author box
+// (options author_name/author_bio/author_avatar_url). No gravatar (third-party request, often broken).
+$su_opt_name = function_exists( 'studentup_opt' ) ? (string) studentup_opt( 'author_name', 'Charan Pendota' ) : '';
+$su_opt_bio  = function_exists( 'studentup_opt' ) ? (string) studentup_opt( 'author_bio', '' ) : '';
+$su_opt_av   = function_exists( 'studentup_opt' ) ? (string) studentup_opt( 'author_avatar_url', '' ) : '';
+$su_role     = function_exists( 'studentup_opt' ) ? (string) studentup_opt( 'author_experience', __( 'Senior Education Editor · 5+ Years of Experience', 'studentup' ) ) : '';
+$su_name     = $su_opt_name ?: ( $su_name ?: 'Charan Pendota' );
+$su_bio      = $su_opt_bio ?: ( $su_bio ?: __( 'Charan Pendota is a senior content editor and digital career researcher with 5+ years of experience in Telugu job notifications, exam patterns, and career guidance. At StudentUp, he leads the fact-checking desk, ensuring 100% source-verified information for Telangana and Andhra Pradesh students.', 'studentup' ) );
+$su_initials = mb_strtoupper( mb_substr( $su_name, 0, 1 ) . ( preg_match( '/\s(\S)/u', $su_name, $su_m ) ? $su_m[1] : '' ) );
 $su_url    = $su_author instanceof WP_User ? $su_author->user_url : get_the_author_meta( 'user_url', $su_id );
 $su_count  = $su_id ? (int) count_user_posts( $su_id, 'post', true ) : 0;
 ?>
@@ -33,8 +40,10 @@ $su_count  = $su_id ? (int) count_user_posts( $su_id, 'post', true ) : 0;
 		<section class="article authortop" aria-labelledby="author-title">
 			<div class="authorwrap">
 				<?php
-				if ( $su_id ) {
-					echo get_avatar( $su_id, 96, '', esc_attr( $su_name ), array( 'class' => 'author-avatar' ) );
+				if ( $su_opt_av && wp_http_validate_url( $su_opt_av ) ) {
+					echo '<img class="author-avatar" src="' . esc_url( $su_opt_av ) . '" alt="' . esc_attr( $su_name ) . '" width="96" height="96" loading="lazy" decoding="async">';
+				} else {
+					echo '<div class="author-avatar su-ab-placeholder" aria-hidden="true"><span>' . esc_html( $su_initials ) . '</span></div>';
 				}
 				?>
 				<div class="authorbody">
@@ -47,6 +56,7 @@ $su_count  = $su_id ? (int) count_user_posts( $su_id, 'post', true ) : 0;
 						);
 						?>
 					</h1>
+					<?php if ( $su_role ) : ?><p class="authormeta su-author-role"><?php echo esc_html( $su_role ); ?></p><?php endif; ?>
 					<p class="authormeta">
 						<?php
 						printf(

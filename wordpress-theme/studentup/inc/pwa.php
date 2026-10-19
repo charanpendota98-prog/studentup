@@ -118,7 +118,7 @@ function studentup_manifest() {
 	// v178: empty/default tagline unte brand description — install sheet lo nagna text vaddu.
 	$manifest_desc = (string) get_bloginfo( 'description' );
 	if ( '' === trim( $manifest_desc ) || 'Just another WordPress site' === $manifest_desc ) {
-		$manifest_desc = 'Telangana & AP students ki jobs, scholarships, results, hall tickets — okate app lo anni updates.';
+		$manifest_desc = 'తెలంగాణ & ఆంధ్రప్రదేశ్ విద్యార్థుల కోసం ఉద్యోగాలు, స్కాలర్‌షిప్‌లు, రిజల్ట్స్, హాల్ టికెట్లు — అన్ని అప్‌డేట్స్ ఒకే యాప్‌లో.';
 	}
 	$manifest['description'] = $manifest_desc;
 	nocache_headers();
@@ -303,7 +303,7 @@ function studentup_app_bar() {
 		return;
 	}
 	?>
-	<div class="su-appbar" id="su-appbar" hidden>
+	<div class="su-appbar" id="su-appbar" role="complementary" aria-label="<?php echo esc_attr__( 'StudentUp App', 'studentup' ); ?>" hidden>
 		<div class="su-appbar-in">
 			<span class="su-appbar-mark" aria-hidden="true">SU</span>
 			<div class="su-appbar-tx"><strong><?php echo esc_html__( 'StudentUp App', 'studentup' ); ?></strong></div>

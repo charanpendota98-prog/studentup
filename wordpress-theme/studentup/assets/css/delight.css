@@ -423,3 +423,21 @@ body.dark .su-poll-vote,.su-poll-vote{background:#1d4ed8 !important;color:#fff !
 body.dark .su-scard-hot{background:#7c2d12 !important;color:#fff7ed !important;border-color:#9a3412 !important}
 body.dark .su-op-sec-head a,body.dark .su-op-more,body.dark .su-op-section-head a,body.dark .su-op-head a,body.dark a[rel="tag"],body.dark .su-tags a{color:#93c5fd !important}
 body.dark .su-op-date span,body.dark .su-op-date.is-soon span{color:#fbbf24 !important}
+/* 1.9.157 — WP gives tag archives body.tag; the card chip rule for .tag was styling the whole page (giant pill). */
+body.tag{background:var(--bg) !important;color:var(--ink) !important;border-radius:0 !important;padding:0 !important;font-size:16px !important;font-weight:400 !important;line-height:1.75 !important;display:block !important;overflow-wrap:normal !important}
+body.tag.su-has-applybar{padding-bottom:70px !important}
+@media (max-width:640px){body.tag{padding-bottom:74px !important}}
+/* 1.9.157 — 404 page: search row inline, latest posts as tappable rows (was a bare link list) */
+.su-404 form.chips{display:flex;flex-wrap:nowrap;gap:8px;max-width:520px;margin:14px auto 0;justify-content:center}
+.su-404 form.chips input[type=search]{flex:1 1 auto;min-width:0 !important;width:auto}
+.su-404 form.chips .chip{flex:0 0 auto;white-space:nowrap}
+.su-404 .bluebtn{margin-top:4px}
+.su-404cats{justify-content:center;margin-top:14px}
+.su-404latest{max-width:520px;margin:18px auto 0;display:grid;gap:8px}
+.su-404latest li{margin:0}
+.su-404latest a{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card,#fff);color:var(--ink) !important;font-weight:700;font-size:14px;line-height:1.4;text-align:left}
+.su-404latest a:active{transform:scale(.99)}
+.su-404-ic{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:var(--soft,#eef4ff);color:var(--blue,#1f5fbf)}
+@media (min-width:981px){.su-404latest a:hover{border-color:var(--blue);box-shadow:0 6px 18px rgba(15,46,98,.08)}}
+.authorwrap .su-ab-placeholder{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#1f5fbf,#7c3aed);color:#fff;font-weight:900;font-size:30px;flex:0 0 96px}
+.su-author-role{color:var(--blue) !important;font-weight:700}
