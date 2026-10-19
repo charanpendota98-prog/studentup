@@ -402,3 +402,24 @@ body.su-appbar-on .su-installwrap{display:none !important}
 .su-today-day h2 span,.su-today-group h2 span{color:#334155 !important;background:#e2e8f0 !important}
 .su-pn-wa{background:#128c4a !important;color:#fff !important}
 .su-pn-tg{background:#0b78b3 !important;color:#fff !important}
+/* ===== 1.9.155 DARK MODE CONTRAST (axe-core measured: 283 → 0) =====
+   Light-mode contrast overrides above used !important and leaked into dark mode;
+   sidebar/today links were #0f172a on #101a2c (1.02:1 = invisible). */
+body.dark .su-side-latest a,body.dark .su-side-closing a,body.dark .su-side a,body.dark .su-sidebox a,body.dark .su-today-t,body.dark .su-today-t a{color:#e5edf9 !important}
+body.dark .su-side-latest time,body.dark .su-side-closing time,body.dark .su-today-meta time,body.dark time,body.dark .su-today-time,body.dark .su-op-updated,body.dark .su-doubt-empty,body.dark .su-doubt-hint{color:#aab7c9 !important}
+body.dark .su-side-days,body.dark .su-today-dl,body.dark .su-op-date,body.dark .su-op-date.is-soon{color:#fbbf24 !important}
+body.dark .su-side-days.is-hot,body.dark .su-today-dl.is-hot{color:#fca5a5 !important}
+body.dark .su-today-cat,body.dark .su-secwise-more,body.dark .su-today-meta a{color:#c4b5fd !important}
+body.dark .crumbs a,body.dark .su-breadcrumbs a,body.dark .crumbs{color:#93c5fd !important}
+body.dark .su-bnav-lb,body.dark .su-bnav a{color:#b6c2d6 !important}
+body.dark .su-bnav a.is-active .su-bnav-lb,body.dark .su-bnav a[aria-current] .su-bnav-lb{color:#fff !important}
+body.dark .su-rb-time,body.dark .su-rb-label,body.dark .su-ab-pill{color:#cbd5e1 !important}
+body.dark .su-quiz-score span{color:#cbd5e1 !important}
+body.dark .su-toc-title{color:#dbeafe !important}
+body.dark .su-poll-kick{color:#fcd34d !important}
+.su-appbar-go{background:#fff !important;color:#0f172a !important}
+body.dark .su-poll-vote,.su-poll-vote{background:#1d4ed8 !important;color:#fff !important}
+.su-pn-wa{background:#0f7a5a !important}
+body.dark .su-scard-hot{background:#7c2d12 !important;color:#fff7ed !important;border-color:#9a3412 !important}
+body.dark .su-op-sec-head a,body.dark .su-op-more,body.dark .su-op-section-head a,body.dark .su-op-head a,body.dark a[rel="tag"],body.dark .su-tags a{color:#93c5fd !important}
+body.dark .su-op-date span,body.dark .su-op-date.is-soon span{color:#fbbf24 !important}
