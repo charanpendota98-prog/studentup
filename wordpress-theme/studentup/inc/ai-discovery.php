@@ -69,6 +69,7 @@ function studentup_ai_robots( $output, $public ) {
 	}
 	$lines[] = '# Editorial site guide for AI tools:';
 	$lines[] = '# ' . $home . '/llms.txt';
+	$lines[] = '# ' . $home . '/llms-full.txt';
 	$lines[] = 'Sitemap: ' . $home . '/wp-sitemap.xml';
 
 	return $output . implode( "\n", $lines ) . "\n";
