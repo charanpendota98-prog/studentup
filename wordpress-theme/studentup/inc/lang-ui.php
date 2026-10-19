@@ -1012,3 +1012,32 @@ function studentup_ui_te_page_title( $title, $post_id = 0 ) {
 }
 add_filter( 'the_title', 'studentup_ui_te_page_title', 10, 2 );
 add_filter( 'single_post_title', 'studentup_ui_te_page_title', 10, 2 );
+
+/**
+ * 1.9.153 — raw ISO dates inside post text ("2026-10-21") read like database
+ * output. Render them as "21 అక్టోబర్ 2026" in text nodes only (never inside
+ * tags/attributes, scripts, styles, code). Invalid dates are left untouched.
+ */
+function studentup_ui_te_iso_dates( $html ) {
+	if ( is_admin() || ! is_string( $html ) || false === strpos( $html, '20' ) ) {
+		return $html;
+	}
+	if ( ! function_exists( 'studentup_opt' ) || ! studentup_opt( 'ui_telugu', '1' ) ) {
+		return $html;
+	}
+	$months = array( 'జనవరి', 'ఫిబ్రవరి', 'మార్చి', 'ఏప్రిల్', 'మే', 'జూన్', 'జులై', 'ఆగస్టు', 'సెప్టెంబర్', 'అక్టోబర్', 'నవంబర్', 'డిసెంబర్' );
+	$parts  = preg_split( '/(<(?:script|style|code|pre|a)\b[^>]*>.*?<\/(?:script|style|code|pre|a)>|<[^>]+>)/is', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
+	foreach ( $parts as $i => $chunk ) {
+		if ( '' === $chunk || '<' === $chunk[0] ) {
+			continue;
+		}
+		$parts[ $i ] = preg_replace_callback( '/(?<![\d\/\-])(20\d{2})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])(?![\d\/\-:])/', function ( $m ) use ( $months ) {
+			if ( ! checkdate( (int) $m[2], (int) $m[3], (int) $m[1] ) ) {
+				return $m[0];
+			}
+			return (int) $m[3] . ' ' . $months[ (int) $m[2] - 1 ] . ' ' . $m[1];
+		}, $chunk );
+	}
+	return implode( '', $parts );
+}
+add_filter( 'the_content', 'studentup_ui_te_iso_dates', 11 );

@@ -278,7 +278,6 @@ function studentup_pdf_button() {
 		<button type="button" class="su-pdf-btn" id="su-pdf-btn">
 			<?php echo studentup_ui_icon( 'doc', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Save this notification as PDF', 'studentup' ); ?>
 		</button>
-		<span class="su-pdf-note"><?php esc_html_e( 'Uses your browser print dialog - choose "Save as PDF".', 'studentup' ); ?></span>
 	</p>
 	<script>
 	(function () {
