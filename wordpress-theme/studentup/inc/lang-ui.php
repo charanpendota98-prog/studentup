@@ -624,6 +624,8 @@ function studentup_ui_te_map() {
 		'Exams'                                   => 'పరీక్షలు',
 		'Categories'                              => 'విభాగాలు',
 		'Other links'                             => 'ఇతర లింకులు',
+		'Exams & More'                            => 'పరీక్షలు & మరిన్ని',
+		'Upcoming Exams'                          => 'రాబోయే పరీక్షలు',
 		// Deadlines.
 		'%d days left'                            => '%d రోజులు మిగిలాయి',
 		'Only %d days left'                       => 'ఇంకా %d రోజులే',
@@ -865,7 +867,7 @@ function studentup_nav_strings() {
 			'Hall Tickets', 'Results', 'Daily Quiz', 'Live Exams', 'Walk-in Jobs', 'Internships', 'Success Stories',
 			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
-			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
+			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Exams & More', 'Upcoming Exams', 'Govt Schemes', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
 		), true );
 	}
 	return $set;
