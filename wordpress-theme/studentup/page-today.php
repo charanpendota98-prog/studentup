@@ -18,7 +18,6 @@ get_header();
 		<div class="sectionhead">
 			<div>
 				<h1><?php echo esc_html( studentup_today_h1() ); ?></h1>
-				<p><?php echo esc_html( sprintf( __( 'Updates from the last %d days. Older posts are in each section.', 'studentup' ), STUDENTUP_TODAY_DAYS ) ); ?></p>
 			</div>
 			<a class="su-viewall" href="<?php echo esc_url( function_exists( 'studentup_opportunity_board_url' ) ? studentup_opportunity_board_url() : home_url( '/' ) ); ?>"><?php esc_html_e( 'All deadlines', 'studentup' ); ?> &rarr;</a>
 		</div>

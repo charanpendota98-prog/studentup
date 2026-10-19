@@ -274,7 +274,7 @@ function studentup_ui_te_map() {
 		'Thursday' => 'గురువారం',
 		'Friday' => 'శుక్రవారం',
 		'Saturday' => 'శనివారం',
-		'Today’s updates — jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ — ఉద్యోగాలు, Results, Hall Tickets',
+		'Today’s updates — jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ — ఉద్యోగాలు, రిజల్ట్స్, హాల్ టికెట్లు',
 		'Today’s updates (%s) — latest jobs, results, hall tickets' => 'ఈరోజు అప్‌డేట్స్ (%s) — ఉద్యోగాలు, Results, Hall Tickets',
 		'%1$d updates from the last %2$d days, grouped by date: notifications, last dates, results, hall tickets — Telugu. Updated every day.' => 'గత %2$d రోజుల్లో %1$d అప్‌డేట్స్, తేదీల వారీగా: నోటిఫికేషన్లు, చివరి తేదీలు, Results, Hall Tickets — తెలుగులో. ప్రతిరోజూ అప్‌డేట్.',
 		'Today’s updates'                         => 'ఈరోజు అప్‌డేట్స్',
@@ -860,12 +860,12 @@ function studentup_nav_strings() {
 	if ( null === $set ) {
 		$set = array_fill_keys( array(
 			'Home', 'Jobs', 'Scholarship', 'Scholarships', 'Alerts', 'Search', 'Menu', 'Main menu', 'Close menu',
-			'Explore by Category', 'All sections', 'Breaking News', 'Latest Jobs', 'Today’s updates', 'Today',
+			'Explore by Category', 'All sections', 'Breaking News', 'Latest Jobs', 'Today’s updates',
 			'TS Govt Jobs', 'AP Govt Jobs', 'Central Jobs', 'Central Govt Jobs', 'Software Jobs', 'Private Jobs',
 			'Hall Tickets', 'Results', 'Daily Quiz', 'Live Exams', 'Walk-in Jobs', 'Internships', 'Success Stories',
 			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
-			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'WEB APP', 'Follow us', 'Install', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
+			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
 		), true );
 	}
 	return $set;
