@@ -1,0 +1,10 @@
+import puppeteer from 'puppeteer-core'; import c from '@sparticuz/chromium';
+const urls=process.argv.slice(2).length?process.argv.slice(2):['/','/tspsc-group-2-notification-2026-783-posts/','/category/jobs/','/latest-jobs/'];
+const b=await puppeteer.launch({executablePath:'/tmp/chromium',args:c.args,headless:true});
+for(const u of urls){const p=await b.newPage();await p.setViewport({width:390,height:800,isMobile:true,deviceScaleFactor:2});
+const cdp=await p.target().createCDPSession();await cdp.send('Network.enable');await cdp.send('Network.emulateNetworkConditions',{offline:false,latency:150,downloadThroughput:1.6*1024*1024/8,uploadThroughput:750*1024/8});await cdp.send('Emulation.setCPUThrottlingRate',{rate:4});
+await p.evaluateOnNewDocument(()=>{window.__lcp=0;window.__cls=0;window.__lcpEl='';new PerformanceObserver(l=>{for(const e of l.getEntries()){window.__lcp=e.startTime;window.__lcpEl=(e.element?(e.element.tagName+'.'+e.element.className).slice(0,60):'')}}).observe({type:'largest-contentful-paint',buffered:true});new PerformanceObserver(l=>{for(const e of l.getEntries()){if(!e.hadRecentInput){window.__cls+=e.value;}}}).observe({type:'layout-shift',buffered:true});window.__lt=0;new PerformanceObserver(l=>{for(const e of l.getEntries()){window.__lt+=Math.max(0,e.duration-50)}}).observe({type:'longtask',buffered:true});});
+const t0=Date.now();await p.goto('http://localhost:8099'+u,{waitUntil:'networkidle0',timeout:120000});await new Promise(r=>setTimeout(r,2000));
+const m=await p.evaluate(()=>{const n=performance.getEntriesByType('navigation')[0];const fcp=performance.getEntriesByName('first-contentful-paint')[0];return {ttfb:Math.round(n.responseStart),fcp:Math.round(fcp?fcp.startTime:0),lcp:Math.round(window.__lcp),lcpEl:window.__lcpEl,cls:+window.__cls.toFixed(3),tbt:Math.round(window.__lt),dcl:Math.round(n.domContentLoadedEventEnd),load:Math.round(n.loadEventEnd),res:performance.getEntriesByType('resource').length,kb:Math.round(performance.getEntriesByType('resource').reduce((a,r)=>a+r.transferSize,0)/1024)+Math.round(n.transferSize/1024)}});
+console.log(u,JSON.stringify(m));await p.close();}
+await b.close();process.exit(0);

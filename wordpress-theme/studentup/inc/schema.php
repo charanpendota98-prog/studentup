@@ -30,7 +30,9 @@ function studentup_schema_head() {
 	$name  = get_bloginfo( 'name' );
 	$desc  = get_bloginfo( 'description' );
 	$logo  = has_custom_logo() ? wp_get_attachment_image_url( get_theme_mod( 'custom_logo' ), 'full' ) : '';
-	$socials = array_values( studentup_social_links() );
+	$socials = array_values( array_filter( (array) studentup_social_links(), function ( $u ) {
+		return is_string( $u ) && 0 === strpos( $u, 'http' );
+	} ) );
 
 	$org = array(
 		'@type' => 'Organization',
@@ -154,7 +156,7 @@ function studentup_newsarticle_schema() {
 		'description'      => wp_strip_all_tags( get_the_excerpt( $post_id ) ),
 		'datePublished'    => get_the_date( DATE_W3C, $post_id ),
 		'dateModified'     => get_the_modified_date( DATE_W3C, $post_id ),
-		'inLanguage'       => get_bloginfo( 'language' ),
+		'inLanguage'       => 'te-IN',
 		'mainEntityOfPage' => get_permalink( $post_id ),
 		'author'           => array(
 			'@type' => 'Person',
@@ -163,9 +165,13 @@ function studentup_newsarticle_schema() {
 		),
 		'publisher'        => array( '@id' => home_url( '/' ) . '#org' ),
 	);
-	if ( $image ) {
-		$data['image'] = array( $image );
+	if ( ! $image && function_exists( 'studentup_og_url' ) ) {
+		$image = studentup_og_url( $post_id ); // 1.9.156: Google Article rich results REQUIRE image — branded OG fallback.
 	}
+	if ( ! $image ) {
+		$image = get_template_directory_uri() . '/assets/og-default.png';
+	}
+	$data['image'] = array( $image );
 	// v1.9.119: one article node — entities merged here (was a 2nd Article node).
 	if ( function_exists( 'studentup_ai_entities_for_post' ) ) {
 		$data = array_merge( $data, studentup_ai_entities_for_post( get_the_ID() ) );
@@ -464,6 +470,15 @@ function studentup_rm_jsonld( $data, $jsonld = null ) {
 					$logo = get_site_icon_url( 512 );
 				}
 				$data[ $k ]['logo'] = array( '@type' => 'ImageObject', 'url' => $logo ? $logo : $brand );
+			}
+		}
+		// 1.9.156: Rank Math copies the <title> ("Post – Site") into headline; Google wants the
+		// bare article headline (≤110 chars) — suffix wastes the budget and is not the title.
+		if ( array_intersect( array( 'Article', 'NewsArticle', 'BlogPosting' ), $types ) && is_singular() ) {
+			$bare = wp_strip_all_tags( get_the_title( get_queried_object_id() ) );
+			if ( '' !== $bare ) {
+				$data[ $k ]['headline'] = mb_substr( $bare, 0, 110 );
+				$data[ $k ]['name']     = $bare;
 			}
 		}
 		if ( array_intersect( array( 'Article', 'NewsArticle', 'BlogPosting' ), $types ) && empty( $node['image'] ) ) {

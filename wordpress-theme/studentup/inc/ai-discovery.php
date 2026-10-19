@@ -137,6 +137,8 @@ function studentup_ai_site_schema() {
 	$org = array(
 		'@type' => 'Organization',
 		'@id'   => $home . '/#org',
+		'name'  => get_bloginfo( 'name' ),
+		'url'   => $home . '/',
 	);
 	if ( $topics ) {
 		$org['knowsAbout'] = $topics;
