@@ -14,7 +14,7 @@ get_header();
 ?>
 <main id="main">
 	<div class="wrap">
-		<article class="article" style="text-align:center">
+		<article class="article su-404" style="text-align:center">
 			<h1 style="font-size:56px;margin:0;color:var(--orange)">404</h1>
 			<h2 style="color:var(--navy)"><?php esc_html_e( 'Page not found', 'studentup' ); ?></h2>
 			<p style="color:var(--muted)"><?php esc_html_e( 'The link may have changed — search below or go to the home page.', 'studentup' ); ?></p>
@@ -53,9 +53,11 @@ get_header();
 				echo '<ul class="su-404latest">';
 				while ( $su_new->have_posts() ) {
 					$su_new->the_post();
+					$su_ic = function_exists( 'studentup_cat_icon' ) && function_exists( 'studentup_card_icon_key' ) ? studentup_cat_icon( studentup_card_icon_key( get_the_category() ? get_the_category()[0] : null ), 18 ) : '';
 					printf(
-						'<li><a href="%s">%s</a></li>',
+						'<li><a href="%s"><span class="su-404-ic" aria-hidden="true">%s</span><span>%s</span></a></li>',
 						esc_url( get_permalink() ),
+						$su_ic, // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 						esc_html( get_the_title() )
 					);
 				}
