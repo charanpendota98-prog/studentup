@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function studentup_opportunity_sections() {
 	return array(
-		'ts'          => array( 'label' => 'Telangana Government Jobs', 'icon' => 'bank' ),
-		'ap'          => array( 'label' => 'Andhra Pradesh Government Jobs', 'icon' => 'bank' ),
-		'central'     => array( 'label' => 'Central Government Jobs', 'icon' => 'flag' ),
+		'ts'          => array( 'label' => 'TS Govt Jobs', 'icon' => 'bank' ),
+		'ap'          => array( 'label' => 'AP Govt Jobs', 'icon' => 'bank' ),
+		'central'     => array( 'label' => 'Central Govt Jobs', 'icon' => 'flag' ),
 		'walkin'      => array( 'label' => 'Walk-in Jobs', 'icon' => 'walk' ),
 		'outsourcing' => array( 'label' => 'Outsourcing & Contract Jobs', 'icon' => 'person' ),
 		'job-melas'   => array( 'label' => 'Job Melas & Job Fairs', 'icon' => 'person' ),

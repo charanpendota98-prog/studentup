@@ -281,9 +281,7 @@ function studentup_doubts_block( $content ) {
 		. '<input type="text" name="su_doubt_hp" value="" tabindex="-1" autocomplete="off" aria-hidden="true" class="su-doubt-hp" />'
 		. '<button type="submit" name="su_doubt_submit" value="1" class="su-doubt-btn">'
 		. esc_html__( 'Ask question', 'studentup' ) . '</button>'
-		. '<small class="su-doubt-hint">'
-		. esc_html__( 'Reviewed before publishing. No links, emails or phone numbers.', 'studentup' )
-		. '</small></form>';
+		. '</form>';
 
 	return $content
 		. '<section class="su-doubts" id="su-doubts" aria-labelledby="su-doubts-title">'

@@ -387,3 +387,7 @@ body.su-appbar-on .su-installwrap{display:none !important}
 .su-cmp-table thead th{white-space:nowrap !important;word-break:keep-all;hyphens:none;font-size:11px}
 .su-cmp-table tbody th{min-width:220px}
 @media (max-width:640px){.su-cmp-table{min-width:560px;font-size:12.5px}}
+/* 1.9.153 — Download App pill must never sit on top of the sticky apply bar (desktop/tablet) */
+@media (min-width:641px){body.su-has-applybar .su-installwrap{bottom:84px}}
+@media (min-width:900px){body.su-has-applybar .su-appbar{bottom:84px}}
+@media (min-width:641px) and (max-width:899px){body.su-has-applybar .su-appbar{bottom:84px}}
