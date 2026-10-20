@@ -48,7 +48,7 @@ function studentup_mobile_main_rows() {
 		),
 		array( 'slug' => 'ts-jobs', 'icon' => 'bank', 'lab' => 'TS Govt Jobs', 'hint' => '' ),
 		array( 'slug' => 'ap-jobs', 'icon' => 'bank', 'lab' => 'AP Govt Jobs', 'hint' => '' ),
-		array( 'slug' => 'central', 'icon' => 'flag', 'lab' => 'Central Jobs', 'hint' => '' ),
+		array( 'slug' => 'central', 'icon' => 'flag', 'lab' => 'Central Govt Jobs', 'hint' => '' ),
 		array( 'slug' => 'walkin', 'icon' => 'walk', 'lab' => 'Walk-in Jobs', 'hint' => '' ),
 		array( 'slug' => 'software', 'icon' => 'laptop', 'lab' => 'Software Jobs', 'hint' => '' ),
 		array( 'slug' => 'private', 'icon' => 'building', 'lab' => 'Private Jobs', 'hint' => '' ),
