@@ -536,3 +536,16 @@ function studentup_subcat_chips( $cat_id ) {
 	}
 	echo '</nav>';
 }
+
+/**
+ * 1.9.161: keep exam identity tokens together in headlines — "Group 1", "Grade II",
+ * "Tier 2", "Paper 1" must never break across lines ("APPSC Group / 1 Notification").
+ * Front-end display only (titles in feeds, admin, <title> untouched).
+ */
+function studentup_title_nowrap_tokens( $title ) {
+	if ( is_admin() || is_feed() || ! is_string( $title ) || '' === $title || false !== strpos( $title, "\xC2\xA0" ) ) {
+		return $title;
+	}
+	return preg_replace( '/\b(Group|Grade|Level|Tier|Paper|Phase|Stage|Class|Set|గ్రూప్|గ్రేడ్)\s+(?=[IVX]{1,4}\b|\d{1,2}\b)/u', '$1' . "\xC2\xA0", $title );
+}
+add_filter( 'the_title', 'studentup_title_nowrap_tokens', 20 );
