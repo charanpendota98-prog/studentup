@@ -190,7 +190,13 @@ function studentup_apply_bar() {
 	}
 	$meta = studentup_apply_meta( get_the_ID() );
 	$days = studentup_apply_days_left( $meta['last'] );
-	$url  = '' !== $meta['apply'] ? $meta['apply'] : $meta['source'];
+	// 1.9.163 AUDIT FIX: sticky "Apply" button fell back to studentup_source_url —
+	// on live bot posts that is the news PUBLISHER (news18/sakshi). The primary
+	// CTA must never send readers to a competitor. Fallback order now: apply →
+	// official org site → official source (gov/nic/ac host only) → details anchor.
+	$org  = (string) get_post_meta( get_the_ID(), 'studentup_org_url', true );
+	$src  = ( '' !== $meta['source'] && function_exists( 'studentup_is_official_url' ) && studentup_is_official_url( $meta['source'], get_the_ID() ) ) ? $meta['source'] : '';
+	$url  = '' !== $meta['apply'] ? $meta['apply'] : ( ( preg_match( '#^https?://#i', $org ) && filter_var( $org, FILTER_VALIDATE_URL ) ) ? $org : $src );
 
 	$chip  = '';
 	$state = 'open';

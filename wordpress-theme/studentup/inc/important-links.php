@@ -31,9 +31,17 @@ function studentup_important_links_box() {
 	$pid     = get_the_ID();
 	$apply   = esc_url_raw( (string) get_post_meta( $pid, 'studentup_apply_url', true ) );
 	$source  = esc_url_raw( (string) get_post_meta( $pid, 'studentup_source_url', true ) );
+	$org     = esc_url_raw( (string) get_post_meta( $pid, 'studentup_org_url', true ) );
+	// 1.9.163 AUDIT FIX: studentup_source_url is often the news PUBLISHER the bot
+	// rewrote from (news18 / sakshi / HT). It was rendered as "Official
+	// Notification" and "Official Website · telugu.news18.com" on live posts.
+	// Publisher links are never shown (owner rule v340); only official hosts.
+	if ( $source && function_exists( 'studentup_is_official_url' ) && ! studentup_is_official_url( $source, $pid ) ) {
+		$source = '';
+	}
 	$last    = trim( (string) get_post_meta( $pid, 'studentup_last_date', true ) );
 	$expired = function_exists( 'studentup_opportunity_is_expired' ) ? studentup_opportunity_is_expired( $last ) : false;
-	if ( ! $apply && ! $source ) {
+	if ( ! $apply && ! $source && ! $org ) {
 		return; // golden rule: data lekapote render kaadu.
 	}
 	$rows = array();
@@ -44,9 +52,10 @@ function studentup_important_links_box() {
 		$is_pdf = (bool) preg_match( '/\.pdf(\?|$)/i', $source );
 		$rows[] = array( $is_pdf ? __( 'Official Notification (PDF)', 'studentup' ) : __( 'Official Notification', 'studentup' ), $source, $is_pdf ? 'download' : 'news', 'notification', false );
 	}
-	$host_src = wp_parse_url( $source ? $source : $apply, PHP_URL_HOST );
-	if ( $host_src ) {
-		$scheme = wp_parse_url( $source ? $source : $apply, PHP_URL_SCHEME );
+	$site_u   = $org ? $org : ( $source ? $source : $apply );
+	$host_src = $site_u ? wp_parse_url( $site_u, PHP_URL_HOST ) : '';
+	if ( $host_src && ( $org || ! function_exists( 'studentup_is_official_url' ) || studentup_is_official_url( $site_u, $pid ) ) ) {
+		$scheme = wp_parse_url( $site_u, PHP_URL_SCHEME );
 		$rows[] = array( __( 'Official Website', 'studentup' ) . ' · ' . preg_replace( '/^www\./', '', $host_src ), ( $scheme ? $scheme : 'https' ) . '://' . $host_src . '/', 'globe', 'official', false );
 	}
 	$cat = function_exists( 'studentup_card_cat' ) ? studentup_card_cat( $pid ) : null;

@@ -175,7 +175,6 @@ function studentup_llms_full_txt() {
 			'studentup_salary'    => 'Salary',
 			'studentup_fee'       => 'Application fee',
 			'studentup_apply_url' => 'Apply link',
-			'studentup_source_url' => 'Official notification',
 			'studentup_org_url'   => 'Organisation website',
 		);
 		foreach ( $posts as $post ) {

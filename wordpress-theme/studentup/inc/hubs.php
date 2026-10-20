@@ -123,7 +123,7 @@ function studentup_hub_section( $slug, $label, $limit = 6 ) {
 	$out .= '</div>';
 	if ( $cat_url && ! is_wp_error( $cat_url ) ) {
 		$out .= '<p class="su-hub-more"><a class="su-viewall" href="' . esc_url( $cat_url ) . '">'
-			. esc_html( 'See all ' . $label ) . ' ' . studentup_ui_icon( 'arrow-right', 13 ) . '</a></p>';
+			. esc_html( __( 'See all', 'studentup' ) . ' ' . $label ) . ' ' . studentup_ui_icon( 'arrow', 13 ) . '</a></p>'; // 1.9.163: translatable + real icon key
 	}
 	return $out;
 }
