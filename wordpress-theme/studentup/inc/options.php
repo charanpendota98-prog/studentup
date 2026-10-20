@@ -61,7 +61,7 @@ function studentup_option_fields() {
 				'audio_reader' => array( 'Telugu text-to-speech audio reader (posts)', 'check', '1', 'v165: Web Speech API voice synthesis bar — increases dwell time' ),
 				'faq_schema' => array( 'FAQ accordion & FAQPage schema (posts)', 'check', '1', 'v165: rich snippet FAQ schema for Google SERP expandable snippets' ),
 				'quick_summary' => array( '1-Minute Key Highlights box (posts)', 'check', '1', 'v166: TL;DR bullet takeaways — reduces bounce rate' ),
-				'reader_toolbar' => array( 'Reader toolbar (font sizer & reading time)', 'check', '1', 'v166: accessibility font adjuster and reading time' ),
+				'reader_toolbar' => array( 'Reader toolbar (font sizer & reading time)', 'check', '0', 'v379: OFF by default — owner: read-time & A-/A+ bar above apply link is wasted space (browser zoom exists)' ),
 				'community_pulse' => array( 'Community Pulse WhatsApp/Telegram card', 'check', '1', 'v166: 50k+ student community conversion box' ),
 				'fee_calc' => array( 'Application fee & concession calculator', 'check', '1', 'v167: interactive fee calculator with category exemptions' ),
 				'syllabus_tracker' => array( 'Syllabus & study progress tracker', 'check', '1', 'v167: interactive syllabus checkbox checklist with percentage' ),
