@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function studentup_reader_toolbar() {
-	if ( ! is_singular( 'post' ) || ! studentup_opt( 'reader_toolbar', '1' ) ) {
+	if ( ! is_singular( 'post' ) || ! studentup_opt( 'reader_toolbar', '0' ) ) {   // v379: default off (owner)
 		return;
 	}
 
