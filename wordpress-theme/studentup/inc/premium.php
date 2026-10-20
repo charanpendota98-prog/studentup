@@ -465,7 +465,7 @@ function studentup_category_rail() {
 	$defs = array(
 		array( 'slug' => 'ts-jobs', 'icon' => 'bank', 'lab' => 'TS Govt Jobs', 'hint' => '' ),
 		array( 'slug' => 'ap-jobs', 'icon' => 'city', 'lab' => 'AP Govt Jobs', 'hint' => '' ),
-		array( 'slug' => 'central-jobs', 'icon' => 'flag', 'lab' => 'Central Jobs', 'hint' => '' ),
+		array( 'slug' => 'central-jobs', 'icon' => 'flag', 'lab' => 'Central Govt Jobs', 'hint' => '' ),
 		array( 'slug' => 'software-jobs', 'icon' => 'laptop', 'lab' => 'Software Jobs', 'hint' => '' ),
 		array( 'slug' => 'private-jobs', 'icon' => 'building', 'lab' => 'Private Jobs', 'hint' => '' ),
 		array( 'slug' => 'hall-tickets', 'icon' => 'ticket', 'lab' => 'Hall Tickets', 'hint' => '' ),

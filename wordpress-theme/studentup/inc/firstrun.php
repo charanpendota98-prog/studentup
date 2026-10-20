@@ -365,7 +365,7 @@ function studentup_setup_menu_plan() {
 		array( 'home', '', 'Home' ),
 		array( 'cat', 'ts-jobs', 'Telangana Jobs' ),
 		array( 'cat', 'ap-jobs', 'AP Jobs' ),
-		array( 'cat', 'central-jobs', 'Central Jobs' ),
+		array( 'cat', 'central-jobs', 'Central Govt Jobs' ),
 		array( 'cat', 'results', 'Results' ),
 		array( 'cat', 'hall-ticket', 'Hall Tickets' ),
 		array( 'cat', 'scholarships', 'Scholarships' ),
