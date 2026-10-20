@@ -224,7 +224,7 @@ function studentup_apply_bar() {
 						<span class="su-applyfact"><?php echo esc_html( $meta['vac'] ); ?> <?php esc_html_e( 'posts', 'studentup' ); ?></span>
 					<?php endif; ?>
 					<?php if ( '' !== $meta['qual'] && function_exists( 'studentup_qual_pretty' ) ) : ?>
-						<span class="su-applyfact"><?php echo esc_html( studentup_qual_pretty( $meta['qual'] ) );   // v175: raw keys kaadu — human labels ?></span>
+						<span class="su-applyfact su-applyfact--qual"><?php echo esc_html( studentup_qual_pretty( $meta['qual'] ) );   // v175: raw keys kaadu — human labels ?></span>
 					<?php endif; ?>
 				</span>
 			</div>
