@@ -512,7 +512,7 @@ function studentup_feed_content( $content ) {
 	}
 	$id     = get_the_ID();
 	$out    = $content;
-	$source = $id ? trim( (string) get_post_meta( $id, 'studentup_source_url', true ) ) : '';
+	$source = $id ? trim( (string) get_post_meta( $id, 'studentup_org_url', true ) ) : '';   // 1.9.163: official org only — publisher URL never leaves the site (RSS/Telegram feeds included)
 	if ( $source && wp_http_validate_url( $source ) ) {
 		$out .= '<p><strong>Official source:</strong> <a href="' . esc_url( $source ) . '">Notification / official portal</a></p>';
 	}

@@ -53,6 +53,25 @@ function studentup_strip_foreign_block_placeholders( $html ) {
 		// Bot's own "More updates" list duplicates the theme's related block below the article.
 		$html = preg_replace( '#<section[^>]*class="[^"]*\bsu-related\b[^"]*"[^>]*>.*?</section>#is', '', $html );
 		$html = studentup_clean_legacy_bot_chrome( $html );
+		// 1.9.164 owner screenshots (live): class names vary across old bot
+		// versions, so also strip by TEXT markers — any innermost block that
+		// carries a promo kicker/disclosure or a source/provenance line.
+		// Nested boxes ("STUDENTUP · మా సేవ" wrapping "SPONSORED · PARTNER")
+		// are removed inside-out by looping.
+		$html = studentup_strip_blocks_with_marker( $html, array(
+			'SPONSORED · PARTNER', 'SPONSORED · COLLEGE PARTNER', 'SPONSORED', 'Sponsored · Partner',
+			'direct link to our partner', 'not a paid advertisement', 'Advertisement —', 'Advertisement -',
+			'STUDENTUP · మా సేవ', '🔎 Source', '🔎 Sources', 'Source check తేదీ', '· checked 20',
+			'Official Website‌లో ఒకసారి ధృవీకరించుకోండి', 'రూపొందించబడింది. Source',
+		) );
+		// 1.9.165: per-post <style> with a Google Fonts @import (old bot MOBILE_CSS)
+		// — render-blocking request on every article; theme already loads the font.
+		$html = preg_replace( '#<style\b[^>]*>[^<]*@import\s+url\([^<]*fonts\.googleapis[^<]*</style>#isu', '', $html );
+		// 1.9.165: stale baked countdown ("29 days left") → theme pill from meta is live.
+		$html = preg_replace( '#\s*[—–-]\s*<strong>\s*\d+\s+days left\s*</strong>[^<]*#iu', '', $html );
+		$html = preg_replace( '#Last date to apply:#iu', 'దరఖాస్తు చివరి తేదీ:', $html );
+		// Standalone "More updates: <category>" line (theme shows its own related block).
+		$html = preg_replace( '#<p[^>]*>\s*(?:<strong>)?\s*(?:More updates|మరిన్ని అప్‌డేట్స్|మరిన్ని అప్‌డేట్‌లు)\s*:?.*?</p>#isu', '', $html );
 	}
 
 	/* 3) Khali shells clean — pైn strip tarvata migిలే blank blocks. */
@@ -122,5 +141,104 @@ function studentup_clean_legacy_bot_chrome( $html ) {
 	}
 	// 6) Machine phrasing.
 	$html = preg_replace( '#\s*,?\s*(?:as per|according to|per) (?:the )?source (?:evidence|text|data)\b#i', '', $html );
+	return $html;
+}
+
+/**
+ * 1.9.164: remove the innermost <aside|section|div|p|blockquote> that contains
+ * any marker text. Loops so nested promo boxes disappear inside-out. Markers
+ * are matched case-sensitively as given (plus lowercase variant for ASCII).
+ *
+ * @param string $html    Content.
+ * @param array  $markers Plain-text markers.
+ * @return string
+ */
+function studentup_strip_blocks_with_marker( $html, $markers ) {
+	if ( ! is_string( $html ) || '' === $html ) {
+		return $html;
+	}
+	$hit = false;
+	foreach ( $markers as $m ) {
+		if ( false !== strpos( $html, $m ) ) {
+			$hit = true;
+			break;
+		}
+	}
+	if ( ! $hit ) {
+		return $html;
+	}
+	$alt = implode( '|', array_map( 'preg_quote', $markers, array_fill( 0, count( $markers ), '#' ) ) );
+	// innermost element: no same-tag opening between the opening tag and the marker.
+	$re  = '#<(aside|section|div|p|blockquote)\b[^>]*>(?:(?!<\1\b)(?!</\1>).)*?(?:' . $alt . ')(?:(?!<\1\b)(?!</\1>).)*?</\1>#isu';
+	// 0) OUTERMOST promo container first (aside/section wrapping a marker) —
+	//    balanced scan, so the whole box goes, not just the kicker line.
+	$html = studentup_remove_enclosing_blocks( $html, $markers, array( 'aside', 'section' ) );
+	for ( $i = 0; $i < 8; $i++ ) {
+		$new = preg_replace( $re, '', $html );
+		if ( null === $new || $new === $html ) {
+			break;
+		}
+		$html = $new;
+	}
+	// Any marker left as bare text (no wrapper) — drop that text line.
+	$html = preg_replace( '#(?:^|>)[^<]*(?:' . $alt . ')[^<]*(?=<|$)#u', '>', $html );
+	return $html;
+}
+
+/**
+ * 1.9.164: remove the OUTERMOST <aside>/<section> that encloses a marker, using
+ * a balanced tag scan (handles nested boxes). Max 12 removals per call.
+ *
+ * @param string $html    Content.
+ * @param array  $markers Plain-text markers.
+ * @param array  $tags    Container tag names.
+ * @return string
+ */
+function studentup_remove_enclosing_blocks( $html, $markers, $tags ) {
+	for ( $guard = 0; $guard < 12; $guard++ ) {
+		$mpos = false;
+		foreach ( $markers as $m ) {
+			$pp = strpos( $html, $m );
+			if ( false !== $pp && ( false === $mpos || $pp < $mpos ) ) {
+				$mpos = $pp;
+			}
+		}
+		if ( false === $mpos ) {
+			return $html;
+		}
+		// tokens: opening/closing tags of the container names, with offsets.
+		$tagre = '#<(/?)(' . implode( '|', $tags ) . ')\b[^>]*>#i';
+		if ( ! preg_match_all( $tagre, $html, $tm, PREG_OFFSET_CAPTURE ) ) {
+			return $html;
+		}
+		$stack = array();
+		$outer = null; // array(start, end) of outermost container containing $mpos
+		$depth_at_marker = null;
+		foreach ( $tm[0] as $i => $tok ) {
+			$off   = $tok[1];
+			$close = '/' === $tm[1][ $i ][0];
+			if ( $off > $mpos && null === $depth_at_marker ) {
+				$depth_at_marker = count( $stack );
+				if ( 0 === $depth_at_marker ) {
+					break; // marker not inside any container → nothing to do here
+				}
+				$outer = array( 'start' => $stack[0], 'end' => null );
+			}
+			if ( ! $close ) {
+				$stack[] = $off;
+			} else {
+				array_pop( $stack );
+				if ( null !== $outer && 0 === count( $stack ) ) {
+					$outer['end'] = $off + strlen( $tok[0] );
+					break;
+				}
+			}
+		}
+		if ( null === $outer || null === $outer['end'] ) {
+			// marker outside any container (or unbalanced) → leave for the innermost pass
+			return $html;
+		}
+		$html = substr( $html, 0, $outer['start'] ) . substr( $html, $outer['end'] );
+	}
 	return $html;
 }

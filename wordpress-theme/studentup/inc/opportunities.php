@@ -53,20 +53,51 @@ function studentup_opportunity_days_left( $last_date ) {
 	return (int) floor( ( $end - $today ) / DAY_IN_SECONDS );
 }
 
+/**
+ * 1.9.163: is this URL an OFFICIAL organisation page (never a news publisher)?
+ * Bot stores the publisher it rewrote from in studentup_source_url; that must
+ * never be labelled "Official". Official = government/education TLDs, or the
+ * same host as the verified organisation URL (studentup_org_url) / apply URL.
+ */
+function studentup_is_official_url( $url, $post_id = 0 ) {
+	$host = strtolower( (string) wp_parse_url( (string) $url, PHP_URL_HOST ) );
+	if ( '' === $host ) {
+		return false;
+	}
+	$host = preg_replace( '/^www\./', '', $host );
+	if ( preg_match( '/\.(gov|nic|ac|edu|res|mil)\.in$|\.gov$|\.edu$|\.ac\.[a-z]{2}$|cgg\.gov\.in$|apcfss\.in$|\.org\.in$/', $host ) ) {
+		return true;
+	}
+	foreach ( array( 'studentup_org_url', 'studentup_apply_url' ) as $k ) {
+		$u = (string) get_post_meta( (int) $post_id, $k, true );
+		$h = preg_replace( '/^www\./', '', strtolower( (string) wp_parse_url( $u, PHP_URL_HOST ) ) );
+		if ( '' !== $h && ( $h === $host || substr( $host, -strlen( '.' . $h ) ) === '.' . $h || substr( $h, -strlen( '.' . $host ) ) === '.' . $host ) ) {
+			return true;
+		}
+	}
+	return (bool) apply_filters( 'studentup_is_official_url', false, $url, $host, $post_id );
+}
+
 function studentup_source_verification_notice( $post_id = 0 ) {
-	$post_id      = $post_id ? (int) $post_id : (int) get_the_ID();
-	$source_url   = trim( (string) get_post_meta( $post_id, 'studentup_source_url', true ) );
-	$checked      = trim( (string) get_post_meta( $post_id, 'studentup_source_checked', true ) );
-	$application  = trim( (string) get_post_meta( $post_id, 'studentup_apply_url', true ) );
-	if ( ! wp_http_validate_url( $source_url ) ) {
+	// 1.9.163 AUDIT FIX: this line used to print "Source verification · Open
+	// official source" in English and LINKED THE PUBLISHER (news18/sakshi/HT)
+	// stored in studentup_source_url on every bot post — owner rule v340: never
+	// show source details on posts. Now: Telugu trust line, links ONLY the
+	// verified official organisation site (studentup_org_url); publisher URL is
+	// never rendered. Nothing official → nothing rendered.
+	$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+	$org_url = trim( (string) get_post_meta( $post_id, 'studentup_org_url', true ) );
+	$checked = trim( (string) get_post_meta( $post_id, 'studentup_source_checked', true ) );
+	if ( ! preg_match( '#^https?://#i', $org_url ) || ! filter_var( $org_url, FILTER_VALIDATE_URL ) ) { // display-only check (wp_http_validate_url does DNS)
 		return '';
 	}
 	$checked_stamp = preg_match( '/^20\d{2}-\d{2}-\d{2}$/', $checked ) ? strtotime( $checked . ' 12:00:00' ) : false;
-	$html = '<div class="su-source-trust" role="note"><strong>Source verification</strong> · ';
-	$html .= $checked_stamp ? esc_html( 'Checked ' . wp_date( 'd M Y', $checked_stamp ) ) : esc_html__( 'Official source registered; check the notice before applying.', 'studentup' );
-	$html .= ' · <a href="' . esc_url( $source_url ) . '" target="_blank" rel="noopener noreferrer">Open official source</a>';
-	if ( wp_http_validate_url( $application ) ) {
-		$html .= ' · <a href="' . esc_url( $application ) . '" target="_blank" rel="noopener noreferrer">Official application</a>';
+	$host          = preg_replace( '#^www\.#', '', (string) wp_parse_url( $org_url, PHP_URL_HOST ) );
+	$html          = '<div class="su-source-trust" role="note">' . studentup_ui_icon( 'check', 13 ) . ' '
+		. '<a href="' . esc_url( $org_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $host ) . '</a> '
+		. esc_html__( 'అధికారిక నోటిఫికేషన్ ఆధారంగా', 'studentup' );
+	if ( $checked_stamp ) {
+		$html .= ' · ' . esc_html__( 'చివరిగా సరిచూసినది', 'studentup' ) . ': ' . esc_html( function_exists( 'studentup_ui_te_date' ) ? studentup_ui_te_date( wp_date( 'j F Y', $checked_stamp ), 'j F Y' ) : wp_date( 'j F Y', $checked_stamp ) );
 	}
 	return $html . '</div>';
 }
