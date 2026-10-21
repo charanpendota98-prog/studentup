@@ -64,6 +64,12 @@ function studentup_strip_foreign_block_placeholders( $html ) {
 			'STUDENTUP · మా సేవ', '🔎 Source', '🔎 Sources', 'Source check తేదీ', '· checked 20',
 			'Official Website‌లో ఒకసారి ధృవీకరించుకోండి', 'రూపొందించబడింది. Source',
 		) );
+		// 1.9.165: per-post <style> with a Google Fonts @import (old bot MOBILE_CSS)
+		// — render-blocking request on every article; theme already loads the font.
+		$html = preg_replace( '#<style\b[^>]*>[^<]*@import\s+url\([^<]*fonts\.googleapis[^<]*</style>#isu', '', $html );
+		// 1.9.165: stale baked countdown ("29 days left") → theme pill from meta is live.
+		$html = preg_replace( '#\s*[—–-]\s*<strong>\s*\d+\s+days left\s*</strong>[^<]*#iu', '', $html );
+		$html = preg_replace( '#Last date to apply:#iu', 'దరఖాస్తు చివరి తేదీ:', $html );
 		// Standalone "More updates: <category>" line (theme shows its own related block).
 		$html = preg_replace( '#<p[^>]*>\s*(?:<strong>)?\s*(?:More updates|మరిన్ని అప్‌డేట్స్|మరిన్ని అప్‌డేట్‌లు)\s*:?.*?</p>#isu', '', $html );
 	}
