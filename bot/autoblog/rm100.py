@@ -249,13 +249,33 @@ def _trim_slug(slug: str, limit: int = 75) -> str:
     return cut.strip("-")
 
 
+def _translit_slug(text: str, max_len: int = 60) -> str:
+    """Telugu → lowercase ASCII kebab (ITRANS via indic-transliteration when
+    installed; minimal built-in fallback keeps digits/latin only)."""
+    try:
+        from indic_transliteration import sanscript
+        from indic_transliteration.sanscript import transliterate
+        lat = transliterate(text, sanscript.TELUGU, sanscript.ITRANS)
+    except Exception:  # noqa: BLE001 — library optional
+        lat = text
+    import unicodedata
+    lat = "".join(c for c in unicodedata.normalize("NFKD", lat) if not unicodedata.combining(c))
+    lat = lat.replace("\u200c", "").replace("\u200d", "").lower()
+    lat = re.sub(r"\.(?=[a-z])", "", lat)          # ITRANS dots (.n .d)
+    lat = lat.replace("~", "").replace("^", "")
+    lat = re.sub(r"([aeiou])\1", r"\1", lat)        # aa→a, ii→i (readable)
+    lat = re.sub(r"[^a-z0-9]+", "-", lat).strip("-")
+    return _trim_slug(lat, max_len)
+
+
 def fix_slug(article: dict) -> bool:
     kw = _kw(article)
     if not kw:
         return False
     # v85: ASCII-only tokens (Telugu keyword → %E0.. URL-encoded slug vaddu;
     # English kebab-case = share/CTR safe). LLM slug English unte touch kaadu.
-    toks = [t for t in re.sub(r"[^a-z0-9\s-]", " ", kw.lower()).split() if len(t) > 2]
+    toks = [t for t in re.sub(r"[^a-z0-9\s-]", " ", kw.lower()).split()
+            if len(t) > 2 or t.isdigit()]   # v395: keep "group 2" / "grade ii" numbers
     slug = (article.get("slug") or "").lower()
     need = min(2, len(toks)) if toks else 1
     have = sum(1 for t in toks if t in slug)
@@ -266,9 +286,18 @@ def fix_slug(article: dict) -> bool:
         article["slug"] = _trim_slug(slug)
         return True
     prefix = "-".join(toks) or re.sub(r"[^a-z0-9]+", "-", kw.lower()).strip("-")
+    if not re.search(r"[a-z]", prefix):
+        prefix = ""   # v395: "2" / "2026" alone is not a keyword prefix ("2-tspsc-group-2-…" bug)
     if not prefix:
-        return False  # pure-Telugu keyword — existing slug ne keep (corrupt vaddu)
-    slug_ascii = re.sub(r"[^a-z0-9-]+", "-", slug).strip("-")
+        # v395: pure-Telugu keyword → readable transliterated ASCII slug
+        # ("ఉపాధ్యాయ నియామకాలు 2026" → "upadhyaya-niyamakalu-2026") instead of a
+        # %E0-encoded URL (share/CTR + Rank Math URL test). Existing English slug kept.
+        if slug and re.fullmatch(r"[a-z0-9-]{8,}", slug) and not slug.startswith("auto-draft"):
+            return False
+        prefix = _translit_slug(kw)
+        if not prefix:
+            return False
+    slug_ascii = "" if ("%" in slug or not re.search(r"[a-z]", slug)) else re.sub(r"[^a-z0-9-]+", "-", slug).strip("-")
     article["slug"] = _trim_slug(
         re.sub(r"-{2,}", "-", f"{prefix}-{slug_ascii}").strip("-"), 70)
     return True
