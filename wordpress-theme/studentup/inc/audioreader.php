@@ -53,7 +53,7 @@ function studentup_audio_reader() {
 			</div>
 		</div>
 		<div class="su-audio-controls" id="su-audio-controls" style="display:none;">
-			<button type="button" id="su-audio-stop" class="su-audio-ctrl-btn" aria-label="<?php esc_attr_e( 'Stop audio', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> Stop</button>
+			<button type="button" id="su-audio-stop" class="su-audio-ctrl-btn" aria-label="<?php esc_attr_e( 'Stop audio', 'studentup' ); ?>"><?php echo studentup_ui_icon( 'close', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Stop', 'studentup' ); ?></button>
 			<span class="su-audio-speed" id="su-audio-speed-btn" role="button" tabindex="0" title="Change speed">1.0x</span>
 		</div>
 	</div>

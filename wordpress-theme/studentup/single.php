@@ -153,8 +153,16 @@ get_header();
 
 			<?php studentup_ad( 'below-content' ); ?>
 			<?php
-			if ( comments_open() || get_comments_number() ) {
+			// 1.9.168: the Doubts & Answers box is the reader-question surface on posts —
+			// a second WordPress comment form under it was duplicate input (clutter).
+			// Existing comments still render; the form only when the doubts box is off.
+			$su_doubts_on = function_exists( 'studentup_doubts_enabled' ) ? studentup_doubts_enabled() : false;
+			if ( get_comments_number() || ( comments_open() && ! $su_doubts_on ) ) {
+				if ( $su_doubts_on ) {
+					add_filter( 'comments_open', '__return_false', 99 );
+				}
 				comments_template();
+				remove_filter( 'comments_open', '__return_false', 99 );
 			}
 			?>
 

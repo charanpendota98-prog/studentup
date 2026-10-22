@@ -702,6 +702,7 @@ function studentup_ui_te_map() {
 		'Apply Now'                               => 'దరఖాస్తు చేయండి',
 		'Job alerts on Telegram'                  => 'Telegram లో జాబ్ అలర్ట్స్',
 		'Doubts & Answers'                        => 'సందేహాలు & సమాధానాలు',
+		'Stop'                                    => 'ఆపండి',
 		'No questions yet. Ask the first one — we answer with the official source.' => 'ఇంకా ప్రశ్నలు లేవు. మొదటి ప్రశ్న మీరే అడగండి — official source ఆధారంగా సమాధానం ఇస్తాం.',
 		'Your question (Telugu or English)'       => 'మీ ప్రశ్న (తెలుగు లేదా English)',
 		'Your name (optional)'                    => 'మీ పేరు (ఐచ్ఛికం)',
@@ -868,7 +869,7 @@ function studentup_nav_strings() {
 			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
 			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Exams & More', 'Upcoming Exams', 'Govt Schemes', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
-			'Social', 'More', 'Explore', 'Browse everything', 'Most searched by students', 'Site menu', 'Sidebar',
+			'Social', 'More', 'Explore', 'Walk-in Interviews', 'Jobs by qualification', 'Exams', 'Previous papers & keys', 'Browse everything', 'Most searched by students', 'Site menu', 'Sidebar',
 		), true );
 	}
 	return $set;

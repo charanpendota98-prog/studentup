@@ -69,6 +69,11 @@ function studentup_keyfacts_box() {
 	// v310: Key Highlights box (quick_summary) already lists vacancies/qualification/salary/last date —
 	// same facts twice, stacked = clutter. Strip renders only when that box is switched off.
 	// v1.9.117: quick_summary box no longer in the post template → this strip is THE facts block.
+	// 1.9.168: bot posts carry their own facts card (.su-facts-card) in the content —
+	// the same numbers twice, stacked, was showing on live. One facts block per post.
+	if ( false !== strpos( (string) get_post_field( 'post_content', get_the_ID() ), 'su-facts-card' ) ) {
+		return;
+	}
 	$facts = studentup_keyfacts_data();
 	$apply = esc_url_raw( (string) get_post_meta( get_the_ID(), 'studentup_apply_url', true ) );
 	if ( count( $facts ) < 2 && ! $apply ) {
