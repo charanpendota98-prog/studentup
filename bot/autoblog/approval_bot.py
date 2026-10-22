@@ -328,10 +328,33 @@ class ApprovalBot:
     # ------------------------------------------------------------- actions
 
     def _wp_post_status(self, post_id: int, status: str) -> dict:
-        resp = self.wp._request("POST", f"posts/{post_id}", json={"status": status})
-        if resp.status_code not in (200, 201):
-            raise WordPressError(f"WP {resp.status_code}: {resp.text[:200]}")
-        return resp.json()
+        """v394: publish fires many WP hooks (Rank Math, sitemap, push, cache
+        purge) — the proxy sometimes answers 5xx/timeout AFTER WordPress has
+        already changed the status. Verify by GET before reporting failure, and
+        retry once on a transient error."""
+        last = ""
+        for attempt in (1, 2):
+            transient = False
+            try:
+                resp = self.wp._request("POST", f"posts/{post_id}", json={"status": status},
+                                        timeout=max(120, int(getattr(config, "HTTP_TIMEOUT", 90))))
+                if resp.status_code in (200, 201):
+                    return resp.json()
+                last = f"WP {resp.status_code}: {resp.text[:200]}"
+                transient = resp.status_code >= 500 or resp.status_code in (408, 429)
+            except (requests.Timeout, requests.ConnectionError) as exc:
+                last, transient = f"WP connection: {str(exc)[:160]}", True
+            try:  # status already changed server-side?
+                chk = self.wp._request("GET", f"posts/{post_id}", params={"context": "edit"})
+                if chk.status_code == 200 and (chk.json() or {}).get("status") == status:
+                    log.info("post %s status=%s confirmed after transient error (%s)", post_id, status, last)
+                    return chk.json()
+            except Exception:  # noqa: BLE001
+                pass
+            if not transient or attempt == 2:
+                break
+            time.sleep(4)
+        raise WordPressError(last or "WP: unknown error")
 
     def _finish(self, cb: dict, text: str, answer: str) -> None:
         msg = cb.get("message", {})
@@ -469,10 +492,20 @@ class ApprovalBot:
                 + (notifier.esc(review_note) if review_note else ""),
                 "Publish ayyindi! 🚀",
             )
-        except WordPressError as exc:
-            log.error("Publish failed for %s: %s", post_id, exc)
+        except Exception as exc:  # noqa: BLE001 — v394: owner must always see WHY
+            log.exception("Publish failed for %s", post_id)
+            short = str(exc)[:150] or type(exc).__name__
             self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),
-                                            "text": f"Failed: {str(exc)[:150]}"})
+                                            "text": f"Failed: {short}"})
+            low = short.lower()
+            hint = ("WordPress slow/unreachable — 1 నిమిషం తర్వాత మళ్లీ ✅ నొక్కండి"
+                    if ("connection" in low or "timeout" in low or re.match(r"wp 5\d\d", low))
+                    else "WordPress admin లో draft open చేసి అక్కడే Publish నొక్కండి")
+            self.tg("sendMessage", {
+                "chat_id": str(cb.get("message", {}).get("chat", {}).get("id", "")),
+                "text": f"❌ Post {post_id} publish fail: {notifier.esc(short)}\n{hint}",
+                "parse_mode": "HTML",
+            })
 
     def do_delete(self, cb: dict, post_id: int) -> None:
         try:
