@@ -1,4 +1,6 @@
 
+## v394 — TOC dead-link sync · 2nd+ "ఇది" sentence-start fix · related-entities casing (RRB not Rrb) · build_milesweb_kit NameError
+
 ## Bot source repo లో ఉంది (`bot/`) — zip అవసరం లేదు
 
 Server లో ఒకసారి:

@@ -693,6 +693,23 @@ def fix_takeaways(article: dict, html: str) -> str:
     return box + html
 
 
+_ACRONYMS = {"rrb", "ssc", "upsc", "tspsc", "tgpsc", "appsc", "ntpc", "dsc", "tet", "ibps", "sbi",
+             "rbi", "lic", "isro", "drdo", "ecil", "becil", "nmms", "jee", "neet", "eamcet", "icet",
+             "pgecet", "cbse", "ap", "ts", "tg", "iti", "iiit", "nit", "iit", "gds", "cgl", "chsl",
+             "mts", "alp", "je", "si", "pc", "asi", "pet", "pst", "cbt", "ugc", "net", "csir", "aiims",
+             "esic", "epfo", "bsnl", "ongc", "ntpc", "sail", "bhel", "hal", "bel", "nlc", "nhpc", "pgcil"}
+
+
+def _nice_case(kw: str) -> str:
+    """'rrb group d 2026 last date' → 'RRB Group D 2026 Last Date' (no 'Rrb')."""
+    out = []
+    for w in str(kw or "").split():
+        lw = w.lower()
+        out.append(w.upper() if lw in _ACRONYMS or re.fullmatch(r"[a-z]\d*|\d+[a-z]", lw)
+                   else (w if re.search(r"[\u0c00-\u0c7f]", w) else w[:1].upper() + w[1:]))
+    return " ".join(out)
+
+
 def fix_entities(article: dict, html: str) -> str:
     """'సంబంధిత అంశాలు' — primary entity ki related entities (universe nunchi).
 
@@ -737,7 +754,7 @@ def fix_entities(article: dict, html: str) -> str:
         return html
     base = config.WP_SITE.rstrip("/")
     links = "".join(
-        f'<li><a href="{_html.escape(base)}/?s={_html.escape(urlencode({"q": n})[2:])}">{_html.escape(n.title())}</a></li>'
+        f'<li><a href="{_html.escape(base)}/?s={_html.escape(urlencode({"q": n})[2:])}">{_html.escape(_nice_case(n))}</a></li>'
         for n in names[:4])
     block = ('<div class="su-related-entities"><div class="su-related-title">సంబంధిత అంశాలు</div>'
              f'<ul>{links}</ul></div>\n')

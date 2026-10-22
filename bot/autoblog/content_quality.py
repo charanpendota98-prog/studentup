@@ -163,12 +163,36 @@ _SENT_FILLER = (
 )
 
 
+# v394 (owner v322: no robotic "ఇది" sentence starts). The first "ఇది …" in a
+# post is tolerated (gate: ≤1); every later one is rewritten ONLY when dropping
+# the pronoun leaves a complete Telugu sentence — i.e. it ends in a finite verb /
+# predicate where the subject is understood from the previous sentence.
+_IDI_SAFE_END = re.compile(
+    r"(?:అవసరం|ఉంటుంది|ఉంది|ఉన్నాయి|అవుతుంది|జరుగుతుంది|వస్తుంది|ఉంటాయి|చేయాలి|"
+    r"చేసుకోవాలి|చేయవచ్చు|చేసుకోవచ్చు|వర్తిస్తుంది|లభిస్తుంది|తప్పనిసరి)\s*[.!]?\s*$")
+
+
+def _drop_idi_start(part: str, seen: dict) -> str:
+    m = re.match(r"^(\s*(?:<[^>]+>\s*)*)ఇది\s+(\S.*)$", part, flags=re.S)
+    if not m:
+        return part
+    seen["n"] += 1
+    if seen["n"] <= 1:
+        return part
+    rest = m.group(2)
+    plain = validator.strip_tags(rest).strip()
+    if len(plain.split()) < 4 or not _IDI_SAFE_END.search(plain):
+        return part
+    return m.group(1) + rest
+
+
 def tidy(html: str) -> Tuple[str, Dict]:
     """v360 deterministic clean-up (owner v322/v340): drop the 2nd+ copy of an
     exact sentence/paragraph and whole-sentence filler. Works inside <p>/<li>
     only and never removes a fragment whose inline tags would become unbalanced."""
-    removed = {"dup_sentences": 0, "dup_paragraphs": 0, "filler": 0}
+    removed = {"dup_sentences": 0, "dup_paragraphs": 0, "filler": 0, "idi_start": 0}
     seen_par: set = set()
+    seen_idi = {"n": 0}
     seen_sent: set = set()
 
     def _para(m):
@@ -181,6 +205,10 @@ def tidy(html: str) -> Tuple[str, Dict]:
             seen_par.add(norm_p)
         parts = re.split(r"(?<=[.!?\u0964])\s+", inner)
         if len(parts) <= 1 and not any(re.search(f, validator.strip_tags(inner).strip(), re.I) for f in _SENT_FILLER):
+            inner2 = _drop_idi_start(inner, seen_idi)
+            if inner2 != inner:
+                removed["idi_start"] += 1
+                return open_tag + inner2 + close_tag
             return m.group(0)
         keep = []
         for part in parts:
@@ -192,6 +220,10 @@ def tidy(html: str) -> Tuple[str, Dict]:
             if any(re.search(f, txt, re.I) for f in _SENT_FILLER):
                 removed["filler"] += 1
                 continue
+            part2 = _drop_idi_start(part, seen_idi)
+            if part2 != part:
+                removed["idi_start"] += 1
+                part = part2
             if len(n.split()) >= 6:
                 if n in seen_sent:
                     removed["dup_sentences"] += 1
@@ -217,8 +249,9 @@ def tidy(html: str) -> Tuple[str, Dict]:
     out, n_bang = re.subn(r"!{2,}", "!", out)
     removed["hype_marks"] = n_bang
     try:  # v392: a heading left with no body after filler removal ("ముగింపు")
-        from .det_fix import drop_empty_sections
+        from .det_fix import drop_empty_sections, sync_toc
         out, removed["empty_sections"] = drop_empty_sections(out)
+        out, removed["toc_dead_links"] = sync_toc(out)   # v394
     except Exception:  # noqa: BLE001
         pass
     return out, removed

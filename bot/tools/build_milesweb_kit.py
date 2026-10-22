@@ -214,7 +214,8 @@ def main(argv: list[str] | None = None) -> int:
         stale = theme_zip_stale_files(ROOT / "wordpress-theme" / "studentup",
                                       ROOT / "wordpress-theme" / "studentup-theme.zip")
     except Exception as exc:  # noqa: BLE001
-        stale, stale_detail = [], lambda _s: str(exc)  # type: ignore[assignment]
+        _err = str(exc)
+        stale, stale_detail = [], lambda _s, _e=_err: _e  # type: ignore[assignment]
     if stale:
         print(f"  ⛔ theme zip stale ({stale_detail(stale)}) — mundu run cheyandi:")
         print("     python3 tools/build_wp_theme.py")

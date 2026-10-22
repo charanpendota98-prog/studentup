@@ -236,10 +236,38 @@ def fix_first_para_keyword(html: str, keyword: str) -> tuple[str, bool]:
 _EMPTY_H2 = re.compile(r"<h2\b[^>]*>(?:(?!</h2>).)*</h2>\s*(?=<h2\b|<section\b|<script\b|$)", re.S | re.I)
 
 
+def sync_toc(html: str) -> tuple[str, int]:
+    """v394: TOC rows whose heading no longer exists (section dropped later in
+    the pipeline) are removed; a TOC left with < 3 live rows is removed whole.
+    Returns (html, rows_removed)."""
+    html = html or ""
+    m = re.search(r"<!-- wp:rank-math/toc-block[^>]*-->.*?<!-- /wp:rank-math/toc-block -->\n?",
+                  html, flags=re.S)
+    if not m:
+        return html, 0
+    block = m.group(0)
+    ids = set(re.findall(r'<h[1-6][^>]*\bid="([^"]+)"', html))
+    rows = re.findall(r"<li>.*?</li>", block, flags=re.S)
+    def _live(row: str) -> bool:
+        h = re.search(r'href="#([^"]+)"', row)
+        return bool(h) and h.group(1) in ids
+    keep = [r for r in rows if _live(r)]
+    dropped = len(rows) - len(keep)
+    if not dropped:
+        return html, 0
+    if len(keep) < 3:
+        return html.replace(block, "", 1), dropped
+    new_block = re.sub(r"<ol>.*?</ol>", "<ol>" + "".join(keep) + "</ol>", block, count=1, flags=re.S)
+    return html.replace(block, new_block, 1), dropped
+
+
 def drop_empty_sections(html: str) -> tuple[str, int]:
     """v392: an H2 with nothing under it (model's "Conclusion" whose only
-    sentence was filler and got removed) must not stay as a dangling heading."""
+    sentence was filler and got removed) must not stay as a dangling heading.
+    v394: TOC re-synced so no dead jump links remain."""
     out, n = _EMPTY_H2.subn("", html or "")
+    if n:
+        out, _ = sync_toc(out)
     return out, n
 
 
