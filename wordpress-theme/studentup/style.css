@@ -4,7 +4,7 @@ Theme URI: https://studentup.in/
 Author: StudentUp
 Author URI: https://studentup.in/
 Description: StudentUp design for Telangana & Andhra Pradesh students — TS/AP/Central govt jobs, qualification filter (SSC/10th · Inter · Degree · PG), live search, latest-jobs scrolling ticker, brand social icons, install as an app (PWA), job/exam cards, AdSense-ready ad slots, dark mode. Mobile-first, Rank Math + AdSense friendly.
-Version: 1.9.166
+Version: 1.9.167
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -315,6 +315,9 @@ body.dark .article-content .su-quick-answer-card .su-qa{color:#e7f0ff}
 body.dark .article-content .su-official-links{background:#16213a;border-color:#25406b}
 body.dark .article-content .su-official-links h2{color:#cfe1ff}
 body.dark .article-content .su-official-links a{color:#9ec4ff}
+.article-content .su-implinks-aff,.su-implinks-aff{margin:8px 0 0;font-size:12px;line-height:1.5;color:#5b6b7f}
+html.su-dark .su-implinks-aff{color:#9fb0c6}
+
 /* Author box (E-E-A-T) */
 .su-author-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin:8px 0 4px;color:#42566f;font-size:13px}.su-author-meta strong{color:#163f73}.su-author{display:flex;gap:12px;align-items:flex-start;background:#fafcff;border:1px solid #e3ecf9;border-radius:12px;padding:14px;margin:18px 0}
 .su-author-avatar{width:44px;height:44px;border-radius:50%;background:#e8f1ff;display:grid;place-items:center;font-size:22px}
