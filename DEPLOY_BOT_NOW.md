@@ -1,4 +1,6 @@
 
+## v395 bot — slugs: pure-Telugu keywords → readable transliterated ASCII slug (no %E0 URLs); "2-tspsc-…" numeric-prefix bug fixed; "group 2" numbers kept in slugs; encoded junk never appended
+## theme 1.9.168 — rig-verified (WP 6.8 + theme rendered: home/category/single/search/404/author = 0 PHP warnings) + fixes: one facts block per post (theme strip hidden when bot facts card present); no 2nd comment form under Doubts box; card excerpts start at first sentence (facts-card text leaked); closing-soon dates Telugu-only ("Fri," gone); auto-cover cards no duplicate category chip; "Stop"→"ఆపండి"; drawer "Walk-in Interviews" English. Plus live screenshot fixes: drawer "More" duplicate menu removed + vertical-list guard; leftover old-theme sidebar widgets (Blocksy search / lorem testimonial) OFF by default; footer "Daily Quiz" duplicate removed; full Telugu month names in dates; orphan English title tails ("… Last", "… Official") hidden on display; drawer labels English (nav_english)
 ## v394 + theme 1.9.167 — affiliate row (Important Links box, one-switch, disclosure) · adsense_ready repo path · Telegram ✅ Publish resilient (5xx/timeout → verify+retry, clear error message) · TOC dead-link sync · 2nd+ "ఇది" sentence-start fix · related-entities casing (RRB not Rrb) · build_milesweb_kit NameError
 
 ## Bot source repo లో ఉంది (`bot/`) — zip అవసరం లేదు

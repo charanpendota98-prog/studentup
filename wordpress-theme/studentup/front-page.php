@@ -76,7 +76,7 @@ if ( ! $su_is_p2 && function_exists( 'studentup_opportunity_board_posts' ) && fu
 		<?php foreach ( $su_closing as $su_row ) : ?>
 			<li><?php echo studentup_slider_pill( $su_row['id'] ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<a href="<?php echo esc_url( $su_row['link'] ); ?>" data-su-ev="closing_click"><?php echo esc_html( $su_row['title'] ); ?></a>
-				<span class="su-closing-date"><?php echo esc_html( date_i18n( 'D, j M', strtotime( $su_row['last_date'] ) ) ); ?></span></li>
+				<span class="su-closing-date"><?php echo esc_html( date_i18n( 'j F', strtotime( $su_row['last_date'] ) ) ); ?></span></li>
 		<?php endforeach; ?>
 		</ul>
 	</div>

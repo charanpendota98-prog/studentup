@@ -166,19 +166,7 @@ studentup_breaking_ticker();
 		?>
 		<a href="<?php echo esc_url( get_category_link( $term ) ); ?>"><?php echo studentup_ui_icon( $m['icon'], 15 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php echo esc_html( translate( $m['label'], 'studentup' ) ); ?></a>
 	<?php endforeach; ?>
-	<div class="mlabel"><?php esc_html_e( 'More', 'studentup' ); ?></div>
-	<?php
-	if ( has_nav_menu( 'mobile' ) ) {
-		wp_nav_menu(
-			array(
-				'theme_location' => 'mobile',
-				'container'      => false,
-				'depth'          => 1,
-				'fallback_cb'    => false,
-			)
-		);
-	}
-	?>
+	<?php /* v1.9.168: 'More' wp_nav_menu block removed — it repeated the category links above (owner: no duplicates) and rendered letter-per-line on some phones. */ ?>
 	<div class="mlabel"><?php esc_html_e( 'Social', 'studentup' ); ?></div>
 	<?php $su_soc = studentup_social_links(); ?>
 	<a class="su-msoc su-msoc-wa" href="<?php echo esc_url( $su_soc['whatsapp'] ); ?>" target="_blank" rel="noopener"><?php echo studentup_social_icon( 'whatsapp', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> WhatsApp</a>

@@ -7,3 +7,4 @@ trafilatura>=1.9.0   # v374: open-source main-text extractor (boilerplate remova
 lxml_html_clean>=0.1   # v374: trafilatura needs it with lxml>=5.2
 feedparser>=6.0.0    # v374: tolerant RSS/Atom parsing
 dateparser>=1.2   # v393: optional, English free-text dates
+indic-transliteration>=2.3

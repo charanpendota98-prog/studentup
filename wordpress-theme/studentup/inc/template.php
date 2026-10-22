@@ -189,7 +189,9 @@ $label = $terms ? $terms[0]->name : 'Update';
 		<?php endif; ?>
 		<div class="newsbody">
 			<div class="tagrow">
+				<?php if ( has_post_thumbnail() ) : // 1.9.168: auto cover already shows the category name — no second chip ?>
 				<span class="tag"><?php echo esc_html( $label ); ?></span>
+				<?php endif; ?>
 				<?php
 				// v140: honest freshness tag — only for posts actually published
 				// in the last 24 hours. No fake "HOT" on an old notification.
@@ -549,3 +551,41 @@ function studentup_title_nowrap_tokens( $title ) {
 	return preg_replace( '/\b(Group|Grade|Level|Tier|Paper|Phase|Stage|Class|Set|గ్రూప్|గ్రేడ్)\s+(?=[IVX]{1,4}\b|\d{1,2}\b)/u', '$1' . "\xC2\xA0", $title );
 }
 add_filter( 'the_title', 'studentup_title_nowrap_tokens', 20 );
+
+/**
+ * 1.9.168: older bot titles were cut at a word boundary and left an orphan
+ * English tail ("… 1688 పోస్టులు Last", "… పరీక్షల తేదీలు Official"). Display-only
+ * clean: drop ONE trailing orphan token from a small list when the title also
+ * contains Telugu (never touches pure-English or editor-written titles ending in
+ * real words like "Notification"). Post data / <title> untouched.
+ */
+function studentup_title_strip_orphan_tail( $title ) {
+	if ( is_admin() || is_feed() || ! is_string( $title ) || '' === $title || ! preg_match( '/[\x{0C00}-\x{0C7F}]/u', $title ) ) {
+		return $title;
+	}
+	return preg_replace( '/[\s\x{00A0}]+(?:Last|Official|Apply|Check|Online|Direct|Link|Download|Here|Details|Full|Latest|New|Out|Date|Dates)[\s\x{00A0}.:\-–]*$/u', '', $title );
+}
+add_filter( 'the_title', 'studentup_title_strip_orphan_tail', 19 );
+
+
+/**
+ * 1.9.168: card excerpts must start with the article's first sentence — not the
+ * facts card / quick answer / official links / tables / headings the bot places
+ * before it ("ముఖ్య వివరాలు పోస్టులు1,200 చివరి తేదీ…" was showing on cards).
+ */
+function studentup_excerpt_source_clean( $text, $post = null ) {
+	if ( ! $post || ! empty( $post->post_excerpt ) || is_admin() ) {
+		return $text;
+	}
+	$html = (string) $post->post_content;
+	$html = preg_replace( '#<(section|div)[^>]*class="[^"]*(su-facts-card|su-quick-answer-card|su-official-links|su-faq|su-related-entities|su-toc|wp-block-rank-math-toc-block)[^"]*"[^>]*>.*?</\1>#isu', ' ', $html );
+	$html = preg_replace( '#<!-- wp:rank-math/toc-block.*?<!-- /wp:rank-math/toc-block -->#isu', ' ', $html );
+	$html = preg_replace( '#<(table|h[1-6]|figure|ul|ol)\b[^>]*>.*?</\1>#isu', ' ', $html );
+	$html = strip_shortcodes( $html );
+	$plain = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $html ) ) );
+	if ( '' === $plain ) {
+		return $text;
+	}
+	return wp_trim_words( $plain, (int) apply_filters( 'excerpt_length', 30 ), '…' );
+}
+add_filter( 'get_the_excerpt', 'studentup_excerpt_source_clean', 9, 2 );
