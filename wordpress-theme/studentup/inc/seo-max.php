@@ -42,7 +42,10 @@ function studentup_seo_max_head() {
 	global $wp_query;
 	$paged = max( 1, (int) get_query_var( 'paged' ), (int) get_query_var( 'page' ) );
 	$max   = isset( $wp_query->max_num_pages ) ? (int) $wp_query->max_num_pages : 0;
-	if ( ! is_singular() && $max > 1 ) {
+	// 1.9.168: virtual routes (/latest-jobs/, org/qual pages) have no /page/N/ —
+	// rel=next pointed to a 404 (found by crawl QA).
+	$virtual = get_query_var( 'studentup_opportunities' ) || get_query_var( 'studentup_org_page' ) || get_query_var( 'studentup_qual_page' ) || get_query_var( 'studentup_today' );
+	if ( ! is_singular() && $max > 1 && ! $virtual ) {
 		if ( $paged > 1 ) {
 			$prev = get_pagenum_link( $paged - 1 );
 			if ( $prev ) {
