@@ -125,6 +125,7 @@ body.dark .article-content .su-quick-answer-card .su-qa{color:#e7f0ff}
 body.dark .article-content .su-official-links{background:#16213a;border-color:#25406b}
 body.dark .article-content .su-official-links h2{color:#cfe1ff}
 body.dark .article-content .su-official-links a{color:#9ec4ff}
+.article-content .su-implinks-aff{margin:8px 0 0;font-size:12px;line-height:1.5;color:#5b6b7f}
 .entry-content .su-figure{margin:16px 0;padding:0}
 .entry-content .su-figure img{width:100%;height:auto;border-radius:12px;display:block}
 .entry-content .su-figure figcaption{font-size:13px;color:#5b6b7f;margin-top:7px;line-height:1.5;text-align:center}

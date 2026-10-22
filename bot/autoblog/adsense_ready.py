@@ -35,6 +35,8 @@ from . import config
 ROOT = Path(config.BASE_DIR)
 PREVIEW = ROOT / "preview"
 THEME = ROOT / "wordpress-theme" / "studentup"
+if not THEME.exists() and (ROOT.parent / "wordpress-theme" / "studentup").exists():
+    THEME = ROOT.parent / "wordpress-theme" / "studentup"   # v394: repo layout (bot/ next to wordpress-theme/)
 PAGES = PREVIEW / "pages"
 
 # Google's guidance: apply once the site has a solid base of substantive pages.

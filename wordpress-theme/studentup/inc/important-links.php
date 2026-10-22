@@ -70,6 +70,10 @@ function studentup_important_links_box() {
 	if ( $tg ) {
 		$rows[] = array( __( 'Job alerts on Telegram', 'studentup' ), 'https://t.me/' . rawurlencode( $tg ), 'bell', 'telegram', false );
 	}
+	$aff = function_exists( 'studentup_affiliate_row' ) ? studentup_affiliate_row( $pid ) : null;   // v1.9.167
+	if ( $aff ) {
+		$rows[] = $aff;
+	}
 	if ( ! $rows ) {
 		return;
 	}
@@ -84,12 +88,15 @@ function studentup_important_links_box() {
 				?>
 				<li class="<?php echo esc_attr( $primary ? 'su-implinks-row is-primary' : 'su-implinks-row' ); ?>">
 					<span class="su-implinks-lab"><?php echo function_exists( 'studentup_ui_icon' ) ? studentup_ui_icon( $icon, 16 ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?><?php echo esc_html( $label ); ?></span>
-					<a class="su-implinks-btn" href="<?php echo esc_url( $url ); ?>" data-su-ev="important_link" data-su-kind="<?php echo esc_attr( $kind ); ?>"<?php if ( $ext ) : ?> target="_blank" rel="noopener nofollow"<?php endif; ?>>
+					<a class="su-implinks-btn" href="<?php echo esc_url( $url ); ?>" data-su-ev="important_link" data-su-kind="<?php echo esc_attr( $kind ); ?>"<?php if ( 'affiliate' === $kind ) : ?> target="_blank" rel="sponsored nofollow noopener"<?php elseif ( $ext ) : ?> target="_blank" rel="noopener nofollow"<?php endif; ?>>
 						<?php echo esc_html( $primary ? __( 'Apply Now', 'studentup' ) : __( 'Click Here', 'studentup' ) ); ?>
 					</a>
 				</li>
 			<?php endforeach; ?>
 		</ul>
+		<?php if ( $aff ) : ?>
+			<p class="su-implinks-aff"><?php esc_html_e( 'Affiliate link: మీరు కొనుగోలు చేస్తే StudentUp కి చిన్న కమీషన్ వస్తుంది — మీకు అదనపు ఖర్చు లేదు.', 'studentup' ); ?></p>
+		<?php endif; ?>
 		<?php if ( $apply && $expired ) : ?>
 			<p class="su-implinks-closed"><?php echo esc_html( __( 'Application window closed', 'studentup' ) . ( $last ? ' · ' . date_i18n( 'j M Y', strtotime( $last ) ) : '' ) ); ?></p>
 		<?php endif; ?>

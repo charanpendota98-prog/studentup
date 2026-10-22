@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.166' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.167' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -49,6 +49,7 @@ require_once get_template_directory() . '/inc/sponsorhub.php'; // v169: high-RPM
 require_once get_template_directory() . '/inc/videoplayer.php'; // v169: smart high-CPM video / outstream ad container
 require_once get_template_directory() . '/inc/searchlog.php'; // v181: on-site search demand log (readers em adigaro → content gaps)
 require_once get_template_directory() . '/inc/search-smart.php'; // v290: smart search results (chips · did-you-mean · closest matches)
+require_once get_template_directory() . '/inc/affiliate.php';
 require_once get_template_directory() . '/inc/important-links.php';
 require_once get_template_directory() . '/inc/postnews.php'; // v294: Post Your News page + Breaking News home exclusion // v292: Important Links box (top job-site #1 click element)
 require_once get_template_directory() . '/inc/smartrecirc.php'; // v169: scroll-depth high-RPM smart recirculation unit
