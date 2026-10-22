@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			foreach ( studentup_most_used() as $m ) {
 				$su_ft_labels[ $m['slug'] ] = $m['label'];
 			}
-			$su_ft_labels += array( 'upcoming-exams' => 'Upcoming Exams', 'admissions' => 'Admissions', 'govt-schemes' => 'Govt Schemes', 'daily-quiz' => 'Daily Quiz' );
+			$su_ft_labels += array( 'upcoming-exams' => 'Upcoming Exams', 'admissions' => 'Admissions', 'govt-schemes' => 'Govt Schemes' );   // v1.9.168: 'Daily Quiz' removed here — 'Daily Quiz & Polls' already in Other links (no duplicate footer links)
 			foreach ( $su_ft_cols as $su_ft_h => $su_ft_slugs ) :
 				$su_ft_links = array();
 				foreach ( $su_ft_slugs as $su_ft_slug ) {

@@ -127,17 +127,17 @@ function studentup_ui_te_map() {
 		'October' => 'అక్టోబర్',
 		'November' => 'నవంబర్',
 		'December' => 'డిసెంబర్',
-		'Jan' => 'జన',
-		'Feb' => 'ఫిబ్ర',
+		'Jan' => 'జనవరి',
+		'Feb' => 'ఫిబ్రవరి',
 		'Mar' => 'మార్చి',
-		'Apr' => 'ఏప్రి',
+		'Apr' => 'ఏప్రిల్',
 		'Jun' => 'జూన్',
 		'Jul' => 'జూలై',
-		'Aug' => 'ఆగ',
-		'Sep' => 'సెప్',
-		'Oct' => 'అక్టో',
-		'Nov' => 'నవం',
-		'Dec' => 'డిసెం',
+		'Aug' => 'ఆగస్టు',
+		'Sep' => 'సెప్టెంబర్',
+		'Oct' => 'అక్టోబర్',
+		'Nov' => 'నవంబర్',
+		'Dec' => 'డిసెంబర్',
 		// v1.9.143 aria-labels / placeholders.
 		'Pages' => 'పేజీలు',
 		'Close' => 'మూసివేయి',
@@ -868,6 +868,7 @@ function studentup_nav_strings() {
 			'Current Affairs', 'Admissions', 'Telangana Jobs', 'AP Jobs', 'Telangana News', 'Andhra Pradesh News',
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
 			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Exams & More', 'Upcoming Exams', 'Govt Schemes', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
+			'Social', 'More', 'Explore', 'Browse everything', 'Most searched by students', 'Site menu', 'Sidebar',
 		), true );
 	}
 	return $set;

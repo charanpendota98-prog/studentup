@@ -12,7 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$su_has_widgets = is_active_sidebar( 'sidebar-1' );
+// v1.9.168: widget area renders ONLY when the owner turns it on — leftover widgets from a
+// previous theme (Blocksy search block, lorem-ipsum testimonial, empty 'Posts') were showing live.
+$su_has_widgets = is_active_sidebar( 'sidebar-1' ) && '1' === (string) studentup_opt( 'sidebar_widgets', '0' );
 // v308: ad code lekapote (AdSense approval mundu) empty wrapper render kaadu.
 $su_has_ad = function_exists( 'studentup_ad_available' ) ? studentup_ad_available( 'sidebar' ) : studentup_ads_allowed( 'sidebar' );
 // v1.9.132: widgets/ads lekapoina desktop sidebar khali ga undadu — real-data

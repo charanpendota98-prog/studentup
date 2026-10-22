@@ -1,4 +1,5 @@
 
+## theme 1.9.168 — live screenshot fixes: drawer "More" duplicate menu removed + vertical-list guard; leftover old-theme sidebar widgets (Blocksy search / lorem testimonial) OFF by default; footer "Daily Quiz" duplicate removed; full Telugu month names in dates; orphan English title tails ("… Last", "… Official") hidden on display; drawer labels English (nav_english)
 ## v394 + theme 1.9.167 — affiliate row (Important Links box, one-switch, disclosure) · adsense_ready repo path · Telegram ✅ Publish resilient (5xx/timeout → verify+retry, clear error message) · TOC dead-link sync · 2nd+ "ఇది" sentence-start fix · related-entities casing (RRB not Rrb) · build_milesweb_kit NameError
 
 ## Bot source repo లో ఉంది (`bot/`) — zip అవసరం లేదు

@@ -549,3 +549,18 @@ function studentup_title_nowrap_tokens( $title ) {
 	return preg_replace( '/\b(Group|Grade|Level|Tier|Paper|Phase|Stage|Class|Set|గ్రూప్|గ్రేడ్)\s+(?=[IVX]{1,4}\b|\d{1,2}\b)/u', '$1' . "\xC2\xA0", $title );
 }
 add_filter( 'the_title', 'studentup_title_nowrap_tokens', 20 );
+
+/**
+ * 1.9.168: older bot titles were cut at a word boundary and left an orphan
+ * English tail ("… 1688 పోస్టులు Last", "… పరీక్షల తేదీలు Official"). Display-only
+ * clean: drop ONE trailing orphan token from a small list when the title also
+ * contains Telugu (never touches pure-English or editor-written titles ending in
+ * real words like "Notification"). Post data / <title> untouched.
+ */
+function studentup_title_strip_orphan_tail( $title ) {
+	if ( is_admin() || is_feed() || ! is_string( $title ) || '' === $title || ! preg_match( '/[\x{0C00}-\x{0C7F}]/u', $title ) ) {
+		return $title;
+	}
+	return preg_replace( '/[\s\x{00A0}]+(?:Last|Official|Apply|Check|Online|Direct|Link|Download|Here|Details|Full|Latest|New|Out|Date|Dates)[\s\x{00A0}.:\-–]*$/u', '', $title );
+}
+add_filter( 'the_title', 'studentup_title_strip_orphan_tail', 19 );
