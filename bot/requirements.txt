@@ -1,0 +1,9 @@
+requests>=2.31.0
+pillow>=10.0.0
+beautifulsoup4>=4.12.0
+pypdf>=5.0.0
+soupsieve>=2.5,<3   # v237: soupsieve 3.x CSS selectors ni break chesindi (live_seo/research tests fail)
+trafilatura>=1.9.0   # v374: open-source main-text extractor (boilerplate removal)
+lxml_html_clean>=0.1   # v374: trafilatura needs it with lxml>=5.2
+feedparser>=6.0.0    # v374: tolerant RSS/Atom parsing
+dateparser>=1.2   # v393: optional, English free-text dates

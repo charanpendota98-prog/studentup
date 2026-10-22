@@ -1,0 +1,3435 @@
+"""Main orchestrator: schedule -> generate -> image -> publish.
+
+Usage (see run.py):
+  python run.py               # scheduled run (used by cron/systemd hourly)
+  python run.py --force       # post immediately, ignore schedule
+  python run.py --dry-run     # generate locally, do NOT touch WordPress
+  python run.py --mock        # offline test article (no Gemini key needed)
+  python run.py --status      # show today's plan & stats
+  python run.py --check-wp    # verify WordPress credentials only
+"""
+
+import argparse
+import json
+import os
+import logging
+import re
+import sys
+import unicodedata
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from . import config, gemini_client, image_gen, notifier, pipeline, sources, state, topic_engine, wordpress_client
+
+log = logging.getLogger("autoblog")
+
+def _soft_fail(message: str) -> None:
+    """Log a non-fatal step failure without dumping a crash traceback.
+
+    v136: these steps are optional (monitors, digests, weekly rebuilds). A
+    network hiccup must read as a warning line; the traceback stays at DEBUG
+    for anyone actually debugging.
+    """
+    exc = sys.exc_info()[1]
+    log.warning("%s (%s: %s)", message, type(exc).__name__, exc)
+    log.debug("%s traceback", message, exc_info=True)
+    try:  # v362: failure budget — 3 runs in a row / >5 per run → Telegram alert
+        from . import ops
+        ops.record_soft_fail(message)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+
+KOLKATA_OFFSET = timezone(timedelta(hours=5, minutes=30))
+
+
+def _now() -> datetime:
+    try:
+        from zoneinfo import ZoneInfo
+
+        return datetime.now(ZoneInfo(config.TIMEZONE))
+    except Exception:
+        return datetime.now(KOLKATA_OFFSET)
+
+
+def _setup_logging() -> None:
+    config.LOG_DIR.mkdir(parents=True, exist_ok=True)
+    fmt = logging.Formatter("%(asctime)s %(levelname)-7s %(name)s: %(message)s")
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    console = logging.StreamHandler(sys.stdout)
+    console.setFormatter(fmt)
+    root.addHandler(console)
+    from logging.handlers import TimedRotatingFileHandler
+
+    filehandler = TimedRotatingFileHandler(
+        config.LOG_DIR / "autoblog.log", when="midnight", backupCount=7, encoding="utf-8"
+    )
+    filehandler.setFormatter(fmt)
+    root.addHandler(filehandler)
+
+
+def _safe_slug(slug: str, fallback_title: str) -> str:
+    slug = (slug or "").strip().lower()
+    slug = re.sub(r"[^a-z0-9-]+", "-", slug).strip("-")[:60]
+    if not slug:
+        # transliteration fallback: strip non-ascii from title (English words in Telugu titles)
+        ascii_part = unicodedata.normalize("NFKD", fallback_title).encode("ascii", "ignore").decode()
+        slug = re.sub(r"[^a-z0-9]+", "-", ascii_part.lower()).strip("-")[:60] or "studentup-post"
+    return slug
+
+
+def success_story_review(csv_path: str, output_path: str = "") -> int:
+    """Private Google Forms CSV → consent/evidence review manifest.
+
+    This command never calls WordPress and never publishes. The CSV and
+    manifest must remain outside public web roots; the owner controls deletion.
+    """
+    from . import success_story_intake
+
+    source = Path(csv_path).expanduser()
+    target = Path(output_path or config.SUCCESS_STORY_QUEUE).expanduser()
+    try:
+        rows = success_story_intake.load_csv(source)
+        manifest = success_story_intake.write_manifest(rows, target)
+    except Exception as exc:  # noqa: BLE001
+        print(f"❌ success-story review failed: {exc}")
+        return 1
+    print("VERIFIED SUCCESS STORIES — PRIVATE REVIEW ONLY")
+    print(f"  selected: {len(manifest['selected'])} · deferred/rejected: {len(manifest['rejected'])}")
+    print(f"  weekly cap: {config.SUCCESS_STORY_WEEKLY_MAX} · manifest: {target}")
+    print("  ⚠️  Human evidence, consent and photo-rights review required; nothing was published.")
+    return 0
+
+
+def generate_one(category: str, mock: bool, mock_index: int = 0,
+                 trend_topic: str = "") -> dict:
+    """Generate an article with duplicate-avoidance retries."""
+    recent = state.recent_titles(config.STATE_PATH, limit=50)
+    avoid_extra = None
+    for attempt in range(1, config.GEMINI_MAX_RETRIES + 1):
+        if mock:
+            article = topic_engine.mock_article(category, mock_index + attempt)
+        else:
+            article = gemini_client.generate_article(category, recent, year=_now().year,
+                                                     avoid_extra=avoid_extra,
+                                                     trend_topic=trend_topic)
+        title = article["title"].strip()
+        if not state.title_exists(config.STATE_PATH, title):
+            article["title"] = title
+            from . import seo as _seo
+            article["slug"] = _seo.optimize_slug(
+                _safe_slug(article.get("slug", ""), title),
+                focus_keyword=article.get("focus_keyword", ""))
+            return article
+        log.warning("Duplicate title generated (%s) — retrying", title)
+        avoid_extra = f"Already tried (do NOT repeat): {title}"
+    raise RuntimeError("Could not generate a non-duplicate title after retries")
+
+
+def run(dry_run: bool, force: bool, mock: bool, category: str = "",
+        source_url: str = "", process_queue: int = 0, update_id: int = 0,
+        listicle: str = "", auto_refresh_n: int = 0,
+        quiz: bool = False, quiz_topic: str = "", quiz_level: int = 0,
+        quiz_questions: int = 0, notebooklm_brief_file: str = "",
+        target_year: int = 0) -> int:
+    # SAFETY: mock stubs eppudu LIVE publish avvavu (thin test content
+    # WordPress ki vellakudadu) — --mock ante automatic dry-run.
+    if mock and not dry_run:
+        log.warning("--mock tho live publish block chesamu (auto dry-run ON)")
+        dry_run = True
+    now = _now()
+    today = now.date()
+    now_hour = now.hour
+    state.init(config.STATE_PATH)
+    try:  # scheduler heartbeat (watchdog kosam)
+        state.meta_set(config.STATE_PATH, "heartbeat", now.isoformat())
+    except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
+        log.debug("run skip: %s", exc)
+
+    # v121: once per IST day, send the owner a forward-ready active list. The
+    # public /latest-jobs/ board is live and independently hides expired items.
+    digest_key = f"opportunity-digest:{today.isoformat()}"
+    if (getattr(config, "OPPORTUNITY_DIGEST_ENABLED", True)
+            and now_hour >= getattr(config, "OPPORTUNITY_DIGEST_HOUR", 8)
+            and not state.meta_get(config.STATE_PATH, digest_key)):
+        try:
+            if notifier.send_opportunity_digest():
+                state.meta_set(config.STATE_PATH, digest_key, "1")
+                log.info("OPPORTUNITY DIGEST ✔ active list sent to owner chat")
+        except Exception:
+            _soft_fail("Opportunity digest failed (regular posting continues)")
+
+    # v324: once per day (evening) verify the newest published posts on the
+    # live site — Rank Math stored score + rendered-HTML SEO coverage → owner.
+    seo_key = f"live-seo:{today.isoformat()}"
+    if (getattr(config, "LIVE_SEO_DAILY", True)
+            and now_hour >= getattr(config, "LIVE_SEO_DAILY_HOUR", 20)
+            and not mock and not state.meta_get(config.STATE_PATH, seo_key)):
+        try:
+            from . import live_seo as _ls
+            reports = _ls.audit_recent(getattr(config, "LIVE_SEO_DAILY_LIMIT", 5))
+            notifier.send_telegram(_ls.summary_html(reports))
+            state.meta_set(config.STATE_PATH, seo_key, "1")
+            log.info("LIVE SEO ✔ %d posts verified, summary sent", len(reports))
+        except Exception:
+            _soft_fail("Live SEO daily check failed (regular posting continues)")
+
+    # v124: once-per-day read-only official-source freshness scan. A changed
+    # notice is alerted for owner review; the scheduler never edits content by
+    # itself, so dates/fees/status still pass through the full update gate.
+    source_monitor_key = f"source-monitor:{today.isoformat()}"
+    if (getattr(config, "SOURCE_MONITOR_ENABLED", True)
+            and now_hour >= getattr(config, "SOURCE_MONITOR_HOUR", 6)
+            and not state.meta_get(config.STATE_PATH, source_monitor_key)):
+        try:
+            from . import source_monitor as _source_monitor
+
+            monitor_result = _source_monitor.scan(notify=True)
+            state.meta_set(
+                config.STATE_PATH,
+                source_monitor_key,
+                json.dumps({
+                    "scanned": monitor_result.get("scanned", 0),
+                    "changed": len(monitor_result.get("changed", [])),
+                    "errors": len(monitor_result.get("errors", [])),
+                }),
+            )
+            log.info(
+                "SOURCE MONITOR ✔ scanned=%s changed=%s errors=%s",
+                monitor_result.get("scanned", 0),
+                len(monitor_result.get("changed", [])),
+                len(monitor_result.get("errors", [])),
+            )
+        except Exception as exc:  # noqa: BLE001
+            # v136: a network/TLS hiccup in the optional monitor is a warning,
+            # not a crash report. Full traceback stays available at DEBUG.
+            log.warning("Source freshness monitor failed (%s: %s) — regular "
+                        "posting continues", type(exc).__name__, exc)
+            log.debug("source monitor traceback", exc_info=True)
+
+    # v125: lifecycle scan for active opportunities. It only probes public URLs
+    # and writes a private review queue; it never changes a post or hides a
+    # deadline automatically. This keeps temporary official-site outages from
+    # becoming destructive edits.
+    opportunity_monitor_key = f"opportunity-monitor:{today.isoformat()}"
+    if (getattr(config, "OPPORTUNITY_MONITOR_ENABLED", True)
+            and now_hour >= getattr(config, "OPPORTUNITY_MONITOR_HOUR", 6)
+            and not state.meta_get(config.STATE_PATH, opportunity_monitor_key)):
+        try:
+            from . import opportunity_monitor as _opportunity_monitor
+
+            lifecycle_result = _opportunity_monitor.scan(notify=True)
+            state.meta_set(
+                config.STATE_PATH,
+                opportunity_monitor_key,
+                json.dumps({
+                    "posts": lifecycle_result.get("posts", 0),
+                    "issues": len(lifecycle_result.get("issues", [])),
+                    "errors": len(lifecycle_result.get("errors", [])),
+                }),
+            )
+            log.info(
+                "OPPORTUNITY MONITOR ✔ posts=%s issues=%s errors=%s",
+                lifecycle_result.get("posts", 0),
+                len(lifecycle_result.get("issues", [])),
+                len(lifecycle_result.get("errors", [])),
+            )
+        except Exception:
+            _soft_fail("Opportunity lifecycle monitor failed (regular posting continues)")
+
+    # --- bulk queue mode: --process-queue N (N URLs ippude process) ---------
+    if process_queue:
+        done = 0
+        while done < process_queue:
+            url = sources.pending_from_queue()
+            if not url:
+                log.info("Queue empty — %d URLs process ayyayi", done)
+                break
+            completed = False
+            failure_type = "draft_failed"
+            failure_details = ""
+            try:
+                result = pipeline.create_from_source(url, mock=mock, category=category)
+                log.info("QUEUE POST ✔ %s -> %s", url[:60], result["link"])
+                done += 1
+                completed = True
+            except Exception as exc:
+                failure_details = str(exc)
+                low = failure_details.lower()
+                if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
+                    failure_type = "fetch_failure"
+                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                    failure_type = "stale_notice"
+                log.error("Queue URL failed (%s): %s — retryable; keep opportunity open", url[:60], exc)
+            finally:
+                sources.mark_done_and_clean(
+                    url, completed=completed, failure_type=failure_type,
+                    details=failure_details,
+                )
+        return 0
+
+    # --- manual listicle mode (--listicle "Top 10 ...") ---------------------
+    if listicle:
+        result = pipeline.create_listicle(topic=listicle, mock=mock)
+        log.info("LISTICLE READY ✔ %s (status=%s)", result["link"], result["status"])
+        return 0
+
+    # --- manual quiz mode (--quiz / --quiz-topic "...") ----------------------
+    if quiz or quiz_topic:
+        result = pipeline.create_quiz(topic=quiz_topic, level=quiz_level,
+                                      questions=quiz_questions, mock=mock,
+                                      dry_run=dry_run)
+        log.info("QUIZ READY ✔ %s (status=%s)", result["link"], result["status"])
+        return 0
+
+    # --- manual auto-refresh (--auto-refresh N) ------------------------------
+    if auto_refresh_n:
+        done = pipeline.auto_refresh(limit=auto_refresh_n)
+        log.info("AUTO-REFRESH complete — %d posts updated", len(done))
+        return 0
+
+    # --- update mode: existing post ni kotha info tho improve --------------
+    if update_id:
+        result = pipeline.update_post(update_id,
+                                      new_source_urls=[source_url] if source_url else None,
+                                      mock=mock)
+        log.info("POST UPDATED ✔ %s", result.get("link"))
+        return 0
+
+    # --- explicit source URL mode (--url / Telegram) -----------------------
+    if source_url:
+        if not mock and not config.gemini_configured():
+            log.error("AI provider key set kavali! .env lo Gemini/Groq/other provider key pettandi.")
+            return 2
+        brief = ""
+        if notebooklm_brief_file:
+            brief_path = Path(notebooklm_brief_file)
+            if not brief_path.exists():
+                log.error("NotebookLM brief file ledu: %s", notebooklm_brief_file)
+                return 2
+            brief = brief_path.read_text(encoding="utf-8", errors="replace")[:18000]
+        result = pipeline.create_from_source(
+            source_url, mock=mock, category=category, notebooklm_brief=brief,
+            target_year=target_year or None)
+        log.info("SOURCE POST READY ✔ %s (status=%s)", result["link"], result["status"])
+        return 0
+
+    # --- schedule check ----------------------------------------------------
+    if not (force or dry_run):
+        # v20: hub pages auto-rebuild — week ki okkaru (Mon after 07h), playbook
+        # Phase-2 authority engine. Fail ayna daily flow pariparu (try/except).
+        iso = today.isocalendar()
+        hkey = f"hubweek:{iso[0]}-{iso[1]}"
+        if now_hour >= config.ACTIVE_HOUR_START \
+                and not state.meta_get(config.STATE_PATH, hkey):
+            state.meta_set(config.STATE_PATH, hkey, "1")
+            try:
+                from . import hubs as _hubs
+
+                n = len(_hubs.rebuild_hubs())
+                log.info("WEEKLY HUBS: %d pages refreshed", n)
+            except Exception:
+                _soft_fail("Weekly hub rebuild failed (non-fatal)")
+            # v100: district hubs (v96) + link graph (v99) ee weekly slot lo ne
+            # automatic ga run avvali. Ivi ippati varaku CLI-only — ante owner
+            # manual ga gurtu pettukoni run cheyyali. Adi jaragadu (nenu
+            # cheppanu, adi nijam): orphan posts perigipotayi, district pages
+            # stale avutayi. Ippudu rendu cron flow lopala.
+            if getattr(config, "DISTRICT_HUBS_AUTO", True):
+                try:
+                    from . import district_hubs as _dh
+
+                    rows = _dh.rebuild(apply=True)
+                    made = sum(1 for r in rows if r.get("publish"))
+                    log.info("WEEKLY DISTRICT HUBS: %d/%d pages (thin-guard %d)",
+                             made, len(rows), len(rows) - made)
+                except Exception:
+                    _soft_fail("Weekly district hubs failed (non-fatal)")
+            if getattr(config, "LINK_GRAPH_AUTO", True):
+                try:
+                    from . import link_graph as _lg
+
+                    rep = _lg.run(apply=True,
+                                  limit=getattr(config, "LINK_GRAPH_LIMIT", 100))
+                    log.info("WEEKLY LINK GRAPH: %d orphans · %d weak · "
+                             "%d links added", rep.get("orphans", 0),
+                             rep.get("weak", 0), rep.get("applied", 0))
+                except Exception:
+                    _soft_fail("Weekly link graph failed (non-fatal)")
+        # v114: daily GSC sync + deduplicated control-center alert. This is
+        # maintenance only; credentials/network failure never stops posting.
+        if (getattr(config, "GSC_AUTO_SYNC", True)
+                and now_hour == getattr(config, "GSC_SYNC_HOUR", 6)
+                and not state.meta_get(config.STATE_PATH, f"gscauto:{today.isoformat()}")):
+            try:
+                from . import gsc_api as _gapi
+                _end = today - timedelta(days=2)
+                _start = _end - timedelta(days=27)
+                _gapi.sync(_start.isoformat(), _end.isoformat())
+                log.info("DAILY GSC API SYNC ✔")
+            except Exception:
+                log.warning("Daily GSC sync unavailable — CSV/manual mode remains safe",
+                            exc_info=True)
+            finally:
+                state.meta_set(config.STATE_PATH, f"gscauto:{today.isoformat()}", "1")
+        if (getattr(config, "OPS_ALERTS_ENABLED", True)
+                and now_hour == getattr(config, "GSC_SYNC_HOUR", 6)
+                and not state.meta_get(config.STATE_PATH, f"opsalert:{today.isoformat()}")):
+            try:
+                from . import ops_alerts as _ops
+                _ops.check_and_alert(send=True)
+                log.info("DAILY OPS ALERT CHECK ✔")
+            except Exception:
+                _soft_fail("Daily ops alert failed (non-fatal)")
+            finally:
+                state.meta_set(config.STATE_PATH, f"opsalert:{today.isoformat()}", "1")
+
+        count = state.today_count(config.STATE_PATH, today)
+        # v354: DAILY_MAX ikkada return cheyyadu — mundu idi breaking feed,
+        # quiz, radar sweep, queue drain anni block chesedi (5 drafts tarvata
+        # roju motham bot "silent"). Ippudu cap generic slot ki matrame
+        # (plan/hour-claim mundu check — kinda chudandi).
+        daily_full = count >= config.DAILY_MAX
+        plan = state.today_plan(
+            config.STATE_PATH, today,
+            config.ACTIVE_HOUR_START, config.ACTIVE_HOUR_END,
+            config.DAILY_MIN, config.DAILY_MAX,
+        )
+        # daily auto-refresh (maintenance — plan lo leda parvaledu)
+        if (config.AUTO_REFRESH_PER_DAY > 0
+                and now_hour == config.AUTO_REFRESH_HOUR
+                and not state.meta_get(config.STATE_PATH, f"autorefresh:{today.isoformat()}")):
+            try:
+                pipeline.auto_refresh(limit=config.AUTO_REFRESH_PER_DAY)
+                state.meta_set(config.STATE_PATH, f"autorefresh:{today.isoformat()}", "1")
+            except Exception:
+                _soft_fail("Daily auto-refresh failed")
+        # --- v59: బ్రేకింగ్ న్యూస్ feed — radar sweep tarvata site ticker fresh ---
+        if (getattr(config, "BREAKING_ENABLED", True)
+                and now_hour >= getattr(config, "RADAR_HOUR", 7)
+                and not state.meta_get(config.STATE_PATH, f"breaking:{today.isoformat()}")):
+            try:
+                from . import breaking, news_radar
+
+                _r = news_radar.run_radar()
+                _bres = breaking.publish(_r.get("items", []))
+                state.meta_set(config.STATE_PATH, f"breaking:{today.isoformat()}", "1")
+                log.info("BREAKING FEED ✔ %d items (site ticker)", _bres["count"])
+                _breaking_drafts(mock)
+                try:  # v61: theme ki kuda push (WP theme active unte)
+                    from . import wp_theme_sync
+
+                    _tres = wp_theme_sync.push()
+                    log.info("WP THEME SYNC %s — %s", "✔" if _tres.get("ok") else "skip",
+                             _tres.get("reason") or _tres.get("updated"))
+                except Exception:
+                    _soft_fail("wp theme sync failed (non-fatal)")
+            except Exception:
+                _soft_fail("breaking feed failed (non-fatal)")
+        # --- v355: daily DRAFT RE-CHECK — WP drafts malli gate + polish (publish kaadu) ---
+        if (getattr(config, "FINAL_POLISH_ENABLED", True)
+                and now_hour >= getattr(config, "DRAFT_RECHECK_HOUR", 21)
+                and not mock and config.gemini_configured()
+                and not state.meta_get(config.STATE_PATH, f"draftrecheck:{today.isoformat()}")):
+            state.meta_set(config.STATE_PATH, f"draftrecheck:{today.isoformat()}", "1")
+            try:
+                from . import final_polish as _fp
+
+                _rows = _fp.recheck_drafts(limit=getattr(config, "DRAFT_RECHECK_LIMIT", 10),
+                                           apply=getattr(config, "DRAFT_RECHECK_APPLY", True))
+                log.info("DRAFT RECHECK ✔ %d drafts · %d updated", len(_rows),
+                         sum(1 for r in _rows if r.get("updated")))
+            except Exception:
+                _soft_fail("draft recheck failed (non-fatal)")
+        # --- v60: SITE GUARDIAN — roju okkasari system motham check + report ---
+        if (getattr(config, "GUARDIAN_ENABLED", True)
+                and now_hour >= getattr(config, "GUARDIAN_HOUR", 20)
+                and not state.meta_get(config.STATE_PATH, f"guardian:{today.isoformat()}")):
+            try:
+                from . import guardian
+
+                _g = guardian.guard(notify=True, print_out=False)
+                state.meta_set(config.STATE_PATH, f"guardian:{today.isoformat()}", "1")
+                log.info("SITE GUARDIAN ✔ %d/%d ok · %d owner-pending",
+                         _g["passed"], _g["checked"], _g.get("warned", 0))
+                for _r in _g["results"]:
+                    if not _r["ok"] and not _r.get("warn_only"):
+                        log.warning("GUARDIAN ❌ %s: %s (%s)", _r["id"], _r["detail"], _r["fix"])
+            except Exception:
+                _soft_fail("site guardian failed (non-fatal)")
+        # --- v181: GROWTH LOOPS — roju demand (search log) + sponsor plan ---
+        if (getattr(config, "GROWTH_LOOPS_ENABLED", True)
+                and now_hour >= getattr(config, "GROWTH_LOOPS_HOUR", 9)
+                and not state.meta_get(config.STATE_PATH,
+                                       f"growth:{today.isoformat()}")):
+            try:
+                from . import search_demand as _sd
+
+                _terms, _meta = _sd.fetch_live()
+                if _terms:
+                    _rep = _sd.analyze(_terms, state.recent_titles(config.STATE_PATH,
+                                                                   limit=400))
+                    _q = _sd.write_queue(_rep)
+                    log.info("SEARCH DEMAND ✔ %d terms · %d gaps → %s",
+                             _rep["total_terms"], len(_rep["gaps"]), _q.name)
+            except Exception:  # noqa: BLE001 — theme deploy/creds lekapote skip
+                log.info("search demand loop skipped (theme log/creds ledu)")
+            try:
+                from . import sponsor_crm as _sc
+
+                _plan = _sc.today_plan()
+                if _plan["outreach"] or _plan["followups"]:
+                    # `notifier` is imported at module level; re-importing it
+                    # here made it function-local and broke the earlier
+                    # send_opportunity_digest() call with UnboundLocalError.
+                    notifier.send_telegram(_sc.report_text(_plan, _sc.forecast()))
+                    log.info("SPONSOR PLAN ✔ outreach %d · followups %d",
+                             len(_plan["outreach"]), len(_plan["followups"]))
+            except Exception:  # noqa: BLE001
+                _soft_fail("sponsor plan failed (non-fatal)")
+            state.meta_set(config.STATE_PATH, f"growth:{today.isoformat()}", "1")
+        # --- v57: AD ADVISOR — roju okkasari: e network ki eppudu apply cheyyali ---
+        if (getattr(config, "AD_ADVISOR_ENABLED", True)
+                and now_hour >= getattr(config, "AD_ADVISOR_HOUR", 10)
+                and not state.meta_get(config.STATE_PATH,
+                                       f"advisor:{today.isoformat()}")):
+            try:
+                from . import ad_advisor as _adv
+
+                _res = _adv.advice(notify=True)
+                state.meta_set(config.STATE_PATH, f"advisor:{today.isoformat()}", "1")
+                log.info("AD ADVISOR ✔ %s", _res["action"]["title"])
+                for _k in _res["new_milestones"]:
+                    log.info("AD ADVISOR milestone: %s — Telegram alert pampindi", _k)
+            except Exception:
+                _soft_fail("Ad advisor failed (non-fatal)")
+        # --- v26: Daily Quiz slot — roju okati, QUIZ_HOUR tarvata ---
+        if (config.QUIZ_ENABLED
+                and now_hour >= config.QUIZ_HOUR
+                and not state.meta_get(config.STATE_PATH,
+                                       f"quizdate:{today.isoformat()}")):
+            # A missing provider must not turn the promised daily review slot
+            # into a silent no-op. The deterministic bank is explicitly a
+            # sample/review quiz; create_quiz() hard-locks it to WordPress
+            # `draft`, so this fallback can never publish unreviewed copy.
+            quiz_mock = bool(mock)
+            if not quiz_mock and not config.gemini_configured():
+                if getattr(config, "QUIZ_SAMPLE_FALLBACK", True):
+                    quiz_mock = True
+                    log.warning("QUIZ: AI provider unavailable — creating deterministic sample draft")
+                else:
+                    log.warning("QUIZ skip — AI provider key ledu")
+            if quiz_mock or config.gemini_configured():
+                try:
+                    result = pipeline.create_quiz(mock=quiz_mock)
+                    state.meta_set(config.STATE_PATH,
+                                   f"quizdate:{today.isoformat()}", "1")
+                    log.info("DAILY QUIZ REVIEW DRAFT READY ✔ %s (status=%s%s)",
+                             result["link"], result["status"],
+                             ", sample" if quiz_mock else "")
+                    return 0
+                except ValueError as exc:
+                    # Only the idempotency guard consumes today's slot. Other
+                    # validation/provider errors should be retried next run.
+                    if "already generated today:" in str(exc).lower():
+                        state.meta_set(config.STATE_PATH,
+                                       f"quizdate:{today.isoformat()}", "1")
+                        log.info("Daily quiz already done: %s", exc)
+                    else:
+                        log.warning("Daily quiz draft failed — retry next run: %s", exc)
+                except Exception:
+                    _soft_fail("Daily quiz failed — regular posting continues")
+        # --- v15/v16: Breaking-News Radar — every RADAR_INTERVAL_HOURS ---
+        if (config.RADAR_ENABLED
+                and (now_hour - config.RADAR_HOUR) % max(1, config.RADAR_INTERVAL_HOURS) == 0
+                and now_hour >= config.RADAR_HOUR
+                and not state.meta_get(config.STATE_PATH,
+                                       f"radar:{today.isoformat()}:{now_hour}")):
+            state.meta_set(config.STATE_PATH, f"radar:{today.isoformat()}:{now_hour}", "1")
+            log.info("RADAR: scheduled district+grid+watch sweep (hour %02d)", now_hour)
+            try:
+                radar_run()
+            except Exception:
+                _soft_fail("RADAR run failed — regular posting continues")
+        # v320: hourly queue drain — verified source links (radar/Telegram
+        # retry) become review drafts every active hour, independent of plan.
+        if (config.ACTIVE_HOUR_START <= now_hour <= config.ACTIVE_HOUR_END
+                and not mock and config.gemini_configured()):
+            try:
+                drained = drain_source_queue(config.QUEUE_DRAIN_PER_HOUR)
+                if drained:
+                    log.info("Queue drain: %d review draft(s) this hour", drained)
+            except Exception:
+                _soft_fail("Queue drain failed — regular posting continues")
+        # v338: a slot whose generation crashed (AI quota, WP error…) is
+        # retried in the next hourly run instead of being lost for the day.
+        retry_key = f"post:retry:{today.isoformat()}"
+        if daily_full:
+            log.info("Daily limit reached (%d/%d) — generic slot skip (breaking/queue/quiz lanes ran).",
+                     count, config.DAILY_MAX)
+            return 0
+        # v372 CATCH-UP GUARANTEE: plan hours are random; a cron gap, a host
+        # sleep, a slow radar sweep or a crash inside a plan hour used to lose
+        # that slot for the whole day ("drafts raavu"). Now every hourly run
+        # compares drafts made so far with the plan hours already passed and
+        # fills the gap immediately — so the day always reaches its plan.
+        expected_by_now = sum(1 for h in plan if h <= now_hour)
+        behind = count < expected_by_now
+        if now_hour not in plan:
+            if state.meta_get(config.STATE_PATH, retry_key):
+                log.info("Hour %02d:00 not in plan %s — but a failed slot is pending: retrying now.",
+                         now_hour, plan)
+                state.meta_delete(config.STATE_PATH, retry_key)
+            elif behind and config.ACTIVE_HOUR_START <= now_hour <= config.ACTIVE_HOUR_END:
+                log.info("Hour %02d:00 not in plan %s — but only %d/%d planned draft(s) exist: "
+                         "CATCH-UP draft now.", now_hour, plan, count, expected_by_now)
+            else:
+                log.info("Hour %02d:00 not in today's plan %s — nothing to do.", now_hour, plan)
+                return 0
+        # v84: hour-slot CLAIM (overlap race fix) — generation MUNDU set.
+        # Rendu runs okate hour lo vasthe okati matrame post chestundi.
+        # Crash ayithe hour skip (safe direction — over-post kanna under-post melu).
+        hclaim = f"post:{today.isoformat()}:{now_hour:02d}"
+        if state.meta_get(config.STATE_PATH, hclaim):
+            log.info("Hour %02d:00 already claimed — overlapping run, skipping.", now_hour)
+            return 0
+        state.meta_set(config.STATE_PATH, hclaim, "1")
+        state.meta_set(config.STATE_PATH, "post:lastclaim", f"{today.isoformat()}|{now_hour:02d}")
+        log.info("Hour %02d:00 in plan %s — generating post (%d done today).",
+                 now_hour, plan, count)
+
+        # trending listicle quota: roju LISTICLES_PER_DAY stories
+        lkey = f"listiclecount:{today.isoformat()}"
+        lcount = int(state.meta_get(config.STATE_PATH, lkey) or 0)
+        if (lcount < config.LISTICLES_PER_DAY
+                and not getattr(config, "AUTO_SOURCE_ONLY", True)):
+            log.info("Listicle slot (%d/%d today) — trending story mode",
+                     lcount + 1, config.LISTICLES_PER_DAY)
+            if not mock and not config.gemini_configured():
+                log.error("AI provider key ledu — listicle skip")
+            else:
+                try:
+                    result = pipeline.create_listicle(mock=mock)
+                    state.meta_set(config.STATE_PATH, lkey, str(lcount + 1))
+                    log.info("LISTICLE READY ✔ %s (status=%s)",
+                             result["link"], result["status"])
+                    return 0
+                except Exception:
+                    _soft_fail("Listicle failed — normal post ki veltanu")
+
+    # --- source queue check (sources_queue.txt lo URLs unnaye priority) ----
+    queued = sources.pending_from_queue()
+    if queued:
+        log.info("Sources queue lo URL dorikindi — original rewrite mode: %s", queued)
+        if not mock and not config.gemini_configured():
+            # Keep the URL in sources_queue.txt. A missing model key is an
+            # environment/setup issue, not a failed opportunity; deleting it
+            # here made the bot appear to do nothing and lost review work.
+            log.error("AI provider key ledu — URL pending ga preserve chesanu")
+            state.mark_source_retry(config.STATE_PATH, queued)
+            state.record_radar_event(
+                config.STATE_PATH, "draft_deferred", queued,
+                details="GEMINI_API_KEY unavailable; source remains pending",
+            )
+        else:
+            completed = False
+            failure_type = "draft_failed"
+            failure_details = ""
+            try:
+                result = pipeline.create_from_source(
+                    queued, mock=mock, category=category, force_draft=True)
+                log.info("SOURCE POST READY ✔ %s (status=%s)", result["link"], result["status"])
+                completed = True
+                return 0
+            except Exception as exc:
+                failure_details = str(exc)
+                low = failure_details.lower()
+                if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
+                    failure_type = "fetch_failure"
+                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                    failure_type = "stale_notice"
+                log.error("Queue URL failed (%s) — retryable; normal flow continues: %s",
+                          queued, exc)
+            finally:
+                sources.mark_done_and_clean(
+                    queued, completed=completed, failure_type=failure_type,
+                    details=failure_details,
+                )
+
+    # Source-first automation: if radar found nothing trustworthy, wait for the
+    # next sweep. Never fill a scheduled slot with an evidence-free AI topic.
+    fallback_draft = False
+    if (getattr(config, "AUTO_SOURCE_ONLY", True) and not mock and not category):
+        if not getattr(config, "AUTO_DRAFT_FALLBACK", True):
+            log.info("No verified source candidate — scheduled generic generation skipped")
+            return 0
+        # v372: before an evidence-free topic draft, try the pending RADAR /
+        # keyword topics with the research resolver — a source-backed draft on
+        # a topic students are already searching for beats a generic one.
+        try:
+            from . import news_radar as _nr, research as _research
+
+            for _topic in _nr.pending_topics(limit=3):
+                _made = False
+                try:
+                    for _cand in _research.topic_source_candidates(_topic, limit=4):
+                        try:
+                            _res = pipeline.create_from_source(
+                                _cand["url"], category=pipeline.classify_category(_topic),
+                                force_draft=True)
+                            log.info("TOPIC DRAFT ✔ %s (slot fallback, source-backed: %s)",
+                                     _res.get("link"), _cand["url"][:60])
+                            _made = True
+                            break
+                        except Exception as exc:  # noqa: BLE001 — next candidate
+                            log.warning("topic candidate rejected (%s): %s", _cand["url"][:55], exc)
+                finally:
+                    _nr.mark_topic_done(_topic)
+                if _made:
+                    state.meta_delete(config.STATE_PATH, "post:lastclaim")
+                    return 0
+        except Exception as exc:  # noqa: BLE001 — never block the slot
+            log.debug("slot topic research skip: %s", exc)
+        # v316: owner wants drafts flowing every slot. No source → still write a
+        # review DRAFT (never publish) from the topic engine; admin approves.
+        fallback_draft = True
+        log.info("No verified source this slot — AUTO_DRAFT_FALLBACK: review draft "
+                 "from topic engine (status=draft, publish kaadu)")
+
+    # --- generate (manual category/mock fallback only) ---------------------
+    cat = category or topic_engine.pick_category(config.STATE_PATH)
+    log.info("Category selected: %s%s", cat, " (forced)" if category else "")
+
+    if not mock and not config.gemini_configured():
+        log.error("AI provider key set kavali! .env lo Gemini/Groq/other provider key pettandi.")
+        return 2
+
+    # --- Google Trends trending topic (roju 1 post trend meeda) ---
+    trend_topic = ""
+    if not mock and config.USE_TRENDS and not state.meta_get(config.STATE_PATH, f"trend:{today}"):
+        try:
+            edu = topic_engine.filter_edu_trends(topic_engine.fetch_trending_topics())
+            if edu:
+                trend_topic = edu[0]["title"]
+                state.meta_set(config.STATE_PATH, f"trend:{today}", trend_topic)
+                log.info("🔥 Google Trends topic: %s", trend_topic)
+        except Exception:
+            _soft_fail("Trends fetch error (continue normal topic)")
+
+    mock_index = state.today_count(config.STATE_PATH, today)
+    article = generate_one(cat, mock, mock_index, trend_topic=trend_topic)
+    if fallback_draft:
+        article["_force_status"] = "draft"
+        article["_fallback_draft"] = True
+        tags = list(article.get("tags") or [])
+        if "verify-before-publish" not in tags:
+            tags.append("verify-before-publish")
+        article["tags"] = tags
+    article.setdefault("focus_keyword", "")
+    article.setdefault("external_links", [])
+    article.setdefault("seo_title", "")
+    log.info("Article ready: %s (slug=%s, model=%s)",
+             article["title"], article["slug"], article.get("model"))
+
+    # --- featured image (dry-run kosam; real publish lo pipeline chestundi) --
+    image_path: Path = Path(
+        config.OUTPUT_DIR / "images" / f"{article['slug']}.jpg"
+    )
+    if dry_run and config.IMAGE_ENABLED:
+        if not image_gen.generate_featured_image(
+            article["banner_text"], article["category"], image_path
+        ):
+            image_path = None
+    else:
+        image_path = None
+
+    # --- publish / dry-run -------------------------------------------------
+    if dry_run:
+        out_dir = config.OUTPUT_DIR / today.isoformat() / article["slug"]
+        out_dir.mkdir(parents=True, exist_ok=True)
+        html = (
+            f"<!doctype html><html><head><meta charset='utf-8'>"
+            f"<title>{article['title']}</title></head><body>"
+            f"<h1>{article['title']}</h1>"
+            f"{article['content_html']}</body></html>"
+        )
+        (out_dir / "article.html").write_text(html, encoding="utf-8")
+        (out_dir / "meta.json").write_text(
+            json.dumps(
+                {
+                    "title": article["title"],
+                    "slug": article["slug"],
+                    "category": article["category"],
+                    "tags": article["tags"],
+                    "meta_description": article["meta_description"],
+                    "focus_keyword": article.get("focus_keyword"),
+                    "seo_title": article.get("seo_title"),
+                    "external_links": article.get("external_links"),
+                    "image": image_path.name if image_path else None,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        if image_path and image_path.exists():
+            import shutil
+
+            shutil.copy(image_path, out_dir / "featured.jpg")
+        log.info("DRY-RUN saved to %s (state lo record cheyaledu — dedupe "
+                 "pollution avoid)", out_dir)
+        return 0
+
+    wp = wordpress_client.WordPressClient()
+    wp.check_connection()
+
+    result = pipeline.publish_article(article, day=today)
+    state.meta_delete(config.STATE_PATH, "post:lastclaim")
+    if result["status"] == "draft":
+        log.info("DRAFT saved (review kosam) id=%s", result["id"])
+
+    # --- end-of-day digest (roji chivari slot lo summary message) ---
+    if not (force or dry_run) and now_hour >= config.ACTIVE_HOUR_END:
+        digest_key = f"digest:{today.isoformat()}"
+        if not state.meta_get(config.STATE_PATH, digest_key):
+            count = state.today_count(config.STATE_PATH, today)
+            summary = state.status_summary(config.STATE_PATH, limit=5)
+            try:
+                notifier.daily_digest(count, summary.get("last", []))
+                state.meta_set(config.STATE_PATH, digest_key, "1")
+            except Exception:
+                _soft_fail("Daily digest failed")
+    return 0
+
+
+def why_no_draft() -> int:
+    """v337: one-command answer to "draft cheyatledu" — status words only,
+    never key values. Checks every stop point of the hourly scheduled run."""
+    import glob as _glob
+    from collections import Counter
+
+    state.init(config.STATE_PATH)
+    now = _now()
+    today = now.date()
+    print("== WHY NO DRAFT ==", now.strftime("%Y-%m-%d %H:%M"))
+    # 1. AI provider
+    ai_ok = config.gemini_configured()
+    print(f"[{'OK' if ai_ok else 'FAIL'}] AI provider key configured"
+          + ("" if ai_ok else "  → .env lo GEMINI_API_KEY (or other provider) set cheyandi"))
+    # 2. WordPress
+    try:
+        wordpress_client.WordPressClient().check_connection()
+        print("[OK] WordPress REST login")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[FAIL] WordPress REST login → {type(exc).__name__}: {str(exc)[:120]}")
+    # 3. schedule
+    plan = state.today_plan(config.STATE_PATH, today, config.ACTIVE_HOUR_START,
+                            config.ACTIVE_HOUR_END, config.DAILY_MIN, config.DAILY_MAX)
+    done = state.today_count(config.STATE_PATH, today)
+    claimed = [h for h in range(24)
+               if state.meta_get(config.STATE_PATH, f"post:{today.isoformat()}:{h:02d}")]
+    print(f"[{'OK' if plan else 'FAIL'}] Today plan hours {plan} · done {done} · claimed {claimed}"
+          + (" · retry pending" if state.meta_get(config.STATE_PATH, f"post:retry:{today.isoformat()}") else ""))
+    if claimed and done < len(claimed):
+        print(f"   ⚠ {len(claimed) - done} claimed hour(s) produced NO post → generation/publish "
+              "failed inside those runs (see log lines below)")
+    _exp = sum(1 for h in plan if h <= now.hour)
+    if done < _exp:
+        print(f"   ⚠ behind plan: {done}/{_exp} expected by now → next hourly run does a CATCH-UP draft (v372)")
+    print(f"[{'OK' if config.ACTIVE_HOUR_START <= now.hour <= config.ACTIVE_HOUR_END else 'INFO'}] "
+          f"Active window {config.ACTIVE_HOUR_START:02d}-{config.ACTIVE_HOUR_END:02d}h (now {now.hour:02d}h)")
+    _fl = state.meta_get(config.STATE_PATH, "fast:watch:last") or ""
+    print(f"[{'OK' if _fl else 'WARN'}] Fast lane (--fast-drain, cron */10): "
+          f"{'last watch sweep ' + _fl[:16] if _fl else 'NEVER RAN — add the */10 crontab line (crontab.example)'}")
+    try:
+        _ws = config.watch_sources()
+        print(f"[{'OK' if _ws else 'WARN'}] Direct watch sources: {len(_ws)} "
+              f"(built-in official boards {'ON' if config.OFFICIAL_WATCH_BUILTIN else 'OFF'} + WATCH_SOURCES)")
+    except Exception:  # noqa: BLE001
+        pass
+    print(f"[INFO] AUTO_SOURCE_ONLY={getattr(config, 'AUTO_SOURCE_ONLY', True)} "
+          f"AUTO_DRAFT_FALLBACK={getattr(config, 'AUTO_DRAFT_FALLBACK', True)} "
+          f"GATE_DRAFT_WARN_ONLY={getattr(config, 'GATE_DRAFT_WARN_ONLY', True)} "
+          f"DEFAULT_POST_STATUS={getattr(config, 'DEFAULT_POST_STATUS', 'draft')}")
+    if getattr(config, "AUTO_SOURCE_ONLY", True) and not getattr(config, "AUTO_DRAFT_FALLBACK", True):
+        print("   ⚠ AUTO_DRAFT_FALLBACK=0 → source lekapote slot SKIP avutundi. .env lo AUTO_DRAFT_FALLBACK=1 pettandi")
+    # 4. sources / radar
+    try:
+        counts = state.source_status_counts(config.STATE_PATH)
+        print(f"[INFO] Sources: {counts or 'none'}")
+        try:  # v354
+            from . import breaking as _bk
+            _bp = _bk.pending_drafts()
+            _bd = state.meta_get(config.STATE_PATH, f"breaking:drafts:{now.date().isoformat()}") or 0
+            print(f"[INFO] Breaking draft lane: {len(_bp)} pending · {_bd} draft(s) today "
+                  f"(per sweep {getattr(config, 'BREAKING_DRAFTS_PER_SWEEP', 3)}, "
+                  f"per day {getattr(config, 'BREAKING_DRAFTS_PER_DAY', 12)})")
+        except Exception as exc:  # noqa: BLE001
+            print(f"[WARN] breaking lane state unreadable: {exc}")
+        ev = state.recent_radar_events(config.STATE_PATH, limit=400)
+        today_ev = [e for e in ev if str(e.get("created_at", "")).startswith(today.isoformat())]
+        print(f"[INFO] Radar events today: {dict(Counter(e['event_type'] for e in today_ev)) or 'none'}")
+        fails = [e for e in ev if e["event_type"] in ("draft_failed", "fetch_failure", "stale_notice",
+                                                        "draft_deferred")][:5]
+        for e in fails:
+            print(f"   · {e['created_at'][:16]} {e['event_type']}: {str(e.get('details') or '')[:140]}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARN] radar state unreadable: {exc}")
+    # 5. last posts
+    summ = state.status_summary(config.STATE_PATH, limit=3)
+    for r in summ["last"]:
+        print(f"[INFO] last post {r['created_at'][:16]} {r['status']} · {str(r['title'])[:60]}")
+    if not summ["last"]:
+        print("[INFO] state.db lo posts levu (fresh install?)")
+    # 6. log scan — last failure reasons
+    pats = ("failed", "error", "block", "rejected", "skip-", "all attempts", "quota", "bad_key",
+            "model_not_found", "traceback")
+    hits = []
+    for lf in sorted(_glob.glob(str(config.BASE_DIR / "log" / "*.log")) +
+                     _glob.glob(str(config.BASE_DIR / "logs" / "*.log")))[-6:]:
+        try:
+            lines = Path(lf).read_text(encoding="utf-8", errors="replace").splitlines()[-400:]
+        except OSError:
+            continue
+        for ln in lines:
+            low = ln.lower()
+            if any(p in low for p in pats):
+                hits.append(f"{Path(lf).name}: {ln.strip()[:170]}")
+    for h in hits[-12:]:
+        print("[LOG] " + h)
+    if not hits:
+        print("[LOG] log/*.log lo failure lines levu — timer/cron asalu run avutundo check: "
+              "systemctl list-timers | grep studentup  ·  crontab -l | grep run.py")
+    print("== journal: journalctl -u studentup-bot --since today --no-pager | tail -40 ==")
+    return 0
+
+
+def _release_failed_slot() -> None:
+    """v338: the hourly slot claimed by this run produced no post → mark a
+    retry so the next hourly run generates even outside the plan hours."""
+    try:
+        last = state.meta_get(config.STATE_PATH, "post:lastclaim") or ""
+        day, _, hour = last.partition("|")
+        today = _now().date().isoformat()
+        if day != today:
+            return
+        if int(state.today_count(config.STATE_PATH, _now().date())) >= getattr(config, "DAILY_MAX", 5):
+            return
+        state.meta_set(config.STATE_PATH, f"post:retry:{today}", hour or "1")
+        state.meta_delete(config.STATE_PATH, "post:lastclaim")
+        log.warning("Slot %s:00 failed — retry flagged for the next hourly run", hour)
+    except Exception as exc:  # noqa: BLE001 — never mask the original error
+        log.debug("release slot skip: %s", exc)
+
+
+def show_status() -> int:
+    state.init(config.STATE_PATH)
+    today = _now().date()
+    plan = state.today_plan(
+        config.STATE_PATH, today,
+        config.ACTIVE_HOUR_START, config.ACTIVE_HOUR_END,
+        config.DAILY_MIN, config.DAILY_MAX,
+    )
+    summary = state.status_summary(config.STATE_PATH)
+    print(f"Site         : {config.WP_SITE}")
+    print(f"Today        : {today}  (now {_now().strftime('%H:%M')})")
+    print(f"Today plan   : {plan}  -> posts done: {state.today_count(config.STATE_PATH, today)}")
+    print(f"Total posts  : {summary['total']}")
+    # Radar is intentionally observable: skipped mirrors, stale notices and
+    # fetch failures stay in SQLite instead of vanishing from scheduler logs.
+    try:
+        from collections import Counter
+        from . import sources as _sources
+
+        queue_lines = (_sources.queue_file_path().read_text(encoding="utf-8").splitlines()
+                       if _sources.queue_file_path().exists() else [])
+        pending = [u for u in queue_lines if u.strip() and u.strip().startswith("http")
+                   and not state.source_done(config.STATE_PATH, u.strip())]
+        event_counts = Counter(e["event_type"] for e in state.recent_radar_events(
+            config.STATE_PATH, limit=500))
+        source_counts = state.source_status_counts(config.STATE_PATH)
+        print(f"Radar queue : {len(pending)} pending review source(s) · "
+              f"queued={source_counts.get('queued', 0)} · "
+              f"retry={source_counts.get('retry', 0)}")
+        print("Radar audit : " + ", ".join(
+            f"{name}={event_counts[name]}" for name in (
+                "queued", "duplicate_opportunity", "duplicate_url", "stale_notice",
+                "fetch_failure", "validation_blocked", "draft_failed", "draft_deferred",
+                "draft_ready") if event_counts[name]
+        ) or "no events")
+    except Exception as exc:  # noqa: BLE001 — status must remain useful
+        log.debug("Radar status unavailable: %s", exc)
+    avgs = state.avg_scores(config.STATE_PATH)
+    if avgs["n"]:
+        print(f"Quality      : avg QA {avgs['qa']}/100 · avg originality {avgs['orig']}%"
+              f"  ({avgs['n']} posts measured)")
+    print("Last posts:")
+    for p in summary["last"]:
+        print(f"  [{p['created_at']}] ({p['status']}) {p['title']}  ->  {p['link']}")
+    return 0
+
+
+def check_wp() -> int:
+    state.init(config.STATE_PATH)
+    try:
+        wp = wordpress_client.WordPressClient()
+        me = wp.check_connection()
+        print(f"OK! Connected as {me.get('name')} — roles: {me.get('roles')}")
+        cats = wp.ensure_categories()
+        print(f"Categories ready: {len(cats)} ids")
+        return 0
+    except wordpress_client.WordPressError as exc:
+        print(f"FAILED: {exc}")
+        return 1
+
+
+def gsc_opportunities(csv_path: str) -> int:
+    """Search Console 'Top queries' export -> striking-distance opportunities.
+
+    Top revenue trick (real data driven): rank 5-20 lo unna queries =
+    page-1/2 lo untayi kani clicks takkuva. Veeti posts ni improve cheyali
+    (update + optimize) -> fastest traffic gain. Idi guess-work kadu —
+    me own Google data.
+    """
+    import csv as _csv
+
+    path = Path(csv_path)
+    if not path.exists():
+        print(f"❌ file ledu: {csv_path}")
+        print("   Search Console > Performance > Queries > Export CSV download cheyandi")
+        return 1
+
+    rows = list(_csv.reader(path.open(encoding="utf-8-sig", errors="replace")))
+    # GSC export: first row header ("Top queries"/"Queries"), second row maybe dates group
+    if not rows or "quer" not in (rows[0][0] if rows[0] else "").lower():
+        print("❌ idi 'Top queries' export kadu (first column 'Top queries' kavali)."
+              "\n   Search Console > Performance > Export (Queries) cheyandi.")
+        return 1
+    data_rows = [r for r in rows[1:] if len(r) >= 5 and r[0].strip()]
+    # skip group-date row (Clicks header repeat)
+    data_rows = [r for r in data_rows if not r[1].lower().startswith("clicks")]
+
+    queries = []
+    for r in data_rows:
+        try:
+            clicks = int(r[1])
+            impressions = int(r[2])
+            ctr_s = r[3].strip().rstrip("%")
+            ctr = float(ctr_s) / 100.0   # GSC export always percentage format
+            position = float(r[4])
+        except (ValueError, IndexError):
+            continue
+        queries.append({"query": r[0].strip(), "clicks": clicks,
+                        "impressions": impressions, "ctr": ctr,
+                        "position": position})
+
+    if not queries:
+        print("❌ parse ayye rows levu — GSC 'Queries' export check cheyandi")
+        return 1
+
+    # striking distance filter: impressions 100+, position 4-20, low CTR
+    opps = [q for q in queries
+            if q["impressions"] >= 100 and 4 <= q["position"] <= 20 and q["ctr"] < 0.05]
+    opps.sort(key=lambda q: q["impressions"] * (21 - q["position"]), reverse=True)
+
+    print("=" * 70)
+    print(f"  SEARCH CONSOLE OPPORTUNITIES ({len(queries)} queries, "
+          f"{len(opps)} striking-distance)")
+    print("=" * 70)
+    if not opps:
+        print("  Ippudu striking-distance queries levu — inka traffic early stage."
+              "\n  2-3 nelalu posts perigaka malli run cheyandi.")
+        return 0
+
+    print(f"  {'QUERY':38} {'IMPR':>7} {'POS':>5} {'CTR':>6}")
+    print("  " + "-" * 66)
+    for q in opps[:20]:
+        print(f"  {q['query'][:36]:38} {q['impressions']:>7} "
+              f"{q['position']:>5.1f} {q['ctr']*100:>5.1f}%")
+    print("-" * 70)
+    top3 = [q["query"] for q in opps[:3]]
+    print("  🎯 ACTION PLAN (top 3 — immediate):")
+    for i, q in enumerate(top3, 1):
+        print(f"   {i}. \"{q}\" — ee query meeda already rank {opps[i-1]['position']:.0f}")
+        print("      -> matching post ni --update cheyandi OR fresh deep article")
+        print("         ravadam (title/desc/content optimize -> CTR perugutundi)")
+    print("\n  Next step: matching post ni human ga inspect chesi title/snippet or content/internal links "
+          "test cheyandi. Search Console lo before/after data tho impact measure cheyandi; "
+          "traffic percentage or timing guarantee ledu.")
+
+    # v21: GSC real data → queue priority boost (radar/keyword queue lo
+    # ee queries matche ayye items mundu process avutayi)
+    try:
+        import json as _json
+        import re as _re
+
+        from . import sources as _src
+        from . import state as _st
+
+        boost = []
+        for q in opps[:5]:
+            for tok in _re.findall(r"[a-z0-9ఀ-౿]{3,}",
+                                   q["query"].lower()):
+                if tok not in boost:
+                    boost.append(tok)
+        boost = boost[:25]
+        if boost:
+            _st.meta_set(config.STATE_PATH, "gscboost:v1",
+                         _json.dumps(boost, ensure_ascii=False))
+            n = _src.apply_queue_boost(boost)
+            print(f"  ✅ Queue boost: {len(boost)} GSC terms saved"
+                  f" + {n} queue line(s) top ki move ayayi")
+    except Exception:
+        _soft_fail("Queue boost apply failed (non-fatal)")
+    print("=" * 70)
+    return 0
+
+
+def doctor() -> int:
+    """Deployment health check — Oracle lo first run mundu okka command."""
+    import requests as _rq
+    import shutil as _sh
+
+    ok = True
+    results = []
+
+    def check(label, fn):
+        nonlocal ok
+        try:
+            detail = fn()
+            results.append((True, label, detail or "OK"))
+        except Exception as exc:
+            ok = False
+            results.append((False, label, f"FAIL: {exc}"))
+
+    print("=" * 62)
+    print("  DOCTOR — Deployment Health Check")
+    print("=" * 62)
+
+    # 1) AI provider key + live validation
+    def _gemini():
+        providers = gemini_client._provider_order()
+        if not providers:
+            raise RuntimeError("AI provider key ledu (.env)")
+        provider = providers[0]
+        keys = config.ai_provider_keys(provider)
+        if not keys:
+            raise RuntimeError(f"{provider} key ledu (.env lo set cheyandi)")
+        key = keys[0]
+        if provider == "gemini":
+            r = _rq.get(
+                f"{config.GEMINI_API_BASE}/models",
+                params={"key": key},
+                timeout=15,
+            )
+            if r.status_code != 200:
+                raise RuntimeError(f"Gemini API {r.status_code} — key invalid?")
+            n = len(r.json().get("models", []))
+            # v318: listing != usable. Google retires models for new keys
+            # (404 "no longer available to new users") — do a real 1-token call.
+            model = gemini_client._model_override(config.GEMINI_MODEL)
+            g = _rq.post(
+                f"{config.GEMINI_API_BASE}/models/{model}:generateContent",
+                params={"key": key},
+                json={"contents": [{"parts": [{"text": "Say OK"}]}],
+                      "generationConfig": {"maxOutputTokens": 8}},
+                timeout=30,
+            )
+            if g.status_code != 200:
+                import re as _re
+                m = _re.search(r"use\s+models/([A-Za-z0-9.\-]+)", g.text or "")
+                fix = (f" → .env lo GEMINI_MODEL={m.group(1)} pettandi"
+                       if m else "")
+                raise RuntimeError(
+                    f"model {model} generateContent {g.status_code}: "
+                    f"{(g.text or '')[:140]}{fix}")
+            return f"Gemini key valid, {n} models, model {model} generates OK"
+        base = str(getattr(config, f"{provider.upper()}_API_BASE", "")).rstrip("/")
+        r = _rq.get(
+            f"{base}/models",
+            headers={"Authorization": f"Bearer {key}"},
+            timeout=15,
+        )
+        if r.status_code not in (200, 404, 405):
+            raise RuntimeError(f"{provider} API {r.status_code} — key invalid?")
+        # Some compatible gateways do not expose GET /models; generation will
+        # still validate the configured model via the normal fallback path.
+        model = getattr(config, f"{provider.upper()}_MODEL", "")
+        return f"{provider} key configured (model={model})"
+    check("Gemini API", _gemini)
+
+    # 2) WordPress REST + auth
+    def _wp():
+        from .wordpress_client import WordPressClient
+        wp = WordPressClient()
+        me = wp.check_connection()
+        cats = wp.list_categories()
+        return f"{me.get('name', '?')} @ {config.WP_SITE} | {len(cats)} categories"
+    check("WordPress REST", _wp)
+
+    # 3) Telegram bot token (getMe — non-intrusive)
+    def _tg():
+        if not config.TELEGRAM_BOT_TOKEN:
+            raise RuntimeError("TELEGRAM_BOT_TOKEN ledu")
+        r = _rq.get(f"{config.TELEGRAM_API_BASE}/bot{config.TELEGRAM_BOT_TOKEN}/getMe",
+                    timeout=10)
+        data = r.json()
+        if not data.get("ok"):
+            raise RuntimeError(f"getMe fail ({r.status_code})")
+        if not config.TELEGRAM_CHAT_ID:
+            raise RuntimeError("TELEGRAM_CHAT_ID ledu")
+        return f"@{data['result'].get('username', '?')} -> chat {config.TELEGRAM_CHAT_ID}"
+    check("Telegram bot", _tg)
+
+    # 4) IndexNow key format
+    def _in():
+        if not config.INDEXNOW_KEY:
+            return "not set (optional — instant indexing ki set cheyandi)"
+        k = config.INDEXNOW_KEY.strip()
+        if not (8 <= len(k) <= 128) or not re.fullmatch(r"[A-Za-z0-9-]+", k):
+            raise RuntimeError("key format wrong (A-Za-z0-9- chars only)")
+        return f"set ({len(k)} chars)"
+    check("IndexNow", _in)
+
+    # 5) state DB + output dirs writable
+    def _db():
+        state.init(config.STATE_PATH)
+        state.meta_set(config.STATE_PATH, "doctor:ping", "1")
+        assert state.meta_get(config.STATE_PATH, "doctor:ping") == "1"
+        config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        (config.OUTPUT_DIR / ".ping").write_text("ok", encoding="utf-8")
+        (config.OUTPUT_DIR / ".ping").unlink()
+        return f"{config.STATE_PATH} + {config.OUTPUT_DIR} writable"
+    check("Storage", _db)
+
+    # 6) disk space (Oracle free VM 25GB; images + DB perugutayi)
+    def _disk():
+        free_gb = _sh.disk_usage(str(config.OUTPUT_DIR)).free / 1e9
+        if free_gb < 1:
+            raise RuntimeError(f"only {free_gb:.1f} GB free — clean cheyandi!")
+        return f"{free_gb:.1f} GB free"
+    check("Disk", _disk)
+
+    for good, label, detail in results:
+        print(f"  {'✅' if good else '❌'} {label:14} {detail}")
+
+    # config summary
+    print("-" * 62)
+    print(f"  Plan: {config.DAILY_MIN}-{config.DAILY_MAX} posts/day + "
+          f"{config.LISTICLES_PER_DAY} listicles | auto-refresh "
+          f"{config.AUTO_REFRESH_PER_DAY}/day @ {config.AUTO_REFRESH_HOUR}:00")
+    print(f"  Trends {'ON' if config.USE_TRENDS else 'OFF'} | Discover meta "
+          f"{'ON' if config.DISCOVER_META_ENABLED else 'OFF'} | ads "
+          f"{config.MAX_AD_SLOTS} slots"
+          + (" (shortcode set)" if config.AD_SHORTCODE else " (NO shortcode!)"))
+    # v38: top-post engine summary (offline — no network calls)
+    try:
+        from . import top_post as _tp
+        _st = _tp.universe_stats()
+        print(f"  Top Post Engine {'ON' if config.TOP_POST_ENGINE else 'OFF'} | "
+              f"gate {config.TOP_POST_MIN_SCORE}/100 "
+              f"({'strict' if config.TOP_POST_STRICT else 'off'}) | "
+              f"{_st['total']} keywords ({_st['entities']} entities × "
+              f"{_st['intents']} intents) | {_st['clusters']} clusters")
+    except Exception as exc:  # noqa: BLE001
+        print(f"  Top Post Engine: ❌ {str(exc)[:60]}")
+    print("=" * 62)
+    if ok:
+        print("  ALL SYSTEMS GO 🚀  — bot ready, start: systemctl --user start autoblog")
+    else:
+        print("  ❌ problems unna — ventane fix cheyandi (upper errors chudu)")
+    print("=" * 62)
+    return 0 if ok else 1
+
+
+def trends_check() -> int:
+    """Google Trends India daily — education-relevant trends display."""
+    print("=" * 62)
+    print("  GOOGLE TRENDS (India) — TODAY")
+    print("=" * 62)
+    topics = topic_engine.fetch_trending_topics()
+    if not topics:
+        print("  (fetch fail / empty — network check cheyandi)")
+        return 1
+    print("\n  TOP 10 (anni):")
+    for i, t in enumerate(topics[:10], 1):
+        print(f"  {i:2}. {t['title']}  [{t['traffic'] or '?'} searches]")
+    edu = topic_engine.filter_edu_trends(topics)
+    print(f"\n  EDUCATION-RELEVANT ({len(edu)}):")
+    for t in edu:
+        print(f"  🎓 {t['title']}  [{t['traffic'] or '?'}]")
+        if t["news_title"]:
+            print(f"      ↳ {t['news_title'][:70]}")
+    if edu:
+        print("\n  ↳ USE_TRENDS=1 unte bot automatically ee topic meeda article"
+              " rashtundi (1/day).")
+    print("=" * 62)
+    return 0
+
+
+def pin_check_run() -> int:
+    """v65/v66: pin-to-pin certificate proof (68 checks · deterministic fixture)."""
+    from . import post_gate
+
+    return post_gate.main()
+
+
+def trends_run(queue: bool = True) -> int:
+    """v65: Google Trends + Suggest capture (niche filter → topic queue)."""
+    from . import trends
+
+    if queue:
+        return trends.main()
+    res = trends.capture(queue=False)
+    print(f"trends: {res['trends']} · suggest: {res['suggest']}")
+    for t in res["top"]:
+        print("   -", str(t.get("title"))[:70])
+    return 0
+
+
+def show_draft(n: int = 1) -> int:
+    """v382: dump newest drafts as readable plain text — owner pastes this for
+    quality review. Prints nothing secret (no URLs from .env, no keys)."""
+    import html as _html
+    import re as _re
+    from .wordpress_client import WordPressClient
+    wp = WordPressClient()
+    try:
+        drafts = wp.list_drafts(per_page=max(1, min(10, n)))
+    except Exception as exc:  # noqa: BLE001
+        print(f"[FAIL] cannot list drafts: {exc}")
+        return 1
+    if not drafts:
+        print("[INFO] no drafts in WP")
+        return 0
+    for d in drafts:
+        title = _html.unescape((d["title"].get("raw") or d["title"].get("rendered") or "").strip())
+        raw = d["content"].get("raw") or d["content"].get("rendered") or ""
+        meta = d.get("meta") or {}
+        print("=" * 72)
+        print(f"DRAFT #{d['id']}  {d.get('date','')[:16]}")
+        print(f"TITLE: {title}")
+        for k in ("rank_math_title", "rank_math_description", "rank_math_focus_keyword"):
+            if meta.get(k):
+                print(f"{k.replace('rank_math_', 'SEO ').upper()}: {meta[k]}")
+        print("-" * 72)
+        txt = _re.sub(r"<(h[1-6])[^>]*>", lambda m: "\n## ", raw)
+        txt = _re.sub(r"</(p|li|h[1-6]|tr|div|blockquote)>", "\n", txt)
+        txt = _re.sub(r"<li[^>]*>", "• ", txt)
+        txt = _re.sub(r"<br\s*/?>", "\n", txt)
+        txt = _html.unescape(_re.sub(r"<[^>]+>", "", txt))
+        txt = _re.sub(r"\n{3,}", "\n\n", txt).strip()
+        words = len(txt.split())
+        tel = sum(1 for ch in txt if "\u0c00" <= ch <= "\u0c7f")
+        letters = tel + sum(1 for ch in txt if ch.isascii() and ch.isalpha())
+        print(txt)
+        print("-" * 72)
+        print(f"words: {words} · telugu share: {int(100 * tel / max(1, letters))}%")
+    return 0
+
+
+def rm100_run() -> int:
+    """v64: Rank Math 100 engine proof — imperfect draft → 100/100 breakdown."""
+    from . import rm100, validator
+
+    
+    art = rm100.sample_article()
+    res = rm100.apply(art)
+    checks = validator.rankmath_strict(art, art.get("content_html", "")).get("checks", [])
+    print("=" * 70)
+    print("  🎯 RANK MATH LOCAL PRE-FLIGHT — deterministic checks only")
+    print("  ⚠️  This is NOT the live Rank Math plugin score. Use --live-seo POST_ID for WordPress readback.")
+    print("=" * 70)
+    print(f"  score: {res['before']}/100  →  {res['after']}/100"
+          f"   ({len(checks)} on-page tests)")
+    print(f"  fixes: {', '.join(res['applied']) or '—'}")
+    print(f"  migilinavi: {res['remaining'] or 'emi ledu ✔'}")
+    print(f"  title: {art['title']} ({len(art['title'])} ch)")
+    print(f"  meta: {len(art['meta_description'])} ch · slug: {art['slug']}"
+          f" · words: {rm100._words(art['content_html'])}")
+    if checks:
+        print("-" * 70)
+        for c in checks:
+            print(f"    {'✅' if c['ok'] else '❌'} {c['item']:26s} {c['points']} pts")
+    print("=" * 70)
+    return 0 if res["after"] == 100 else 1
+
+
+def readiness_run() -> int:
+    """v62: TOP WEBSITE READINESS — okka command lo motham system proof."""
+    from . import readiness
+
+    rep = readiness.run_report()
+    arts = readiness.write_artifacts(rep)
+    readiness.print_report(rep, arts)
+    return 0 if rep.get("ok") else 1
+
+
+def push_theme_data(dry_run: bool = False) -> int:
+    """v61: bot data → WordPress theme (breaking · proof · house ads).
+
+    v73: countdown/deadline push teesesaamu (hero card user brief tho poyindi).
+    """
+    from . import wp_theme_sync
+
+    payload = wp_theme_sync.build_payload()
+    if not payload:
+        print("  ⚠️  push cheyyalsina data ledu (breaking feed/house ads/proof khali)")
+        return 0
+    res = wp_theme_sync.push(payload, dry_run=dry_run)
+    print("=" * 62)
+    print("  🎨 WP THEME SYNC — bot data → site theme")
+    print("=" * 62)
+    for k, v in res.get("sent", {}).items():
+        print(f"  • {k}: {v if not isinstance(v, list) else str(len(v)) + ' items'}")
+    if res.get("ok"):
+        extra = " (dry-run, network call ledu)" if res.get("dry_run") else ""
+        print(f"  ✅ push OK{extra} — updated: {res.get('updated', [])}")
+        return 0
+    print(f"  ❌ push fail: {res.get('reason')}")
+    print("     ↳ fix: .env lo WP_SITE/WP_USERNAME/WP_APP_PASSWORD + theme activate")
+    return 1
+
+
+def daily_run(send: bool = True, whatsapp: bool = True, telegram: bool = True,
+              drafts: bool = True, guardian_check: bool = True,
+              save_files: bool = True) -> int:
+    """v190: OKE COMMAND daily routine — draft flow tho ne list, automatic send.
+
+    User ask: "draf elaga chesthavo alaga cheyali anthe daily ... malli anni nuvve
+    set cheyu perefctgaa".
+
+    Order (prathi step non-fatal — okka step fail aina migilinavi continue):
+      1. Drafts — radar + queue topics → **prathi link ki veru draft** (hook lead tho)
+      2. Guardian quick check (site/system health)
+      3. Daily list — ade hook format → save → Telegram + WhatsApp + click-to-forward
+
+    rc: 0 = list build ayyi (send ok / channels levu) · 1 = list khali ·
+        2 = list build fail · 3 = channels unna anni send fail.
+    """
+    print("=" * 62)
+    print("  🌅 DAILY ROUTINE — drafts → health → list → send")
+    print("=" * 62)
+    if drafts:
+        try:
+            print("\n[1/5] DRAFTS (radar + queue → separate drafts, hook lead tho)")
+            rc = radar_run(process_posts=True)
+            if rc not in (0, None):
+                print(f"  ⚠️ draft step rc={rc} — list step continue avutundi")
+        except Exception as exc:  # noqa: BLE001 — drafts fail aina list aagakudadu
+            log.exception("daily drafts step failed (non-fatal): %s", exc)
+    else:
+        print("\n[1/5] DRAFTS — skip (--daily-no-drafts)")
+    if guardian_check:
+        try:
+            print("\n[2/5] GUARDIAN (system health)")
+            guardian_run(quiet=True)
+        except Exception as exc:  # noqa: BLE001
+            log.info("guardian step skip (safe): %s", exc)
+    else:
+        print("\n[2/5] GUARDIAN — skip")
+    # v197: [3/5] daily engage — quiz post + reader poll (config: DAILY_ENGAGE=1)
+    if str(getattr(config, "DAILY_ENGAGE", "1")) not in ("0", "false", "False", ""):
+        try:
+            print("\n[3/5] DAILY ENGAGE (quiz post + reader poll push)")
+            from . import engage_push
+            engage_push.run(client=None)
+        except Exception as exc:  # noqa: BLE001 — engage fail aina daily list aagakudadu
+            log.info("daily engage step skip (safe): %s", exc)
+    else:
+        print("\n[3/5] DAILY ENGAGE — skip (DAILY_ENGAGE=0)")
+
+    # v224: money autopilot — vaaram ki okasari (Sunday) taane run avutundi.
+    if datetime.now().weekday() == 6 and str(
+            getattr(config, "MONEY_AUTOPILOT", "1")) not in ("0", "false", "False", ""):
+        try:
+            print("\n[3.5/5] MONEY AUTOPILOT (weekly — revenue gaps + auto link fixes)")
+            from . import money_autopilot
+            money_autopilot.run_cli(apply=True, send=True)
+        except Exception as exc:  # noqa: BLE001 — money step fail aina daily aagakudadu
+            log.info("money autopilot skip (safe): %s", exc)
+
+    # v197: [4/5] AUTO-PUBLISH LANE — gate-passed drafts mattrame live
+    if str(getattr(config, "AUTO_PUBLISH_DAILY", "0")) in ("1", "true", "True"):
+        try:
+            print("\n[4/5] AUTO-PUBLISH (source + words + Rank Math gate)")
+            from . import publish_lane
+            report = publish_lane.run(dry=False)
+            try:
+                publish_lane.notify(report)
+            except Exception:  # noqa: BLE001
+                pass
+        except Exception as exc:  # noqa: BLE001
+            log.info("auto-publish step skip (safe): %s", exc)
+    else:
+        print("\n[4/5] AUTO-PUBLISH — OFF (AUTO_PUBLISH_DAILY=1 tho on cheyyandi)")
+
+    print("\n[5/5] DAILY LIST (Telugu · hook items · mana blog links) + SEND")
+    from . import forward_list as _fl
+
+    return _fl.run_morning(save_files=save_files, send=send,
+                           whatsapp=whatsapp, telegram=telegram)
+
+
+def guardian_run(notify: bool = False, quiet: bool = False) -> int:
+    """v60: SITE GUARDIAN — system motham check (site/UI/SEO/ads/feed/storage)."""
+    from . import guardian
+
+    summary = guardian.guard(notify=notify, print_out=not quiet)
+    return 0 if summary.get("ok") else 1
+
+
+def breaking_feed_run(from_file: str = "") -> int:
+    """v59: బ్రేకింగ్ న్యూస్ feed build — site ticker + section ki.
+
+    Default: radar sweep (district + 258 curated source queries) → verified items
+    matrame → preview/data/breaking.json. `--breaking-from FILE` tho offline
+    (test/approved list) nunchi kuda generate cheyochu.
+    """
+    import json as _json
+
+    from . import breaking
+
+    print("=" * 62)
+    print("  🚨 BREAKING NEWS FEED — site ticker + బ్రేకింగ్ న్యూస్ section")
+    print("=" * 62)
+    raw = []
+    if from_file:
+        try:
+            data = _json.loads(Path(from_file).read_text(encoding="utf-8"))
+            raw = data.get("items", data) if isinstance(data, dict) else data
+            print(f"  source file: {from_file} ({len(raw)} raw items)")
+        except Exception as exc:  # noqa: BLE001
+            print(f"  ⛔ file chadavalekapoyindi: {exc}")
+            return 1
+    else:
+        from . import news_radar
+
+        # `--breaking-feed` is a standalone CLI path; initialize SQLite before
+        # the radar reads its rotation/meta tables.
+        state.init(config.STATE_PATH)
+        summary = news_radar.run_radar()
+        raw = summary.get("items", [])
+        if not summary.get("enabled", True):
+            print("  RADAR_ENABLED=0 — feed khali ga untundi (fake news ledu)")
+    res = breaking.publish(raw, source="file" if from_file else "radar")
+    st = breaking.stats()
+    print(f"  feed: {res['count']} items → {res['path']}")
+    print(f"  updated: {res['updated']}")
+    if st["by_tag"]:
+        print("  tags: " + " · ".join(f"{k}:{v}" for k, v in st["by_tag"].items()))
+    if not res["count"]:
+        print("  ℹ️  ippudu verified breaking item ledu — site 'kotha update ledu' ani cheptundi")
+    print("  most-used order: " + " · ".join(breaking.most_used_cats()))
+    print("=" * 62)
+    return 0
+
+
+def _breaking_drafts(mock: bool = False) -> int:
+    """v354: breaking lane — fresh verified breaking URLs → WP review drafts now.
+    AI key lekapote URLs pending ga untayi (next run lo try)."""
+    if not getattr(config, "BREAKING_DRAFTS_ENABLED", True):
+        return 0
+    if not mock and not config.gemini_configured():
+        log.info("breaking draft lane: AI key ledu — URLs pending (next run)")
+        return 0
+    try:
+        from . import breaking as _bk
+
+        made = _bk.drain_drafts(getattr(config, "BREAKING_DRAFTS_PER_SWEEP", 3), mock=mock)
+        if made:
+            log.info("BREAKING DRAFTS ✔ %d review draft(s)", made)
+        return made
+    except Exception:  # noqa: BLE001
+        _soft_fail("breaking draft lane failed (non-fatal)")
+        return 0
+
+
+def drain_source_queue(limit: int) -> int:
+    """v320: turn up to ``limit`` pending queue URLs into review drafts now.
+    Daily cap QUEUE_DRAFTS_PER_DAY; failures are classified + cleaned like radar."""
+    day_key = f"queue:drafts:{_now().date().isoformat()}"
+    done_today = int(state.meta_get(config.STATE_PATH, day_key) or 0)
+    budget = min(limit, max(0, config.QUEUE_DRAFTS_PER_DAY - done_today))
+    made = 0
+    while made < budget:
+        url = sources.pending_from_queue()
+        if not url:
+            break
+        completed, failure_type, details = False, "draft_failed", ""
+        try:
+            result = pipeline.create_from_source(url, force_draft=True)
+            made += 1
+            completed = True
+            log.info("QUEUE DRAFT ✔ %s", result.get("link"))
+        except Exception as exc:  # noqa: BLE001 — one bad link must not stop the hour
+            details = str(exc)
+            low = details.lower()
+            if any(w in low for w in ("fetch", "http ", "timeout", "connection")):
+                failure_type = "fetch_failure"
+            elif any(w in low for w in ("stale", "expired", "deadline passed")):
+                failure_type = "stale_notice"
+            elif any(w in low for w in ("conflict", "unsupported", "preflight", "evidence", "validation")):
+                failure_type = "validation_blocked"
+            log.error("queue URL failed (%s): %s", url[:60], details[:200])
+        finally:
+            sources.mark_done_and_clean(url, completed=completed,
+                                        failure_type=failure_type, details=details)
+    if made:
+        state.meta_set(config.STATE_PATH, day_key, str(done_today + made))
+    return made
+
+
+def fast_drain() -> int:
+    """v375 FAST LANE — run every 10 minutes from cron (`--fast-drain`).
+
+    Owner: "drafts minute lo raavali". The hourly run keeps the plan/catch-up
+    logic; this lane only turns ALREADY-FOUND verified sources into review
+    drafts as soon as they exist (queue → draft), and refreshes the official
+    watch list every FAST_WATCH_MINUTES so a new TSPSC/APPSC/SSC notice
+    becomes a draft within minutes, not next hour. Drafts only, never publish.
+    A file lock prevents overlapping runs; daily caps still apply.
+    """
+    import fcntl
+
+    state.init(config.STATE_PATH)
+    lock_path = config.BASE_DIR / "state.fastlane.lock"
+    try:
+        lock_fh = open(lock_path, "w")  # noqa: SIM115
+        fcntl.flock(lock_fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        log.info("fast-drain: previous run still active — skip")
+        return 0
+    try:
+        now = _now()
+        if not (config.ACTIVE_HOUR_START <= now.hour <= config.ACTIVE_HOUR_END):
+            log.info("fast-drain: outside active window %02d-%02d — skip",
+                     config.ACTIVE_HOUR_START, config.ACTIVE_HOUR_END)
+            return 0
+        if not config.gemini_configured():
+            log.warning("fast-drain: AI provider key ledu — skip")
+            return 0
+        # 1) official watch list refresh (cheap: direct pages/RSS) every N minutes
+        last = state.meta_get(config.STATE_PATH, "fast:watch:last") or ""
+        due = True
+        if last:
+            try:
+                from datetime import datetime as _dt
+
+                due = (now - _dt.fromisoformat(last)).total_seconds() >= config.FAST_WATCH_MINUTES * 60
+            except ValueError:
+                due = True
+        if due:
+            try:
+                from . import news_radar as _nr
+
+                n = _nr.watch_channels()
+                state.meta_set(config.STATE_PATH, "fast:watch:last", now.isoformat())
+                if n:
+                    log.info("fast-drain: watch sweep queued %d new source(s)", n)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("fast-drain: watch sweep skip: %s", exc)
+        # 2) queue → drafts (per-run cap keeps Gemini/WP load smooth)
+        made = drain_source_queue(config.FAST_DRAIN_PER_RUN)
+        log.info("fast-drain: %d review draft(s) this run", made)
+        return 0
+    finally:
+        try:
+            fcntl.flock(lock_fh, fcntl.LOCK_UN)
+            lock_fh.close()
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def radar_run(process_posts: bool = True) -> int:
+    """v15/v16/v17: full radar sweep — districts + official grid + watch.
+    # v65: Google Trends/Suggest capture (network lekapote silent skip)
+    if getattr(config, "TRENDS_ENABLED", True):
+        try:
+            from . import trends as _tr
+
+            _cap = _tr.capture(queue=True)
+            if _cap.get("trends") or _cap.get("suggest"):
+                log.info("v65 trends: %d niche trends · %d suggest · queue +%s",
+                         _cap["trends"], _cap["suggest"],
+                         (_cap.get("queue") or {}).get("added", 0))
+        except Exception:  # noqa: BLE001 — trends bot ni aapakudadu
+            log.info("trends capture skip (safe)")
+
+    Queue fresh edu news URLs + channel topics; optionally process up to
+    RADAR_POSTS_PER_DAY articles (topics first, then source queue URLs).
+    """
+    from . import news_radar
+
+    state.init(config.STATE_PATH)
+    print("=" * 62)
+    print("  📡 BREAKING NEWS RADAR — TS 33 + AP 26 districts")
+    print("     + official sources grid + watch channels")
+    print("=" * 62)
+    summary = news_radar.run_radar()
+    if not summary.get("enabled", True):
+        print("  RADAR_ENABLED=0 — skip chesesaru")
+        return 0
+    d = summary.get("districts", 0)
+    g = summary.get("grid", 0)
+    w = summary.get("watch", 0)
+    print(f"  New queue items: {d} district + {g} grid URLs | {w} channel topics")
+
+    # v59: same sweep → site బ్రేకింగ్ న్యూస్ feed (ticker + section)
+    try:
+        from . import breaking
+
+        if config.BREAKING_ENABLED:
+            bres = breaking.publish(summary.get("items", []))
+            print(f"  🚨 breaking feed: {bres['count']} items → preview/data/breaking.json")
+            made = _breaking_drafts(False)
+            if made:
+                print(f"  📝 breaking → {made} WP draft(s) (original Telugu rewrite)")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("breaking feed skip: %s", exc)
+
+    # v21: GSC boost (state meta) → queue re-sort — real impressions decide
+    # ee roju enti process avalo (radar sweep tarvata automatic).
+    try:
+        import json as _json
+
+        _boost = _json.loads(state.meta_get(config.STATE_PATH,
+                                            "gscboost:v1") or "[]")
+        if _boost:
+            from . import sources as _src
+
+            _nb = _src.apply_queue_boost(_boost)
+            if _nb:
+                print(f"  GSC boost: {_nb} queue line(s) prioritized")
+    except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
+        log.debug("radar_run skip: %s", exc)
+
+    # v17: keyword dominance — prathi roju 1 saari autocomplete + gap analyse
+    kw_queued = 0
+    try:
+        from . import keyword_engine as ke
+
+        kw = ke.daily_keyword_harvest(max_queue=config.KEYWORD_DAILY_QUEUE)
+        kw_queued = int(kw.get("queued", 0) or 0)
+        if kw_queued:
+            print(f"  Keyword engine: {kw_queued} keyword topics queued")
+    except Exception as exc:
+        print(f"  keyword engine skip: {exc}")
+
+    if not process_posts:
+        print("  (posts processing skip — --dry-run mode)")
+        return 0
+    if not config.gemini_configured():
+        print("  AI provider key ledu — queue fill ayyindi, posts skip")
+        return 0
+
+    # v320: process the BACKLOG, not just this sweep's fresh finds. Earlier a
+    # sweep with 0 new URLs processed 0 posts even with a full queue.
+    _rk = f"radar:posts:{_now().date().isoformat()}"
+    _already = int(state.meta_get(config.STATE_PATH, _rk) or 0)
+    n = max(0, config.RADAR_POSTS_PER_DAY - _already)
+    print(f"  Radar budget today: {n} more draft(s) (done {_already}/{config.RADAR_POSTS_PER_DAY}); "
+          f"fresh this sweep: {d + g + w + kw_queued}")
+    done = 0
+    # 1) Text-only alerts are NOT sent straight to Gemini. Resolve them to an
+    # official/Telugu article first, then run the full multi-source evidence
+    # pipeline. This is slower, but produces a reviewable source-backed draft.
+    for topic in news_radar.pending_topics(limit=n):
+        made = False
+        try:
+            from . import research as _research
+
+            candidates = _research.topic_source_candidates(topic, limit=6)
+            for candidate in candidates:
+                try:
+                    result = pipeline.create_from_source(
+                        candidate["url"], category=pipeline.classify_category(topic),
+                        force_draft=True)
+                    done += 1
+                    made = True
+                    print(f"  VERIFIED DRAFT ✔ {result['link']} "
+                          f"(topic source: {candidate['url'][:55]})")
+                    break
+                except Exception as exc:
+                    log.warning("topic candidate rejected (%s): %s",
+                                candidate["url"][:55], exc)
+            if not made:
+                log.warning("topic has no verified source set — no draft: %s", topic[:90])
+        except Exception as exc:
+            log.error("radar topic research failed (%s): %s", topic[:50], exc)
+        finally:
+            news_radar.mark_topic_done(topic)  # poison-loop kaadu
+    # 2) source queue URLs (district/grid news) — original rewrite flow
+    while done < n:
+        url = sources.pending_from_queue()
+        if not url:
+            break
+        completed = False
+        failure_type = "draft_failed"
+        details = ""
+        try:
+            result = pipeline.create_from_source(url, force_draft=True)
+            done += 1
+            completed = True
+            print(f"  VERIFIED DRAFT ✔ {result['link']}")
+        except Exception as exc:
+            details = str(exc)
+            low = details.lower()
+            if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
+                failure_type = "fetch_failure"
+            elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                failure_type = "stale_notice"
+            elif any(word in low for word in ("conflict", "unsupported", "preflight", "evidence", "validation")):
+                failure_type = "validation_blocked"
+            log.error("radar URL failed (%s): %s — retryable", url[:60], exc)
+        finally:
+            sources.mark_done_and_clean(
+                url, completed=completed, failure_type=failure_type, details=details
+            )
+    try:
+        state.meta_set(config.STATE_PATH, _rk, str(_already + done))
+    except Exception:  # noqa: BLE001
+        pass
+    print(f"  Radar posts created: {done}")
+    return 0
+
+
+def sources_view() -> int:
+    """v16.1: official sources grid anni chupinchu (verify coverage)."""
+    from . import sources_grid as sg
+
+    by_cat: dict = {}
+    for s_ in sg.SOURCES_GRID:
+        by_cat.setdefault(s_["cat"], []).append(s_)
+    daily_n = sum(1 for s_ in sg.SOURCES_GRID if s_.get("daily"))
+    print("=" * 62)
+    print(f"  OFFICIAL SOURCES GRID — {len(sg.SOURCES_GRID)} sources "
+          f"({daily_n} daily hot-list, rest rotation)")
+    print("=" * 62)
+    for cat in sorted(by_cat):
+        print(f"\n  [{cat}] ({len(by_cat[cat])})")
+        for s_ in by_cat[cat]:
+            print(f"    - {s_['name']}" + ("  ★ daily" if s_.get("daily") else ""))
+    print()
+    return 0
+
+
+def keywords_view() -> int:
+    """v17: keyword matrix + coverage vs live posts + live autocomplete."""
+    state.init(config.STATE_PATH)
+    from . import keyword_engine as ke
+
+    matrix = ke.keyword_matrix()
+    hot = [m for m in matrix if m["hot"]]
+    print("=" * 62)
+    print(f"  KEYWORD DOMINANCE ENGINE — {len(matrix)} keywords "
+          f"({len(ke.EXAMS)} exams × {len(ke.INTENTS)} intents, {len(hot)} hot)")
+    print("=" * 62)
+    titles: list = []
+    try:
+        from .wordpress_client import WordPressClient
+
+        titles = [t.get("title", "") for t in
+                  WordPressClient().get_recent_published(per_page=100)]
+    except Exception:
+        print("  (live post titles raaledu — sandbox/network; coverage 0 ga untundi)")
+    rep = ke.coverage_report(titles)
+    print(f"\n  Coverage vs {rep['existing_posts']} live posts: "
+          f"{rep['covered']}/{rep['total']} keywords ({rep['pct']}%)")
+    print("\n  Sample keyword targets (hot first):")
+    for m in matrix[:8]:
+        print(f"    - {m['title']}")
+    print("\n  Google Autocomplete harvest (live, top seeds):")
+    for seed in ke.suggest_seeds()[:5]:
+        sugg = ke.harvest_suggest(seed)
+        print(f"    {seed}: {', '.join(sugg[:5]) or '(no data)'}")
+    q = ke.daily_keyword_harvest(max_queue=config.KEYWORD_DAILY_QUEUE, force=True)
+    print(f"\n  Daily harvest: {q.get('queued', 0)} keyword topics queued (topics_queue.txt)")
+    print("=" * 62)
+    return 0
+
+
+def revenue_check() -> int:
+    """Revenue setup audit — em set ayyindi, em missing o cheptundi."""
+    state.init(config.STATE_PATH)
+    print("=" * 62)
+    print("  STUDENTUP.IN REVENUE AUDIT")
+    print("=" * 62)
+
+    checks = [
+        ("TELEGRAM_CHANNEL_URL set (repeat traffic CTA)",
+         bool(config.TELEGRAM_CHANNEL_URL)),
+        ("AdSense pre-approval gate (ads intentionally off)",
+         not bool(getattr(config, "ADSENSE_APPROVED", False))),
+        ("ADSENSE_CLIENT_ID valid after approval",
+         (not getattr(config, "ADSENSE_APPROVED", False)) or
+         (bool(getattr(config, "ADSENSE_CLIENT_ID", ""))
+          and re.fullmatch(r"ca-pub-\d{6,20}",
+                           getattr(config, "ADSENSE_CLIENT_ID", "")) is not None)),
+        ("AdSense loader enabled only after approval",
+         not getattr(config, "ADSENSE_APPROVED", False) or
+         bool(getattr(config, "ADSENSE_ENABLED", False))),
+        ("AdSense CMP/provider after approval",
+         not getattr(config, "ADSENSE_APPROVED", False) or
+         bool(getattr(config, "ADSENSE_CONSENT_PROVIDER", ""))),
+        ("Plugin auto-stack enabled", bool(getattr(config, "PLUGIN_AUTO_INSTALL", False))),
+        ("AFFILIATE_LINKS set (affiliate income)",
+         bool(config.AFFILIATE_LINKS)),
+        ("AD_SHORTCODE gate (ignored before approval)",
+         not getattr(config, "ADSENSE_APPROVED", False) or bool(config.AD_SHORTCODE)),
+        (f"MAX_AD_SLOTS = {config.MAX_AD_SLOTS} (cap; unused before approval)",
+         1 <= config.MAX_AD_SLOTS <= 5),
+        ("CLS wrapper ON (layout-shift protection)",
+         config.AD_CLS_WRAPPER),
+        (f"Commercial-topic mix = {config.HIGH_CPC_SHARE}% (not a CPC promise)",
+         0 <= config.HIGH_CPC_SHARE <= 50),
+        (f"LISTICLES_PER_DAY = {config.LISTICLES_PER_DAY} (trending stories)",
+         config.LISTICLES_PER_DAY >= 1),
+        (f"Daily auto-refresh ON ({config.AUTO_REFRESH_PER_DAY}/day)",
+         config.AUTO_REFRESH_PER_DAY >= 1),
+        ("INDEXNOW_KEY set (instant indexing)",
+         bool(config.INDEXNOW_KEY)),
+        (f"Google Trends topics ON (USE_TRENDS={config.USE_TRENDS})",
+         bool(config.USE_TRENDS)),
+        (f"Discover max-image-preview meta ({'ON' if config.DISCOVER_META_ENABLED else 'OFF'})",
+         bool(config.DISCOVER_META_ENABLED)),
+    ]
+    score = 0
+    print("\nBOT-SIDE (.env):")
+    for label, ok in checks:
+        mark = "✅" if ok else "⚠️ "
+        print(f"  {mark} {label}")
+        score += 1 if ok else 0
+    avgs = state.avg_scores(config.STATE_PATH)
+    if avgs["n"]:
+        print(f"  📊 Quality: avg QA {avgs['qa']}/100 · originality {avgs['orig']}%")
+
+    print(f"\n  Bot-side score: {score}/{len(checks)}")
+
+    print("\nSITE-SIDE (WordPress dashboard — manual cheyali):")
+    ads_steps = ([
+        "Keep ADSENSE_APPROVED=0; no ad spaces until the owner sees Google approval",
+        "Use Search Console Indexing + Core Web Vitals reports weekly",
+    ] if not getattr(config, "ADSENSE_APPROVED", False) else [
+        "Verify AdSense Policy Center, CMP/consent, ads.txt and authorized sites",
+        "Review Auto Ads/anchor placements manually; no forced clicks or refresh tricks",
+    ])
+    for item in ads_steps + [
+        "Rank Math / Yoast plugin active + sitemap",
+        "Caching plugin (LiteSpeed / WP-Optimize) — test real mobile UX",
+        "Search Console lo sitemap submit and inspect important URLs",
+        "Google News/Discover visibility is not guaranteed by an application",
+        "Rank Math > Titles & Meta > Global Robots: 'Large' image preview set cheyandi (Discover)",
+    ]:
+        print(f"  🔧 {item}")
+
+    print("\nPOLICY REMINDERS (ban risk nunchi kapadutayi):")
+    for item in [
+        "Own ads click cheyakudadu (instant ban)",
+        "Forced navigation / back-refresh ad tricks cheyakudadu",
+        "'Click here' arrows deggara ads pettakudadu",
+    ]:
+        print(f"  🚫 {item}")
+    print("=" * 62)
+    return 0
+
+
+def content_audit_run(limit: int = 500) -> int:
+    """Read-only audit of all published WP posts, independent of state.db."""
+    from . import content_audit
+
+    return content_audit.run(limit=limit)
+
+
+def google_audit_run(url: str) -> int:
+    from . import google_audit
+
+    return google_audit.run(url)
+
+
+def research_brief_run(seed: str, url_file: str = "", limit: int = 6,
+                       target_year: int = 0) -> int:
+    from . import research_brief
+
+    return research_brief.run(
+        seed, url_file=url_file, limit=max(1, min(limit, 12)),
+        target_year=target_year or None)
+
+
+# --------------------------------------------------------------- v38 top post
+
+def top_post_run(keyword: str, category: str = "", publish: bool = False,
+                 mock: bool = False, dry_run: bool = False) -> int:
+    """v38: blueprint (plan) → optional article → draft/publish."""
+    from . import top_post
+
+    # SAFETY: mock top-post eppudu WP ki velladu (auto dry-run).
+    if publish and mock and not dry_run:
+        log.warning("--publish-top-post --mock tho live block (auto dry-run ON)")
+        dry_run = True
+    state.init(config.STATE_PATH)
+    if publish:
+        log.info("Top-post publish flow: keyword=%r mock=%s dry_run=%s",
+                 keyword, mock, dry_run)
+        try:
+            result = top_post.create_top_post(keyword, mock=mock, dry_run=dry_run,
+                                              category=category)
+        except Exception as exc:  # noqa: BLE001
+            log.error("Top-post create failed: %s", exc)
+            top_post.run_blueprint(keyword, category=category)
+            return 4
+        print(f"🏆 TOP POST {'(dry-run) ' if dry_run else ''}created: "
+              f"{result.get('link', '')} [{result.get('status')}]")
+        return 0
+    return top_post.run_blueprint(keyword, category=category)
+
+
+def top_post_plan_run(days: int = 0, per_day: int = 1, show: int = 14) -> int:
+    from . import top_post
+
+    return top_post.run_plan(days=days or config.TOP_POST_PLAN_DAYS,
+                             per_day=per_day, show=show)
+
+
+def keyword_universe_view(export: bool = True, show: int = 12) -> int:
+    from . import top_post
+
+    return top_post.run_universe(export=export, show=show)
+
+
+def score_post_run(path: str, keyword: str = "") -> int:
+    from . import top_post
+
+    return top_post.run_score_file(path, keyword)
+
+
+# ------------------------------------------------------------- test runner
+
+def test_all_run(only: str = "", quiet: bool = False) -> int:
+    """v41: ANNI suites okate command tho (local + CI).
+
+    ee command ne `.github/workflows/tests.yml` kuda run chestundi — so CI lo
+    fail ayye suite ni local lo kuda exact ga reproduce cheyyachu.
+    """
+    import subprocess
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    root = _Path(__file__).resolve().parent.parent
+    files = sorted((root / "tests").glob("*.py"))
+    if only:
+        files = [f for f in files if only in f.name]
+    if not files:
+        print("tests/ lo e suites levu")
+        return 1
+    passed, failed = [], []
+    for f in files:
+        try:
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(root) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+            proc = subprocess.run([_sys.executable, str(f)], cwd=root, env=env,
+                                  capture_output=True, text=True, timeout=600)
+        except subprocess.TimeoutExpired:
+            failed.append((f.name, "TIMEOUT (>600s)"))
+            print(f"  ⏱️  {f.name} — TIMEOUT")
+            continue
+        out = (proc.stdout or "").strip().splitlines()
+        tail = out[-3:] if out else []
+        if proc.returncode == 0:
+            passed.append(f.name)
+            print(f"  ✔ {f.name}" + ("" if quiet else f" — {tail[-1][:70] if tail else ''}"))
+        else:
+            failed.append((f.name, "\n".join((proc.stdout or "")[-1200:] +
+                                              (proc.stderr or "")[-400:])))
+            print(f"  ❌ {f.name}")
+            if not quiet:
+                print("\n".join("      " + ln for ln in
+                                ((proc.stdout or "")[-1200:] +
+                                 (proc.stderr or "")[-400:]).splitlines()[-14:]))
+    print("=" * 62)
+    print(f"  suites: {len(passed)} passed · {len(failed)} failed "
+          f"(total {len(files)})")
+    if failed:
+        print("  FAILED: " + ", ".join(n for n, _ in failed))
+        return 1
+    print("  ALL SUITES PASSED ✔")
+    return 0
+
+
+# ------------------------------------------------------- v41 site audit + fix
+
+def site_audit_run(fix: bool = False, apply: bool = False, allow_trash: bool = False,
+                   actions: str = "", snapshot: str = "", save: str = "") -> int:
+    """v41: studentup.in deep audit (+ optional safe autofix)."""
+    from . import site_audit
+
+    acts = [a.strip() for a in (actions or "").split(",") if a.strip()]
+    return site_audit.run_audit(fix=fix, dry_run=not apply,
+                                allow_trash=allow_trash, actions=acts or None,
+                                snapshot=snapshot, save=save)
+
+
+def service_center_setup(dry: bool = True, force: bool = False) -> int:
+    """Publish/preview the Student Internet Center service landing page."""
+    from . import service_center
+
+    if not config.SERVICE_CENTER_ENABLED:
+        print("📞 Student Service Center disabled: SERVICE_CENTER_ENABLED=0")
+        return 0
+    if dry:
+        out = config.OUTPUT_DIR / "service-center.html"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        page = service_center.publish_page(None, dry=True)
+        out.write_text(
+            "<!doctype html><html lang='en'><head><meta charset='utf-8'>"
+            f"<title>{page['title']}</title></head><body>{page['html']}</body></html>",
+            encoding="utf-8",
+        )
+        print(f"📞 Service Center preview saved: {out}")
+        if not (config.SERVICE_CENTER_PHONE or config.SERVICE_CENTER_WHATSAPP):
+            print("⚠️  Add SERVICE_CENTER_PHONE or SERVICE_CENTER_WHATSAPP before publishing")
+        return 0
+    from .wordpress_client import WordPressClient
+    try:
+        wp = WordPressClient()
+        wp.check_connection()
+        result = service_center.publish_page(wp, dry=False, force=force)
+        if result.get("status") == "manual-preserved":
+            print(f"⚠️  Service Center page preserved: {result.get('detail', '')}")
+            return 0
+        print(f"📞 Service Center page: {result.get('link', result.get('slug'))}")
+        return 0
+    except Exception as exc:  # noqa: BLE001
+        print(f"❌ Service Center page failed: {exc}")
+        return 1
+
+
+def notify_test() -> int:
+    """Send a test notification to all configured channels."""
+    ok_any = False
+    if config.TELEGRAM_BOT_TOKEN:
+        ok = notifier.send_telegram(
+            "🧪 <b>Test message</b> — studentup.in auto-blogger Telegram connect ayyindi ✔"
+        )
+        ok_any = ok_any or ok
+    if config.WHATSAPP_CALLMEBOT_URL:
+        ok = notifier.send_whatsapp("🧪 Test — studentup auto-blogger WhatsApp connect ayyindi ✔")
+        ok_any = ok_any or ok
+    if not ok_any:
+        print("Emi channel configure cheyaledu (.env lo TELEGRAM_BOT_TOKEN / WHATSAPP_CALLMEBOT_URL)")
+        return 1
+    print("Test notification pampinchi!" if ok_any else "Notification fail ayyindi — log chudandi")
+    return 0 if ok_any else 4
+
+
+
+PRIVACY_HTML = f"""<p>Welcome to StudentUp. This short policy explains what information may be processed when you visit the site, read an article or use the quiz.</p>
+<h2>Information we collect</h2>
+<p>Hosting and security systems may receive technical information such as browser type, device, IP address, referring page, pages visited and basic usage or error data. This helps with security and performance; exact logs and retention depend on the hosting provider.</p>
+<p>StudentUp does not require an account or ask for Aadhaar, OTPs, passwords, UPI PINs or bank details to read an update. If you contact us, we use the information you choose to send for that request. We do not sell personal information.</p>
+<h2>Cookies and browser storage</h2>
+<p>Necessary cookies or similar browser features may support security, consent and performance. Theme choice, saved posts, quiz scores and daily answers may stay in your browser. Optional saved-post account sync works only when enabled and logged in. You can block or delete cookies in your browser; some features may then stop working.</p>
+<h2>Google AdSense</h2>
+<p>Google AdSense is used only after approval, publisher configuration and consent setup. Until then, house or partner placements are clearly labelled. When AdSense is active, Google and its partners may use cookies for personalised or non-personalised advertising based on your choices and visits to this or other websites.</p>
+<p>Manage choices at <a href="https://www.google.com/settings/ads">Google Ads Settings</a> or <a href="https://www.aboutads.info/choices/">aboutads.info/choices</a>. Where required, a consent message is shown before advertising cookies are used.</p>
+<h2>Third-party links</h2>
+<p>Articles may link to official portals, employers, universities and other websites. We do not control their content or privacy practices. Read their policy before submitting personal data and confirm jobs, scholarships, exams and results on the official notification.</p>
+<h2>Security, requests and changes</h2>
+<p>We take reasonable measures to protect information under our control, but no internet method is completely secure. Do not send passwords, OTPs, financial credentials or sensitive documents through ordinary email or chat. For a privacy question, correction or deletion request, contact <a href="mailto:{config.SUPPORT_EMAIL}">{config.SUPPORT_EMAIL}</a>. We may update this page when the website, advertising tools or legal requirements change.</p>
+<p><strong>StudentUp Team</strong><br>StudentUp — your education and career information platform.</p>"""
+
+ABOUT_HTML = """<h2>Welcome to StudentUp</h2>
+<p>StudentUp is an independent education and career-information platform for students, freshers and job-seekers. We bring useful TS, AP and central updates into one clear place, using simple language and links back to the official notification.</p>
+<h2>What you can find here</h2>
+<ul>
+<li>Government, private, software, walk-in and internship opportunities</li>
+<li>Scholarships, admissions, documents and application guidance</li>
+<li>Exam notifications, hall tickets, results and preparation support</li>
+<li>Reasoning, simple English aptitude, general knowledge, interview preparation and technology-learning resources</li>
+</ul>
+<h2>Our mission</h2>
+<p>Our mission is to make important student information easier to understand and act on, while helping readers make their own informed decisions. We do not replace an official department, university or employer; we help readers find and read the original source.</p>
+<h2>How it works</h2>
+<ul>
+<li>We monitor official sources such as TSPSC, APPSC, SSC, NSP, state boards, DSC and DISCOMs.</li>
+<li>Dates, eligibility and important claims are checked against available official evidence.</li>
+<li>Automation can assist research and drafting, but doubtful information stays out of public content until reviewed.</li>
+<li>When a notification changes, older information can be corrected and the last-updated date is shown.</li>
+</ul>
+<h2>Our vision</h2>
+<p>We want StudentUp to be a dependable starting point for Telangana and Andhra Pradesh students as they learn, prepare and explore opportunities — with clarity, useful practice and honest limits.</p>
+<h2>What we never do</h2>
+<ul>
+<li>We are not a government body and have no connection with TSPSC, APPSC, SSC, NSP or any department.</li>
+<li>We never guarantee a job, scholarship, admission, rank, income or selection.</li>
+<li>We never ask for an OTP, PIN, password or bank details to show an update.</li>
+<li>We never sell personal data.</li>
+</ul>
+<p><strong>Always verify:</strong> deadlines, vacancy counts, fees, eligibility and results can change. Confirm them once in the official notification. If you spot a mistake, send the article link through the Contact page so we can review it.</p>
+<p><strong>StudentUp — learn, grow and make informed decisions.</strong></p>"""
+
+CONTACT_HTML = f"""<p>Mana team ki direct ga contact avvali:</p>
+<ul>
+<li>Editorial: <a href="mailto:{config.SUPPORT_EMAIL}">{config.SUPPORT_EMAIL}</a></li>
+<li>Service Center: <a href="mailto:{config.SERVICE_CENTER_EMAIL or config.SUPPORT_EMAIL}">{config.SERVICE_CENTER_EMAIL or config.SUPPORT_EMAIL}</a></li>
+</ul>
+<p>Personal documents or sensitive credentials ni email lo pampakandi; configured private upload channel matrame use cheyandi.</p>"""
+
+CORRECTIONS_HTML = f"""<p>studentup.in lo articles official notifications &amp; trusted sources aadharanga untayi. Emaina tappu dorikina:</p>
+<ul>
+<li><a href="mailto:{config.SUPPORT_EMAIL}">{config.SUPPORT_EMAIL}</a> ki post link + wrong detail pampandi</li>
+<li>Team verify chesi correction note/update chestundi; response time workload batti untundi</li>
+<li>Dates, fees, eligibility ki official website ni kuda confirm chesukondi</li>
+</ul>
+<p>Correction policy: <a href="/corrections-policy/">details chudandi</a>.</p>"""
+
+EDITORIAL_HTML = f"""<p>studentup.in editorial standards — useful, source-backed and people-first content kosam.</p>
+<h2>Content ela test</h2>
+<ul>
+<li>Official notifications &amp; trusted sources nunchi facts matrame; copied text kaadu</li>
+<li>Dates/fees/eligibility verify cheyali; guessing banned</li>
+<li>AI-assisted drafting + human review required before a draft is treated as final</li>
+<li>Near-duplicate check: same topic revisit aithe merge/update, kotha thin page kaadu</li>
+</ul>
+<h2>Authors and corrections</h2>
+<p>Configured author team bylines use chestundi. Mistakes report: <a href="mailto:{config.SUPPORT_EMAIL}">{config.SUPPORT_EMAIL}</a>.</p>"""
+
+ADSENSE_PAGES = [
+    ("Privacy Policy", "privacy-policy", PRIVACY_HTML),
+    ("About Us", "about-us", ABOUT_HTML),
+    ("Contact Us", "contact-us", CONTACT_HTML),
+    ("Corrections Policy", "corrections-policy", CORRECTIONS_HTML),
+    ("Editorial Policy", "editorial-policy", EDITORIAL_HTML),
+]
+
+
+def ensure_adsense() -> int:
+    """AdSense preparation: policy pages + owner checklist; approval remains Google-side."""
+    from .wordpress_client import WordPressClient
+
+    print("\n========== GOOGLE ADSENSE APPROVAL CHECKLIST (v19) ==========")
+    ok_all = True
+    try:
+        wp = WordPressClient()
+        wp.check_connection()
+        for title, slug, html in ADSENSE_PAGES:
+            try:
+                if wp.page_exists(slug):
+                    print(f"[OK]     {title} page undi")
+                else:
+                    res = wp.create_page(title, html, slug)
+                    print(f"[CREATE] {title} -> {res.get('link')}")
+            except Exception as exc:  # noqa: BLE001 — network SSL errors tolidu
+                ok_all = False
+                print(f"[WARN]   {title}: {type(exc).__name__}")
+    except Exception as exc:  # noqa: BLE001 — sandbox/server network variance
+        ok_all = False
+        print(f"[WARN] WP connect kaDU ({type(exc).__name__}) — pages manual ga create cheyandi")
+    try:
+        n = wp.published_count()
+        if n >= 20:
+            print(f"[INFO]   {n} published posts — content inventory check only; no fixed Google threshold")
+        else:
+            print(f"[INFO]   {n} published posts — continue building useful, original content; "
+                  "Google has no code-verifiable fixed post-count threshold")
+    except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
+        log.debug("ensure_adsense skip: %s", exc)
+    print("\n--- MANUAL CHECKS (bot cheyyaleru — mee browser/console lo) ---")
+    for name, howto in [
+        ("ads.txt", "https://studentup.in/ads.txt open chesi correct publisher ID verify (AdSense > Earn > Get code)"),
+        ("Policy LINKS", "AUTO: run.py --setup — footer menu create+assign chesthundi (AdSense/Google News ki links mandatory)"),
+        ("Originality", "Bot NO-COPY hard floor (72%) auto enforce; manual posts ki same rule paalinchandi"),
+        ("Human eye", "Rozu okko auto-post human ga chaduvandi — 'AI at scale, unedited' Google demotion trigger #1"),
+        ("Dead/expired links", "Month ki okkaru expired posts/links clean cheyandi (auto-refresh undi kaani manual spot-check best)"),
+        ("No self-clicks", "mee own ads ni eppudu click cheyadraku — ban risk"),
+        ("Traffic/posts", "useful original content + real organic traffic; no fixed post-count guarantee"),
+        ("Search Console", "Sitemap submitted aa check (/sitemap_index.xml); Coverage + Core Web Vitals warnings fix"),
+        ("Google News", "Bylines + Editorial Policy page LIVE ayaka Publisher Center lo site add cheyandi (news traffic = notification site oxygen)"),
+        ("Auto Ads audit", "AdSense approved taraivata auto-ads placements month ki okkaru review — above-fold stack + interstitials avoid"),
+        ("RPM reality", "Education/govt-jobs IN audience = moderate CPC; volume + session depth meeda focus (per-click value kaadu)"),
+    ]:
+        print(f"  [ ] {name}: {howto}")
+    print("===============================================================\n")
+    return 0 if ok_all else 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="studentup.in auto-blogger")
+    parser.add_argument("--dry-run", action="store_true", help="generate locally, no publishing")
+    parser.add_argument("--force", action="store_true", help="ignore schedule & post now")
+    parser.add_argument("--mock", action="store_true", help="offline mock article (no Gemini)")
+    parser.add_argument("--category", default="", help="force a category")
+    parser.add_argument("--url", default="", help="source URL -> 100%% original rewrite post")
+    parser.add_argument("--fast-drain", action="store_true",
+                        help="v375: 10-minute fast lane — watch list refresh + queue → review drafts (cron */10)")
+    parser.add_argument("--process-queue", type=int, default=0, metavar="N",
+                        help="sources_queue.txt lo first N URLs ippude process chey")
+    parser.add_argument("--update", type=int, default=0, metavar="POST_ID",
+                        help="existing post ni kotha info tho improve chesi update chey")
+    parser.add_argument("--rollback-post", type=int, default=0, metavar="POST_ID",
+                        help="v105: latest safe backup nunchi post restore chey")
+    parser.add_argument("--rollback-backup", default="", metavar="JSON",
+                        help="v105: specific update backup JSON restore chey")
+    parser.add_argument("--cannibalization-audit", action="store_true",
+                        help="v106: same search-intent pages detect chey — merge/canonical recommendations")
+    parser.add_argument("--gsc-sync", action="store_true",
+                        help="v107: direct Search Console API sync + position/CTR drop alerts")
+    parser.add_argument("--gsc-days", type=int, default=28,
+                        help="v107: GSC API comparison window days (default 28)")
+    parser.add_argument("--gsc-inspect", default="", metavar="URL",
+                        help="v115: direct Google URL Inspection — index/canonical/crawl status")
+    parser.add_argument("--performance-audit", default="", metavar="URL",
+                        help="v109: mobile PageSpeed/CWV/accessibility/SEO audit")
+    parser.add_argument("--corrections-audit", action="store_true",
+                        help="v111: verify tamper-evident update/correction ledger")
+    parser.add_argument("--revenue-plan", default="", metavar="GSC_CSV",
+                        help="v164: GSC + AdSense join — prioritised actions with Rs impact")
+    parser.add_argument("--adsense", default="", metavar="CSV",
+                        help="v164: --revenue-plan ki AdSense pages CSV")
+    parser.add_argument("--push-keys", action="store_true",
+                        help="v163: VAPID keypair generate (okka sari)")
+    parser.add_argument("--push-auto", action="store_true",
+                        help="v305: theme push queue drain — publish ayina posts ki auto notification (cron * * * * *)")
+    parser.add_argument("--push-send", default="", metavar="MSG",
+                        help="v163: web push pampadam — \"Title|url|body\"")
+    parser.add_argument("--slot-lab", nargs="?", const="", default=None, metavar="CSV",
+                        help="v162: ad slot A/B (RPM) measurement — AdSense CSV nunchi")
+    parser.add_argument("--factcheck", default=None, metavar="DRAFT",
+                        help="v161: draft lo unna dates/fees/vacancies ni source tho cross-check")
+    parser.add_argument("--against", default="", metavar="SOURCE",
+                        help="v161: --factcheck ki official source file")
+    parser.add_argument("--final-audit", action="store_true",
+                        help="v160: anni gates okate saari (deploy mundu)")
+    parser.add_argument("--aeo", nargs="?", const="", default=None, metavar="HTML",
+                        help="v158: AI Overview / featured-snippet readiness audit + HowTo schema")
+    parser.add_argument("--rpm-report", nargs="?", const="", default=None, metavar="CSV",
+                        help="v151: AdSense CSV nunchi page/slot RPM report + weak slots (read-only)")
+    parser.add_argument("--ctr-boost", nargs="?", const="", default=None, metavar="CSV",
+                        help="v149: Search Console CSV nunchi low-CTR pages + title suggestions (edit cheyyadu)")
+    parser.add_argument("--ctr-min-impressions", type=int, default=200,
+                        help="v149: CTR boost lo minimum impressions (default 200)")
+    parser.add_argument("--notify", action="store_true",
+                        help="v149: command finish ayyaka Telegram alert pampu (--daily-quiz tho)")
+    parser.add_argument("--quiz-push", action="store_true",
+                        help="v286: today's quiz invite (quote + link + button) ni Telegram ki push + WhatsApp text print (cron daily)")
+    parser.add_argument("--quiz-push-dry", action="store_true", help="v286: --quiz-push text matrame print (send cheyyadu)")
+    parser.add_argument("--daily-quiz", action="store_true",
+                        help="v148: prepare today's quiz as a WordPress DRAFT (never publishes)")
+    parser.add_argument("--import-quiz", default="", metavar="FILE",
+                        help="v200: intake daily 20 exam-wise questions (JSON/list) from external bot into quiz bank")
+    parser.add_argument("--export-quiz-channel", default="", choices=["telegram", "whatsapp"],
+                        help="v200: export today's 20 questions formatted for Telegram or WhatsApp channel broadcast")
+    parser.add_argument("--daily-engage", action="store_true",
+                        help="v197: roju quiz post + reader poll ni site ki push chey (daily engage)")
+    parser.add_argument("--publish", action="store_true",
+                        help="v197: --daily-engage tho quiz ni direct publish "
+                             "(gate-safe content, default draft)")
+    parser.add_argument("--auto-publish", action="store_true",
+                        help="v197: gate-passed drafts ni publish chey (source + words + Rank Math >= 80 + fresh)")
+    parser.add_argument("--auto-publish-dry", action="store_true",
+                        help="v197: auto-publish lane report mattrame — emi publish cheyyadu")
+    parser.add_argument("--daily-quiz-dry", action="store_true",
+                        help="v148: show today's quiz plan without touching WordPress")
+    parser.add_argument("--control-center", action="store_true",
+                        help="v112: unified read-only editorial/SEO safety action queue")
+    parser.add_argument("--ops-alert", action="store_true",
+                        help="v113: deduplicated Telegram alert for new control-center actions")
+    parser.add_argument("--security-audit", action="store_true",
+                        help="v116: scan tracked files for leaked credentials/secrets")
+    parser.add_argument("--listicle", nargs="?", const="auto", default=None,
+                        metavar="TOPIC",
+                        help="trending listicle post (Top 10 jobs lanti stories); topic optional")
+    parser.add_argument("--auto-refresh", type=int, default=0, metavar="N",
+                        help="purana N posts ni kotha info tho refresh chey")
+    parser.add_argument("--add-source", default="",
+                        help="--update tho extra source URL (kotha info)")
+    parser.add_argument("--status", action="store_true", help="show stats & today's plan")
+    parser.add_argument("--draft-recheck", action="store_true",
+                        help="v355: WP drafts ni Rank Math strict + pin-gate tho malli check (report)")
+    parser.add_argument("--draft-recheck-apply", action="store_true",
+                        help="v355: weak drafts ni polish chesi same draft lo update (publish kaadu)")
+    parser.add_argument("--ops-status", action="store_true",
+                        help="v362: last draft age, backups, heartbeat config")
+    parser.add_argument("--show-draft", type=int, nargs="?", const=1, default=0, metavar="N",
+                        help="v382: print the N newest WP drafts as plain text (title, meta, body) for quality review")
+    parser.add_argument("--why-no-draft", action="store_true",
+                        help="v337: draft enduku raledu — AI/WP/plan/claims/radar/log reasons (status words only)")
+    parser.add_argument("--check-wp", action="store_true", help="verify WP credentials")
+    parser.add_argument("--gnews-test", metavar="URL",
+                        help="v316: Google News link → publisher URL resolver test")
+    parser.add_argument("--notify-test", action="store_true", help="send test notification")
+    parser.add_argument("--tg-test", action="store_true",
+                        help="v91: Telegram connectivity ping (bot ↔ owner chat + getMe identity)")
+    parser.add_argument("--tg-broadcast", default=None, metavar="MESSAGE",
+                        help="v91: manual channel announcement — long text auto-split "
+                             "(private -100… channels supported; bot channel lo admin)")
+    parser.add_argument("--tg-alert", default=None, metavar="CODE|MESSAGE",
+                        help="v91: site notify queue ki push (WP REST studentup/v1/notify; "
+                             "critical aithe public banner)")
+    parser.add_argument("--tg-severity", default="info", metavar="LEVEL",
+                        help="v91: --tg-alert severity (info|warn|critical; default info)")
+    parser.add_argument("--approval-poll", action="store_true",
+                        help="v74: Telegram approvals — okka poll pass (cron mode; "
+                             "shared hosting lo */5 min cron; VPS lo daemon ki badulu)")
+    parser.add_argument("--revenue-check", action="store_true",
+                        help="revenue setup audit — em missing o cheptundi")
+    parser.add_argument("--ad-advisor", action="store_true",
+                        help="v57: eppudu e ad-network ki apply cheyyali (auto suggest)")
+    parser.add_argument("--traffic-csv", default="", metavar="CSV",
+                        help="GA4 CSV export -> logs/traffic.json (advisor kosam)")
+    parser.add_argument("--traffic-views", default="", metavar="N",
+                        help="advisor ki pageviews (10k / 25000) — data save avutundi")
+    parser.add_argument("--traffic-sessions", default="", metavar="N", help="advisor ki sessions")
+    parser.add_argument("--tier1", default="", metavar="SHARE",
+                        help="Tier-1 traffic share 0-1 (0.5 = 50%%)")
+    parser.add_argument("--gsc", default="", metavar="CSV",
+                        help="Search Console queries CSV -> striking-distance opportunities")
+    parser.add_argument("--gsc-refresh", default="", metavar="CSV",
+                        help="Search Console Pages CSV -> evidence-based old-post refresh priority")
+    parser.add_argument("--doctor", action="store_true",
+                        help="deployment health check — anni dependencies verify")
+    parser.add_argument("--production-audit", action="store_true",
+                        help="v30: production safety, consent, ads, plugins, theme, and legal audit")
+    parser.add_argument("--live-validation", nargs="?", const="", default=None, metavar="SITE",
+                        help="read-only live HTTP/REST/auth validation; SITE optional, defaults to WP_SITE")
+    parser.add_argument("--live-seo-recent", type=int, default=0, metavar="N",
+                        help="v324: read-only live SEO audit of the newest N published posts (+ --notify → Telegram)")
+    parser.add_argument("--live-seo", type=int, default=0, metavar="POST_ID",
+                        help="read-only real Rank Math score + rendered SEO audit for one live post")
+    parser.add_argument("--service-center", action="store_true",
+                        help="v31: preview/publish Student Internet Center services page")
+    parser.add_argument("--source-scan", action="store_true",
+                        help="v390: scan published posts + drafts for source names/publisher domains/legacy promo chrome; --apply cleans stored content")
+    parser.add_argument("--dedupe-posts", action="store_true",
+                        help="v391: group published posts that cover the SAME notification; --apply keeps the best copy, others → draft + canonical")
+    parser.add_argument("--content-audit", action="store_true",
+                        help="v32: read-only audit of all published posts; no rewrite/no URL changes")
+    parser.add_argument("--content-limit", type=int, default=500,
+                        help="v32: maximum published posts to inspect (default: 500)")
+    parser.add_argument("--google-audit", default="", metavar="URL",
+                        help="v33: public HTML + PageSpeed mobile/desktop audit for a URL")
+    parser.add_argument("--research-brief", default="", metavar="TOPIC_OR_URL",
+                        help="v36: build a cited NotebookLM-ready source bundle")
+    parser.add_argument("--research-urls", default="", metavar="FILE",
+                        help="v36: optional file with checked public URLs, one per line")
+    parser.add_argument("--research-limit", type=int, default=6, metavar="N",
+                        help="v36: maximum public sources in the NotebookLM bundle")
+    parser.add_argument("--research-year", type=int, default=0, metavar="YEAR",
+                        help="v37: explicit target year; prevents mixing old/current cycles")
+    parser.add_argument("--target-year", type=int, default=0, metavar="YEAR",
+                        help="v37: target year for a source article, e.g. 2027")
+    parser.add_argument("--notebooklm-brief", default="", metavar="FILE",
+                        help="v36: use an editor-verified NotebookLM brief with --url")
+    parser.add_argument("--deep-research", default="", metavar="TOPIC_OR_URL",
+                        help="v44: DEEP POST ENGINE — source tiering + deep fact "
+                             "extraction + cross-verification + confidence report "
+                             "(--research-urls FILE / --research-limit N / "
+                             "--research-year Y / --notebooklm-brief FILE / "
+                             "--deep for NotebookLM passes 6-8)")
+    parser.add_argument("--deep", action="store_true",
+                        help="v44: emit extended NotebookLM prompt (passes 6-8: "
+                             "year-over-year, ELI-12, gap priority)")
+    parser.add_argument("--top-post", default="", metavar="KEYWORD",
+                        help="v38: TOP POST BLUEPRINT — title/meta/outline/keywords/"
+                             "schema/E-E-A-T plan for an exact search phrase "
+                             "(save chesi chupistundi: output/top-posts/)")
+    parser.add_argument("--top-post-category", default="", metavar="CAT",
+                        help="v38: blueprint category override (default: auto)")
+    parser.add_argument("--publish-top-post", action="store_true",
+                        help="v38: blueprint + article generate chesi publish "
+                             "(DEFAULT_POST_STATUS=draft tho review flow)")
+    parser.add_argument("--top-post-plan", action="store_true",
+                        help="v38: keyword domination calendar (pillar + support "
+                             "posts, cluster balanced) — CSV/MD/JSON export")
+    parser.add_argument("--top-post-days", type=int, default=0, metavar="N",
+                        help="v38: plan length in days (default TOP_POST_PLAN_DAYS=90)")
+    parser.add_argument("--top-post-per-day", type=int, default=1, metavar="N",
+                        help="v38: posts per day in the plan (1-5)")
+    parser.add_argument("--keyword-universe", action="store_true",
+                        help="v38: ANNI keywords (9000+) stats + CSV/JSON export "
+                             "(output/keywords/keyword_universe.csv)")
+    parser.add_argument("--score-post", default="", metavar="FILE",
+                        help="v38: any HTML/text file ni Top Post Score tho measure "
+                             "(30+ checks + fixes)")
+    parser.add_argument("--score-keyword", default="", metavar="KEYWORD",
+                        help="v38: keyword for --score-post")
+    parser.add_argument("--ads", action="store_true",
+                        help="v43: AD MANAGER — owner ads (college banners/shop/"
+                             "services) inventory status + per-category slot plan")
+    parser.add_argument("--rate-card", action="store_true",
+                        help="v71: rate card (internal) — prices site meeda public ga levu; "
+                             "ee card ni WhatsApp/Telegram lo personal ga deal cheyyadaniki vaadandi")
+    parser.add_argument("--ads-demo", action="store_true",
+                        help="v43: AD MANAGER — visible ad placement preview "
+                             "(output/ads-preview.html — browser lo open cheyandi)")
+    parser.add_argument("--deploy-check", action="store_true",
+                        help="v41: deploy readiness — python/deps/files/disk/env + "
+                             "artifacts (server SSH lo; v74: portal boot ledu — "
+                             "cron-only bot)")
+    parser.add_argument("--test-all", action="store_true",
+                        help="v41: ANNI suites okate command tho run chey "
+                             "(--test-only NAME tho okka suite; CI idi ne run "
+                             "chestundi)")
+    parser.add_argument("--test-only", default="", metavar="NAME",
+                        help="v41: --test-all tho okka suite matrame (ex: v41)")
+    parser.add_argument("--check-links", nargs="*", default=None, metavar="URL",
+                        help="v80 (P47): page outbound links liveness — dead + "
+                             "redirect report (ex: --check-links https://.../post/)")
+    parser.add_argument("--orphans", nargs="*", default=None, metavar="SITEMAP-URL",
+                        help="v81 (§32): sitemap crawl → inbound-0 ORPHAN pages "
+                             "report (ex: --orphans https://site/sitemap.xml)")
+    parser.add_argument("--link-graph", action="store_true",
+                        help="v99: internal link graph audit — orphan posts "
+                             "(inbound link ZERO) kanukkoni fix plan")
+    parser.add_argument("--link-graph-apply", action="store_true",
+                        help="v99: link fixes ni live posts lo nijamga apply "
+                             "(idi lekapothe dry-run — edi marchadu)")
+    parser.add_argument("--freshness-audit", action="store_true",
+                        help="v101: 'deceptive freshness' guard status — "
+                             "refresh lo dateModified fake bump avutunda?")
+    parser.add_argument("--source-monitor", action="store_true",
+                        help="read-only: detect changed official sources and alert owner")
+    parser.add_argument("--opportunity-monitor", action="store_true",
+                        help="read-only: probe official/application links and build an expiry review queue")
+    parser.add_argument("--verify-keyword", default="",
+                        help="v97: oka focus keyword ki LIVE demand verify "
+                             "(Google Autocomplete — dummy list kaadu)")
+    parser.add_argument("--keyword-audit", action="store_true",
+                        help="v97: live WP posts focus keywords ni bulk verify "
+                             "(verified/weak/dead + fluff report)")
+    parser.add_argument("--district-hubs", action="store_true",
+                        help="v96: TS 33 + AP 26 district job hub pages "
+                             "(local jobs + job melas) — default dry-run plan")
+    parser.add_argument("--district-hubs-apply", action="store_true",
+                        help="v96: district hubs ni WordPress lo nijamga "
+                             "publish/update chey (thin-page guard active)")
+    parser.add_argument("--district-hubs-state", default="",
+                        help="v96: okka state matrame (TS leda AP)")
+    parser.add_argument("--site-audit", action="store_true",
+                        help="v41: full site audit (21 problem classes — thin/junk "
+                             "content, wrong category, PII, tags, timezone) + report")
+    parser.add_argument("--site-audit-fix", action="store_true",
+                        help="v41: audit + SAFE autofix (default dry-run)")
+    parser.add_argument("--site-audit-apply", action="store_true",
+                        help="v41: fixes ni nijamga apply chey (dry-run kaadu)")
+    parser.add_argument("--site-audit-trash", action="store_true",
+                        help="v41: demo/junk pages ni trash cheyyadaniki permission")
+    parser.add_argument("--site-audit-action", default="",
+                        help="v41: only ee fixers run chey (comma list, ex: "
+                             "strip_pii,strip_shortcode)")
+    parser.add_argument("--site-audit-snapshot", default="", metavar="FILE",
+                        help="v41: offline audit from snapshot JSON "
+                             "(leda 'demo' — engine proof, network avasaram ledu)")
+    parser.add_argument("--site-audit-save", default="", metavar="FILE",
+                        help="v41: fetched site data ni JSON snapshot ga save chey "
+                             "(tarvata offline/CI audit ki)")
+    parser.add_argument("--trends", action="store_true",
+                        help="Google Trends India education trends chupinchindi")
+    parser.add_argument("--pin-check", action="store_true",
+                        help="Pin-to-pin certificate proof (68 checks, offline)")
+    parser.add_argument("--index-now", default="", metavar="URL",
+                        help="v68: IndexNow + Google Indexing API (JobPosting) ki URL submit")
+    parser.add_argument("--index-status", action="store_true",
+                        help="v68: instant-indexing configuration status (SA key · openssl · key file)")
+    parser.add_argument("--index-key-gen", action="store_true",
+                        help="v68: kotha IndexNow key generate (hex) + .env lo pettalsina line")
+    parser.add_argument("--trends-queue", action="store_true",
+                        help="v65: --trends tho paatu Suggest capture + topic queue")
+    parser.add_argument("--rm100", action="store_true",
+                        help="local Rank Math pre-flight only; live plugin score requires --live-seo POST_ID")
+    parser.add_argument("--readiness", action="store_true",
+                        help="v62: TOP WEBSITE READINESS — content/SEO/ads/automation/site score")
+    parser.add_argument("--push-theme-data", action="store_true",
+                        help="v61: bot data (breaking/proof/deadline/house ads) → WP theme REST")
+    parser.add_argument("--guardian", action="store_true",
+                        help="v60: SITE GUARDIAN — site/UI/SEO/ads/feed/storage full check")
+    parser.add_argument("--guardian-notify", action="store_true",
+                        help="v60: guardian report ni Telegram ki kuda pampu")
+    # ---- v181: growth loops (demand · rank trend · sponsor pipeline) ----
+    parser.add_argument("--search-demand", action="store_true",
+                        help="v181: on-site search log → content gap queue "
+                             "(readers' queries; human review — auto-publish ledu)")
+    parser.add_argument("--search-import", default="", metavar="FILE",
+                        help="v181: search demand ni JSON/CSV file nunchi (offline/test)")
+    parser.add_argument("--search-notify", action="store_true",
+                        help="v181: search demand report ni Telegram ki")
+    parser.add_argument("--rank-trend", action="store_true",
+                        help="v181: GSC time-series — rising/decaying pages + refresh queue")
+    parser.add_argument("--rank-csv", default="", metavar="CSV",
+                        help="v181: GSC Pages CSV ingest chesi snapshot save chey")
+    parser.add_argument("--rank-window", type=int, default=7,
+                        help="v181: baseline window days (default 7; 28 kuda ok)")
+    parser.add_argument("--rank-notify", action="store_true",
+                        help="v181: rank trend report ni Telegram ki")
+    parser.add_argument("--sponsor-crm", action="store_true",
+                        help="v181: sponsor pipeline — roju outreach + follow-ups + forecast")
+    parser.add_argument("--sponsor-targets", action="store_true",
+                        help="v181: evarini contact cheyyali (prospect types + search strings)")
+    parser.add_argument("--sponsor-add", default="",
+                        metavar='"Name|type|city|contact|value"',
+                        help="v181: kotha prospect add chey")
+    parser.add_argument("--sponsor-update", default="",
+                        metavar='"Name|stage|note|followup"',
+                        help="v181: prospect stage/follow-up update (new/contacted/"
+                             "replied/negotiating/won/lost/paused)")
+    parser.add_argument("--sponsor-notify", action="store_true",
+                        help="v181: roju sponsor plan ni Telegram ki")
+    parser.add_argument("--sponsor-limit", type=int, default=0,
+                        help="v181: roju outreach count (default SPONSOR_OUTREACH_PER_DAY=2)")
+    parser.add_argument("--sponsor-templates", action="store_true",
+                        help="v181: outreach messages kuda print chey (rate card tho)")
+    # ---- v182: editorial calendar · revenue loop · backlink authority ----
+    parser.add_argument("--calendar", action="store_true",
+                        help="v182: 90-day editorial calendar (demand+decay+trend+gaps+₹)")
+    parser.add_argument("--calendar-days", type=int, default=0,
+                        help="v182: plan days (default EDITORIAL_CALENDAR_DAYS=90)")
+    parser.add_argument("--calendar-per-day", type=int, default=0,
+                        help="v182: slots per day (default EDITORIAL_CALENDAR_PER_DAY=3)")
+    parser.add_argument("--calendar-apply", action="store_true",
+                        help="v182: top topics ni pipeline queue (topics_queue.txt) loki")
+    parser.add_argument("--calendar-limit", type=int, default=0,
+                        help="v182: apply chese topic count (default CALENDAR_APPLY_LIMIT=12)")
+    parser.add_argument("--calendar-no-universe", action="store_true",
+                        help="v182: keyword-matrix gaps ni skip chey (fast plan)")
+    parser.add_argument("--calendar-notify", action="store_true",
+                        help="v182: calendar summary ni Telegram ki")
+    parser.add_argument("--revenue-loop", default="", metavar="CSV",
+                        help="v182: AdSense Pages CSV → category RPM · money pages · leaks")
+    parser.add_argument("--revenue-notify", action="store_true",
+                        help="v182: revenue loop report ni Telegram ki")
+    parser.add_argument("--revenue-min-views", type=int, default=0,
+                        help="v182: sample threshold (default REVENUE_LOOP_MIN_IMPRESSIONS)")
+    # ---- v187: multi-link intake (list lo links → prathi okkati veru draft) ----
+    parser.add_argument("--links-file", default="",
+                        help="v187: links file (oka line okka link · markdown/plain)")
+    parser.add_argument("--links", default="",
+                        help="v187: inline links (comma/space separated)")
+    parser.add_argument("--links-limit", type=int, default=0,
+                        help="v187: ee run ki max links (default LINK_INTAKE_MAX=10)")
+    parser.add_argument("--links-dry-run", action="store_true",
+                        help="v187: plan mattrame chupu (eem create cheyyadu)")
+    parser.add_argument("--links-notify", action="store_true",
+                        help="v187: summary ni Telegram ki")
+    # ---- v220: AI provider/key status (multi-key setup verify) ----
+    parser.add_argument("--ai-status", action="store_true",
+                        help="v220: ే AI providers/keys configured ayyayo chupu "
+                             "(gemini · groq · openrouter · cerebras · together · "
+                             "mistral · openai · custom)")
+    # ---- v222: okate command tho full go-live setup ----
+    parser.add_argument("--go-live", action="store_true",
+                        help="v222: FULL setup okate command tho — deploy-check · AI keys · "
+                             "WP connection · 20 categories · site settings/menus/SEO · "
+                             "IndexNow · AdSense readiness · production audit "
+                             "(default preview; nijam ga apply cheyyadaniki --apply)")
+    parser.add_argument("--apply", action="store_true",
+                        help="v222: --go-live ni nijamga apply cheyandi (lekapothe preview)")
+    parser.add_argument("--launch-check", action="store_true",
+                        help="v226: 42-item website launch checklist ni StudentUp ki "
+                             "nijamga audit cheyandi (code / .env key / owner)")
+    # ---- v224: money autopilot (revenue pani kooda bot ye) ----
+    parser.add_argument("--money-autopilot", action="store_true",
+                        help="v224: GSC data auto-pull → CTR money gap · striking distance · "
+                             "title fixes · internal links auto-fix · refresh queue · "
+                             "cannibalization · RPM/slot lab (preview; --apply tho auto-fix)")
+    parser.add_argument("--money-days", type=int, default=28,
+                        help="v224: --money-autopilot ki enni rojula GSC data (default 28)")
+    parser.add_argument("--money-csv", default="",
+                        help="v224: GSC credentials leka pote manual CSV path")
+    parser.add_argument("--money-notify", action="store_true",
+                        help="v224: money autopilot summary Telegram ki")
+    parser.add_argument("--ai-status-live", action="store_true",
+                        help="v220: --ai-status tho patu prathi provider ki real ping")
+    # ---- v186: live site audit (deploy tarvata nijamaina HTTP verification) ----
+    parser.add_argument("--live-audit", action="store_true",
+                        help="v186: live site ni 16 checks tho verify (robots · sitemap · "
+                             "schema · PWA · security headers · sample posts · 404)")
+    parser.add_argument("--verify-deploy", action="store_true",
+                        help="v197: zip upload tarvata live proof — theme version · "
+                             "mega menu · quiz · poll · /daily-quiz/ · assets")
+    parser.add_argument("--verify-url", default="",
+                        help="v197: --verify-deploy ki URL (default .env WP_SITE)")
+    parser.add_argument("--verify-notify", action="store_true",
+                        help="v197: deploy verify summary ni Telegram ki pampu")
+    parser.add_argument("--live-url", default="",
+                        help="v186: audit URL (default .env WP_SITE)")
+    parser.add_argument("--live-posts", type=int, default=0,
+                        help="v186: sample post pages count (default LIVE_AUDIT_POSTS=5)")
+    parser.add_argument("--live-timeout", type=int, default=0,
+                        help="v186: per-request timeout seconds (default 20)")
+    parser.add_argument("--live-notify", action="store_true",
+                        help="v186: audit summary ni Telegram ki")
+    parser.add_argument("--live-strict", action="store_true",
+                        help="v186: warnings ni kuda fail ga treat cheyyi (exit 1)")
+    # ---- v183: daily WhatsApp forward list ----
+    parser.add_argument("--forward-list", action="store_true",
+                        help="v183: roju WhatsApp-forward-ready active list (plain text) "
+                             "→ output/forward-list.txt (+ roju file)")
+    parser.add_argument("--forward-format", default="wa", choices=("wa", "tg"),
+                        help="v183: wa = WhatsApp plain text (default) · tg = Telegram HTML")
+    parser.add_argument("--forward-per-section", type=int, default=10,
+                        help="v183: section ki max items (default 6)")
+    parser.add_argument("--daily", action="store_true",
+                        help="v190: OKE COMMAND daily routine — drafts (radar+queue) → "
+                             "guardian → list → Telegram+WhatsApp send")
+    parser.add_argument("--daily-no-drafts", action="store_true",
+                        help="v190: draft step skip (list + send mattrame)")
+    parser.add_argument("--daily-no-guardian", action="store_true",
+                        help="v190: guardian step skip")
+    parser.add_argument("--daily-no-send", action="store_true",
+                        help="v190: list build/save mattrame (send skip)")
+    parser.add_argument("--forward-morning", action="store_true",
+                        help="v189: daily morning send — list build → save → "
+                             "Telegram + WhatsApp (+ wa.me click-to-forward)")
+    parser.add_argument("--forward-morning-no-send", action="store_true",
+                        help="v189: morning list build/save mattrame (send skip)")
+    parser.add_argument("--forward-no-whatsapp", action="store_true",
+                        help="v189: morning send lo WhatsApp skip (Telegram mattrame)")
+    parser.add_argument("--forward-send", action="store_true",
+                        help="v183: list ni Telegram/WhatsApp ki pampinchadam (optional)")
+    parser.add_argument("--forward-no-save", action="store_true",
+                        help="v183: files save cheyyakunda print matrame")
+    parser.add_argument("--backlink", action="store_true",
+                        help="v182: backlink/authority plan (white-hat) + forecast")
+    parser.add_argument("--backlink-assets", action="store_true",
+                        help="v182: link-worthy asset ideas (mee data nunchi)")
+    parser.add_argument("--backlink-targets", action="store_true",
+                        help="v182: evarini contact cheyyali (types + search strings)")
+    parser.add_argument("--backlink-add", default="",
+                        metavar='"Name|type|city|contact|asset"',
+                        help="v182: kotha outreach target add chey")
+    parser.add_argument("--backlink-update", default="",
+                        metavar='"Name|stage|note|followup"',
+                        help="v182: stage/follow-up update (idea/asset_ready/outreach/"
+                             "mentioned/linked/lost/paused)")
+    parser.add_argument("--backlink-notify", action="store_true",
+                        help="v182: backlink plan ni Telegram ki")
+    parser.add_argument("--backlink-templates", action="store_true",
+                        help="v182: outreach message templates kuda print chey")
+    parser.add_argument("--breaking-feed", action="store_true",
+                        help="v59: బ్రేకింగ్ న్యూస్ feed build (radar → preview/data/breaking.json)")
+    parser.add_argument("--breaking-from", default="", metavar="FILE",
+                        help="v59: breaking feed ni JSON file nunchi generate (offline/test)")
+    parser.add_argument("--radar", action="store_true",
+                        help="breaking-news radar: TS+AP districts + grid + watch (queue+post)")
+    parser.add_argument("--sources", action="store_true",
+                        help="official sources grid (105 sources) list chupinchu")
+    parser.add_argument("--rebuild-hubs", action="store_true",
+                        help="authority hub pages: one per exam, auto-linked (weekly also auto)")
+    parser.add_argument("--setup", action="store_true",
+                        help="FULL WordPress site setup: audit + auto-fix settings, "
+                             "footer menu, category SEO, robots/sitemap checks (add --dry-run to preview)")
+    parser.add_argument("--plugins", action="store_true",
+                        help="v28: install/activate only the reviewed plugin stack "
+                             "(add --dry-run to preview)")
+    parser.add_argument("--theme-audit", action="store_true",
+                        help="v28: read-only active-theme audit; never switches themes")
+    parser.add_argument("--adsense-ready", action="store_true",
+                        help="v94: AdSense approval READINESS (pre-application gate — "
+                             "policy pages · content depth · navigation · technical · "
+                             "prohibited scan · Discover) + JSON report")
+    parser.add_argument("--adsense-kit", action="store_true",
+                        help="v28: validate ADSENSE_CLIENT_ID and install/update "
+                             "the site-wide Auto Ads loader widget")
+    parser.add_argument("--ensure-adsense", action="store_true",
+                        help="AdSense approval: mandatory pages auto-create + full checklist")
+    parser.add_argument("--success-stories", default="", metavar="CSV",
+                        help="v117: private Google Forms CSV → consent/evidence review manifest (never publishes)")
+    parser.add_argument("--success-stories-out", default="", metavar="JSON",
+                        help="v117: private output path (default SUCCESS_STORY_QUEUE)")
+    parser.add_argument("--keywords", action="store_true",
+                        help="keyword dominance engine: matrix + coverage + autocomplete")
+    parser.add_argument("--polish", action="store_true",
+                        help="v24: site-wide design kit CSS via footer widget — "
+                             "colors/typography/tables/cards on ALL pages. "
+                             "Idempotent; re-run after theme changes.")
+    parser.add_argument("--quiz", action="store_true",
+                        help="v26: generate today's Daily Quiz (auto topic rotation) "
+                             "and publish")
+    parser.add_argument("--quiz-topic", default="",
+                        help="custom quiz topic (Telugu lo cheppina ok — "
+                             "e.g. --quiz-topic \"స్కాలర్‌షిప్‌ల మీద క్విజ్\")")
+    parser.add_argument("--quiz-level", type=int, default=0,
+                        help="quiz difficulty 1-4 (default: day-based auto ramp)")
+    parser.add_argument("--quiz-questions", type=int, default=0,
+                        help="number of questions (default: QUIZ_QUESTIONS)")
+    parser.add_argument("--quiz-kit", action="store_true",
+                        help="v26: install/update site-wide quiz engine "
+                             "(CSS+JS footer widget) — quiz UI, timers, scoring")
+    args = parser.parse_args()
+
+    if args.revenue_plan:
+        from . import revenue_plan as _rp
+        return _rp.run_cli(args.revenue_plan, args.adsense)
+
+    if args.push_auto:
+        from . import webpush as _wp
+        return _wp.run_auto(bool(args.dry_run))
+
+    if args.push_keys or args.push_send:
+        from . import webpush as _wp
+        return _wp.run_cli(args.push_send, bool(args.dry_run), bool(args.push_keys))
+
+    if args.slot_lab is not None:
+        from . import slot_lab as _sl
+        return _sl.run_cli(args.slot_lab)
+
+    if args.factcheck:
+        from . import factcheck as _fc
+        return _fc.run_cli(args.factcheck, args.against)
+
+    if args.final_audit:
+        from . import final_audit as _fa
+        return _fa.run_cli()
+
+    if args.aeo is not None:
+        from . import aeo as _aeo
+        return _aeo.run_cli(args.aeo)
+
+    if args.rpm_report is not None:
+        from . import rpm_report as _rr
+
+        return _rr.run_cli(args.rpm_report)
+    if args.ctr_boost is not None:
+        from . import ctr_boost as _cb
+
+        return _cb.run_cli(args.ctr_boost, args.ctr_min_impressions)
+    if args.daily_engage:
+        from . import engage_push
+        res = engage_push.run(publish_quiz=bool(getattr(args, "publish", False)))
+        ok = bool(res.get("quiz", {}).get("ok")) and bool(res.get("poll", {}).get("ok"))
+        return 0 if ok else 1
+
+    if args.auto_publish or args.auto_publish_dry:
+        from . import publish_lane
+        dry = bool(args.auto_publish_dry)
+        report = publish_lane.run(dry=dry)
+        try:
+            publish_lane.notify(report)
+        except Exception:  # noqa: BLE001 — notify is best-effort
+            pass
+        if report.get("error"):
+            return 2
+        return 0
+
+    if getattr(args, "import_quiz", None):
+        from . import quiz_intake
+        res = quiz_intake.ingest_questions(args.import_quiz)
+        print(f"  ✅ Ingested {res['count']} exam-wise questions for {res['day']}")
+        return 0
+
+    if getattr(args, "export_quiz_channel", None):
+        from . import quiz_intake
+        output = quiz_intake.export_channel_broadcast(target_channel=args.export_quiz_channel)
+        print(output)
+        return 0
+
+    if args.quiz_push or args.quiz_push_dry:
+        from . import quiz_share as _qs
+        from . import quiz_engine as _qe
+        try:
+            _t = _qe.pick_daily_topic()
+            _topic, _n = (_t[0] if _t else ""), (int(_t[3]) if _t and len(_t) > 3 else 0)
+        except Exception:  # noqa: BLE001
+            _topic, _n = "", 0
+        return 0 if _qs.push(topic=_topic, questions=_n, dry=args.quiz_push_dry) else 1
+
+    if args.daily_quiz or args.daily_quiz_dry:
+        from . import daily_quiz as _dq
+
+        return _dq.run_cli(dry=args.daily_quiz_dry, notify=args.notify)
+
+    _setup_logging()
+
+    if args.status:
+        return show_status()
+    if args.draft_recheck or args.draft_recheck_apply:
+        from . import final_polish as _fp
+
+        state.init(config.STATE_PATH)
+        try:
+            rows = _fp.recheck_drafts(limit=int(getattr(config, "DRAFT_RECHECK_LIMIT", 10)),
+                                      apply=bool(args.draft_recheck_apply), notify=False)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[FAIL] WordPress drafts fetch → {type(exc).__name__}: {str(exc)[:140]}")
+            return 2
+        _fp.print_report(rows)
+        return 0
+    if args.ops_status:
+        from . import ops
+        for k, v in ops.status().items():
+            print(f"{k:18} {v}")
+        return 0
+
+    if args.show_draft:
+        return show_draft(int(args.show_draft))
+    if args.why_no_draft:
+        return why_no_draft()
+    if args.gnews_test:
+        from . import gnews
+        real = gnews.resolve(args.gnews_test)
+        print("RESOLVED →", real if real else "FAIL (resolve avvaledu)")
+        return 0 if real else 1
+    if args.check_wp:
+        return check_wp()
+    if args.notify_test:
+        return notify_test()
+    if getattr(args, "tg_test", False) or getattr(args, "tg_broadcast", None) \
+            or getattr(args, "tg_alert", None):
+        from . import telegram_tools
+
+        return telegram_tools.run_cli(args)
+    if args.fast_drain:
+        return fast_drain()
+    if args.approval_poll:
+        from . import approval_bot
+
+        return approval_bot.main_once()
+    if args.revenue_check:
+        return revenue_check()
+    if args.cannibalization_audit:
+        from . import cannibalization as _ca
+
+        return _ca.run_cli()
+    if args.gsc_sync:
+        from . import gsc_api as _ga
+
+        return _ga.run_cli(days=args.gsc_days)
+    if args.gsc_inspect:
+        from . import gsc_api as _gi
+
+        try:
+            result = _gi.inspect_url(args.gsc_inspect)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except Exception as exc:  # noqa: BLE001
+            print(f"❌ URL Inspection unavailable: {exc}")
+            return 1
+    if args.performance_audit:
+        from . import performance_audit as _pa
+
+        return _pa.run_cli(args.performance_audit)
+    if args.corrections_audit:
+        from . import corrections as _co
+
+        return _co.run_cli()
+    if args.control_center:
+        from . import control_center as _cc
+
+        return _cc.run_cli()
+    if args.ops_alert:
+        from . import ops_alerts as _oa
+
+        return _oa.run_cli()
+    if args.security_audit:
+        from . import security_audit as _sa_sec
+
+        return _sa_sec.run_cli()
+    if args.rollback_post:
+        from . import update_safety as _us
+
+        _wp = wordpress_client.WordPressClient()
+        _wp.check_connection()
+        try:
+            result = _us.rollback(_wp, args.rollback_post, args.rollback_backup)
+            print(f"  ✅ rollback restored: {result.get('link', '')}")
+            return 0
+        except Exception as exc:  # noqa: BLE001
+            print(f"  ❌ rollback failed: {exc}")
+            return 1
+    if args.freshness_audit:
+        from . import freshness as _fr
+
+        return _fr.run_cli()
+    if getattr(args, "source_monitor", False):
+        from . import source_monitor as _sm
+
+        return _sm.run_cli(notify=True)
+    if getattr(args, "opportunity_monitor", False):
+        from . import opportunity_monitor as _om
+
+        return _om.run_cli(notify=True)
+    if args.gsc_refresh:
+        from . import gsc_refresh as _gr
+
+        return _gr.run_cli(args.gsc_refresh)
+    if args.gsc:
+        return gsc_opportunities(args.gsc)
+    if args.doctor:
+        return doctor()
+    if args.production_audit:
+        from . import production_audit
+
+        return production_audit.run()
+    if args.live_validation is not None:
+        from . import live_validation
+
+        return live_validation.run_cli(args.live_validation)
+    if args.live_seo_recent:
+        from . import live_seo
+
+        return live_seo.run_recent_cli(args.live_seo_recent, notify=bool(getattr(args, "notify", False)))
+    if args.live_seo:
+        from . import live_seo
+
+        return live_seo.run_cli(args.live_seo)
+    if args.service_center:
+        return service_center_setup(dry=args.dry_run, force=args.force)
+    if args.source_scan:
+        from . import source_leak
+
+        return source_leak.run(limit=max(1, min(args.content_limit, 2000)), apply=bool(args.apply))
+    if args.dedupe_posts:
+        from . import dedupe_posts
+
+        return dedupe_posts.run(apply=bool(args.apply))
+    if args.content_audit:
+        return content_audit_run(limit=max(1, min(args.content_limit, 5000)))
+    if args.rate_card:
+        from . import rate_card as rc
+
+        print(rc.as_markdown())
+        print("\n⚠️  Public site lo prices chupinchakandi (v71 rule) — personal ga deal cheyandi.")
+        return 0
+    if args.ads or args.ads_demo:
+        from . import ad_manager
+
+        return ad_manager.run_cli("demo" if args.ads_demo else "status")
+    if args.google_audit:
+        return google_audit_run(args.google_audit)
+    if args.deep_research:
+        from . import deep_research
+
+        return deep_research.run_cli(
+            args.deep_research, url_file=args.research_urls,
+            limit=max(1, args.research_limit), target_year=args.research_year,
+            notebooklm_brief=args.notebooklm_brief,
+            deep_prompt=args.deep)
+    if args.research_brief:
+        return research_brief_run(args.research_brief, args.research_urls,
+                                  args.research_limit, args.research_year)
+    if args.top_post:
+        return top_post_run(args.top_post, category=args.top_post_category,
+                            publish=args.publish_top_post, mock=args.mock,
+                            dry_run=args.dry_run)
+    if args.top_post_plan:
+        return top_post_plan_run(args.top_post_days,
+                                 per_day=args.top_post_per_day)
+    if args.keyword_universe:
+        return keyword_universe_view()
+    if args.score_post:
+        return score_post_run(args.score_post, args.score_keyword)
+    if args.deploy_check:
+        from . import deploy_check
+
+        return deploy_check.run_deploy_check()
+    if args.test_all:
+        return test_all_run(only=args.test_only)
+    if args.check_links is not None:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import check_links as _cl
+
+        return _cl.main(["check_links"] + (args.check_links or []))
+    if args.orphans is not None:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import check_links as _cl
+
+        # v84: URL ivvakapote WP sitemap default (cron-friendly — usage kaadu)
+        urls = args.orphans or [config.WP_SITE.rstrip("/") + "/wp-sitemap.xml"]
+        return _cl.main(["check_links", "--orphans"] + urls)
+    if getattr(args, "link_graph", False):
+        from . import link_graph as _lg
+
+        return _lg.run_cli(apply=args.link_graph_apply)
+    if getattr(args, "verify_keyword", "") or getattr(args, "keyword_audit", False):
+        from . import keyword_verify as _kv
+
+        return _kv.run_cli(keyword=args.verify_keyword,
+                           audit_live=args.keyword_audit)
+    if getattr(args, "district_hubs", False):
+        from . import district_hubs as _dh
+
+        return _dh.run_cli(state=args.district_hubs_state,
+                           apply=args.district_hubs_apply)
+    if args.site_audit or args.site_audit_fix:
+        return site_audit_run(fix=args.site_audit_fix, apply=args.site_audit_apply,
+                              allow_trash=args.site_audit_trash,
+                              actions=args.site_audit_action,
+                              snapshot=args.site_audit_snapshot,
+                              save=args.site_audit_save)
+    if getattr(args, "index_key_gen", False):
+        import secrets
+
+        key = secrets.token_hex(16)
+        print("=" * 62)
+        print("  🔑 INDEXNOW KEY (kotha)")
+        print("=" * 62)
+        print(f"  {key}")
+        print("\n  .env lo ee line pettandi:")
+        print(f"  INDEXNOW_KEY={key}")
+        print("\n  Tarvata: python run.py --push-theme-data  (theme /" + key + ".key serve chestundi)")
+        print("           python run.py --index-status     (verify)")
+        print("=" * 62)
+        return 0
+    if getattr(args, "index_status", False):
+        from . import indexing
+
+        st = indexing.status()
+        print("=" * 62)
+        print("  🔎 INSTANT INDEXING (v68)")
+        print("=" * 62)
+        print(f"  IndexNow key      : {'set ✔' if st['indexnow_key'] else 'ledu (INDEXNOW_KEY set cheyandi)'}")
+        print(f"  Google SA         : {'configured ✔ ' + st['client_email'] if st['configured'] else 'ledu (GOOGLE_INDEXING_SA_JSON / GOOGLE_INDEXING_SA)'}")
+        print(f"  RS256 signing     : {st['signing']} (openssl: {st['openssl']})")
+        print("  IndexNow key file : theme /<key>.key serve chestundi (StudentUp → Advanced)")
+        print("=" * 62)
+        return 0
+    if getattr(args, "index_now", ""):
+        from . import indexnow, indexing
+
+        url = args.index_now
+        st = indexing.status()
+        ok_bing = indexnow.submit(url)
+        ok_google = indexing.publish_url(url, "URL_UPDATED") if st["configured"] else False
+        print("=" * 62)
+        print(f"  URL: {url}")
+        print(f"  IndexNow (Bing/Yandex): {'✔ submitted' if ok_bing else '✘ skip (key ledu leda fail)'}")
+        print(f"  Google Indexing API   : {'✔ submitted' if ok_google else '✘ skip (SA ledu leda JobPosting page kaadu)'}")
+        print("=" * 62)
+        return 0 if (ok_bing or ok_google) else 0
+    if args.trends:
+        rc = trends_check()
+        if getattr(args, "trends_queue", False):
+            trends_run(queue=True)
+        return rc
+    if args.sources:
+        return sources_view()
+    if args.keywords:
+        return keywords_view()
+    if args.ensure_adsense:
+        return ensure_adsense()
+    if args.setup:
+        from . import site_setup
+
+        return site_setup.run_setup(dry=args.dry_run)
+    if args.plugins:
+        from . import site_setup
+
+        return site_setup.run_plugins(dry=args.dry_run)
+    if args.theme_audit:
+        from . import site_setup
+
+        return site_setup.run_theme_audit()
+    if args.adsense_ready:
+        from . import adsense_ready
+
+        return adsense_ready.run()
+
+    if args.success_stories:
+        return success_story_review(args.success_stories, args.success_stories_out)
+
+    if args.adsense_kit:
+        from . import site_setup
+
+        return site_setup.run_adsense_kit(dry=args.dry_run)
+    if args.polish:
+        from . import design_kit
+        from .wordpress_client import WordPressClient
+        wp = WordPressClient()
+        try:
+            wp.check_connection()
+        except Exception as exc:  # noqa: BLE001
+            print(f"WP connect kaDU ({str(exc)[:70]}...) — "
+                  "Appearance→Customize→Additional CSS lo paste cheyandi:")
+            print(design_kit.build_css())
+            return 0
+        status, detail = design_kit.install(wp)
+        f_stat, f_detail = design_kit.broken_footer_token(wp)
+        print(f"🎨 Design kit: {status} — {detail}")
+        print(f"🦶 Footer token: {f_stat} — {f_detail}")
+        # v26: quiz engine site-wide CSS+JS (same widget mechanism)
+        try:
+            from . import quiz_engine
+            q_stat, q_detail = quiz_engine.install(wp)
+            print(f"🎯 Quiz engine: {q_stat} — {q_detail}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"🎯 Quiz engine failed (harmless): {str(exc)[:100]}")
+        return 0
+
+    if args.ad_advisor or args.traffic_csv or args.traffic_views:
+        from . import ad_advisor
+
+        if args.traffic_csv:
+            try:
+                info = ad_advisor.import_ga4_csv(args.traffic_csv)
+            except (OSError, ValueError) as exc:
+                print(f"❌ traffic CSV chadavaleka poyindi: {exc}")
+                return 6
+            print(f"📈 traffic import: {info['pageviews']:,} pageviews · "
+                  f"{info['sessions']:,} sessions · Tier-1 {int(info['tier1_share'] * 100)}% "
+                  f"({info['rows']} rows) → {info['path']}")
+        views = ad_advisor.parse_views(args.traffic_views) if args.traffic_views else 0
+        sessions = ad_advisor.parse_views(args.traffic_sessions) if args.traffic_sessions else 0
+        tier1 = None
+        if args.tier1:
+            try:
+                tier1 = float(args.tier1)
+                tier1 = tier1 / 100.0 if tier1 > 1 else tier1
+            except ValueError:
+                print("❌ --tier1 number ga undali (0.5 leda 50)")
+                return 6
+        result = ad_advisor.advice(pageviews=views or None,
+                                   sessions=sessions or None, tier1=tier1)
+        print(ad_advisor.render(result))
+        return 0
+
+    if args.quiz_kit:
+        from . import quiz_engine
+        from .wordpress_client import WordPressClient
+        wp = WordPressClient()
+        try:
+            wp.check_connection()
+        except Exception as exc:  # noqa: BLE001
+            print(f"WP connect kaDU ({str(exc)[:70]}...) — "
+                  "Appearance→Widgets lo text widget lo paste cheyandi:")
+            print(quiz_engine.build_widget_html())
+            return 0
+        status, detail = quiz_engine.install(wp)
+        print(f"🎯 Quiz engine: {status} — {detail}")
+        return 0
+
+    if args.rebuild_hubs:
+        from . import hubs as _hubs
+
+        rows = _hubs.rebuild_hubs()
+        print(f"{len(rows)} hub pages upserted:")
+        for r in rows:
+            print(f"  • {r['exam']:<22} {r.get('posts', '?')} posts -> {r.get('link', r['slug'])}")
+        return 0
+    if getattr(args, "pin_check", False):
+        return pin_check_run()
+    if getattr(args, "trends", False):
+        return trends_run(queue=not getattr(args, "no_queue", False))
+    if getattr(args, "rm100", False):
+        return rm100_run()
+    if args.readiness:
+        return readiness_run()
+    if args.push_theme_data:
+        return push_theme_data(dry_run=args.dry_run)
+    if args.guardian or args.guardian_notify:
+        return guardian_run(notify=args.guardian_notify)
+    # ---- v181: growth loops (demand · rank trend · sponsor pipeline) ----
+    if getattr(args, "search_demand", False):
+        from . import search_demand as _sd
+
+        return _sd.run_cli(import_path=getattr(args, "search_import", "") or "",
+                           notify=getattr(args, "search_notify", False))
+    if getattr(args, "rank_trend", False):
+        from . import rank_trend as _rt
+
+        return _rt.run_cli(csv_path=getattr(args, "rank_csv", "") or "",
+                           window=int(getattr(args, "rank_window", 7) or 7),
+                           notify=getattr(args, "rank_notify", False))
+    if getattr(args, "sponsor_crm", False):
+        from . import sponsor_crm as _sc
+
+        return _sc.run_cli(notify=getattr(args, "sponsor_notify", False),
+                           limit=int(getattr(args, "sponsor_limit", 0) or 0),
+                           templates=getattr(args, "sponsor_templates", False))
+    if getattr(args, "sponsor_targets", False):
+        from . import sponsor_crm as _sc
+
+        return _sc.targets_cli()
+    if getattr(args, "sponsor_add", ""):
+        from . import sponsor_crm as _sc
+
+        parts = [p.strip() for p in args.sponsor_add.split("|")]
+        while len(parts) < 5:
+            parts.append("")
+        try:
+            row = _sc.add(parts[0], parts[1], parts[2], parts[3],
+                          int(parts[4] or 0))
+        except ValueError as exc:
+            print(f"❌ {exc}")
+            return 1
+        print(f"✅ prospect added: {row['name']} ({row['type'] or '—'}, {row['city'] or '—'})"
+              f" — stage new. Roju plan: python run.py --sponsor-crm")
+        return 0
+    if getattr(args, "sponsor_update", ""):
+        from . import sponsor_crm as _sc
+
+        parts = [p.strip() for p in args.sponsor_update.split("|")]
+        while len(parts) < 4:
+            parts.append("")
+        try:
+            row = _sc.update(parts[0], stage=parts[1], note=parts[2], followup=parts[3])
+        except ValueError as exc:
+            print(f"❌ {exc}")
+            return 1
+        print(f"✅ {row['name']} → {row['stage']}"
+              f" (follow-up {row.get('next_followup', '—')})")
+        return 0
+    # ---- v182: editorial calendar · revenue loop · backlink authority ----
+    if getattr(args, "calendar", False) or getattr(args, "calendar_apply", False):
+        from . import editorial_calendar as _ec
+
+        days = int(getattr(args, "calendar_days", 0) or 0) or config.EDITORIAL_CALENDAR_DAYS
+        per_day = (int(getattr(args, "calendar_per_day", 0) or 0)
+                   or config.EDITORIAL_CALENDAR_PER_DAY)
+        limit = (int(getattr(args, "calendar_limit", 0) or 0)
+                 or config.CALENDAR_APPLY_LIMIT)
+        return _ec.run_cli(days=days, per_day=per_day,
+                           notify=getattr(args, "calendar_notify", False),
+                           apply=getattr(args, "calendar_apply", False),
+                           apply_limit=limit,
+                           universe=not getattr(args, "calendar_no_universe", False))
+    if getattr(args, "revenue_loop", ""):
+        from . import revenue_loop as _rl
+
+        return _rl.run_cli(csv_path=args.revenue_loop,
+                           notify=getattr(args, "revenue_notify", False),
+                           min_impressions=(int(getattr(args, "revenue_min_views", 0) or 0)
+                                            or None))
+    if getattr(args, "backlink_assets", False):
+        from . import backlink_engine as _bl
+
+        return _bl.assets_cli()
+    if getattr(args, "backlink_targets", False):
+        from . import backlink_engine as _bl
+
+        return _bl.targets_cli()
+    if getattr(args, "backlink_add", ""):
+        from . import backlink_engine as _bl
+
+        parts = [p.strip() for p in args.backlink_add.split("|")]
+        while len(parts) < 5:
+            parts.append("")
+        try:
+            row = _bl.add(parts[0], parts[1], parts[2], parts[3], parts[4])
+        except ValueError as exc:
+            print(f"❌ {exc}")
+            return 1
+        print(f"✅ outreach target added: {row['name']} ({row['type'] or '—'})"
+              f" — stage {row['stage']}. Plan: python run.py --backlink")
+        return 0
+    if getattr(args, "backlink_update", ""):
+        from . import backlink_engine as _bl
+
+        parts = [p.strip() for p in args.backlink_update.split("|")]
+        while len(parts) < 4:
+            parts.append("")
+        try:
+            row = _bl.update(parts[0], stage=parts[1], note=parts[2],
+                             followup=parts[3])
+        except ValueError as exc:
+            print(f"❌ {exc}")
+            return 1
+        print(f"✅ {row['name']} → {row['stage']} (follow-up {row.get('next_followup', '—')})")
+        return 0
+    if args.links_file or args.links:
+        from . import link_intake as _li
+        return _li.run_cli(args.links, args.links_file, args.links_limit,
+                           dry_run=args.links_dry_run, notify=args.links_notify)
+
+    if getattr(args, "launch_check", False):
+        from . import launch42
+
+        return launch42.run_cli()
+
+    if getattr(args, "money_autopilot", False):
+        from . import money_autopilot
+
+        return money_autopilot.run_cli(
+            apply=bool(getattr(args, "apply", False)),
+            days=int(getattr(args, "money_days", 28) or 28),
+            csv_path=str(getattr(args, "money_csv", "") or ""),
+            send=bool(getattr(args, "money_notify", False)))
+
+    if getattr(args, "go_live", False):
+        from . import go_live
+
+        return go_live.run_cli(apply=bool(getattr(args, "apply", False)))
+
+    if getattr(args, "ai_status", False) or getattr(args, "ai_status_live", False):
+        from . import ai_status
+
+        return ai_status.run_cli(live=bool(getattr(args, "ai_status_live", False)))
+
+    if getattr(args, "verify_deploy", False):
+        from . import deploy_verify as _dv
+        return _dv.run_cli(getattr(args, "verify_url", ""),
+                           notify=getattr(args, "verify_notify", False))
+
+    if getattr(args, "live_audit", False):
+        from . import live_audit as _la
+        return _la.run_cli(args.live_url, args.live_posts,
+                           notify=args.live_notify, strict=args.live_strict,
+                           timeout=args.live_timeout)
+
+    if getattr(args, "daily", False):
+        return daily_run(send=not args.daily_no_send,
+                         whatsapp=not args.forward_no_whatsapp,
+                         drafts=not args.daily_no_drafts,
+                         guardian_check=not args.daily_no_guardian,
+                         save_files=not args.forward_no_save)
+
+    if getattr(args, "forward_morning", False):
+        from . import forward_list as _fl
+        return _fl.run_morning(save_files=not args.forward_no_save,
+                               send=not args.forward_morning_no_send,
+                               whatsapp=not args.forward_no_whatsapp)
+
+    if getattr(args, "forward_list", False):
+        from . import forward_list as _fl
+        return _fl.run_cli(args.forward_format, args.forward_per_section,
+                           send=args.forward_send,
+                           save_files=not args.forward_no_save)
+
+    if getattr(args, "backlink", False) or getattr(args, "backlink_notify", False):
+        from . import backlink_engine as _bl
+
+        return _bl.run_cli(notify=getattr(args, "backlink_notify", False),
+                           templates=getattr(args, "backlink_templates", False))
+    if args.breaking_feed or args.breaking_from:
+        return breaking_feed_run(from_file=args.breaking_from)
+    if args.radar:
+        return radar_run(process_posts=not args.dry_run)
+    rc = 5
+    try:
+        src = args.add_source or args.url
+        listicle_arg = args.listicle or ""
+        if listicle_arg == "auto":
+            listicle_arg = ""  # bot idea pick chestundi
+        rc = run(dry_run=args.dry_run, force=args.force, mock=args.mock,
+                   category=args.category, source_url=src,
+                   process_queue=args.process_queue, update_id=args.update,
+                   listicle=listicle_arg, auto_refresh_n=args.auto_refresh,
+                   quiz=args.quiz, quiz_topic=args.quiz_topic,
+                   quiz_level=args.quiz_level,
+                   quiz_questions=args.quiz_questions,
+                   notebooklm_brief_file=args.notebooklm_brief,
+                   target_year=args.target_year)
+        return rc
+    except wordpress_client.WordPressAuthError as exc:
+        log.error("%s", exc)
+        _release_failed_slot()
+        rc = 3
+        return rc
+    except (wordpress_client.WordPressError, gemini_client.GeminiError) as exc:
+        log.error("Publishing failed: %s", exc)
+        _release_failed_slot()
+        rc = 4
+        return rc
+    except Exception:
+        log.exception("Unexpected error")
+        _release_failed_slot()
+        rc = 5
+        return rc
+    finally:
+        if not args.mock:  # v362 ops: heartbeat · failure budget · draft watchdog · state.db backup
+            try:
+                from . import ops
+                ops.finish_run(rc)
+            except Exception:  # noqa: BLE001
+                log.debug("ops.finish_run failed", exc_info=True)

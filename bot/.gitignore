@@ -1,0 +1,14 @@
+# v391 (guardian P9): runtime data & secrets never leave the server
+.env
+.env.*
+!.env.example
+state.db
+state.db.lock
+state.fastlane.lock
+state.db.bak*
+log/
+output/
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
