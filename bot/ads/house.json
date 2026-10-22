@@ -1,0 +1,45 @@
+{
+  "note": "StudentUp sonta ads (house ads) — sponsor ad lekapoyinappudu slot khali ga undakunda ivi vastayi. Paid kaavu, anduke SPONSORED label veyyamu.",
+  "version": 1,
+  "ads": [
+    {
+      "id": "house-services",
+      "name": "StudentUp services",
+      "type": "house",
+      "layout": "card",
+      "title": "దరఖాస్తు సహాయం కావాలా? — StudentUp సేవలు",
+      "description": "పత్రాల చెక్‌లిస్ట్, దరఖాస్తు మార్గదర్శనం, స్కాలర్‌షిప్ మరియు ఉద్యోగ ప్రక్రియ — విద్యార్థుల కోసం ఉచిత మార్గదర్శనం.",
+      "cta": "సేవలు చూడండి",
+      "link": "https://studentup.in/#services",
+      "label": "StudentUp · మా సేవ",
+      "active": true,
+      "house": true
+    },
+    {
+      "id": "house-daily-quiz",
+      "name": "StudentUp daily quiz",
+      "type": "house",
+      "layout": "card",
+      "title": "రోజూ 6 ప్రశ్నలు — ఉచిత క్విజ్ + వివరణ",
+      "description": "TSPSC · APPSC · SSC స్థాయి ప్రశ్నలు, ప్రతిదానికి వివరణ. రోజూ ఆడండి, స్కోరు పెంచుకోండి.",
+      "cta": "క్విజ్ ఆడండి",
+      "link": "https://studentup.in/#quiz",
+      "label": "StudentUp · మా సేవ",
+      "active": true,
+      "house": true
+    },
+    {
+      "id": "house-jobs",
+      "name": "StudentUp latest opportunities",
+      "type": "house",
+      "layout": "card",
+      "title": "తాజా అవకాశాలు — TS · AP · కేంద్ర ఉద్యోగాలు",
+      "description": "ఫ్యాక్ట్-చెక్ చేసిన గైడ్‌లు — నోటిఫికేషన్లు, హాల్ టికెట్లు, ఫలితాలు. రోజూ కొత్తవి.",
+      "cta": "అవకాశాలు చూడండి",
+      "link": "https://studentup.in/#jobs",
+      "label": "StudentUp · మా సేవ",
+      "active": true,
+      "house": true
+    }
+  ]
+}

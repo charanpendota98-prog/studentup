@@ -1,0 +1,531 @@
+"""Article QA engine — originality proof, validation scoring, HTML sanitizer.
+
+1. originality_score(): 5-gram shingle containment — final article vs
+   source texts. Idi measurable "no copy" proof (prompt hope kadu).
+2. sanitize_html(): Gemini output lo ALLOWED tags tappa anni strip.
+3. validate_article(): Rank Math-style checks -> score/100 + issues.
+"""
+
+import logging
+import re
+from datetime import date as _date
+from typing import Optional, Dict, List
+from zoneinfo import ZoneInfo
+
+log = logging.getLogger("autoblog.validator")
+
+IST = ZoneInfo("Asia/Kolkata")
+
+
+def ist_today() -> _date:
+    """v84: server TZ (UTC) kadu — IST date. Deadline-day 00:00-05:30
+    window lo UTC-date vadithe expired jobs kuda 'valid' avutayi."""
+    from datetime import datetime as _dt
+
+    return _dt.now(IST).date()
+
+ALLOWED_TAGS = {
+    "h2", "h3", "p", "ul", "ol", "li", "strong", "em",
+    "table", "thead", "tbody", "tr", "th", "td", "a",
+    # v81 (§2): callouts (blockquote) + code/pre — iframe/video/script
+    # deliberately OUT (XSS; WP auto-embeds plain URLs instead).
+    "blockquote", "pre", "code",
+}
+
+
+def strip_tags(html: str) -> str:
+    # v84: <script>/<style> BLOCKS motham thollaru (JSON-LD schema words
+    # count loki vachi gate false-pass ayyedi: 1400 + 106 JSON = 1506!).
+    # Google kuda script content ni word-count lo lekkacheyadu.
+    no_script = re.sub(r"<script[^>]*>.*?</script>", " ", html or "",
+                       flags=re.S | re.I)
+    no_style = re.sub(r"<style[^>]*>.*?</style>", " ", no_script,
+                      flags=re.S | re.I)
+    return re.sub(r"<[^>]+>", " ", no_style)
+
+
+def _normalize_words(text: str) -> List[str]:
+    text = re.sub(r"[^\w\u0c00-\u0c7f]+", " ", text.lower())
+    return re.sub(r"\s+", " ", text).split()
+
+
+def text_shingles(text: str, n: int = 5) -> set:
+    words = _normalize_words(text)
+    return {" ".join(words[i:i + n]) for i in range(len(words) - n + 1)}
+
+
+def originality_score(article_html: str, source_texts: List[str]) -> float:
+    """100 = fully original. Worst-case containment across sources."""
+    art_shingles = text_shingles(strip_tags(article_html))
+    if not art_shingles:
+        return 100.0
+    worst = 0.0
+    for src in source_texts or []:
+        src_shingles = text_shingles(src)
+        if not src_shingles:
+            continue
+        overlap = len(art_shingles & src_shingles)
+        containment = overlap / min(len(art_shingles), len(src_shingles))
+        worst = max(worst, containment)
+    return round(100.0 * (1.0 - worst), 1)
+
+
+_VERBATIM_STOP = {
+    "the", "and", "for", "of", "to", "in", "on", "at", "by", "with", "from", "is", "are",
+    "లో", "కి", "కు", "ను", "ని", "మరియు", "లేదా", "ఈ", "ఆ", "గా", "తో", "పై", "నుంచి", "నుండి",
+}
+
+
+def _free_words(phrase: str, ignore: set, telugu_article: bool = False) -> int:
+    """Words in a shared run that are NOT names/numbers/stop words — i.e. the
+    part that could actually have been paraphrased. In a Telugu article the
+    Latin-script words are course/org/exam names (B.Com E-Commerce, Cyber
+    Security, Forest Beat Officer) — never paraphrasable prose."""
+    n = 0
+    for w in phrase.split():
+        if w.isdigit() or w in _VERBATIM_STOP or w in ignore:
+            continue
+        if re.fullmatch(r"[a-z]{1,4}", w):      # b, com, ba, ap, ts, iti, ug …
+            continue
+        if telugu_article and re.fullmatch(r"[a-z0-9]+", w):
+            continue
+        n += 1
+    return n
+
+
+def verbatim_overlaps(article_html: str, source_texts: List[str],
+                      n: int = 12, limit: int = 12,
+                      ignore_terms: Optional[List[str]] = None,
+                      min_free: int = 6) -> List[str]:
+    """Return long exact word runs shared with a source.
+
+    A similarity percentage alone can miss a copied paragraph when the source
+    is much longer. This second guard looks for contiguous 12-word runs and is
+    intentionally conservative: it reports evidence for review rather than
+    pretending to be a copyright court or a plagiarism verdict.
+
+    v388: ENTITY-AWARE. Official names cannot be paraphrased — "Agriculture
+    Pharmacy Common Entrance Test AP EAPCET 2026", course lists ("B.Com
+    E-Commerce, M.Com Digital Marketing, BA Cyber Security"), "ITI విద్యార్థులకు
+    రూ 10,000 / పాలిటెక్నిక్ రూ …" (a fee/stipend table). A run counts as
+    verbatim only when at least `min_free` of its words are free prose words
+    (not title/keyword/entity tokens, numbers, stop words or short codes).
+    """
+    plain = strip_tags(article_html)
+    article = text_shingles(plain, n=n)
+    if not article:
+        return []
+    te = len(re.findall(r"[\u0c00-\u0c7f]", plain))
+    la = len(re.findall(r"[A-Za-z]", plain))
+    telugu_article = te > la
+    ignore = set()
+    for term in ignore_terms or []:
+        ignore.update(_normalize_words(str(term)))
+    found = set()
+    for source in source_texts or []:
+        src_words = _normalize_words(source)
+        src_sh = {" ".join(src_words[i:i + n]) for i in range(len(src_words) - n + 1)}
+        shared = article & src_sh
+        for phrase in shared:
+            if _free_words(phrase, ignore, telugu_article) < min_free:
+                continue
+            # vacancy breakdown / fee tables: "2 750 పోస్టులు సీనియర్ క్లర్క్ 371 పోస్టులు …"
+            nums = sum(1 for w in phrase.split() if w.isdigit())
+            if nums >= 2 and re.search(r"పోస్టు|posts?|vacanc|ఖాళీ|రూ|₹|fee|ఫీజు", phrase):
+                continue
+            # a run that repeats inside the source itself is a name/boilerplate
+            if source.lower().count(" ".join(phrase.split()[:6])) >= 3:
+                continue
+            found.add(phrase)
+            if len(found) >= limit:
+                return sorted(found)
+    return sorted(found)
+
+
+def sanitize_html(html: str) -> str:
+    """Allowed tags tappa anni strip (content ni preserve chesi)."""
+    if not html:
+        return html
+    # full script/style blocks remove
+    html = re.sub(r"<(script|style|iframe|form)[^>]*>.*?</\1>", "", html,
+                  flags=re.S | re.I)
+    html = re.sub(r"</?(html|head|body|!doctype)[^>]*>", "", html, flags=re.I)
+    # markdown artifacts
+    html = html.replace("```html", "").replace("```", "")
+
+    def _keep(m: re.Match) -> str:
+        return m.group(0) if m.group(1).lower() in ALLOWED_TAGS else ""
+
+    html = re.sub(r"</?([a-zA-Z][a-zA-Z0-9]*)[^>]*>", _keep, html)
+    # XSS hardening: event-handler attributes + javascript:/data: URLs strip
+    # (allowed tags kuda attributes lo danger untayi — 1000x audit finding)
+    html = re.sub(r"\s+on[a-zA-Z]+\s*=\s*(\"[^\"]*\"|'[^']*'|[^\s>]+)", "", html,
+                  flags=re.I)
+    html = re.sub(r"(href|src)\s*=\s*(\"|')?\s*(javascript|vbscript|data):[^\s\"'>]*[\"']?",
+                  r'\1="#"', html, flags=re.I)
+    # empty paragraphs / excess newlines clean
+    html = re.sub(r"<p>\s*</p>", "", html)
+    html = re.sub(r"\n{3,}", "\n\n", html)
+    return html.strip()
+
+
+def word_count(html: str) -> int:
+    return len(_normalize_words(strip_tags(html)))
+
+
+def reading_minutes(words: int) -> int:
+    return max(1, round(words / 200))
+
+
+def validate_article(article: Dict, final_html: str = "") -> Dict:
+    """Rank Math-style QA score. Returns {score, issues, words, reading_min}."""
+    issues: List[str] = []
+    html = final_html or article.get("content_html", "")
+    plain = strip_tags(html)
+    words = word_count(html)
+    kw = (article.get("focus_keyword") or "").strip()
+
+    def add(ok: bool, points: int, msg: str) -> int:
+        if not ok:
+            issues.append(msg)
+        return points if ok else 0
+
+    score = 0
+    score += add(bool(kw), 5, "focus_keyword ledu")
+    if kw:
+        title = article.get("title", "")
+        tlow = title.lower()
+        score += add(kw.lower() in tlow, 6, "focus keyword title lo ledu")
+        # Rank Math: keyword title FIRST HALF lo + number in title
+        half = tlow[: max(1, len(tlow) // 2)]
+        score += add(kw.lower() in half, 3, "focus keyword title first-half lo ledu")
+        score += add(bool(re.search(r"\d", title)), 3, "title lo number ledu (year/vacancies)")
+        first_p = re.search(r"<p>(.*?)</p>", html, flags=re.S)
+        first_txt = strip_tags(first_p.group(1)) if first_p else ""
+        score += add(kw.lower() in first_txt.lower(), 10,
+                     "focus keyword first paragraph lo ledu")
+        h2s = re.findall(r"<h2[^>]*>(.*?)</h2>", html, flags=re.S)
+        kw_in_h2 = sum(1 for h in h2s if kw.lower() in strip_tags(h).lower())
+        score += add(kw_in_h2 >= 1, 10, "focus keyword subheadings lo ledu")
+        # Rank Math sweet spot ~1-2.5%
+        density = plain.lower().count(kw.lower()) / max(1, words)
+        score += add(0.008 <= density <= 0.025, 5,
+                     f"keyword density out of range ({density:.3f})")
+
+    from . import config as _cfg
+    min_words = int(getattr(_cfg, "RM_MIN_WORDS", 600))
+    score += add(words >= min_words, 10,
+                 f"word count takkuva ({words} < {min_words})")
+    score += add("<table" in html, 5, "table ledu (snippet eligibility)")
+    score += add(len(article.get("faq") or []) >= 3, 10, "FAQ 3+ kavali")
+    score += add(bool(article.get("external_links")), 4, "external links ledu")
+    site_host = ""
+    try:
+        from urllib.parse import urlparse as _up
+        from . import config as _cfg
+        site_host = _up(_cfg.WP_SITE).netloc
+    except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
+        log.debug("validator.validate_article skip: %s", exc)
+    links = re.findall(r'href="(http[^"]+)"', html)
+    n_internal = sum(1 for l in links if site_host and site_host in l) if site_host else (1 if links else 0)
+    score += add(n_internal >= 1, 4, "internal links ledu (Rank Math check)")
+    meta_desc = article.get("meta_description") or ""
+    score += add(120 <= len(meta_desc) <= 170 and (not kw or kw.lower() in meta_desc.lower()),
+                 8, "meta description length/keyword problem")
+    score += add(5 <= len(article.get("tags") or []) <= 8, 4, "tags 5-8 kavali")
+    score += add(bool(article.get("quick_answer")), 5, "quick_answer ledu (snippet bait)")
+    score += add(5 <= len(article.get("secondary_keywords") or []) <= 10, 4,
+                 "secondary keywords 5-10 kavali")
+    # Rank Math readability: prathi paragraph 160 words kanna takkuva
+    para_words = [len(strip_tags(m).split()) for m in re.findall(r"<p>(.*?)</p>", html, flags=re.S)]
+    long_paras = sum(1 for w_ in para_words if w_ > 160)
+    score += add(long_paras == 0 and len(para_words) >= 3, 6,
+                 f"{long_paras} paragraphs too long (160+ words)" if long_paras else
+                 "paragraphs structure weak")
+
+    return {
+        "score": min(100, score),
+        "issues": issues,
+        "words": words,
+        "reading_min": reading_minutes(words),
+    }
+
+
+# ---------------------------------------------------------------- v18
+# Real Rank Math panel lu check chese exact items — mana custom QA kaadu.
+# Score normalize /100 + fixes list (auto-refine prompt ki veltundi).
+# v327: Rank Math's own EN power-word list (assets/vendor/powerwords/en.php)
+# contains words that are NATURAL in job titles — "official", "latest", "new",
+# "direct", "last", "deadline", "final", "release", "important", "today", "now".
+# Prefer those; "complete/best/guide" style suffixes are banned by the owner.
+TITLE_POWER_WORDS = ("official", "latest", "new", "direct", "last", "deadline",
+                     "final", "release", "important", "today", "now", "free",
+                     "best", "top", "easy", "complete", "ultimate", "proven",
+                     "simple", "guide")
+TRANSITION_MARKS = ("\u0c15\u0c3e\u0c28\u0c40", "\u0c05\u0c28\u0c4d\u0c26\u0c41\u0c35\u0c32\u0c4d\u0c32",
+                    "\u0c2e\u0c30\u0c4b\u0c35\u0c48\u0c2a\u0c41", "\u0c05\u0c28\u0c4d\u0c24\u0c47\u0c15\u0c3e\u0c15\u0c41\u0c02\u0c21",
+                    "\u0c1a\u0c3f\u0c35\u0c30\u0c17\u0c3e", "\u0c09\u0c26\u0c3e\u0c39\u0c30\u0c23\u0c15\u0c41",
+                    "\u0c05\u0c32\u0c3e\u0c17\u0c47", "\u0c15\u0c3e\u0c2c\u0c1f\u0c4d\u0c1f\u0c3f", "\u0c05\u0c2f\u0c3f\u0c24\u0c47")
+
+# v136: the site writes Tinglish too, so a romanized connective is a real
+# transition word for a Telugu reader even though it is not in Telugu script.
+TRANSITION_MARKS_ROMAN = ("alage", "andhuvalla", "anduvalla", "kabatti", "kaani",
+                          "malli", "marovaipu", "chivaraga", "ika", "appudu",
+                          "however", "therefore", "also", "finally", "moreover")
+
+
+def has_transition(sentence: str) -> bool:
+    """True if a sentence carries a Telugu or romanized-Telugu connective."""
+    low = (sentence or "").lower()
+    return (any(t in sentence for t in TRANSITION_MARKS)
+            or any(re.search(r"\b" + t + r"\b", low) for t in TRANSITION_MARKS_ROMAN))
+
+
+
+def rankmath_strict(article: Dict, final_html: str = "") -> Dict:
+    """Rank Math content-analysis checks — honest score + actionable fixes."""
+    html = final_html or article.get("content_html", "") or ""
+    title = (article.get("title") or "").strip()
+    kw = (article.get("focus_keyword") or "").strip()
+    kw_l = kw.lower()
+    meta = (article.get("meta_description") or "").strip()
+    slug = (article.get("slug") or "").lower()
+    plain = strip_tags(html)
+    words = len(_normalize_words(plain))
+    paras = re.findall(r"<p[^>]*>(.*?)</p>", html, flags=re.S)
+    results = []
+
+    def check(name, ok, pts, fix=""):
+        results.append({"item": name, "ok": bool(ok), "points": pts, "fix": fix})
+        return bool(ok)
+
+    check("focus-keyword", bool(kw), 4,
+          "focus_keyword set cheyandi (exact search phrase)")
+    if kw:
+        # Rank Math evaluates the SEO title field. The visible H1 remains a
+        # natural article title; seo_title may carry a concise power word.
+        seo_title = (article.get("seo_title") or title).strip()
+        tl = seo_title.lower()
+        check("kw-in-title", kw_l in tl, 10, "title lo focus keyword undali")
+        _pos = tl.find(kw_l)
+        check("kw-title-start", _pos != -1
+              and _pos <= max(0, len(tl) // 2 - len(kw_l)), 5,
+              "focus keyword TITLE MODALO (first half) vundali")
+        check("title-length", 40 <= len(seo_title) <= 62, 5,
+              f"title {len(seo_title)} chars — 40-60 chars madhya pettandi")
+        check("title-number", bool(re.search(r"\d", seo_title)), 5,
+              "title lo number (year / vacancy count) undali")
+        check("title-power-word",
+              any(w in tl for w in TITLE_POWER_WORDS), 4,
+              "title lo natural power word (Official / Latest / Last Date / Direct Link)")
+        md = meta.lower()
+        check("kw-in-meta", kw_l in md, 8, "meta description lo focus keyword undali")
+        check("meta-length", 110 <= len(meta) <= 160, 4,
+              f"meta description {len(meta)} chars — 110-156 ki madhya")
+        kw_tokens = [t for t in re.sub(r"[^\w]+", " ", kw_l).split() if len(t) > 2]
+        hits = sum(1 for t in kw_tokens if t in slug) if kw_tokens else 1
+        check("kw-in-url", bool(slug) and hits >= min(2, len(kw_tokens) or 1), 5,
+              "URL/slug lo focus keyword tokens undali")
+        first = strip_tags(paras[0]).lower() if paras else ""
+        check("kw-first-para", kw_l in first, 8,
+              "first paragraph lo focus keyword rawali")
+        dens = plain.lower().count(kw_l) / max(1, words)
+        check("kw-density", 0.004 <= dens <= 0.03, 8,
+              f"keyword density {dens:.2%} — exact phrase ga 8-14 sarlu repeat cheyandi")
+        h2s = re.findall(r"<h2[^>]*>(.*?)</h2>", html, flags=re.S)
+        check("kw-in-h2",
+              sum(1 for h in h2s if kw_l in strip_tags(h).lower()) >= 2, 5,
+              "2+ H2 headings lo focus keyword undali")
+    # v95: Rank Math parity adds — slug length + image-alt (image unte mattrame;
+    # image ledu ante ee check add avvadu → gate fair ga untundi).
+    check("slug-length", len(slug) <= 75, 3,
+          f"URL/slug {len(slug)} chars — 75 lopala short cheyandi (rm100 fix_slug)")
+    _imgs = re.findall(r"<img\b[^>]*>", html, flags=re.I)
+    if _imgs:
+        _alts = " ".join(re.findall(r'alt="([^"]*)"', " ".join(_imgs))).lower()
+        check("kw-in-img-alt", bool(kw) and kw_l in _alts, 4,
+              "image alt lo focus keyword pettandi (seo.attach_inline_image)")
+    from . import config as _cfg
+    min_words = int(getattr(_cfg, "RM_MIN_WORDS", 600))
+    check("content-length", words >= min_words, 8,
+          f"content {words} words — {min_words}+ useful words rayandi; filler vaddu")
+    # v83: engine-generated boxes (takeaways/TOC) <li> ni skip — check
+    # content STEPS kosam (takeaway summary = step kaadu; self-fail fix).
+    li_html = re.sub(r'<div class="su-takeaways".*?</ul>\s*</div>', "",
+                     html, flags=re.S)
+    li_html = re.sub(r'<div class="su-toc".*?</ol>\s*</div>', "",
+                     li_html, flags=re.S)
+    lis = [strip_tags(x).split()
+           for x in re.findall(r"<li[^>]*>(.*?)</li>", li_html, flags=re.S)]
+    bad_li = sum(1 for w in lis if len(w) > 12)
+    check("list-items-short", bad_li == 0, 6,
+          f"{bad_li} list items 12+ wordsunnayi — prathi step 10 words ki menta short cheyandi")
+    pws = [len(strip_tags(p).split()) for p in paras] if paras else []
+    big = sum(1 for n in pws if n > 120)
+    check("paragraph-length", big <= max(0, len(pws) // 10), 6,
+          f"{big} paragraphs peddayi — 2-3 sentences ki seema")
+    seg = re.split(r"<h[23][^>]*>", html)
+    long_seg = sum(1 for ss in seg[1:] if len(strip_tags(ss).split()) > 300)
+    check("subheadings-distribution", long_seg == 0, 5,
+          f"{long_seg} sections 300+ words — kotha H2/H3 divisions add cheyandi")
+    sents = [x for x in re.split(r"[.!?\u0964]\s", plain) if len(x.split()) >= 4]
+    trans = sum(1 for x in sents if has_transition(x))
+    t_ratio = trans / max(1, len(sents))
+    check("transition-words", True, 0,  # v322: advisory only — forcing connectives created filler lines
+          f"connectives {int(t_ratio * 100)}% matrame — కానీ/అందువల్ల/మరోవైపు/అలాగే/చివరగా peruganga vaadi")
+    check("tables", html.count("<table") >= 1, 3, "okka comparison tableaina add cheyandi")
+    check("faq-answers", html.count("<h3") >= 3 or len(article.get("faq") or []) >= 3, 3,
+          "FAQ section lo 3+ questions")
+    links = re.findall(r'href="(http[^"]+)"', html)
+    ext = [l for l in links if config_site_host() not in l] if links else []
+    check("external-links", len(ext) >= 1, 3, "oka real official website link add cheyandi")
+    check("internal-links", len(links) - len(ext) >= 1, 3,
+          "mana site lōki okka internal linkaina kavali")
+
+    earned = sum(r["points"] for r in results if r["ok"])
+    possible = sum(r["points"] for r in results) or 1
+    fails = [r for r in results if not r["ok"]]
+    return {
+        "score": min(100, round(100 * earned / possible)),
+        "issues": [r["item"] for r in fails],
+        "fixes": [r["fix"] for r in fails if r["fix"]],
+        "checks": results,          # v64: per-test breakdown (proof + refine)
+        "words": words,
+    }
+
+
+def config_site_host() -> str:
+    try:
+        from urllib.parse import urlparse as _up
+        from . import config as _cfg
+        return _up(_cfg.WP_SITE).netloc
+    except Exception:
+        return ""
+
+# ---------------------------------------------------------------- v19
+# Near-duplicate detection (Google "scaled content abuse" policy): swapped-
+# name / only-date-changed pages — mana own published posts tho compare.
+# Method: unique 3-word shingles of first slice → containment overlap
+# |A∩B| / min(|A|,|B|) — robust even when lengths differ.
+def fingerprint_tokens(text: str, limit: int = 400) -> list:
+    words = [w for w in re.findall(r"[a-z0-9\u0c00-\u0c7f]+",
+                                   (text or "").lower())
+             if len(w) >= 2]
+    grams, seen = [], set()
+    for i in range(max(0, len(words) - 2)):
+        g = " ".join(words[i:i + 3])
+        if g not in seen:
+            seen.add(g)
+            grams.append(g)
+    if len(grams) > limit:  # deterministic downsample
+        step = len(grams) / limit
+        grams = [grams[int(i * step)] for i in range(limit)]
+    return grams
+
+
+def rewrite_distance(content_html: str, source_texts: list) -> dict:
+    """v77: article vs DONOR sources shingle overlap — copied sentences catch.
+
+    near_duplicate mana OWN posts tho compare chestundi; idi SOURCE tho —
+    rewrite nijamga fresh aa leda copy-paste aa ani REAL % istundi.
+    LOW overlap = truly rewritten. Returns {overlap, fresh, verdict}.
+
+    NOTE: full shingle sets (no 400-cap downsample) — capped sampling
+    donor matches ni champi copy-paste ni "rewrite" ga chupistundi.
+    """
+    _FULL = 1000000  # per-post scoring ki sets cheap; accuracy first
+    mine = set(fingerprint_tokens(strip_tags(content_html or ""), limit=_FULL))
+    if len(mine) < 60:
+        return {"overlap": 0.0, "fresh": 1.0, "verdict": "short"}
+    best = 0.0
+    for text in source_texts or []:
+        theirs = set(fingerprint_tokens(text or "", limit=_FULL))
+        if len(theirs) < 60:
+            continue
+        ov = len(mine & theirs) / min(len(mine), len(theirs))
+        best = max(best, ov)
+    fresh = 1.0 - best
+    verdict = ("fresh" if fresh >= 0.70 else
+               "rewrite" if fresh >= 0.40 else "copy-risk")
+    return {"overlap": round(best, 3), "fresh": round(fresh, 3),
+            "verdict": verdict}
+
+
+def near_duplicate(title: str, content_html: str,
+                   stored: list, threshold: float = 0.62):
+    """stored: [{"slug":..., "t":[shingles]}]. Returns (overlap, matched_slug)."""
+    mine = set(fingerprint_tokens(
+        (title or "") + ". " + strip_tags(content_html)))
+    if len(mine) < 60:
+        return 0.0, ""  # too short to judge — false-positive kaadu
+    best, slug = 0.0, ""
+    for row in stored or []:
+        theirs = set(row.get("t") or [])
+        if len(theirs) < 60:
+            continue
+        ov = len(mine & theirs) / min(len(mine), len(theirs))
+        if ov > best:
+            best, slug = ov, row.get("slug", "")
+    return best, slug
+
+
+# ---------------------------------------------------------------- v21
+# Fact guard: article lo verify-avga data (dates, vacancy counts) leak
+# rayakudadu — Google News + AdSense trust ki idi #1 requirement.
+_MONTH_NAMES = ["january", "february", "march", "april", "may", "june",
+               "july", "august", "september", "october", "november",
+               "december"]
+_MONTHS = {}
+for _i, _mn in enumerate(_MONTH_NAMES, 1):
+    _MONTHS[_mn] = _i
+    _MONTHS[_mn[:3]] = _i  # "15-Nov-2026" type abbreviations kuda
+
+
+def _date_tuples(text: str) -> set:
+    """All (y, m, d) date shapes in text — numeric + English month formats."""
+    out = set()
+    t = (text or "").lower()
+    for m in re.finditer(r"(\d{4})-(\d{1,2})-(\d{1,2})", t):
+        y, mo, d = map(int, m.groups())
+        out.add((y, mo, d))
+    for m in re.finditer(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})", t):
+        d, mo, y = map(int, m.groups())
+        if y < 100:
+            y += 2000
+        out.add((y, mo, d))
+    for m in re.finditer(
+            r"(\d{1,2})\s*(?:st|nd|rd|th)?[\s./-]*([a-z]+)[\s./-]*(\d{4})",
+            t):
+        d, mon, y = m.groups()
+        if mon in _MONTHS:
+            out.add((int(y), _MONTHS[mon], int(d)))
+    for m in re.finditer(
+            r"([a-z]+)\s+(\d{1,2}),?\s*(\d{4})", t):
+        mon, d, y = m.groups()
+        if mon in _MONTHS:
+            out.add((int(y), _MONTHS[mon], int(d)))
+    return {x for x in out if 2020 <= x[0] <= 2035 and 1 <= x[1] <= 12
+            and 1 <= x[2] <= 31}
+
+
+def fact_guard(article_html: str, source_texts: list) -> list:
+    """Returns human-fix strings for dates/counts NOT present in sources."""
+    if not source_texts:
+        return []  # schedule-generated (no reference) — guard N/A
+    src_dates = set()
+    for st in source_texts:
+        src_dates |= _date_tuples(st or "")
+    art_text = strip_tags(article_html or "")
+    bad = []
+    for (y, mo, d) in sorted(_date_tuples(art_text) - src_dates):
+        bad.append(f"{d:02d}-{mo:02d}-{y} (date source lo ledu)")
+    # vacancy counts: "1234 posts/vacancies/positions/upadhis" 
+    src_nums = set(re.findall(r"\d[\d,]{1,7}", " ".join(source_texts)))
+    src_nums_nocomma = {n.replace(",", "") for n in src_nums}
+    for m in re.finditer(
+            r"([\d,]{2,8})\s*(?:posts|vacanc|position|upadhi|అవకాశ)",
+            art_text, flags=re.I):
+        n = m.group(1).replace(",", "")
+        if n not in src_nums_nocomma and not any(n in x for x in src_nums):
+            bad.append(f"{m.group(1)} count source lo verify kaledu")
+    return bad[:8]

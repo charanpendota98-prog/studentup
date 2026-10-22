@@ -1,3 +1,12 @@
+
+## Bot source repo లో ఉంది (`bot/`) — zip అవసరం లేదు
+
+Server లో ఒకసారి:
+```
+cd ~/su-repo && git fetch origin && git checkout -q origin/arena/b17fbd8d-studentup -- bot DEPLOY_BOT_NOW.md
+cd ~/studentup-bot && cp -r ~/su-repo/bot/. . && .venv/bin/pip install -r requirements.txt -q && .venv/bin/python run.py --doctor && sudo systemctl restart studentup-approval.service
+```
+(`.env`, `state.db` touch అవవు — repo లో లేవు.) ప్రతి కొత్త version కి ఇదే 2 lines.
 # బాట్ deploy — step by step (v220)
 
 మీకు రెండు దారులు ఉన్నాయి. **ఒకటే ఎంచుకోండి.**
