@@ -10,13 +10,13 @@ Rendu surfaces ki okate hook logic:
 1. **WhatsApp forwarded list** (Telugu) — item `*SSC CHSL 2026 ఉద్యోగాలు*` (hook = main
    ento, boilerplate teesi) → kinda `— 2,000+ పోస్టులు · 💰 pay · ⏰ 2 రోజులు` → kinda
    **mana blog link** (external source URL eppudu ledu).
-2. **Blog draft lead** (English — site public surfaces English-only gate) — article
-   modati paragraph hook ga: "SSC CHSL 2026 recruitment — eligibility, important dates,
-   vacancy details and the official apply link in one place." Fabricate cheyyadu:
+2. **Blog draft lead** (Telugu — v323 site language policy; English only for standard
+   terms) — article modati paragraph hook ga: "SSC CHSL 2026 ఉద్యోగాలు — అర్హత, ముఖ్య
+   తేదీలు, ఖాళీలు, అధికారిక దరఖాస్తు లింక్ ఒకే చోట." Fabricate cheyyadu:
    title/keyword + **nijamaina** count/deadline unte mattrame avi kalustaayi.
 
 Doctrine: no fabricated numbers/dates · idempotent (okate post ki rendu sari lead ledu) ·
-Telugu mattrame list ki (public site English).
+Telugu everywhere (list + post); English chips only for software/private EN rows.
 """
 from __future__ import annotations
 

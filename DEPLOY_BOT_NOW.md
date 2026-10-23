@@ -1,3 +1,8 @@
+## theme 1.9.173 + bot v399 — FIX ALL round 3 (2026-10-23)
+
+- **Theme 1.9.173**: preparation/guide posts (bot `--calendar` evergreen guides) are excluded from the Latest Jobs board + ticker (`studentup_is_guide_post`, title-only test); saffron `screenshot.png`. Upload `studentup-theme-1.9.173.zip` → Activate → LiteSpeed Purge All → hard refresh.
+- **Bot v399**: `SKIP-FOREIGN-TITLE` hard skip for Hindi/Tamil/Kannada/Malayalam/Bengali/Urdu-script titles; `other-state` REVIEW flag (Kerala PSC/TNPSC/UPPSC… without an AP/TS/central anchor); Gemini network timeouts now `RETRYABLE:network` (rotate key/model instead of aborting the run) + 15 s connect timeout; hooks.py docstring updated. Tests 141 pass.
+
 
 ## theme 1.9.172 — (+) render-time cleaners for ALL old posts (re-save అవసరం లేదు): facts table "Quick Overview:" prefix, "Official Source: freejobalert/sakshi…" row (gov hosts మాత్రమే ఉంటాయి), FAQ "Q1./Q:" prefixes, ఖాళీ &nbsp; paragraphs, "ఇది చక్కని అవకాశం" / "… వివరాలు Notification‌లో ఉంటాయి" filler; manual excerpts లో publisher names / "ఇది X గురించి" opener clean (cards + meta); quiz-status share image + reader share image saffron gradient. SAFFRON ORANGE brand (owner pick) + **Customizer colour picker**: theme మొత్తం ఇప్పుడు CSS variables (--navy/--blue/--link/--dark/--pale…) మీద నడుస్తుంది; default Saffron (#e87722 accent, #c2410c AA-safe ink for text/buttons, warm dark #3b1d0e). Appearance → Customize → "StudentUp Brand colour" లో presets (Saffron / Teal / Purple / Navy / Pink / Red) లేదా custom hex — derived palette auto (white-text contrast ≥4.5:1 guaranteed), PWA theme-color కూడా. Rebuild అవసరం లేదు. Upload `studentup-theme-1.9.172.zip` → Activate → LiteSpeed Purge All → hard refresh.
 

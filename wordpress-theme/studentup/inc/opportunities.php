@@ -150,11 +150,38 @@ function studentup_opportunity_title_key( $title ) {
 	return strlen( $text ) >= 10 ? substr( $text, 0, 60 ) : '';
 }
 
+/**
+ * v1.9.173: evergreen guide / preparation-plan posts (bot `--calendar`) are
+ * useful articles but NOT openings — they must not sit in the Latest Jobs
+ * board or job tickers next to real notifications (reader clicks expecting
+ * a vacancy and finds a study plan → trust loss). Title-only test, no guess.
+ */
+function studentup_is_guide_post( $post_id ) {
+	$title = mb_strtolower( wp_strip_all_tags( (string) get_the_title( $post_id ) ) );
+	if ( '' === $title ) {
+		return false;
+	}
+	$markers = array(
+		'ప్రిపరేషన్', 'గైడ్', 'ఎలా చేయాలి', 'కెరీర్ ఆప్షన్స్', 'స్టడీ ప్లాన్', 'సిలబస్, పుస్తకాలు',
+		'preparation plan', 'preparation guide', 'preparation strategy', 'study plan',
+		'complete guide', 'how to apply', 'career options', 'step by step', 'స్టెప్ బై స్టెప్',
+	);
+	foreach ( $markers as $m ) {
+		if ( false !== mb_strpos( $title, mb_strtolower( $m ) ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function studentup_opportunity_category_slugs( $post_id ) {
 	return array_map( 'sanitize_key', wp_list_pluck( (array) get_the_category( $post_id ), 'slug' ) );
 }
 
 function studentup_opportunity_section_for_post( $post_id ) {
+	if ( studentup_is_guide_post( $post_id ) ) {
+		return ''; // v1.9.173: guides are articles, not openings.
+	}
 	$cats  = studentup_opportunity_category_slugs( $post_id );
 	$title = mb_strtolower( wp_strip_all_tags( get_the_title( $post_id ) . ' ' . get_post_field( 'post_content', $post_id ) ) );
 	$blob  = $title . ' ' . implode( ' ', $cats );

@@ -1390,6 +1390,8 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     try:
         from . import live_fix as _lf
         _dflags = _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+        if "foreign-script" in _dflags and not article.get("_mock"):
+            raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
         if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
             _post_title = f"REVIEW: {_post_title}"
             log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])

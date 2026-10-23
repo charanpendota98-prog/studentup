@@ -1098,12 +1098,18 @@ def _call_model(model: str, prompt: str, key: Optional[str] = None,
         "generationConfig": gen_config,
     }
     url = f"{config.GEMINI_API_BASE.rstrip('/')}/models/{model}:generateContent"
-    resp = requests.post(
-        url,
-        params={"key": key},
-        json=payload,
-        timeout=config.HTTP_TIMEOUT,
-    )
+    # v399: a network timeout/DNS blip was a bare requests exception — it
+    # escaped the keys x models loop and aborted the whole run. Now it is a
+    # RETRYABLE GeminiError (next key/model), with a short connect timeout.
+    try:
+        resp = requests.post(
+            url,
+            params={"key": key},
+            json=payload,
+            timeout=(15, config.HTTP_TIMEOUT),
+        )
+    except requests.RequestException as exc:
+        raise GeminiError(f"RETRYABLE:network:{type(exc).__name__}") from exc
     if resp.status_code == 429:
         raise GeminiError(f"QUOTA_KEY:{_key_tag(key)}:429")
     if resp.status_code in (400, 403) and (
@@ -1118,7 +1124,10 @@ def _call_model(model: str, prompt: str, key: Optional[str] = None,
         # model rejects this thinking field shape → retry once without it
         log.info("%s rejected thinkingConfig — retrying without it", model)
         gen_config.pop("thinkingConfig", None)
-        resp = requests.post(url, params={"key": key}, json=payload, timeout=config.HTTP_TIMEOUT)
+        try:
+            resp = requests.post(url, params={"key": key}, json=payload, timeout=(15, config.HTTP_TIMEOUT))
+        except requests.RequestException as exc:
+            raise GeminiError(f"RETRYABLE:network:{type(exc).__name__}") from exc
     if resp.status_code == 404 or (resp.status_code == 400 and "not found" in resp.text.lower()):
         m = _RETIRED_RE.search(resp.text or "")
         if m and m.group(1) != model and _hop < 2:

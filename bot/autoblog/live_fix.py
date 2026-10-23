@@ -275,7 +275,31 @@ def title_flags(title: str) -> List[str]:
         out.append("sentence-title")
     if re.search(r"(?:Best Guide|—\s*Complete|Complete Guide|Ultimate)\s*$", title or "", re.I):
         out.append("template-suffix")
+    # v399: a title in Hindi/Tamil/Kannada/Malayalam/Bengali/Urdu script is a
+    # feed mix-up — a Telugu site must never carry it (pipeline hard-skips).
+    if FOREIGN_SCRIPT_RE.search(title or ""):
+        out.append("foreign-script")
+    # v399: other-state recruitment with no AP/TS/central anchor — the reader
+    # here cannot apply; flag for a human look instead of a silent draft.
+    low_t = (title or "").lower()
+    if (OTHER_STATE_RE.search(low_t)
+            and not re.search(r"telangana|andhra|tgpsc|tspsc|appsc|hyderabad|vijayawada|"
+                              r"తెలంగాణ|ఆంధ్ర|all india|india post|ssc|upsc|rrb|railway|ibps|"
+                              r"sbi|army|navy|air force|isro|drdo|central", low_t)):
+        out.append("other-state")
     return out
+
+
+# Scripts we never publish in (Devanagari, Bengali, Gurmukhi, Gujarati, Tamil,
+# Kannada, Malayalam, Arabic/Urdu). Telugu block (0C00-0C7F) is NOT here.
+FOREIGN_SCRIPT_RE = re.compile(
+    r"[\u0900-\u097f\u0980-\u09ff\u0a00-\u0a7f\u0a80-\u0aff\u0b80-\u0bff"
+    r"\u0c80-\u0cff\u0d00-\u0d7f\u0600-\u06ff]")
+OTHER_STATE_RE = re.compile(
+    r"\b(?:kerala|kpsc|tnpsc|tamil ?nadu|mpsc|maharashtra|uppsc|upsssc|uttar pradesh|"
+    r"bpsc|bihar|wbpsc|west bengal|opsc|odisha|rpsc|rajasthan|gpsc|gujarat|hpsc|haryana|"
+    r"ppsc|punjab|jkssb|jkpsc|jharkhand|jssc|cgpsc|chhattisgarh|mppsc|madhya pradesh|"
+    r"ukpsc|uttarakhand|assam|hpssc|himachal|goa psc|karnataka)\b")
 
 
 def draft_flags(title: str, html: str) -> List[str]:
