@@ -1183,6 +1183,43 @@ def doctor() -> int:
         return f"@{data['result'].get('username', '?')} -> chat {config.TELEGRAM_CHAT_ID}"
     check("Telegram bot", _tg)
 
+    # 3b) v396: WordPress plugin health — Rank Math inactive went unnoticed on
+    # live (bot SEO meta had nowhere to land). REST /wp/v2/plugins needs an
+    # admin app-password; a drafts-only bot user gets 401/403 → public probe.
+    def _plugins():
+        from .wordpress_client import WordPressClient
+        wp = WordPressClient()
+        notes = []
+        try:
+            r = wp._request("GET", "plugins", params={"_fields": "plugin,status,name"})
+            plugins = r.json() if r.status_code == 200 and isinstance(r.json(), list) else None
+        except Exception:  # noqa: BLE001
+            plugins = None
+        if plugins is not None:
+            active = {str(p.get("plugin", "")).split("/")[0]: p.get("status") for p in plugins}
+            if active.get("seo-by-rank-math") != "active":
+                raise RuntimeError("Rank Math SEO ACTIVE kaadu — WP Admin → Plugins → Rank Math → Activate "
+                                   "(bot SEO meta/sitemap/schema anni deeni meeda) ")
+            conflicts = {"ad-inserter": "theme ads tho conflict (AdSense approval mundu ads vaddu)",
+                         "wpconsent-cookies-banner-privacy-suite": "theme consent mode tho double banner",
+                         "wp-cli-login-server": "security — avasaram ledu, delete",
+                         "wordpress-seo": "Yoast + Rank Math rendu vaddu",
+                         "autoptimize": "theme already minify/defer — double processing"}
+            for slug, why in conflicts.items():
+                if active.get(slug) == "active":
+                    notes.append(f"⚠️ {slug}: {why}")
+            return "Rank Math active" + ("; " + "; ".join(notes) if notes else "")
+        # public probe (no admin rights): Rank Math exposes its REST namespace + sitemap
+        site = config.WP_SITE.rstrip("/")
+        ns = _rq.get(f"{site}/wp-json/", timeout=20)
+        has_ns = ns.status_code == 200 and "rankmath/v1" in (ns.text or "")
+        sm = _rq.get(f"{site}/sitemap_index.xml", timeout=20, allow_redirects=True)
+        if not has_ns:
+            raise RuntimeError("Rank Math REST namespace kanipinchaledu — plugin ACTIVE kaadu? "
+                               "WP Admin → Plugins → Rank Math SEO → Activate")
+        return "Rank Math active (public probe)" + ("" if sm.status_code == 200 else " · sitemap_index.xml not 200 — Rank Math → Sitemap Settings → Save")
+    check("WP plugins", _plugins)
+
     # 4) IndexNow key format
     def _in():
         if not config.INDEXNOW_KEY:
