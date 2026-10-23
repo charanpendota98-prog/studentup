@@ -1330,6 +1330,16 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                          str(article.get("title") or ""))
     except Exception:  # noqa: BLE001
         log.debug("body fingerprint store skip", exc_info=True)
+    # v398: deterministic cleaners (foreign-script rupee/words, unrelated official
+    # PDFs, repeated figures, filler lines) — last thing before WordPress.
+    try:
+        from . import live_fix as _lf
+        final_html, _lf_rep = _lf.clean_body(
+            final_html, article.get("title", ""), getattr(wp, "last_media_url", "") or "")
+        if _lf_rep:
+            log.info("v398 clean_body: %s", _lf_rep)
+    except Exception:  # noqa: BLE001 — cleaner fail publish aapadu
+        log.exception("v398 clean_body skip (publish safe)")
     result = wp.create_post(
         title=article["title"],
         content_html=final_html,
@@ -1341,6 +1351,24 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         status="draft" if stage_for_seo else requested_status,
         meta=meta,
     )
+    # v398: WordPress may change the slug on collision ("…-2"); the canonical we
+    # pre-computed from the intended slug then points at a 404. Always re-point
+    # it at the real permalink (live: all six published posts had this).
+    if meta and result.get("id") and result.get("link") and not article.get("_mock"):
+        try:
+            from . import live_fix as _lf
+            real = _lf.canonical_for(str(result["link"]))
+            if real.rstrip("/") != str(meta.get("rank_math_canonical_url") or "").rstrip("/"):
+                log.warning("slug collision: wanted /%s/ got %s — canonical re-pointed",
+                            article.get("slug", ""), real)
+                meta["rank_math_canonical_url"] = real
+                wp.update_post(int(result["id"]), final_html, meta={"rank_math_canonical_url": real})
+                try:
+                    wp.write_seo_meta(int(result["id"]), {"rank_math_canonical_url": real})
+                except Exception:  # noqa: BLE001
+                    log.debug("canonical bridge write skip", exc_info=True)
+        except Exception:  # noqa: BLE001
+            log.exception("v398 canonical re-point skip (publish safe)")
     if result.get("id") and not article.get("_mock"):
         try:  # v362 draft watchdog clock
             from . import ops

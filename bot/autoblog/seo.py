@@ -1105,7 +1105,9 @@ def attach_inline_image(html: str, image_url: str, alt: str,
     )
     h2s = [m.end() for m in re.finditer(r"</h2>", html, flags=re.I)]
     if len(h2s) >= 2:
-        pos = h2s[1]
+        # v398: mid-article (not directly under the featured image, which is
+        # the same picture) — keyword alt still counts for Rank Math.
+        pos = h2s[min(len(h2s) - 1, max(1, len(h2s) // 2))]
         return html[:pos] + "\n" + fig + html[pos:]
     para = re.search(r"</p>", html, flags=re.I)
     if para:
@@ -1130,6 +1132,10 @@ def attach_second_image(html: str, image_url: str, alt: str,
     if not image_url:
         return html
     if len(re.findall(r"<img\b", html, flags=re.I)) >= 2:
+        return html
+    # v398: never repeat an image that is already in the body (live posts showed
+    # the same featured image three times — featured + inline + "second").
+    if image_url.split("?")[0].rsplit("/", 1)[-1].lower() in html.lower():
         return html
     h2s = [m.start() for m in re.finditer(r"<h2\b", html, flags=re.I)]
     if len(h2s) < 3:

@@ -2660,6 +2660,10 @@ def main() -> int:
                              "WP connection · 20 categories · site settings/menus/SEO · "
                              "IndexNow · AdSense readiness · production audit "
                              "(default preview; nijam ga apply cheyyadaniki --apply)")
+    parser.add_argument("--fix-live", type=int, metavar="N",
+                        help="v398: last N published posts — canonical→404 + body cleanup "
+                             "(foreign script, unrelated PDFs, repeated images, filler); "
+                             "preview; add --apply to write")
     parser.add_argument("--apply", action="store_true",
                         help="v222: --go-live ni nijamga apply cheyandi (lekapothe preview)")
     parser.add_argument("--launch-check", action="store_true",
@@ -3003,6 +3007,10 @@ def main() -> int:
         from . import live_validation
 
         return live_validation.run_cli(args.live_validation)
+    if getattr(args, "fix_live", None):
+        from . import live_fix
+
+        return live_fix.run_cli(args.fix_live, apply=bool(args.apply))
     if args.live_seo_recent:
         from . import live_seo
 
