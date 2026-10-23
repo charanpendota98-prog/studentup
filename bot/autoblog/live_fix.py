@@ -225,6 +225,16 @@ def clean_body(html: str, title: str = "", featured_url: str = "") -> Tuple[str,
     html, rep["filler"] = strip_filler(html)
     html, rep["takeaways_dup"] = drop_duplicate_takeaways(html)
     html, rep["title_caption"] = drop_title_captions(html, title)
+    # v398: sentence-level filler / duplicate sentences / publisher attribution
+    # (same deterministic passes new drafts get) — old live posts too.
+    try:
+        from . import content_quality as _cq, source_leak as _sl
+        before = html
+        html = _sl.clean_html(html)
+        html, _rep = _cq.tidy(html)
+        rep["tidy"] = int(before != html)
+    except Exception:  # noqa: BLE001 — live repair must never crash on a cleaner
+        pass
     return html, {k: v for k, v in rep.items() if v}
 
 

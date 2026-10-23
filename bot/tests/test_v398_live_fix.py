@@ -106,7 +106,7 @@ def test_duplicate_takeaways_and_title_caption_and_faq_heading():
             '<h2>Vacancy</h2><figure class="su-figure"><img src="a.webp" alt="k" />'
             '<figcaption>APPSC Group 2 Notification 2026 686 పోస్టులు</figcaption></figure>'
             '<ul><li>డిప్యూటీ తహశీల్దార్: 200</li><li>సీనియర్ అకౌంటెంట్: 90</li></ul>'
-            '<h2>Frequently Asked Questions (FAQ)</h2>')
+            '<h2>Frequently Asked Questions (FAQ)</h2><h3>ఎప్పుడు?</h3><p>నవంబర్ 30 వరకు దరఖాస్తు చేయవచ్చు.</p>')
     out, rep = live_fix.clean_body(body, "APPSC Group 2 Notification 2026 686 పోస్టులు")
     assert "su-takeaways" not in out and rep["takeaways_dup"] == 1
     assert "<figcaption>" not in out and rep["title_caption"] == 1

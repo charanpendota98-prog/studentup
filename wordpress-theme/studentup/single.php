@@ -240,6 +240,52 @@ get_header();
 					)
 				);
 			}
+			// v1.9.170: never repeat the Up-next cards or a same-notification duplicate
+			// (live: "ఇవి కూడా చూడండి" showed the same 3 posts as Up-next + the post's own twin).
+			if ( $su_picks && function_exists( 'studentup_same_topic' ) ) {
+				$su_shown = function_exists( 'studentup_upnext_shown_ids' ) ? studentup_upnext_shown_ids() : array();
+				$su_cur_t = get_the_title();
+				$su_keep  = array();
+				foreach ( array_unique( array_map( 'intval', $su_picks ) ) as $su_cand ) {
+					if ( in_array( $su_cand, $su_shown, true ) || $su_cand === (int) get_the_ID() ) {
+						continue;
+					}
+					$su_cand_t = get_the_title( $su_cand );
+					if ( studentup_same_topic( $su_cur_t, $su_cand_t ) ) {
+						continue;
+					}
+					$su_dup = false;
+					foreach ( $su_keep as $su_k ) {
+						if ( studentup_same_topic( get_the_title( $su_k ), $su_cand_t ) ) {
+							$su_dup = true;
+							break;
+						}
+					}
+					if ( ! $su_dup ) {
+						$su_keep[] = $su_cand;
+					}
+				}
+				if ( count( $su_keep ) < 2 ) {
+					$su_fill = get_posts(
+						array(
+							'fields'              => 'ids',
+							'posts_per_page'      => 6,
+							'post__not_in'        => array_merge( array( get_the_ID() ), $su_shown, $su_keep ),
+							'ignore_sticky_posts' => true,
+							'no_found_rows'       => true,
+						)
+					);
+					foreach ( $su_fill as $su_cand ) {
+						if ( count( $su_keep ) >= 4 ) {
+							break;
+						}
+						if ( ! studentup_same_topic( $su_cur_t, get_the_title( $su_cand ) ) ) {
+							$su_keep[] = (int) $su_cand;
+						}
+					}
+				}
+				$su_picks = array_slice( $su_keep, 0, 4 );
+			}
 			echo '<aside id="su-recent" class="su-recent" hidden data-l="' . esc_attr__( 'Recently viewed', 'studentup' ) . '"></aside>'; // v1.9.135: device-local, JS fills only when ≥2 items
 			if ( $su_picks ) {
 				echo '<div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2></div></div><div class="newsgrid">';
