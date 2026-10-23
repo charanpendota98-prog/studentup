@@ -67,6 +67,7 @@ def sanitize_scripts(html: str) -> Tuple[str, int]:
     if k:
         out = re.sub(r"(?<=[^\s>]) {2,}", " ", out)
         out = re.sub(r"(>| )\s+([,.;:])", r"\1\2", out)
+        out = re.sub(r"(<(?:li|p|td|th|h[1-6])\b[^>]*>)\s+", r"\1", out)   # no leading gap in a cell/item
     return out, n
 
 

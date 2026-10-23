@@ -231,10 +231,23 @@ def fix_meta(article: dict) -> bool:
     if kw.lower() not in meta.lower():
         meta = _text(f"{_kw_title(kw)} గురించి పూర్తి వివరాలు: {meta}")
     if len(meta) < 110:
-        meta = _text(f"{meta} అర్హత, ముఖ్యమైన తేదీలు, దరఖాస్తు విధానం, అధికారిక లింక్ ఇక్కడ ఉన్నాయి.")
+        # v398: pad only with phrases the description does not already carry
+        # (live: "…అర్హత, తేదీలు, దరఖాస్తు విధానం. అర్హత, ముఖ్యమైన తేదీలు, దరఖాస్తు విధానం…").
+        tails = [t for t in ("అర్హత", "ముఖ్యమైన తేదీలు", "దరఖాస్తు విధానం", "అధికారిక లింక్")
+                 if t.split()[-1] not in meta]
+        if tails:
+            meta = _text(f"{meta.rstrip('. ')}. {', '.join(tails)} ఇక్కడ చూడండి.")
     if len(meta) > 156:
         cut = meta[:156]
         meta = cut.rsplit(" ", 1)[0] if " " in cut[:-1] else cut
+        # v398: never end mid-clause — back up to the last sentence end if one
+        # exists past the keyword, then close with a full stop.
+        last_stop = max(meta.rfind("."), meta.rfind("!"), meta.rfind("?"))
+        if last_stop >= 90:
+            meta = meta[: last_stop + 1]
+        meta = meta.rstrip(" ,;:–—-")
+        if not meta.endswith((".", "!", "?")):
+            meta += "."
         if kw.lower() not in meta.lower():  # trim lo keyword poyindi ante mundu pettali
             meta = _text(f"{_kw_title(kw)}: {meta}")[:156]
     article["meta_description"] = meta
@@ -333,6 +346,10 @@ def fix_toc(article: dict, html: str) -> str:
     """
     if TOC_MARK in html:
         return html
+    # v398: normalise the FAQ heading to Telugu BEFORE ids/TOC are computed
+    # (live TOC showed "Frequently Asked Questions (FAQ)" as a row).
+    html = re.sub(r"(<h2\b[^>]*>)\s*Frequently Asked Questions(?:\s*\(FAQ\))?\s*(</h2>)",
+                  r"\1తరచుగా అడిగే ప్రశ్నలు (FAQ)\2", html, flags=re.I)
     heads = list(re.finditer(r"<h([23])([^>]*)>(.*?)</h\1>", html, flags=re.S))
     if len(heads) < 3:
         return html
@@ -351,6 +368,8 @@ def fix_toc(article: dict, html: str) -> str:
         txt = _text(validator.strip_tags(inner))
         # v322: TOC = H2 sections only; FAQ-style question H3s ("What is …?")
         # made the list 12 rows long and repetitive.
+        if re.match(r"^(?:తరచుగా అడిగే|frequently asked|faqs?\b)", txt, flags=re.I):
+            continue            # v398: FAQ heading is not a TOC row (short TOC rule)
         if txt and (m.group(1) == "2" or not txt.rstrip().endswith("?")):
             rows.append((m.group(1), aid, txt))
 

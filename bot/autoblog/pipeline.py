@@ -806,9 +806,29 @@ def _rankmath_missing_cause(wp) -> str:
     return "Fix: Rank Math active aa + StudentUp theme active aa chudandi; `run.py --doctor` run cheyandi."
 
 
+def _backfill_deadline(article: Dict) -> None:
+    """v398: Gemini left recruitment.apply_end empty while the body states the
+    last date → fill it from prose (future, keyword-adjacent only) so the facts
+    card, countdown, calendar and studentup_last_date all agree."""
+    rec = article.get("recruitment") if isinstance(article.get("recruitment"), dict) else None
+    if rec is None:
+        rec = {}
+        article["recruitment"] = rec
+    if str(rec.get("apply_end") or "").strip():
+        return
+    try:
+        iso = qual.last_date_from_text(article.get("content_html") or "")
+    except Exception:  # noqa: BLE001
+        iso = ""
+    if iso:
+        rec["apply_end"] = iso
+        log.info("v398 deadline from body → apply_end %s", iso)
+
+
 def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     """Full publish flow for a generated article dict. Returns WP result."""
     wp = WordPressClient()
+    _backfill_deadline(article)
     wp.check_connection()
 
     is_quiz = article.get("article_type") == "quiz"
