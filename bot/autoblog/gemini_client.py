@@ -859,6 +859,18 @@ VALUE-ADD — source notice ni mirror cheyyakundu (Google scaled-content rule):
 - Salary/vacancy facts unte table; last date unte aa date ne cheppandi — fake urgency lines vaddu (theme countdown automatic ga chupistundi).
 - Prathi post ki value-add okkamaina undali: plain-language eligibility explain, important dates summary, related previous-exam links section — kevalam notice rephrase kaadu.
 - Secondary keywords natural ga body lo (stuffing kaadu) — ee phrases Google lo related searches ga vastayi.
+
+HARD BANS — each one was found on a LIVE studentup.in post and is a reject (v398):
+1. SCRIPT PURITY: Telugu script + Latin only. Kannada ("ರೂ."), Hindi/Devanagari ("निर्दिष्ट", "रु"), Tamil, Malayalam characters — ZERO. Currency ALWAYS "₹" (e.g. "₹35,000"), never "ರೂ."/"Rs."/"रु".
+2. NO INTRO/OUTRO BOILERPLATE: never write "Quick Overview: ఈ పోస్ట్‌లో … పూర్తిగా ఇచ్చాము", "చివరి అప్‌డేట్: …", "ఈ ఆర్టికల్ మీకు … ఆశిస్తున్నాము", "కామెంట్స్ విభాగంలో అడగండి", "స్నేహితులకు షేర్ చేయండి". Start with the news fact; end with the last useful section (FAQ). The theme adds date, share and TOC itself.
+3. HEADINGS IN TELUGU: FAQ heading = "తరచుగా అడిగే ప్రశ్నలు" (never "Frequently Asked Questions"). No heading in pure English.
+4. DEADLINE FIELD IS MANDATORY WHEN KNOWN: if the evidence has a last date ("నవంబర్ 30 వరకు", "Last date 30-11-2026"), recruitment.apply_end MUST be that ISO date — never leave it empty when the body states it. A range start ("నవంబర్ 10 నుండి") is NOT the deadline.
+5. TITLE = headline, not a sentence: never "X is conducting a walk-in drive in Hyderabad for the role 2026 today". Pattern: "<Org> <Exam/Post> <Year> Notification: <number> పోస్టులు". Focus keyword exactly once in the title (never "Upsc 2026 … UPSC 2026"). Year in title = the notification's year; never an older year as if new.
+6. external_links = official government/organisation pages ONLY (.gov.in / .nic.in / .ac.in / the org's own site). Never a news site, YouTube, Telegram, or a category page like "/education-and-career". Max 4, each with a plain label ("Official Notification PDF", "Apply Online") — no file sizes, no "View".
+7. NO DUPLICATION INSIDE THE POST: the same list/table must appear once (no "ముఖ్యాంశాలు" copy of the vacancy list; no FAQ answer repeating a body paragraph verbatim). No image/figure tags in content_html — the theme places images.
+8. ONE NOTIFICATION = ONE POST: if the topic is the same notification as a recent title supplied to you, return the SAME focus keyword and a title that makes the overlap obvious (the bot will skip it) — never re-angle the same notice as a "new" post.
+
+SELF-CHECK before returning JSON (fix silently, do not mention): no non-Telugu Indic characters · no banned boilerplate · FAQ heading Telugu · apply_end filled if a last date exists in the body · title ≤ 62 chars, keyword once, number present · external_links all official hosts · no <img>/<figure> · each fact traceable to evidence.
 """
 
 # v85: JSON SCHEMA CONTRACT — prompts "return valid JSON" annayi kaani KEY

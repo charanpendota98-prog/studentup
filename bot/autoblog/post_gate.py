@@ -383,8 +383,10 @@ def run(article: dict, html: str = "", media_id: Optional[int] = None,
     entities, questions, sentences = _semantic_metrics(article, html)
     add("entity_coverage", "SEMANTIC", "Primary entity + related entities (2+)",
         entities >= 3, f"{entities} entities", "rm100 entities block + body lo related terms", 2)
-    add("takeaways", "SEMANTIC", "ముఖ్యాంశాలు (key takeaways) box",
-        "su-takeaways" in html, "", "rm100 takeaways fix", 2)
+    # v398: takeaways box retired (duplicate chrome) — snippet summary is the quick answer / facts card
+    add("takeaways", "SEMANTIC", "Snippet summary (quick answer / facts card / takeaways)",
+        any(k in html for k in ("su-takeaways", "su-quick-answer-card", "su-facts-card", "su-qa")), "",
+        "quick_answer field / facts card", 2)
     add("question_headings", "SEMANTIC", "Question-form headings 2+",
         questions >= 2, f"{questions} questions",
         "PAA-style ప్రశ్నలు H2/H3 ga (seo.related_questions_block)", 2)

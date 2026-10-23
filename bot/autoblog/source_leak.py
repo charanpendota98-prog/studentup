@@ -58,6 +58,20 @@ _ATTRIB_TE = re.compile(
     r"నమస్తే తెలంగాణ|ప్రజాశక్తి|నవతెలంగాణ|విద్యాత|వార్త|వెలుగు|ఆంధ్రప్రభ|సూర్య|మన తెలంగాణ|జాగరణ్|లోక్‌మత్|"
     r"మీడియా కథనాల|వార్తా కథనాల|జాతీయ మీడియా|స్థానిక మీడియా)"
     r"[^<.]{0,30}?(?:(?:కథనం|నివేదిక|కథనాల)\s*)?(?:ప్రకారం|వెల్లడించింది|తెలిపింది|పేర్కొంది|కథనం|నివేదిక)", re.I)
+# v398: English-spelled publisher/aggregator names (live: "Sakshi Education ప్రకారం",
+# "According to Eenadu Pratibha"). Removed together with the attribution verb.
+_PUB_EN = (r"(?:Sakshi(?:\s+Education)?|Eenadu(?:\s+Pratibha)?|Pratibha|ETV\s*Bharat|News\s*18|TV9|TV5|NTV|ABN|"
+           r"Andhra\s*Jyoth[iy]|Namasthe\s+Telangana|V6(?:\s+Velugu)?|10TV|Zee\s*News|Samayam|Oneindia|"
+           r"Hindustan\s+Times|Times\s+of\s+India|TOI|Indian\s+Express|The\s+Hindu|NDTV|India\s+Today|"
+           r"Deccan\s+Chronicle|Telangana\s+Today|Hans\s+India|Careers\s*360|Jagran\s*Josh|FreshersLive|"
+           r"Sarkari\s*Result|FreeJobAlert|Adda\s*247|Testbook|Oliveboard|Gradeup|BYJU'?S|Shiksha|"
+           r"Employment\s+News|Rojgar\s+Samachar)")
+_ATTRIB_EN = [
+    re.compile(r"\b(?:according to|as per|as reported by|reports? from)\s+(?:the\s+)?" + _PUB_EN + r"\s*,?\s*", re.I),
+    re.compile(_PUB_EN + r"\s+(?:reports?|reported|says|said|stated|confirms?|కథనం|నివేదిక|కథనాల|వార్తల)?\s*(?:ప్రకారం|వెల్లడించింది|తెలిపింది|పేర్కొంది|రిపోర్ట్ చేసింది)\s*,?\s*", re.I),
+    re.compile(r"\b" + _PUB_EN + r"\s+(?:reports?|reported|says|said|stated|confirms?)\s+(?:that\s+)?", re.I),
+]
+
 _PROMO_MARKERS = (
     "SPONSORED · PARTNER", "SPONSORED · COLLEGE PARTNER", "direct link to our partner",
     "not a paid advertisement", "STUDENTUP · మా సేవ", "More updates:",
@@ -165,7 +179,9 @@ def clean_html(html: str) -> str:
     # inline provenance / attribution text
     out = re.sub(r"\s*\(\s*(?:source|మూలం)\s*:[^)]*\)", "", out, flags=re.I)
     out = re.sub(r"(?:^|(?<=[>.!?\u0964]))\s*(?:sources?|మూలం)\s*:[^<.!?\u0964]*[.!?\u0964]?", " ", out, flags=re.I | re.M)
-    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?,?\s*", "", out, flags=re.I)
+    for _rx in _ATTRIB_EN:  # v398: named publishers first ("According to News18" ≠ "according to news")
+        out = _rx.sub('', out)
+    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?\b,?\s*", "", out, flags=re.I)
     out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
     # publisher links → keep anchor text, drop the link (official links stay)
     def _unlink(m: re.Match) -> str:
@@ -191,7 +207,9 @@ def clean_text_attribution(html: str) -> str:
     no structural chrome removal (the pipeline never emits that any more)."""
     out = html or ""
     out = re.sub(r"\s*\(\s*(?:source|మూలం)\s*:[^)]*\)", "", out, flags=re.I)
-    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?,?\s*", "", out, flags=re.I)
+    for _rx in _ATTRIB_EN:  # v398: named publishers first ("According to News18" ≠ "according to news")
+        out = _rx.sub("", out)
+    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?\b,?\s*", "", out, flags=re.I)
     out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
     out = re.sub(r"తాజా సమాచారం ప్రకారం\s*,?\s*తాజా సమాచారం ప్రకారం", "తాజా సమాచారం ప్రకారం", out)
     out = re.sub(r"(ప్రకారం)(\s+ప్రకారం)+", r"\1", out)

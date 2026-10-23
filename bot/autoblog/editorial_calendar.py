@@ -169,8 +169,36 @@ def _apply_revenue_boost(cands: List[Dict], boost: Dict) -> None:
 
 # ------------------------------------------------------------------- planning
 
+# v398: evergreen, genuinely useful guides for the same TS/AP student audience.
+# They rank all year (news posts spike and die) and sit in higher-RPM ad
+# verticals (education finance / coaching / insurance) — content-mix strategy.
+# Facts only: every guide must cite official portals (Vidyalakshmi, ePASS, NSP…).
+EVERGREEN_TOPICS = (
+    ("విద్యా రుణం (Education Loan) 2026: తెలంగాణ, AP విద్యార్థులకు బ్యాంకులు, వడ్డీ, Vidyalakshmi దరఖాస్తు", "Scholarships", "education-loan"),
+    ("ePASS Scholarship 2026: అర్హత, మొత్తం, దరఖాస్తు, స్టేటస్ — పూర్తి గైడ్", "Scholarships", "epass"),
+    ("NSP Scholarship 2026: కేంద్ర స్కాలర్‌షిప్‌లు — అర్హత, మొత్తం, చివరి తేదీ", "Scholarships", "nsp"),
+    ("TGPSC/TSPSC Group 1, 2, 3, 4 ప్రిపరేషన్ ప్లాన్ 2026: సిలబస్, పుస్తకాలు, టైమ్‌టేబుల్", "TS Govt Jobs", "tspsc-prep"),
+    ("APPSC Group 1, Group 2 ప్రిపరేషన్ గైడ్ 2026: సిలబస్, పుస్తకాలు, స్ట్రాటజీ", "AP Govt Jobs", "appsc-prep"),
+    ("SBI PO, IBPS PO ప్రిపరేషన్ 2026: సిలబస్, పుస్తకాలు, ఉచిత మాక్ టెస్టులు", "Central Govt Jobs", "bank-prep"),
+    ("SSC CGL, CHSL ప్రిపరేషన్ 2026: సిలబస్, పుస్తకాలు, స్ట్రాటజీ తెలుగులో", "Central Govt Jobs", "ssc-prep"),
+    ("ఇంటర్ తర్వాత కెరీర్ ఆప్షన్స్ 2026: కోర్సులు, ఎంట్రన్స్ పరీక్షలు, ప్రభుత్వ ఉద్యోగాలు", "Current Affairs", "career-inter"),
+    ("డిగ్రీ తర్వాత ప్రభుత్వ ఉద్యోగాలు 2026: TS, AP, కేంద్ర పరీక్షల పూర్తి జాబితా", "Central Govt Jobs", "career-degree"),
+    ("ప్రభుత్వ ఉద్యోగాలకు ఆన్‌లైన్ దరఖాస్తు ఎలా చేయాలి: OTR, డాక్యుమెంట్లు, ఫీజు — స్టెప్ బై స్టెప్", "Central Govt Jobs", "how-to-apply"),
+    ("ఉచిత కోచింగ్ 2026: TS, AP స్టడీ సర్కిల్స్, BC/SC/ST/మైనారిటీ ఉచిత శిక్షణ కేంద్రాలు", "TS Govt Jobs", "free-coaching"),
+    ("విద్యార్థులకు ఆరోగ్య బీమా, ప్రమాద బీమా పథకాలు 2026: ప్రభుత్వ పథకాలు, అర్హత", "Govt Schemes", "student-insurance"),
+)
+
+
+def evergreen_candidates() -> List[Dict]:
+    return [{
+        "title": t, "source": "evergreen", "score": 62.0,
+        "reason": "evergreen · year-round demand · higher-RPM vertical",
+        "type": "new", "category": cat, "cluster": cl, "intent": "guide",
+    } for t, cat, cl in EVERGREEN_TOPICS]
+
+
 def collect(titles: List[str], use_universe: bool = True) -> List[Dict]:
-    cands = (demand_candidates() + refresh_candidates() + trend_candidates())
+    cands = (demand_candidates() + refresh_candidates() + trend_candidates() + evergreen_candidates())
     if use_universe:
         cands += gap_candidates(titles)
     _apply_revenue_boost(cands, revenue_boost())

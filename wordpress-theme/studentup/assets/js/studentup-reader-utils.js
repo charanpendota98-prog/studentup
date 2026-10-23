@@ -353,8 +353,8 @@
       var h = 1920;
 
       var grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, "#0b1528");
-      grad.addColorStop(0.5, "#0f2e62");
+      grad.addColorStop(0, "#2a0716");
+      grad.addColorStop(0.5, "#9d174d");
       grad.addColorStop(1, "#162235");
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);

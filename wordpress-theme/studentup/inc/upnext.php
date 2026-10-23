@@ -36,6 +36,43 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param int $limit How many posts are needed.
  * @return WP_Post[]
  */
+/**
+ * v1.9.170: two headlines about the SAME notification (bot duplicates such as
+ * "APPSC Group 2 Notification 2026: 686 పోస్టులు" vs "APPSC Group 2 Notification
+ * 2026 686 పోస్టులు Official వివరాలు") must never sit next to each other.
+ *
+ * @param string $a Title.
+ * @param string $b Title.
+ * @return bool
+ */
+function studentup_same_topic( $a, $b ) {
+	$tok = static function ( $t ) {
+		$t = strtolower( wp_strip_all_tags( (string) $t ) );
+		$t = preg_replace( '/[^\p{L}\p{N}]+/u', ' ', $t );
+		$w = array_filter( explode( ' ', $t ), static function ( $x ) {
+			return mb_strlen( $x ) > 1 && ! in_array( $x, array( 'official', 'వివరాలు', 'పోస్టులు', 'notification', 'recruitment', 'apply', 'online', 'latest', 'new', 'posts', 'vacancies', 'vacancy', 'the', 'and', 'for' ), true );
+		} );
+		return array_values( array_unique( $w ) );
+	};
+	$x = $tok( $a );
+	$y = $tok( $b );
+	if ( count( $x ) < 2 || count( $y ) < 2 ) {
+		return false;
+	}
+	$shared = count( array_intersect( $x, $y ) );
+	return $shared / min( count( $x ), count( $y ) ) >= 0.8;
+}
+
+/**
+ * v1.9.170: ids already rendered by Up-next on this page — the "ఇవి కూడా చూడండి"
+ * grid skips them (live: both lists showed the same 3 posts).
+ *
+ * @return int[]
+ */
+function studentup_upnext_shown_ids() {
+	return isset( $GLOBALS['studentup_upnext_ids'] ) && is_array( $GLOBALS['studentup_upnext_ids'] ) ? $GLOBALS['studentup_upnext_ids'] : array();
+}
+
 function studentup_upnext_posts( $limit = 3 ) {
 	$limit = max( 1, (int) $limit );
 	if ( ! is_singular( 'post' ) ) {
@@ -44,7 +81,7 @@ function studentup_upnext_posts( $limit = 3 ) {
 	$id   = (int) get_the_ID();
 	$cats = wp_get_post_categories( $id );
 	$args = array(
-		'posts_per_page'      => $limit,
+		'posts_per_page'      => $limit + 3,
 		'post__not_in'        => array( $id ),
 		'ignore_sticky_posts' => true,
 		'no_found_rows'       => true,
@@ -72,7 +109,29 @@ function studentup_upnext_posts( $limit = 3 ) {
 			$posts = array_merge( $posts, $more );
 		}
 	}
-	return $posts;
+	// v1.9.170: drop same-notification duplicates (vs this post and vs each other).
+	$cur  = get_the_title( $id );
+	$keep = array();
+	foreach ( $posts as $p ) {
+		if ( studentup_same_topic( $cur, $p->post_title ) ) {
+			continue;
+		}
+		$dup = false;
+		foreach ( $keep as $k ) {
+			if ( studentup_same_topic( $k->post_title, $p->post_title ) ) {
+				$dup = true;
+				break;
+			}
+		}
+		if ( ! $dup ) {
+			$keep[] = $p;
+		}
+		if ( count( $keep ) >= $limit ) {
+			break;
+		}
+	}
+	$GLOBALS['studentup_upnext_ids'] = array_unique( array_merge( studentup_upnext_shown_ids(), wp_list_pluck( $keep, 'ID' ) ) ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	return $keep;
 }
 
 /**

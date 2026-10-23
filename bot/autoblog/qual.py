@@ -114,7 +114,67 @@ def last_date(article: dict) -> str:
             except ValueError:
                 continue
             return m.group(1)
-    return ""
+    # v398: structured field missing (live: every card said "Not announced"
+    # while the body clearly said "నవంబర్ 30 వరకు") → read it from the body,
+    # but ONLY next to a deadline keyword and only if it is a future date.
+    return last_date_from_text(article.get("content_html") or article.get("content") or "")
+
+
+_TE_MONTHS = {"జనవరి": 1, "ఫిబ్రవరి": 2, "మార్చి": 3, "ఏప్రిల్": 4, "మే": 5, "జూన్": 6, "జులై": 7,
+              "జూలై": 7, "ఆగస్టు": 8, "ఆగస్ట్": 8, "సెప్టెంబర్": 9, "అక్టోబర్": 10, "నవంబర్": 11,
+              "డిసెంబర్": 12}
+_EN_MONTHS = {m: i for i, m in enumerate(
+    ["january", "february", "march", "april", "may", "june", "july", "august",
+     "september", "october", "november", "december"], 1)}
+_EN_MONTHS.update({k[:3]: v for k, v in list(_EN_MONTHS.items())})
+_MONTH_RE = "|".join(sorted(list(_TE_MONTHS) + list(_EN_MONTHS) + [m.capitalize() for m in _EN_MONTHS], key=len, reverse=True))
+_DEADLINE_KW = re.compile(
+    r"(?:చివరి\s*తేదీ|ఆఖరి\s*తేదీ|గడువు|ముగింపు|వరకు|last\s*date|closing\s*date|deadline|ends?\s*on|till|upto|up\s*to)",
+    re.I)
+_DATE_ANY = re.compile(
+    r"(?P<d>\d{1,2})\s*(?:st|nd|rd|th)?[\s\-/.]*(?P<mname>" + _MONTH_RE + r")[\s,\-/.]*(?P<y>20\d{2})?"
+    r"|(?P<mname2>" + _MONTH_RE + r")\s*(?P<d2>\d{1,2})(?:\s*,)?\s*(?P<y2>20\d{2})?"
+    r"|(?P<d3>\d{1,2})[\-/.](?P<m3>\d{1,2})[\-/.](?P<y3>20\d{2})",
+    re.I)
+
+
+def last_date_from_text(html: str, today=None) -> str:
+    """Deadline from prose — keyword within 70 chars of the date; future only."""
+    text = re.sub(r"<[^>]+>", " ", str(html or ""))
+    text = re.sub(r"\s+", " ", text)
+    if not text:
+        return ""
+    today = today or datetime.now().date()
+    best = ""
+    for m in _DATE_ANY.finditer(text):
+        # keyword right BEFORE ("చివరి తేదీ: 15-11-2026", "Last date 30 Nov") or
+        # right AFTER ("నవంబర్ 30 వరకు") — a range start ("నవంబర్ 10 నుండి") is not a deadline.
+        before = text[max(0, m.start() - 30): m.start()]
+        after = text[m.end(): m.end() + 15]
+        if not (_DEADLINE_KW.search(before) or _DEADLINE_KW.search(after)):
+            continue
+        if re.search(r"నుండి|నుంచి|from", after, re.I) or re.search(r"(?:from|starts?|opens?|ప్రారంభం)\s*:?\s*$", before, re.I):
+            continue
+        try:
+            if m.group("d3"):
+                d, mo, y = int(m.group("d3")), int(m.group("m3")), int(m.group("y3"))
+            else:
+                name = (m.group("mname") or m.group("mname2") or "").lower()
+                mo = _TE_MONTHS.get(m.group("mname") or m.group("mname2") or "") or _EN_MONTHS.get(name) or _EN_MONTHS.get(name[:3])
+                d = int(m.group("d") or m.group("d2"))
+                y = int(m.group("y") or m.group("y2") or 0)
+                if not y:
+                    y = today.year if (mo, d) >= (today.month, today.day) else today.year + 1
+            if not mo:
+                continue
+            cand = datetime(y, mo, d).date()
+        except (ValueError, TypeError):
+            continue
+        if cand < today or (cand - today).days > 400:
+            continue
+        if not best or cand.isoformat() < best:
+            best = cand.isoformat()
+    return best
 
 
 def post_meta(article: dict) -> Dict[str, str]:

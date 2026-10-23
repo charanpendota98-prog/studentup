@@ -622,8 +622,20 @@ def _hygiene(article: Dict) -> Dict:
             seen_secondary.add(key)
             secondary.append(phrase[:90])
     if focus:
-        for suffix in ("eligibility", "apply online", "official notification",
-                       "documents", "selection process"):
+        # v398: intent-aware suffixes — a RESULTS post must not get
+        # "apply online / eligibility" phrases (nonsense keywords on live).
+        _blob = f"{focus} {article.get('title') or ''} {article.get('category') or ''}".lower()
+        if re.search(r"result|ఫలిత|merit list|answer key|final key|prelims key|cut ?off|స్కోర్|score card", _blob):
+            _suffixes = ("cut off", "merit list", "download link", "pdf", "marks")
+        elif re.search(r"hall ticket|admit card|హాల్ టికెట్|call letter", _blob):
+            _suffixes = ("download", "exam date", "direct link", "instructions")
+        elif re.search(r"scholarship|స్కాలర్|epass|nsp|fellowship", _blob):
+            _suffixes = ("eligibility", "last date", "amount", "apply online", "documents")
+        elif re.search(r"syllabus|exam pattern|సిలబస్|preparation|books", _blob):
+            _suffixes = ("pdf", "exam pattern", "topic wise", "books")
+        else:
+            _suffixes = ("eligibility", "apply online", "official notification", "documents", "selection process")
+        for suffix in _suffixes:
             phrase = f"{focus} {suffix}".strip()
             key = phrase.casefold()
             if len(secondary) >= 8:
@@ -635,9 +647,15 @@ def _hygiene(article: Dict) -> Dict:
     # meta description fallback: quick_answer or first para nunchi
     md = (article.get("meta_description") or "").strip()
     if len(md) < 120:
-        base = article.get("quick_answer") or validator.strip_tags(
-            article.get("content_html", ""))
+        base = article.get("quick_answer") or ""
+        if not base:
+            # v398: paragraphs only (headings/FAQ questions leaked into the snippet)
+            _ps = [validator.strip_tags(m) for m in re.findall(r"<p\b[^>]*>(.*?)</p>", article.get("content_html", ""), flags=re.S | re.I)]
+            base = " ".join(t.strip() for t in _ps if len(t.split()) >= 4)[:600]
         base = " ".join(base.split())
+        # v398: never start the snippet with "ఇది X గురించి." / publisher
+        # attribution / promo lines (owner v322/v340 rules).
+        base = rm100.clean_snippet_base(base)
         article["meta_description"] = (base[:155].rsplit(" ", 1)[0]) if base else md
     return article
 
@@ -787,9 +805,48 @@ def analyze_rm(article: dict) -> dict:
     return validator.rankmath_strict(article, article.get("content_html", ""))
 
 
+def _rankmath_missing_cause(wp) -> str:
+    """v397: one-line owner fix for 'SEO meta did not persist'."""
+    try:
+        import requests as _rq
+        r = _rq.get(f"{config.WP_SITE.rstrip('/')}/wp-json/", timeout=15)
+        if r.status_code == 200 and "rankmath/v1" not in (r.text or ""):
+            return ("Karanam: <b>Rank Math SEO plugin ACTIVE kaadu</b>. "
+                    "Fix: WP Admin → Plugins → Rank Math SEO → Activate → Rank Math → Sitemap Settings → Save.")
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        probe = wp.read_rankmath_state(0)
+        if not probe.get("ok") and "HTTP 404" in str(probe.get("reason", "")):
+            return ("Karanam: theme SEO bridge route ledu — StudentUp theme (≥1.9.148) active undo chudandi.")
+    except Exception:  # noqa: BLE001
+        pass
+    return "Fix: Rank Math active aa + StudentUp theme active aa chudandi; `run.py --doctor` run cheyandi."
+
+
+def _backfill_deadline(article: Dict) -> None:
+    """v398: Gemini left recruitment.apply_end empty while the body states the
+    last date → fill it from prose (future, keyword-adjacent only) so the facts
+    card, countdown, calendar and studentup_last_date all agree."""
+    rec = article.get("recruitment") if isinstance(article.get("recruitment"), dict) else None
+    if rec is None:
+        rec = {}
+        article["recruitment"] = rec
+    if str(rec.get("apply_end") or "").strip():
+        return
+    try:
+        iso = qual.last_date_from_text(article.get("content_html") or "")
+    except Exception:  # noqa: BLE001
+        iso = ""
+    if iso:
+        rec["apply_end"] = iso
+        log.info("v398 deadline from body → apply_end %s", iso)
+
+
 def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     """Full publish flow for a generated article dict. Returns WP result."""
     wp = WordPressClient()
+    _backfill_deadline(article)
     wp.check_connection()
 
     is_quiz = article.get("article_type") == "quiz"
@@ -1311,8 +1368,36 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                          str(article.get("title") or ""))
     except Exception:  # noqa: BLE001
         log.debug("body fingerprint store skip", exc_info=True)
+    # v398: deterministic cleaners (foreign-script rupee/words, unrelated official
+    # PDFs, repeated figures, filler lines) — last thing before WordPress.
+    try:
+        from . import live_fix as _lf
+        final_html, _lf_rep = _lf.clean_body(
+            final_html, article.get("title", ""), getattr(wp, "last_media_url", "") or "")
+        if _lf_rep:
+            log.info("v398 clean_body: %s", _lf_rep)
+    except Exception:  # noqa: BLE001 — cleaner fail publish aapadu
+        log.exception("v398 clean_body skip (publish safe)")
+    # v398: nothing to publish — an (almost) empty Gemini body must not become
+    # a draft made only of house chrome (facts table + schema).
+    _body_words = len([w for w in re.findall(r"[^\s<>]+", re.sub(r"<[^>]+>", " ", str(article.get("content_html") or "")))
+                       if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)])
+    if _body_words < 120 and not article.get("_mock") and not article.get("_refresh_of"):
+        raise RuntimeError(f"SKIP-EMPTY-BODY: only {_body_words} words — {article.get('title', '')[:60]}")
+    # v398: human-review flags on the draft title (stale year, English body,
+    # sentence-as-title) — drafts only; a live publish is never renamed.
+    _post_title = article["title"]
+    try:
+        from . import live_fix as _lf
+        _dflags = _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+        if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
+            _post_title = f"REVIEW: {_post_title}"
+            log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
+            article["_review_flags"] = _dflags
+    except Exception:  # noqa: BLE001
+        log.debug("draft_flags skip", exc_info=True)
     result = wp.create_post(
-        title=article["title"],
+        title=_post_title,
         content_html=final_html,
         slug=article["slug"],
         category_id=category_id,
@@ -1322,6 +1407,38 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         status="draft" if stage_for_seo else requested_status,
         meta=meta,
     )
+    # v398: WordPress may change the slug on collision ("…-2"); the canonical we
+    # pre-computed from the intended slug then points at a 404. Always re-point
+    # it at the real permalink (live: all six published posts had this).
+    if meta and result.get("id") and result.get("link") and not article.get("_mock"):
+        try:
+            from . import live_fix as _lf
+            real = _lf.canonical_for(str(result["link"]))
+            if real.rstrip("/") != str(meta.get("rank_math_canonical_url") or "").rstrip("/"):
+                log.warning("slug collision: wanted /%s/ got %s — canonical re-pointed",
+                            article.get("slug", ""), real)
+                meta["rank_math_canonical_url"] = real
+                # v398: a "-2" slug on a NEW post means WordPress already has
+                # this notification under the same slug — the slug guard did
+                # not see it (status outside its list / race). Mark the draft
+                # loudly instead of letting a silent twin reach the site.
+                _upd = {"rank_math_canonical_url": real}
+                try:
+                    if (requested_status != "publish" and re.search(r"-\d+/?$", real)
+                            and not str(_post_title).startswith("REVIEW:")):
+                        wp.update_post(int(result["id"]), final_html, meta=_upd,
+                                       title=f"REVIEW: duplicate? {_post_title}")
+                        article["_review_flags"] = list(article.get("_review_flags") or []) + ["duplicate-slug"]
+                    else:
+                        wp.update_post(int(result["id"]), final_html, meta=_upd)
+                except TypeError:  # update_post without title kwarg
+                    wp.update_post(int(result["id"]), final_html, meta=_upd)
+                try:
+                    wp.write_seo_meta(int(result["id"]), {"rank_math_canonical_url": real})
+                except Exception:  # noqa: BLE001
+                    log.debug("canonical bridge write skip", exc_info=True)
+        except Exception:  # noqa: BLE001
+            log.exception("v398 canonical re-point skip (publish safe)")
     if result.get("id") and not article.get("_mock"):
         try:  # v362 draft watchdog clock
             from . import ops
@@ -1356,10 +1473,17 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                             ", ".join(missing), result["id"])
                 result["seo_meta_missing"] = missing
                 try:
-                    notifier.send_telegram(
-                        "⚠️ <b>SEO meta WAR</b> — post %s lo %s land avvaledu.\n"
-                        "Fix: WP theme (StudentUp) active undo chudandi (SEO bridge)."
-                        % (result["id"], ", ".join(missing)))
+                    # v397: say the REAL cause (live: Rank Math plugin was simply
+                    # inactive for days — old text blamed the theme) and throttle
+                    # to one alert per 6h instead of one per draft.
+                    import time as _t
+                    last = state.meta_get(config.STATE_PATH, "alert:rankmath-meta") or "0"
+                    if _t.time() - float(last) > 6 * 3600:
+                        cause = _rankmath_missing_cause(wp)
+                        notifier.send_telegram(
+                            "⛔ <b>SEO meta land avvaledu</b> — post %s: %s\n%s"
+                            % (result["id"], ", ".join(missing), cause))
+                        state.meta_set(config.STATE_PATH, "alert:rankmath-meta", str(int(_t.time())))
                 except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
                     log.debug("publish_article skip: %s", exc)
             else:
@@ -1756,6 +1880,16 @@ def _append_official_sources(article: dict) -> None:
     visible = []
     for item in resolved:
         kind = item.get("link_type", "unknown")
+        # v398: the PUBLIC "అధికారిక లింక్స్" box is official domains ONLY.
+        # Live post showed "education-and-career → etvbharat.com" (an outbound
+        # link scraped from a news source page) — that leaks the source and is
+        # not an official link. Non-gov links stay in the private ledger.
+        try:
+            _host = urlparse(str(item.get("url") or "")).netloc
+        except Exception:  # noqa: BLE001
+            _host = ""
+        if sources._official_score(_host) < 2:
+            continue
         visible.append({
             "text": item.get("anchor_text") or item.get("text") or
                     f"Official link — {urlparse(item['url']).netloc}",
@@ -2007,7 +2141,7 @@ def _duplicate_title_guard(article: Dict, wp=None) -> None:
     if wp is not None and slug:
         try:
             resp = wp._request("GET", "posts", params={
-                "slug": slug, "status": "publish,draft,pending,future",
+                "slug": slug, "status": "publish,draft,pending,future,private",
                 "context": "edit", "_fields": "id,status,title", "per_page": 5})
             if resp.status_code == 200 and resp.json():
                 hit = resp.json()[0]

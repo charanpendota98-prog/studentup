@@ -62,7 +62,7 @@ function studentup_manifest() {
 		'scope'            => home_url( '/' ),
 		'display'          => 'standalone',
 		'background_color' => '#ffffff',
-		'theme_color'      => '#0f2e62',
+		'theme_color'      => '#9d174d',
 		'lang'             => 'te-IN',
 		'orientation'      => 'portrait',
 		'description'      => get_bloginfo( 'description' ),
@@ -136,7 +136,7 @@ function studentup_head_hints() {
 	if ( is_admin() ) {
 		return;
 	}
-	echo '<meta name="theme-color" content="#0f2e62">' . "\n";
+	echo '<meta name="theme-color" content="#9d174d">' . "\n";
 	// Third-party resource hints are emitted centrally by perf.php only when
 	// Ads/GA4 are really enabled; avoid duplicate or unused connections here.
 	if ( studentup_opt( 'pwa', '1' ) ) {
@@ -162,10 +162,10 @@ function studentup_sw_js() {
 	$ver     = defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '1';
 	$offline = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
 		. '<title>ఆఫ్‌లైన్ — ' . esc_html( get_bloginfo( 'name' ) ) . '</title>'
-		. '<body style="font-family:system-ui,sans-serif;margin:0;padding:28px;text-align:center;color:#0f2e62">'
+		. '<body style="font-family:system-ui,sans-serif;margin:0;padding:28px;text-align:center;color:#9d174d">'
 		. '<h1 style="font-size:20px">మీరు ఆఫ్‌లైన్‌లో ఉన్నారు</h1>'
 		. '<p style="color:#5b6b85;font-size:14px;line-height:1.7">ఇప్పటికే చూసిన పేజీలు అందుబాటులో ఉంటాయి — ఇంటర్నెట్ తిరిగి వచ్చాక కొత్త ఉద్యోగాలు, ఫలితాలు, అప్‌డేట్స్ లోడ్ అవుతాయి.</p>'
-		. '<p style="font-size:14px"><a href="' . esc_url( home_url( '/' ) ) . '" style="color:#2463b7">↻ మళ్లీ ప్రయత్నించండి</a></p>';
+		. '<p style="font-size:14px"><a href="' . esc_url( home_url( '/' ) ) . '" style="color:#db2777">↻ మళ్లీ ప్రయత్నించండి</a></p>';
 
 	return 'var VERSION=' . wp_json_encode( 'su-' . $ver ) . ';' . "\n"
 		. 'var OFFLINE=' . wp_json_encode( $offline ) . ';' . "\n"
