@@ -122,3 +122,10 @@ def test_excerpt_prefix_and_title_flags():
     assert "doubled-keyword" in live_fix.title_flags("Upsc 2026 Upcoming Vacancy UPSC 2026 Forthcoming Exams")
     assert live_fix.title_flags("NIACL AO Recruitment 2025: 500 పోస్టుల భర్తీ") == ["stale-year:2025"]
     assert live_fix.title_flags("APPSC Group 2 Notification 2026 686 పోస్టులు") == []
+
+
+def test_orphan_shortcodes_and_closing_filler_removed():
+    body = ("<p>నిజమైన para.</p><p>[adinsert block=1]</p><table><tr><td>a</td></tr></table>[adinsert block=1]"
+            "<p>ఈ ఆర్టికల్ మీకు పూర్తి సమాచారాన్ని అందించిందని ఆశిస్తున్నాము. షేర్ చేయండి.</p>")
+    out, n = live_fix.strip_filler(body)
+    assert "[adinsert" not in out and "ఆశిస్తున్నాము" not in out and "నిజమైన para." in out and n == 3

@@ -153,6 +153,14 @@ def strip_filler(html: str) -> Tuple[str, int]:
     n += k
     out, k = _LAST_UPDATE_P.subn("", out)
     n += k
+    # Orphan ad-plugin shortcodes printed as text ("[adinsert block=1]" on live)
+    out, k = re.subn(r"(?:<p[^>]*>\s*)?\[(?:adinsert|quads|adrotate|ad_\w+|advanced_ads\w*)\b[^\]]*\](?:\s*</p>)?\s*", "", out, flags=re.I)
+    n += k
+    # Closing filler paragraphs ("ఈ ఆర్టికల్ … ఆశిస్తున్నాము", "కామెంట్స్ విభాగంలో అడగవచ్చు")
+    out, k = re.subn(r"<p[^>]*>(?:(?!</p>).){0,400}?(?:ఆశిస్తున్నాము|కామెంట్స్ విభాగంలో|కామెంట్ చేయండి|"
+                     r"స్నేహితులకు (?:మరియు )?(?:తోటి విద్యార్థులకు )?షేర్ చేయండి|చివరి వరకు చదవండి)(?:(?!</p>).)*</p>\s*",
+                     "", out, flags=re.S)
+    n += k
     # English FAQ heading inside a Telugu article (live: "Frequently Asked Questions (FAQ)")
     out, k = re.subn(r"(<h2\b[^>]*>)\s*Frequently Asked Questions(?:\s*\(FAQ\))?\s*(</h2>)",
                      r"\1తరచుగా అడిగే ప్రశ్నలు (FAQ)\2", out, flags=re.I)

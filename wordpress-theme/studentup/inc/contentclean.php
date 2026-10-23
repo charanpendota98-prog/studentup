@@ -141,6 +141,60 @@ function studentup_clean_legacy_bot_chrome( $html ) {
 	}
 	// 6) Machine phrasing.
 	$html = preg_replace( '#\s*,?\s*(?:as per|according to|per) (?:the )?source (?:evidence|text|data)\b#i', '', $html );
+	// 1.9.169 — defects seen on live posts (old bot output), fixed at render time
+	// so every already-published post is clean without re-saving.
+	// 7) Orphan ad-plugin shortcodes printed as text once the plugin is gone.
+	$html = preg_replace_callback( '#(?:<p[^>]*>\s*)?\[(adinsert|quads|adrotate|ad_\w+|advanced_ads\w*|ad)\b[^\]]*\](?:\s*</p>)?#i', function ( $m ) {
+		return shortcode_exists( strtolower( $m[1] ) ) ? $m[0] : '';
+	}, $html );
+	// 8) Rupee written in another Indic script (Gemini bleed: "ರೂ.35,000") → ₹.
+	$html = preg_replace( '/(?:ರೂ|ರೂಪಾಯಿ|रु|रू|रुपये|ரூ|രൂ|રૂ)\s*\.?\s*(?=\d)/u', '₹', $html );
+	// 9) English FAQ heading inside a Telugu article.
+	$html = preg_replace( '#(<h2\b[^>]*>)\s*Frequently Asked Questions(?:\s*\(FAQ\))?\s*(</h2>)#i', '$1తరచుగా అడిగే ప్రశ్నలు (FAQ)$2', $html );
+	// 10) Robotic intro/outro lines: "Quick Overview: ఈ పోస్ట్‌లో … ఇచ్చాము", "చివరి అప్‌డేట్:" em-line,
+	//     "ఈ ఆర్టికల్ … ఆశిస్తున్నాము / షేర్ చేయండి / కామెంట్స్ విభాగంలో" closers.
+	$html = preg_replace( '#<p[^>]*>(?:\s*<strong>)?[^<]{0,80}?Quick Overview\s*:?(?:</strong>)?[^<]*?(?:ఇచ్చాము|ఇక్కడ ఉన్నాయి)[^<]*</p>\s*#isu', '', $html );
+	$html = preg_replace( '#<p[^>]*>\s*<em>\s*చివరి అప్‌డేట్\s*:[^<]*</em>\s*</p>\s*#isu', '', $html );
+	$html = preg_replace( '#<p[^>]*>(?:(?!</p>).){0,400}?(?:ఆశిస్తున్నాము|కామెంట్స్ విభాగంలో|కామెంట్ చేయండి|స్నేహితులకు (?:మరియు )?(?:తోటి విద్యార్థులకు )?షేర్ చేయండి|చివరి వరకు చదవండి|పూర్తిగా ఇచ్చాము)(?:(?!</p>).)*</p>\s*#isu', '', $html );
+	// 11) The same image repeated in the body (featured + inline + "second"): keep the first.
+	if ( substr_count( $html, '<figure' ) > 1 ) {
+		$seen = array();
+		$html = preg_replace_callback( '#<figure\b[^>]*>.*?</figure>\s*#is', function ( $f ) use ( &$seen ) {
+			if ( ! preg_match( '#src="([^"]+)"#', $f[0], $sm ) ) {
+				return $f[0];
+			}
+			$key = strtolower( basename( strtok( $sm[1], '?' ) ) );
+			$key = preg_replace( '/-\d+x\d+(?=\.\w+$)/', '', $key );
+			if ( isset( $seen[ $key ] ) ) {
+				return '';
+			}
+			$seen[ $key ] = true;
+			return $f[0];
+		}, $html );
+	}
+	// 13) Bot "అధికారిక లింక్స్" box: only official hosts (live showed etvbharat.com
+	//     there — a publisher leak). Box with nothing official left is removed.
+	if ( false !== strpos( $html, 'su-official-links' ) && function_exists( 'studentup_is_official_url' ) ) {
+		$pid  = (int) get_the_ID();
+		$html = preg_replace_callback( '#<section[^>]*class="[^"]*\bsu-official-links\b[^"]*"[^>]*>.*?</section>\s*#is', function ( $box ) use ( $pid ) {
+			$kept = 0;
+			$out  = preg_replace_callback( '#<li>\s*<a\s+href="([^"]+)"[^>]*>.*?</a>\s*</li>\s*#is', function ( $li ) use ( $pid, &$kept ) {
+				if ( studentup_is_official_url( html_entity_decode( $li[1] ), $pid ) ) {
+					$kept++;
+					return preg_replace( '/\s*\(\s*[\d.,]+\s*(?:KB|MB|GB)\s*\)\s*(?:View|Download)?\s*(?=<\/a>)/i', '', $li[0] );
+				}
+				return '';
+			}, $box[0] );
+			return $kept > 0 ? $out : '';
+		}, $html );
+	}
+	// 12) Caption that merely repeats the post title.
+	$title = get_the_title();
+	if ( $title ) {
+		$html = preg_replace_callback( '#<figcaption>(.*?)</figcaption>#is', function ( $c ) use ( $title ) {
+			return ( trim( wp_strip_all_tags( $c[1] ) ) === trim( wp_strip_all_tags( $title ) ) ) ? '' : $c[0];
+		}, $html );
+	}
 	return $html;
 }
 
