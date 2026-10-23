@@ -155,6 +155,13 @@ def reconcile(article: Dict) -> Dict:
     rep: Dict[str, object] = {"filled": [], "conflicts": []}
     body_last = find_last_date(html)
     struct_last = parse_date(str(rec.get("apply_end") or ""))
+    # v398: a body date in the past (stale 2025 repost) or absurdly far away
+    # must never become the countdown deadline (owner: no fake countdown).
+    if body_last and not struct_last:
+        _today = date.today()
+        if body_last < _today or (body_last - _today).days > 400:
+            rep["conflicts"].append(f"last date in body not usable: {body_last.isoformat()}")
+            body_last = None
     if body_last and not struct_last:
         rec["apply_end"] = body_last.isoformat()
         rep["filled"].append(f"apply_end={rec['apply_end']} (body)")

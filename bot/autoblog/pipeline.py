@@ -1378,8 +1378,26 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             log.info("v398 clean_body: %s", _lf_rep)
     except Exception:  # noqa: BLE001 — cleaner fail publish aapadu
         log.exception("v398 clean_body skip (publish safe)")
+    # v398: nothing to publish — an (almost) empty Gemini body must not become
+    # a draft made only of house chrome (facts table + schema).
+    _body_words = len([w for w in re.findall(r"[^\s<>]+", re.sub(r"<[^>]+>", " ", str(article.get("content_html") or "")))
+                       if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)])
+    if _body_words < 120 and not article.get("_mock") and not article.get("_refresh_of"):
+        raise RuntimeError(f"SKIP-EMPTY-BODY: only {_body_words} words — {article.get('title', '')[:60]}")
+    # v398: human-review flags on the draft title (stale year, English body,
+    # sentence-as-title) — drafts only; a live publish is never renamed.
+    _post_title = article["title"]
+    try:
+        from . import live_fix as _lf
+        _dflags = _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+        if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
+            _post_title = f"REVIEW: {_post_title}"
+            log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
+            article["_review_flags"] = _dflags
+    except Exception:  # noqa: BLE001
+        log.debug("draft_flags skip", exc_info=True)
     result = wp.create_post(
-        title=article["title"],
+        title=_post_title,
         content_html=final_html,
         slug=article["slug"],
         category_id=category_id,

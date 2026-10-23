@@ -157,6 +157,23 @@ def strip_filler(html: str) -> Tuple[str, int]:
     # Orphan ad-plugin shortcodes printed as text ("[adinsert block=1]" on live)
     out, k = re.subn(r"(?:<p[^>]*>\s*)?\[(?:adinsert|quads|adrotate|ad_\w+|advanced_ads\w*)\b[^\]]*\](?:\s*</p>)?\s*", "", out, flags=re.I)
     n += k
+    # v398: facts table — "Quick Overview:" heading prefix + "Official Source" row
+    # naming a news/aggregator host (owner v390: never name the publisher)
+    out, k = re.subn(r"(<h2[^>]*>)\s*Quick Overview\s*:\s*", r"\1", out, flags=re.I)
+    n += k
+    def _src_row(m: re.Match) -> str:
+        host = re.sub(r"<[^>]+>", "", m.group(2)).strip().lower().replace("www.", "")
+        if host.endswith((".gov.in", ".nic.in", ".gov", ".ac.in", ".edu", ".edu.in", ".res.in")):
+            return m.group(0)
+        return ""
+    out, k = re.subn(r"<tr[^>]*>\s*<t[hd][^>]*>\s*(Official Source|Source|మూలం)\s*</t[hd]>\s*<td[^>]*>(.*?)</td>\s*</tr>\s*",
+                     _src_row, out, flags=re.I | re.S)
+    n += k
+    # v398: empty paragraphs / "&nbsp;" paragraphs and "Q1." / "Q:" prefixes on FAQ headings
+    out, k = re.subn(r"<p[^>]*>(?:\s|&nbsp;|\u00a0|<br\s*/?>)*</p>\s*", "", out, flags=re.I)
+    n += k
+    out, k = re.subn(r"(<h[2-4][^>]*>)\s*(?:Q\s*\.?\s*\d+\s*[.:)\-–]|Q\s*[.:]|ప్రశ్న\s*\d*\s*[.:)]|FAQ\s*\d+\s*[.:)])\s*", r"\1", out, flags=re.I)
+    n += k
     # Closing filler paragraphs ("ఈ ఆర్టికల్ … ఆశిస్తున్నాము", "కామెంట్స్ విభాగంలో అడగవచ్చు")
     out, k = re.subn(r"<p[^>]*>(?:(?!</p>).){0,400}?(?:ఆశిస్తున్నాము|కామెంట్స్ విభాగంలో|కామెంట్ చేయండి|"
                      r"స్నేహితులకు (?:మరియు )?(?:తోటి విద్యార్థులకు )?షేర్ చేయండి|చివరి వరకు చదవండి)(?:(?!</p>).)*</p>\s*",
@@ -249,6 +266,21 @@ def title_flags(title: str) -> List[str]:
     if re.search(r"(?:Best Guide|—\s*Complete|Complete Guide|Ultimate)\s*$", title or "", re.I):
         out.append("template-suffix")
     return out
+
+
+def draft_flags(title: str, html: str) -> List[str]:
+    """v398: flags computed BEFORE a draft is created (title_flags + body
+    language). The pipeline prefixes the draft title with "REVIEW:" so the
+    owner sees at a glance which drafts need a human look."""
+    flags = [f for f in title_flags(title) if not f.startswith("template-suffix")]
+    plain = re.sub(r"<script.*?</script>|<style.*?</style>", "", html or "", flags=re.S)
+    plain = re.sub(r"<[^>]+>", " ", plain)
+    words = [w for w in re.findall(r"[^\s<>]+", plain) if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)]
+    if len(words) >= 40:
+        tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
+        if tel / len(words) < 0.30:
+            flags.append("english-body")
+    return flags
 
 
 # ------------------------------------------------------------------ live repair

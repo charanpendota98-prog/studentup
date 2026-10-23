@@ -209,6 +209,11 @@ def fix_title(article: dict) -> bool:
     new = _trim_title(head)
     if len(new) < 40:                             # 40 chars minimum (Rank Math)
         _tail = _tail_for(article)
+        # v398: "TS TET Hall Ticket 2026 download · Download Link" → drop tail
+        # items whose words already sit in the title.
+        _tw = set(re.findall(r"[a-z]+", new.lower()))
+        _tail = " · ".join(t for t in _tail.split(" · ")
+                           if not (set(re.findall(r"[a-z]+", t.lower())) & _tw)) or _tail
         extra = _tail.split(" · ")
         for e in extra:
             if len(new) + 3 + len(e) > 62:
@@ -289,7 +294,10 @@ def fix_meta(article: dict) -> bool:
         # (live: "…అర్హత, తేదీలు, దరఖాస్తు విధానం. అర్హత, ముఖ్యమైన తేదీలు, దరఖాస్తు విధానం…").
         _tail = snippet_tail(article)
         if _tail not in meta and _tail.split()[0] not in meta:
-            meta = _text(f"{meta.rstrip('. ')}. {_tail}")
+            _parts = [c.strip() for c in _tail.rsplit(" ఇక్కడ చూడండి", 1)[0].split(",")]
+            _parts = [c for c in _parts if c and c not in meta]
+            if _parts:
+                meta = _text(f"{meta.rstrip('. ')}. {', '.join(_parts)} ఇక్కడ చూడండి.")
         elif _tail.startswith("అర్హత, చివరి"):  # job intent only
             tails = [t for t in ("అర్హత", "ముఖ్యమైన తేదీలు", "దరఖాస్తు విధానం", "అధికారిక లింక్")
                      if t.split()[-1] not in meta]
@@ -512,7 +520,10 @@ _TE_MONTHS = ("జనవరి|ఫిబ్రవరి|మార్చి|ఏ�
 _EN_MONTHS = ("January|February|March|April|May|June|July|August|"
               "September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|"
               "Aug|Sep|Sept|Oct|Nov|Dec")
-_DATE = rf"(?:{_TE_MONTHS}|{_EN_MONTHS})\s+\d{{1,2}}(?:,?\s*\d{{4}})?|\d{{1,2}}[-/]\d{{1,2}}(?:[-/]\d{{2,4}})?"
+_DATE = (rf"\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{_TE_MONTHS}|{_EN_MONTHS})\.?,?\s*\d{{4}}"  # v398: 15 డిసెంబర్ 2026
+         rf"|(?:{_TE_MONTHS}|{_EN_MONTHS})\s+\d{{1,2}}(?:,?\s*\d{{4}})?"
+         rf"|\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{_TE_MONTHS}|{_EN_MONTHS})\b"
+         rf"|\d{{1,2}}[-/]\d{{1,2}}(?:[-/]\d{{2,4}})?")
 
 
 def extract_facts(html: str) -> dict:
@@ -604,7 +615,9 @@ def fix_table(article: dict, html: str) -> str:
         if val:
             rows.append((label, val))
     src = _text(article.get("source_url") or "")
-    if src:
+    # v398: a news/aggregator host is NOT an "Official Source" (owner v340/v390:
+    # never name the publisher) — only government / authority domains.
+    if src and _authority_url(src):
         rows.append(("Official Source", _host_of(src)))
     if len(rows) < 3:
         # v78 fallback: content nunchi extract chesina facts (invent kaadu)
@@ -622,7 +635,7 @@ def fix_table(article: dict, html: str) -> str:
         return html
     body = "".join(f"<tr><th>{_html.escape(k)}</th><td>{_html.escape(v)}</td></tr>"
                    for k, v in rows)
-    table = ('<h2>Quick Overview: ముఖ్య వివరాలు</h2>\n<table class="su-facts"><tbody>'
+    table = ('<h2>ముఖ్య వివరాలు</h2>\n<table class="su-facts"><tbody>'
              + body + "</tbody></table>\n")
     paras = re.findall(r"<p[^>]*>.*?</p>", html, flags=re.S)
     if len(paras) >= 2:
@@ -1039,6 +1052,17 @@ def sample_article() -> dict:
              "పునశ్చరణ సులభం అవుతుంది."),
         ],
     }
+
+
+_AUTHORITY_SUFFIXES = (".gov.in", ".nic.in", ".gov", ".edu", ".ac.in", ".edu.in", ".res.in", ".org.in")
+_AUTHORITY_HOSTS = {"ssc.gov.in", "upsc.gov.in", "tspsc.gov.in", "appsc.gov.in", "nta.ac.in", "ibps.in",
+                    "cbse.gov.in", "sbi.co.in", "rrbcdg.gov.in", "isro.gov.in", "drdo.gov.in", "ongc.co.in",
+                    "indianrailways.gov.in", "joinindianarmy.nic.in", "joinindiannavy.gov.in", "agnipathvayu.cdac.in"}
+
+
+def _authority_url(url: str) -> bool:
+    h = _host_of(url).lower().replace("www.", "")
+    return bool(h) and (h in _AUTHORITY_HOSTS or h.endswith(_AUTHORITY_SUFFIXES))
 
 
 def _host_of(url: str) -> str:

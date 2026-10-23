@@ -147,3 +147,48 @@ def test_more_title_flags():
     assert "sentence-title" in live_fix.title_flags(
         "Electronics Mart India is conducting a walk‑in drive in Hyderabad for the role 2026 today")
     assert "template-suffix" in live_fix.title_flags("Infor Recruitment 2026: సాఫ్ట్‌వేర్ ఇంజనీర్ — Best Guide")
+
+
+# ---------------------------------------------------------------- deep audit 3
+def test_date_regex_day_first_form():
+    from autoblog import rm100
+    facts = rm100.extract_facts("<p>చివరి తేదీ 15 డిసెంబర్ 2026. Last date 30th November 2026.</p>")
+    assert facts["last_date"] == "15 డిసెంబర్ 2026"   # was "డిసెంబర్ 20" (year truncated)
+
+
+def test_facts_table_never_names_news_source():
+    from autoblog import rm100
+    art = {"title": "X Recruitment 2026", "focus_keyword": "X Recruitment 2026", "category": "Jobs",
+           "source_url": "https://www.freejobalert.com/x", "last_date": "15 డిసెంబర్ 2026"}
+    html = rm100.fix_table(art, "<p>a</p><p>b</p>")
+    assert "freejobalert" not in html and "Quick Overview" not in html
+    art["source_url"] = "https://tspsc.gov.in/x"
+    assert "tspsc.gov.in" in rm100.fix_table(art, "<p>a</p><p>b</p>")
+
+
+def test_live_fix_drops_publisher_source_row_and_prefix():
+    from autoblog import live_fix as lf
+    html = ('<h2>Quick Overview: ముఖ్య వివరాలు</h2><table><tbody><tr><th>Official Source</th>'
+            '<td>www.sakshieducation.com</td></tr></tbody></table><h3>Q1. ఎప్పుడు?</h3><p>&nbsp;</p>')
+    out, _ = lf.strip_filler(html)
+    assert "sakshieducation" not in out and "Quick Overview" not in out
+    assert "<h3>ఎప్పుడు?</h3>" in out and "&nbsp;" not in out
+
+
+def test_past_body_date_never_becomes_deadline():
+    from autoblog import facts_te
+    art = {"recruitment": {}, "content_html": "<p>దరఖాస్తు చివరి తేదీ 10 జనవరి 2025.</p>"}
+    facts_te.reconcile(art)
+    assert not art["recruitment"].get("apply_end")
+
+
+def test_draft_flags():
+    from autoblog import live_fix as lf
+    assert "stale-year:2025" in lf.draft_flags("NIACL AO 2025 Notification", "<p>" + "తెలుగు " * 50 + "</p>")
+    assert "english-body" in lf.draft_flags("SSC CGL 2026", "<p>" + "english words only " * 30 + "</p>")
+    assert lf.draft_flags("SSC CGL 2026 నోటిఫికేషన్", "<p>" + "తెలుగు వాక్యం " * 50 + "</p>") == []
+
+
+def test_named_publisher_before_generic_rule():
+    from autoblog import source_leak as sl
+    assert sl.clean_html("<p>According to News18, exam on 5 Nov.</p>") == "<p>exam on 5 Nov.</p>"

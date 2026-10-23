@@ -187,6 +187,7 @@ def _results_article():
             '<h2>TSPSC Group 4 Results 2026 ఎలా చూడాలి?</h2><ol><li>tspsc.gov.in వెబ్‌సైట్ ఓపెన్ చేయండి.</li>'
             '<li>Result PDF download చేయండి.</li></ol>'
             '<h2>Cut Off Marks</h2><table><tr><td>Category</td><td>OC</td></tr></table>'
+            '<p>' + 'అభ్యర్థులు తమ హాల్ టికెట్ నంబర్ మరియు పుట్టిన తేదీ ఉపయోగించి ఫలితాలు చూసుకోవచ్చు. ' * 12 + '</p>'
             '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
             '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
             '<p>మరిన్ని వివరాల కోసం మా YouTube ఛానల్ చూడండి: <a href="https://youtube.com/watch?v=abc">video</a>. '
@@ -229,3 +230,19 @@ def test_results_post_no_publisher_names_or_promos(fake_wp):
     assert not meta.startswith("ఇది")
     assert "అర్హత, చివరి తేదీ" not in meta
     assert html.count("Frequently Asked Questions") == 0
+
+
+def test_empty_body_is_skipped_not_drafted(fake_wp):
+    art = _results_article()
+    art["content_html"] = "<p>TSPSC Group 4 Results 2026.</p>"
+    with pytest.raises(RuntimeError, match="SKIP-EMPTY-BODY"):
+        pipeline.publish_article(art)
+    assert not fake_wp.created
+
+
+def test_stale_year_draft_gets_review_prefix(fake_wp):
+    art = _results_article()
+    art["title"] = "TSPSC Group 4 Results 2025 విడుదల"
+    art["focus_keyword"] = "TSPSC Group 4 Results 2025"
+    pipeline.publish_article(art)
+    assert fake_wp.created["title"].startswith("REVIEW: ")

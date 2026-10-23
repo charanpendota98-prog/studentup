@@ -179,10 +179,10 @@ def clean_html(html: str) -> str:
     # inline provenance / attribution text
     out = re.sub(r"\s*\(\s*(?:source|మూలం)\s*:[^)]*\)", "", out, flags=re.I)
     out = re.sub(r"(?:^|(?<=[>.!?\u0964]))\s*(?:sources?|మూలం)\s*:[^<.!?\u0964]*[.!?\u0964]?", " ", out, flags=re.I | re.M)
-    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?,?\s*", "", out, flags=re.I)
-    out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
-    for _rx in _ATTRIB_EN:
+    for _rx in _ATTRIB_EN:  # v398: named publishers first ("According to News18" ≠ "according to news")
         out = _rx.sub('', out)
+    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?\b,?\s*", "", out, flags=re.I)
+    out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
     # publisher links → keep anchor text, drop the link (official links stay)
     def _unlink(m: re.Match) -> str:
         url = m.group(1)
@@ -207,10 +207,10 @@ def clean_text_attribution(html: str) -> str:
     no structural chrome removal (the pipeline never emits that any more)."""
     out = html or ""
     out = re.sub(r"\s*\(\s*(?:source|మూలం)\s*:[^)]*\)", "", out, flags=re.I)
-    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?,?\s*", "", out, flags=re.I)
-    out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
-    for _rx in _ATTRIB_EN:
+    for _rx in _ATTRIB_EN:  # v398: named publishers first ("According to News18" ≠ "according to news")
         out = _rx.sub("", out)
+    out = re.sub(r"\b(?:according to|as per) (?:the )?(?:source|report|news|media|paper)s?\b,?\s*", "", out, flags=re.I)
+    out = _ATTRIB_TE.sub("తాజా సమాచారం ప్రకారం", out)
     out = re.sub(r"తాజా సమాచారం ప్రకారం\s*,?\s*తాజా సమాచారం ప్రకారం", "తాజా సమాచారం ప్రకారం", out)
     out = re.sub(r"(ప్రకారం)(\s+ప్రకారం)+", r"\1", out)
     for host in PUBLISHER_HOSTS:
