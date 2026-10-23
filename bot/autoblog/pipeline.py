@@ -787,6 +787,25 @@ def analyze_rm(article: dict) -> dict:
     return validator.rankmath_strict(article, article.get("content_html", ""))
 
 
+def _rankmath_missing_cause(wp) -> str:
+    """v397: one-line owner fix for 'SEO meta did not persist'."""
+    try:
+        import requests as _rq
+        r = _rq.get(f"{config.WP_SITE.rstrip('/')}/wp-json/", timeout=15)
+        if r.status_code == 200 and "rankmath/v1" not in (r.text or ""):
+            return ("Karanam: <b>Rank Math SEO plugin ACTIVE kaadu</b>. "
+                    "Fix: WP Admin → Plugins → Rank Math SEO → Activate → Rank Math → Sitemap Settings → Save.")
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        probe = wp.read_rankmath_state(0)
+        if not probe.get("ok") and "HTTP 404" in str(probe.get("reason", "")):
+            return ("Karanam: theme SEO bridge route ledu — StudentUp theme (≥1.9.148) active undo chudandi.")
+    except Exception:  # noqa: BLE001
+        pass
+    return "Fix: Rank Math active aa + StudentUp theme active aa chudandi; `run.py --doctor` run cheyandi."
+
+
 def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     """Full publish flow for a generated article dict. Returns WP result."""
     wp = WordPressClient()
@@ -1356,10 +1375,17 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                             ", ".join(missing), result["id"])
                 result["seo_meta_missing"] = missing
                 try:
-                    notifier.send_telegram(
-                        "⚠️ <b>SEO meta WAR</b> — post %s lo %s land avvaledu.\n"
-                        "Fix: WP theme (StudentUp) active undo chudandi (SEO bridge)."
-                        % (result["id"], ", ".join(missing)))
+                    # v397: say the REAL cause (live: Rank Math plugin was simply
+                    # inactive for days — old text blamed the theme) and throttle
+                    # to one alert per 6h instead of one per draft.
+                    import time as _t
+                    last = state.meta_get(config.STATE_PATH, "alert:rankmath-meta") or "0"
+                    if _t.time() - float(last) > 6 * 3600:
+                        cause = _rankmath_missing_cause(wp)
+                        notifier.send_telegram(
+                            "⛔ <b>SEO meta land avvaledu</b> — post %s: %s\n%s"
+                            % (result["id"], ", ".join(missing), cause))
+                        state.meta_set(config.STATE_PATH, "alert:rankmath-meta", str(int(_t.time())))
                 except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
                     log.debug("publish_article skip: %s", exc)
             else:
