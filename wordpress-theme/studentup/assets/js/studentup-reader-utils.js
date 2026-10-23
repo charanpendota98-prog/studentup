@@ -368,7 +368,7 @@
       ctx.font = "bold 56px system-ui, sans-serif";
       ctx.fillText("StudentUp.in", 136, 156);
 
-      ctx.fillStyle = "#38bdf8";
+      ctx.fillStyle = "#fdba74";
       ctx.font = "600 36px system-ui, sans-serif";
       ctx.fillText("Telangana & AP Job Alerts", 100, 230);
 
@@ -380,7 +380,7 @@
       }
       ctx.fill();
 
-      ctx.fillStyle = "#ec4899";
+      ctx.fillStyle = "#e87722";
       if (ctx.roundRect) {
         ctx.roundRect(140, 380, 450, 64, 32);
       } else {
@@ -433,7 +433,7 @@
         ctx.font = "600 28px system-ui, sans-serif";
         ctx.fillText(facts[j].label + ":", 240, fy + 44);
 
-        ctx.fillStyle = "#38bdf8";
+        ctx.fillStyle = "#fdba74";
         ctx.font = "bold 38px system-ui, sans-serif";
         ctx.fillText(facts[j].val, 240, fy + 90);
 

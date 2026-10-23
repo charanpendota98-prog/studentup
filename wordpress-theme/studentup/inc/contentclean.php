@@ -93,6 +93,20 @@ add_filter( 'the_excerpt', 'studentup_strip_foreign_block_placeholders', 9 );
  * @return string
  */
 function studentup_clean_legacy_bot_chrome( $html ) {
+	// 0) v1.9.172: facts table "Quick Overview:" heading prefix; "Official Source"
+	//    row naming a news/aggregator host (only gov/authority hosts may stay);
+	//    "Q1." / "Q:" prefixes on FAQ headings; empty &nbsp; paragraphs;
+	//    "ఇది చక్కని అవకాశం" / "… వివరాలు Notification‌లో ఉంటాయి" filler lines.
+	$html = preg_replace( '#(<h2[^>]*>)\s*Quick Overview\s*:\s*#iu', '$1', $html );
+	$html = preg_replace_callback( '#<tr[^>]*>\s*<t[hd][^>]*>\s*(?:Official Source|Source|మూలం)\s*</t[hd]>\s*<td[^>]*>(.*?)</td>\s*</tr>\s*#isu', function ( $m ) {
+		$host = strtolower( trim( wp_strip_all_tags( $m[1] ) ) );
+		$host = preg_replace( '#^www\.#', '', $host );
+		return preg_match( '#\.(gov\.in|nic\.in|gov|ac\.in|edu|edu\.in|res\.in)$#', $host ) ? $m[0] : '';
+	}, $html );
+	$html = preg_replace( '#(<h[2-4][^>]*>)\s*(?:Q\s*\.?\s*\d+\s*[.:)\-–]|Q\s*[.:]|ప్రశ్న\s*\d*\s*[.:)]|FAQ\s*\d+\s*[.:)])\s*#iu', '$1', $html );
+	$html = preg_replace( '#<p[^>]*>(?:\s|&nbsp;|\x{00a0}|<br\s*/?>)*</p>\s*#iu', '', $html );
+	$html = preg_replace( '#<li[^>]*>\s*(?:[A-Za-z ]{3,30}|[\x{0c00}-\x{0c7f} ]{3,30}) వివరాలు (?:Notification|నోటిఫికేషన్)\S{0,4} ?(?:లో|లోనే) ?(?:ఉంటాయి|చూడండి|చూడవచ్చు|ఉన్నాయి)\W*</li>\s*#iu', '', $html );
+	$html = preg_replace( '#(?<=[.!?]|>)\s*[^<.!?]{0,120}?(?<!\S)ఇది (?:ఒక )?(?:చక్కని|చక్కటి|మంచి|గొప్ప|అద్భుతమైన|అరుదైన|సువర్ణ)\s*అవకాశం\s*[.!]?\s*#u', '', $html );
 	// 1) "🔎 Source: domain, domain · checked …" line + legacy trust box.
 	$html = preg_replace( '#<p[^>]*class="[^"]*\bsu-source\b[^"]*"[^>]*>.*?</p>#is', '', $html );
 	$html = preg_replace( '#<section[^>]*class="[^"]*\bsu-trust-box\b[^"]*"[^>]*>.*?</section>#is', '', $html );

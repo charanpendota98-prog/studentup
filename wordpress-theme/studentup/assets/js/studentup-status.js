@@ -41,7 +41,7 @@
   function drawCard(o) {
     var W = 1080, H = 1920, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     var c = cv.getContext("2d"); if (!c) throw new Error("no-canvas"); var pct = Math.round((o.score / o.total) * 100);
-    var g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#1e1b4b"); g.addColorStop(.55, "#e11d48"); g.addColorStop(1, "#06b6d4");
+    var g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#3b1d0e"); g.addColorStop(.55, "#e87722"); g.addColorStop(1, "#f59e0b");
     c.fillStyle = g; c.fillRect(0, 0, W, H);
     // soft glow orbs
     c.globalAlpha = .18; c.fillStyle = "#fff";
@@ -51,7 +51,7 @@
     // brand lockup: "Student" white + "Up" cyan, studentup.in under it
     c.font = "900 64px system-ui, -apple-system, Segoe UI, Roboto, sans-serif";
     var w1 = c.measureText("Student").width, w2 = c.measureText("Up").width, x0 = W / 2 - (w1 + w2) / 2;
-    c.textAlign = "left"; c.fillStyle = "#fff"; c.fillText("Student", x0, 210); c.fillStyle = "#67e8f9"; c.fillText("Up", x0 + w1, 210); c.textAlign = "center";
+    c.textAlign = "left"; c.fillStyle = "#fff"; c.fillText("Student", x0, 210); c.fillStyle = "#fed7aa"; c.fillText("Up", x0 + w1, 210); c.textAlign = "center";
     c.font = "800 30px system-ui, sans-serif"; c.fillStyle = "rgba(255,255,255,.78)"; c.fillText("studentup.in  ·  డైలీ క్విజ్  ·  " + o.date, W / 2, 272);
     // day streak pill
     var dtxt = "🔥 రోజు " + o.day; c.font = "800 34px system-ui, sans-serif"; var dw = c.measureText(dtxt).width + 60;
@@ -64,7 +64,7 @@
     // ring
     var cx = W / 2, cy = 880, R = 185;
     c.lineWidth = 34; c.lineCap = "round"; c.strokeStyle = "#e2e8f0"; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.stroke();
-    var rg = c.createLinearGradient(cx - R, cy, cx + R, cy); rg.addColorStop(0, "#22c55e"); rg.addColorStop(1, "#06b6d4");
+    var rg = c.createLinearGradient(cx - R, cy, cx + R, cy); rg.addColorStop(0, "#22c55e"); rg.addColorStop(1, "#f59e0b");
     c.strokeStyle = rg; c.beginPath(); c.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (o.score / o.total)); c.stroke();
     c.fillStyle = "#0f172a"; c.font = "900 150px system-ui, sans-serif"; c.fillText(o.score + "/" + o.total, cx, cy - 10);
     c.font = "800 44px system-ui, sans-serif"; c.fillStyle = "#16a34a"; c.fillText(pct + "%", cx, cy + 95);
