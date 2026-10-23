@@ -1418,7 +1418,21 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                 log.warning("slug collision: wanted /%s/ got %s — canonical re-pointed",
                             article.get("slug", ""), real)
                 meta["rank_math_canonical_url"] = real
-                wp.update_post(int(result["id"]), final_html, meta={"rank_math_canonical_url": real})
+                # v398: a "-2" slug on a NEW post means WordPress already has
+                # this notification under the same slug — the slug guard did
+                # not see it (status outside its list / race). Mark the draft
+                # loudly instead of letting a silent twin reach the site.
+                _upd = {"rank_math_canonical_url": real}
+                try:
+                    if (requested_status != "publish" and re.search(r"-\d+/?$", real)
+                            and not str(_post_title).startswith("REVIEW:")):
+                        wp.update_post(int(result["id"]), final_html, meta=_upd,
+                                       title=f"REVIEW: duplicate? {_post_title}")
+                        article["_review_flags"] = list(article.get("_review_flags") or []) + ["duplicate-slug"]
+                    else:
+                        wp.update_post(int(result["id"]), final_html, meta=_upd)
+                except TypeError:  # update_post without title kwarg
+                    wp.update_post(int(result["id"]), final_html, meta=_upd)
                 try:
                     wp.write_seo_meta(int(result["id"]), {"rank_math_canonical_url": real})
                 except Exception:  # noqa: BLE001
@@ -2127,7 +2141,7 @@ def _duplicate_title_guard(article: Dict, wp=None) -> None:
     if wp is not None and slug:
         try:
             resp = wp._request("GET", "posts", params={
-                "slug": slug, "status": "publish,draft,pending,future",
+                "slug": slug, "status": "publish,draft,pending,future,private",
                 "context": "edit", "_fields": "id,status,title", "per_page": 5})
             if resp.status_code == 200 and resp.json():
                 hit = resp.json()[0]

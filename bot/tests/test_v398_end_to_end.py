@@ -46,7 +46,7 @@ class FakeWP:
         return {"id": 4555, "link": f"https://studentup.in/{kw['slug']}-2/", "status": kw.get("status")}
 
     def update_post(self, post_id, content_html, title=None, excerpt=None, meta=None):
-        self.updates.append({"id": post_id, "content": content_html, "meta": meta})
+        self.updates.append({"id": post_id, "content": content_html, "meta": meta, "title": title})
         return {"id": post_id, "link": "https://studentup.in/x-2/", "status": "draft"}
 
     def write_seo_meta(self, post_id, meta):
@@ -246,3 +246,9 @@ def test_stale_year_draft_gets_review_prefix(fake_wp):
     art["focus_keyword"] = "TSPSC Group 4 Results 2025"
     pipeline.publish_article(art)
     assert fake_wp.created["title"].startswith("REVIEW: ")
+
+
+def test_slug_collision_marks_draft_as_possible_duplicate(fake_wp):
+    pipeline.publish_article(_results_article())   # FakeWP always answers with a "-2" link
+    titles = [u.get("title") for u in fake_wp.updates if u.get("title")]
+    assert titles and titles[0].startswith("REVIEW: duplicate?")
