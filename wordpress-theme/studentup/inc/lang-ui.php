@@ -870,6 +870,8 @@ function studentup_nav_strings() {
 			'Exam Calendar', 'Compare Jobs', 'Saved', 'Post Your News', 'About', 'Contact', 'Privacy Policy',
 			'Daily Quiz & Polls', 'Corrections & Updates', 'Exam & Application Calendar', 'Download App', 'All', 'WEB APP', 'Follow us', 'Exams & More', 'Upcoming Exams', 'Govt Schemes', 'Install', 'StudentUp App', 'New', 'NEW', 'Categories', 'Other links', 'About us', 'About Us', 'Contact', 'Contact Us', 'Privacy policy', 'Disclaimer', 'Terms', 'Terms & Conditions', 'Editorial policy', 'Editorial Policy', 'Post your news', 'Corrections', 'Sitemap',
 			'Social', 'More', 'Explore', 'Walk-in Interviews', 'Jobs by qualification', 'Exams', 'Previous papers & keys', 'Browse everything', 'Most searched by students', 'Site menu', 'Sidebar',
+			/* v1.9.173: mega-menu/mobile-menu subtitles + explore row were still Telugu → mixed menu */
+			'Latest active jobs', 'Instant alerts', 'My workspace', 'My Workspace', 'Open Breaking News', 'District-wise news', 'Saved posts', 'Workspace', 'Scholarships 2026 hub', 'District News', 'Editorial Team', 'Corrections Log', 'Terms of Use',
 		), true );
 	}
 	return $set;

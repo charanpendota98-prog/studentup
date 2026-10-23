@@ -191,10 +191,17 @@ def drop_duplicate_takeaways(html: str) -> Tuple[str, int]:
     m = re.search(r'<div class="su-takeaways">.*?</ul>\s*</div>\s*', html, flags=re.S)
     if not m:
         return html, 0
-    items = [re.sub(r"<[^>]+>", "", x).strip() for x in re.findall(r"<li[^>]*>(.*?)</li>", m.group(0), flags=re.S)]
+    def _norm(x: str) -> str:
+        x = re.sub(r"<[^>]+>", " ", x)
+        x = re.sub(r"[\s\u200c\u200d]+", " ", x)
+        return re.sub(r"[^\w\u0c00-\u0c7f ]+", "", x).strip().lower()
+    items = [_norm(x) for x in re.findall(r"<li[^>]*>(.*?)</li>", m.group(0), flags=re.S)]
+    items = [i for i in items if i]
     rest = html[:m.start()] + html[m.end():]
-    plain = re.sub(r"<[^>]+>", "", rest)
-    if items and all(i and i in plain for i in items):
+    plain = _norm(rest)
+    # v399: live 22-Oct TCS post — bullets were "**Qualification:** …" in the body
+    # and "Qualification: …" in the box; normalise, and 80 % overlap is enough.
+    if items and sum(1 for i in items if i in plain) >= max(1, int(0.8 * len(items))):
         return rest, 1
     return html, 0
 
@@ -275,7 +282,33 @@ def title_flags(title: str) -> List[str]:
         out.append("sentence-title")
     if re.search(r"(?:Best Guide|—\s*Complete|Complete Guide|Ultimate)\s*$", title or "", re.I):
         out.append("template-suffix")
+    # v399: a title in Hindi/Tamil/Kannada/Malayalam/Bengali/Urdu script is a
+    # feed mix-up — a Telugu site must never carry it (pipeline hard-skips).
+    if FOREIGN_SCRIPT_RE.search(title or ""):
+        out.append("foreign-script")
+    # v399: other-state recruitment with no AP/TS/central anchor — the reader
+    # here cannot apply; flag for a human look instead of a silent draft.
+    low_t = (title or "").lower()
+    if (OTHER_STATE_RE.search(low_t)
+            and not re.search(r"\bbank\b|\bltd\b|limited|pvt|infosys|tcs|wipro|off ?campus|"
+                              r"walk-?in|software|developer|engineer trainee", low_t)
+            and not re.search(r"telangana|andhra|tgpsc|tspsc|appsc|hyderabad|vijayawada|"
+                              r"తెలంగాణ|ఆంధ్ర|all india|india post|ssc|upsc|rrb|railway|ibps|"
+                              r"sbi|army|navy|air force|isro|drdo|central", low_t)):
+        out.append("other-state")
     return out
+
+
+# Scripts we never publish in (Devanagari, Bengali, Gurmukhi, Gujarati, Tamil,
+# Kannada, Malayalam, Arabic/Urdu). Telugu block (0C00-0C7F) is NOT here.
+FOREIGN_SCRIPT_RE = re.compile(
+    r"[\u0900-\u097f\u0980-\u09ff\u0a00-\u0a7f\u0a80-\u0aff\u0b80-\u0bff"
+    r"\u0c80-\u0cff\u0d00-\u0d7f\u0600-\u06ff]")
+OTHER_STATE_RE = re.compile(
+    r"\b(?:kerala|kpsc|tnpsc|tamil ?nadu|mpsc|maharashtra|uppsc|upsssc|uttar pradesh|"
+    r"bpsc|bihar|wbpsc|west bengal|opsc|odisha|rpsc|rajasthan|gpsc|gujarat|hpsc|haryana|"
+    r"ppsc|punjab|jkssb|jkpsc|jharkhand|jssc|cgpsc|chhattisgarh|mppsc|madhya pradesh|"
+    r"ukpsc|uttarakhand|assam|hpssc|himachal|goa psc|karnataka)\b")
 
 
 def draft_flags(title: str, html: str) -> List[str]:
@@ -290,7 +323,105 @@ def draft_flags(title: str, html: str) -> List[str]:
         tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
         if tel / len(words) < 0.30:
             flags.append("english-body")
+    # v399: every full date in the body is already in the past (live 22-Oct:
+    # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
+    # ignore the house "last updated"/"published" stamps — they are always today.
+    # results / answer keys / hall-ticket-after-exam posts legitimately talk only
+    # about a past exam date — never flag those.
+    if re.search(r"result|ఫలిత|answer key|final key|prelims key|merit list|cut ?off|score ?card|"
+                 r"selection list|interview list|విడుదల", (title or "").lower()):
+        return flags
+    ds = body_dates(re.sub(r"(?:చివరి అప్‌డేట్|చివరి అప్డేట్|Last updated|Updated on|Published on|Posted on)\s*[:\-–]?[^\n.]{0,40}",
+                           " ", plain, flags=re.I))
+    if ds:
+        from datetime import date as _d, timedelta as _td
+        if max(ds) < _d.today() - _td(days=3):
+            flags.append(f"past-dates:{max(ds).isoformat()}")
+    flags.extend(consistency_flags(title, plain))
     return flags
+
+
+_LAST_DATE_RE = re.compile(
+    r"(?:చివరి తేదీ|ఆఖరి తేదీ|last date|closing date|దరఖాస్తు గడువు)[^.\n]{0,40}?"
+    r"(\d{1,2}[\-/ ](?:\d{1,2}|[A-Za-z]{3,9}|[\u0c00-\u0c7f]+)[\-/ ,]*\d{4}|[A-Za-z]{3,9} \d{1,2},? \d{4})",
+    re.I)
+_POSTS_RE = re.compile(r"(?:మొత్తం|total)\s*(?:పోస్టులు|posts|vacancies|ఖాళీలు)?\s*[:\-–]?\s*(\d[\d,]{1,6})"
+                       r"|(\d[\d,]{1,6})\s*(?:పోస్టులు|posts|vacancies|ఖాళీలు)", re.I)
+_FEE_RE = re.compile(r"(?:ఫీజు|fee)[^.\n]{0,30}?(?:₹|rs\.?)\s*(\d[\d,]{1,5})", re.I)
+
+
+def consistency_flags(title: str, plain: str) -> List[str]:
+    """v400 fact-diff: the same fact stated two different ways inside ONE post
+    (live 22-Oct: TCS post said Visakhapatnam in the title, Hyderabad in the
+    body; another gave two different last dates). Gemini drifts between the
+    source and its own memory — we cannot know which is right, but we CAN
+    see that they disagree → REVIEW flag with both values. No auto-change."""
+    out: List[str] = []
+    txt = plain or ""
+    def _norm_num(x: str) -> str:
+        return x.replace(",", "").lstrip("0") or "0"
+    # a) two different "last date" values
+    lds = {re.sub(r"\s+", " ", m.group(1)).strip().lower() for m in _LAST_DATE_RE.finditer(txt)}
+    lds = {d for d in lds if re.search(r"\d{4}", d)}
+    if len(lds) >= 2:
+        parsed = {d.isoformat() for d in body_dates(" . ".join(lds))}
+        if len(parsed) >= 2:
+            out.append("conflict-last-date:" + "|".join(sorted(parsed)))
+    # b) two different "total posts" numbers (title vs body counts too)
+    nums = set()
+    for m in _POSTS_RE.finditer((title or "") + " . " + txt):
+        v = _norm_num(m.group(1) or m.group(2) or "")
+        if v.isdigit() and 1 <= int(v) <= 500000:
+            nums.add(int(v))
+    if len(nums) >= 2 and (max(nums) - min(nums)) > 0.05 * max(nums):
+        # 500 vs 501 (typo / per-category sum) is not worth a human; 500 vs 5000 is
+        out.append("conflict-posts:" + "|".join(str(n) for n in sorted(nums)))
+    # c) title says city/state A, body never mentions A but names another TS/AP city
+    cities = ["హైదరాబాద్", "విశాఖపట్నం", "విజయవాడ", "వరంగల్", "తిరుపతి", "గుంటూరు", "కరీంనగర్", "నిజామాబాద్",
+              "hyderabad", "visakhapatnam", "vizag", "vijayawada", "warangal", "tirupati", "guntur"]
+    tl = (title or "").lower(); bl = txt.lower()
+    in_title = [c for c in cities if c in tl]
+    if in_title and not any(c in bl for c in in_title):
+        other = [c for c in cities if c in bl and c not in in_title]
+        if other:
+            out.append(f"conflict-place:{in_title[0]}|{other[0]}")
+    return out
+
+
+_MONTHS = {
+    "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7,
+    "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "sept": 9,
+    "oct": 10, "nov": 11, "dec": 12,
+    "జనవరి": 1, "ఫిబ్రవరి": 2, "మార్చి": 3, "ఏప్రిల్": 4, "మే": 5, "జూన్": 6, "జులై": 7, "జూలై": 7,
+    "ఆగస్టు": 8, "ఆగస్ట్": 8, "సెప్టెంబర్": 9, "సెప్టెంబరు": 9, "అక్టోబర్": 10, "అక్టోబరు": 10,
+    "నవంబర్": 11, "నవంబరు": 11, "డిసెంబర్": 12, "డిసెంబరు": 12,
+}
+_MON_RE = "|".join(sorted(map(re.escape, _MONTHS), key=len, reverse=True))
+_DATE_RES = (
+    re.compile(rf"\b(\d{{1,2}})\s*(?:st|nd|rd|th)?\s+({_MON_RE})[,.]?\s+(20\d{{2}})", re.I),   # 11 February 2026 / 11 ఫిబ్రవరి 2026
+    re.compile(rf"({_MON_RE})\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(20\d{{2}})", re.I),         # February 11, 2026 / ఫిబ్రవరి 11, 2026
+    re.compile(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](20\d{2})\b"),                             # 11-02-2026
+)
+
+
+def body_dates(text: str) -> List:
+    """All full calendar dates (day+month+year) found in text, as date objects."""
+    from datetime import date as _d
+    out = []
+    for i, rx in enumerate(_DATE_RES):
+        for m in rx.finditer(text or ""):
+            try:
+                if i == 0:
+                    d, mo, y = int(m.group(1)), _MONTHS[m.group(2).lower()], int(m.group(3))
+                elif i == 1:
+                    mo, d, y = _MONTHS[m.group(1).lower()], int(m.group(2)), int(m.group(3))
+                else:
+                    d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+                out.append(_d(y, mo, d))
+            except (ValueError, KeyError):
+                continue
+    return out
 
 
 # ------------------------------------------------------------------ live repair
@@ -333,6 +464,17 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
             changes["excerpt"] = exc_n
         # Missing studentup_last_date → read the deadline from the body (future only)
         extra_meta: Dict[str, str] = {}
+        # v399: SERP title with a power word wedged mid-sentence ("… 2026 – Latest విశాఖ…")
+        try:
+            from .pipeline import MID_POWER_RE
+            rmt = str(meta.get("rank_math_title") or "")
+            if rmt and MID_POWER_RE.search(rmt):
+                fixed = re.sub(r"\s+", " ", MID_POWER_RE.sub(": ", rmt)).strip()
+                if fixed != rmt:
+                    extra_meta["rank_math_title"] = fixed
+                    changes["seo_title"] = 1
+        except Exception:  # noqa: BLE001
+            log.debug("mid power title fix skip", exc_info=True)
         if not str(meta.get("studentup_last_date") or "").strip():
             try:
                 from . import qual as _q
@@ -342,19 +484,36 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
                     changes["last_date"] = 1
             except Exception:  # noqa: BLE001
                 pass
+        # v399: H1 with a glued/wedged power word ("… 686 పోస్టులు Official వివరాలు",
+        # "… 2026 – Latest విశాఖ…") → natural headline (slug/URL untouched).
+        new_title = title
+        try:
+            from .pipeline import clean_title_text
+            cand = clean_title_text(title)
+            if cand and cand != title and len(cand) >= 20:
+                new_title = cand
+                changes["title"] = 1
+        except Exception:  # noqa: BLE001
+            log.debug("title clean skip", exc_info=True)
         row["changes"] = changes
-        row["flags"] = title_flags(title)
+        row["flags"] = title_flags(new_title)
         if apply and (row["canonical_fix"] or changes):
             new_meta = dict(extra_meta)
             if row["canonical_fix"]:
                 new_meta["rank_math_canonical_url"] = want
             new_meta = new_meta or None
             try:
-                wp.update_post(pid, new_html if changes else html, meta=new_meta,
-                               excerpt=new_exc if exc_n else None)
-                if new_meta and row["canonical_fix"]:
+                try:
+                    wp.update_post(pid, new_html if changes else html, meta=new_meta,
+                                   excerpt=new_exc if exc_n else None,
+                                   title=new_title if new_title != title else None)
+                except TypeError:  # update_post without title kwarg
+                    wp.update_post(pid, new_html if changes else html, meta=new_meta,
+                                   excerpt=new_exc if exc_n else None)
+                if new_meta and (row["canonical_fix"] or "rank_math_title" in new_meta):
                     try:
-                        wp.write_seo_meta(pid, {"rank_math_canonical_url": want})
+                        bridge = {k: v for k, v in new_meta.items() if k.startswith("rank_math_")}
+                        wp.write_seo_meta(pid, bridge)
                     except Exception:  # noqa: BLE001
                         log.debug("canonical bridge write skip", exc_info=True)
                 row["applied"] = True

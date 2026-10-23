@@ -245,6 +245,9 @@ function studentup_latest_ticker_items( $max = 12 ) {
 		if ( ! $link || 'guide' === sanitize_title( $title ) || 'guide' === $slug ) {
 			continue;
 		}
+		if ( function_exists( 'studentup_is_guide_post' ) && studentup_is_guide_post( $p ) ) {
+			continue; // v1.9.173: preparation guides are not Latest Jobs.
+		}
 		$items[] = array(
 			'title' => $title,
 			'link'  => $link,

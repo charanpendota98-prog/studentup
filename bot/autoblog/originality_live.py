@@ -15,7 +15,7 @@ import html
 import logging
 import re
 from typing import Dict, List
-from urllib.parse import quote_plus, urlparse
+from urllib.parse import urlparse
 
 import requests
 

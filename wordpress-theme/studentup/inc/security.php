@@ -48,7 +48,14 @@ function studentup_security_headers() {
 	header( 'Cross-Origin-Opener-Policy: same-origin-allow-popups' );
 	// v81 (§76): HSTS — HTTPS live + SSL confirm ayyaka owner ON cheyali
 	// (default OFF: HTTP staging lo ON chesthe site lock avtundi).
-	// CSP deliberate skip: AdSense/GA4/YouTube embeds break risk (§76 rule).
+	// 1.9.174: CSP in REPORT-ONLY mode — never blocks anything (AdSense / GA4 /
+	// YouTube keep working), browsers just report what WOULD break. Owner reads
+	// the report in WP → Settings → StudentUp CSP log, then flips enforce later.
+	// Option csp_report_only = '1' (default) | '0' off.
+	if ( '0' !== (string) studentup_opt( 'csp_report_only', '1' ) ) {
+		$report = esc_url_raw( rest_url( 'studentup/v1/csp-report' ) );
+		header( "Content-Security-Policy-Report-Only: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https: data: blob:; font-src 'self' https: data:; connect-src 'self' https:; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com https://wa.me https://t.me; report-uri " . $report );
+	}
 	if ( '1' === (string) studentup_opt( 'hsts_enforce', '0' ) && is_ssl() ) {
 		header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains' );
 	}
@@ -147,3 +154,58 @@ function studentup_maybe_disable_file_edit() {
 	}
 }
 add_action( 'admin_init', 'studentup_maybe_disable_file_edit' );
+
+/**
+ * 1.9.174: CSP report sink — keeps the last 40 unique violations in an option
+ * (no PII, no cookies; directive + blocked host only). 2 KB cap, IP rate limit.
+ */
+add_action( 'rest_api_init', function () {
+	register_rest_route( 'studentup/v1', '/csp-report', array(
+		'methods'             => 'POST',
+		'permission_callback' => '__return_true',
+		'callback'            => 'studentup_csp_report_sink',
+	) );
+} );
+function studentup_csp_report_sink( $request ) {
+	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+	$key = 'su_csp_' . md5( $ip );
+	if ( (int) get_transient( $key ) >= 20 ) {
+		return new WP_REST_Response( null, 429 );
+	}
+	set_transient( $key, (int) get_transient( $key ) + 1, 10 * MINUTE_IN_SECONDS );
+	$raw = (string) $request->get_body();
+	if ( strlen( $raw ) > 4096 ) {
+		return new WP_REST_Response( null, 413 );
+	}
+	$data = json_decode( $raw, true );
+	$r    = isset( $data['csp-report'] ) && is_array( $data['csp-report'] ) ? $data['csp-report'] : ( is_array( $data ) ? $data : array() );
+	$dir  = sanitize_text_field( (string) ( $r['violated-directive'] ?? $r['effective-directive'] ?? '' ) );
+	$host = wp_parse_url( (string) ( $r['blocked-uri'] ?? '' ), PHP_URL_HOST );
+	$host = $host ? sanitize_text_field( $host ) : sanitize_text_field( substr( (string) ( $r['blocked-uri'] ?? '' ), 0, 40 ) );
+	if ( '' === $dir ) {
+		return new WP_REST_Response( null, 204 );
+	}
+	$log = get_option( 'studentup_csp_log', array() );
+	if ( ! is_array( $log ) ) {
+		$log = array();
+	}
+	$k = $dir . ' ← ' . $host;
+	$log[ $k ] = array( 'n' => ( isset( $log[ $k ]['n'] ) ? (int) $log[ $k ]['n'] + 1 : 1 ), 'last' => current_time( 'mysql' ) );
+	if ( count( $log ) > 40 ) {
+		uasort( $log, function ( $a, $b ) { return strcmp( $b['last'], $a['last'] ); } );
+		$log = array_slice( $log, 0, 40, true );
+	}
+	update_option( 'studentup_csp_log', $log, false );
+	return new WP_REST_Response( null, 204 );
+}
+add_action( 'admin_notices', function () {
+	if ( ! current_user_can( 'manage_options' ) || ! isset( $_GET['su_csp'] ) ) {
+		return;
+	}
+	$log = get_option( 'studentup_csp_log', array() );
+	echo '<div class="notice notice-info"><p><strong>CSP report-only log</strong> (' . count( (array) $log ) . ')</p><ol>';
+	foreach ( (array) $log as $k => $v ) {
+		echo '<li>' . esc_html( $k ) . ' × ' . (int) $v['n'] . ' · ' . esc_html( $v['last'] ) . '</li>';
+	}
+	echo '</ol></div>';
+} );

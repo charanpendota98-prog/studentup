@@ -505,6 +505,21 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                     log.info("AD ADVISOR milestone: %s — Telegram alert pampindi", _k)
             except Exception:
                 _soft_fail("Ad advisor failed (non-fatal)")
+        # --- v399: DRAFT-FLOW SLO — 14:00 IST ki < DRAFTS_SLO drafts aite owner ki
+        #     Telegram (silent outages like the v391 quiz skip never hide again).
+        if (now_hour >= 14 and not mock
+                and not state.meta_get(config.STATE_PATH, f"slo:{today.isoformat()}")):
+            try:
+                _slo = int(getattr(config, "DRAFTS_SLO", 2))
+                if count < _slo:
+                    notifier.send_telegram(notifier.esc(
+                        f"⚠️ DRAFT-FLOW SLO: {count}/{_slo} drafts by 14:00 today.\n"
+                        f"Check: journalctl -u studentup-autoblog --since today | grep -i 'skip\\|fail\\|error' | tail -20"))
+                    log.warning("DRAFT-FLOW SLO miss: %d/%d", count, _slo)
+            except Exception:  # noqa: BLE001
+                log.debug("slo alert skip", exc_info=True)
+            finally:
+                state.meta_set(config.STATE_PATH, f"slo:{today.isoformat()}", "1")
         # --- v26: Daily Quiz slot — roju okati, QUIZ_HOUR tarvata ---
         if (config.QUIZ_ENABLED
                 and now_hour >= config.QUIZ_HOUR
@@ -541,6 +556,17 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                         log.warning("Daily quiz draft failed — retry next run: %s", exc)
                 except Exception:
                     _soft_fail("Daily quiz failed — regular posting continues")
+                    # v399: the promised daily slot must still produce a review
+                    # draft — fall back ONCE to the deterministic sample bank
+                    # (draft-locked; owner sees "sample" in the Telegram line).
+                    if not quiz_mock and getattr(config, "QUIZ_SAMPLE_FALLBACK", True):
+                        try:
+                            result = pipeline.create_quiz(mock=True)
+                            state.meta_set(config.STATE_PATH,
+                                           f"quizdate:{today.isoformat()}", "1")
+                            log.warning("DAILY QUIZ sample draft (AI failed) ✔ %s", result["link"])
+                        except Exception:
+                            _soft_fail("Daily quiz sample fallback failed too")
         # --- v15/v16: Breaking-News Radar — every RADAR_INTERVAL_HOURS ---
         if (config.RADAR_ENABLED
                 and (now_hour - config.RADAR_HOUR) % max(1, config.RADAR_INTERVAL_HOURS) == 0
@@ -2439,6 +2465,10 @@ def main() -> int:
                         help="v31: preview/publish Student Internet Center services page")
     parser.add_argument("--source-scan", action="store_true",
                         help="v390: scan published posts + drafts for source names/publisher domains/legacy promo chrome; --apply cleans stored content")
+    parser.add_argument("--post-deploy-check", action="store_true",
+                        help="v399: 60-second live smoke test (theme version, REVIEW/duplicate/Tenglish on live, quiz + drafts SLO)")
+    parser.add_argument("--expect-theme", default="",
+                        help="v399: theme version the check must see live, e.g. 1.9.173")
     parser.add_argument("--dedupe-posts", action="store_true",
                         help="v391: group published posts that cover the SAME notification; --apply keeps the best copy, others → draft + canonical")
     parser.add_argument("--content-audit", action="store_true",
@@ -3025,6 +3055,9 @@ def main() -> int:
         from . import source_leak
 
         return source_leak.run(limit=max(1, min(args.content_limit, 2000)), apply=bool(args.apply))
+    if args.post_deploy_check:
+        from . import post_deploy_check
+        return post_deploy_check.run(expected_theme=args.expect_theme, notify=bool(args.notify))
     if args.dedupe_posts:
         from . import dedupe_posts
 

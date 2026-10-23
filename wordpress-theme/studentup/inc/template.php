@@ -384,7 +384,7 @@ function studentup_menu_fallback() {
 		);
 	}
 	$pages = array(
-		array( 'slug' => 'saved',   'label' => 'Saved posts', 'desc' => 'Padhukoni tarvata chudandi' ),
+		array( 'slug' => 'saved',   'label' => 'Saved posts', 'desc' => 'Save now, read later' ),
 		array( 'slug' => 'contact', 'label' => 'Contact',     'desc' => 'Corrections · suggestions' ),
 		array( 'slug' => 'about',   'label' => 'About',       'desc' => 'Who writes this' ),
 		array( 'slug' => 'quiz',    'label' => 'Daily Quiz',  'desc' => 'Practice questions' ),
@@ -573,9 +573,32 @@ add_filter( 'the_title', 'studentup_title_strip_orphan_tail', 19 );
  * facts card / quick answer / official links / tables / headings the bot places
  * before it ("ముఖ్య వివరాలు పోస్టులు1,200 చివరి తేదీ…" was showing on cards).
  */
+/**
+ * v1.9.172: publisher names / "according to" / "ఇది X గురించి." openers in a
+ * MANUAL excerpt (old bot drafts) — cleaned at render time, no re-save needed.
+ *
+ * @param string $text Excerpt.
+ * @return string
+ */
+function studentup_excerpt_text_clean( $text ) {
+	$t = (string) $text;
+	$pub = '(?:Sakshi(?:\s+Education)?|Eenadu(?:\s+Pratibha)?|Pratibha|ETV\s*Bharat|News\s*18|TV9|TV5|NTV|ABN|Andhra\s*Jyoth[iy]|Namasthe\s+Telangana|V6|10TV|Zee\s*News|Samayam|Oneindia|Hindustan\s+Times|Times\s+of\s+India|Indian\s+Express|The\s+Hindu|NDTV|India\s+Today|Deccan\s+Chronicle|Telangana\s+Today|Hans\s+India|Careers\s*360|Jagran\s*Josh|FreshersLive|Sarkari\s*Result|FreeJobAlert|Adda\s*247|Testbook|సాక్షి(?:\s+ఎడ్యుకేషన్)?|ఈనాడు(?:\s+ప్రతిభ)?|ఈటీవీ\s*భారత్)';
+	$t = preg_replace( '/\b(?:according to|as per)\s+(?:the\s+)?' . $pub . '\s*,?\s*/iu', '', $t );
+	$t = preg_replace( '/' . $pub . '\s+(?:కథనం|నివేదిక|వార్తల)?\s*(?:ప్రకారం|వెల్లడించింది|తెలిపింది|reports?|reported)\s*,?\s*/iu', '', $t );
+	$t = preg_replace( '/\b(?:according to|as per)\s+(?:the\s+)?(?:source|report|news|media)s?\b,?\s*/iu', '', $t );
+	$t = preg_replace( '/^\s*ఇది\s+[^.!?]{0,80}?గురించి[^.!?]{0,30}[.!?]\s*/u', '', $t );
+	$t = preg_replace( '/^\s*ఇది\s+/u', '', $t );
+	$t = preg_replace( '/\s*\((?:source|మూలం)\s*:[^)]*\)/iu', '', $t );
+	$t = trim( preg_replace( '/\s+/u', ' ', $t ) );
+	return '' === $t ? (string) $text : $t;
+}
+
 function studentup_excerpt_source_clean( $text, $post = null ) {
-	if ( ! $post || ! empty( $post->post_excerpt ) || is_admin() ) {
+	if ( is_admin() ) {
 		return $text;
+	}
+	if ( ! $post || ! empty( $post->post_excerpt ) ) {
+		return studentup_excerpt_text_clean( $text );
 	}
 	$html = (string) $post->post_content;
 	$html = preg_replace( '#<(section|div)[^>]*class="[^"]*(su-facts-card|su-quick-answer-card|su-official-links|su-faq|su-related-entities|su-toc|wp-block-rank-math-toc-block)[^"]*"[^>]*>.*?</\1>#isu', ' ', $html );
@@ -586,6 +609,6 @@ function studentup_excerpt_source_clean( $text, $post = null ) {
 	if ( '' === $plain ) {
 		return $text;
 	}
-	return wp_trim_words( $plain, (int) apply_filters( 'excerpt_length', 30 ), '…' );
+	return studentup_excerpt_text_clean( wp_trim_words( $plain, (int) apply_filters( 'excerpt_length', 30 ), '…' ) );
 }
 add_filter( 'get_the_excerpt', 'studentup_excerpt_source_clean', 9, 2 );

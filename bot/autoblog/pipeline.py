@@ -20,7 +20,7 @@ import requests
 from . import (config, content_quality, gemini_client, google_quality, image_gen,
                notifier, post_gate, qual, research, rm100, seo, sources, state,
                validator)
-from .notifier import esc, send_telegram
+from .notifier import send_telegram
 from .wordpress_client import WordPressClient
 
 log = logging.getLogger("autoblog.pipeline")
@@ -550,12 +550,22 @@ def clean_title_text(title: str) -> str:
     # word (rm100.fix_title); the visible headline must read naturally.
     t = re.sub(r"\s*(?:[—–:-]\s*)?\(?\b(?:Official|Latest|New|Direct Link|Latest Update)\)?"
                r"(?:\s+(?:జాబ్|జాబ్స్|అప్‌డేట్|అప్డేట్|Job|Jobs|Update|News))?\s*$", "", t, flags=re.I)
+    # v399: power word wedged INSIDE the title (live 22-Oct: "TCS Mini Job Mela
+    # 2026 – Latest విశాఖపట్నంలో 200 ఉద్యోగాలు") — reads broken in Telugu.
+    t = MID_POWER_RE.sub(": ", t)
+    # live H1 22-Oct: "… 686 పోస్టులు Official వివరాలు" — bare power word glued
+    # between Telugu/number words (no separator). Drop the word only.
+    t = re.sub(r"(?<=[\u0c00-\u0c7f0-9,])\s+(?:Official|Latest|New)\s+(?=[\u0c00-\u0c7f])", " ", t, flags=re.I)
     # v386: no hype in headlines (live: "అద్భుత అవకాశం!", "బంగారు అవకాశం!",
     # "— Complete Details"). Exclamation marks go; clickbait tails go.
     t = re.sub(r"(?:\s*[:—–-])?\s+(?:అద్భుత(?:మైన)? అవకాశం|బంగారు అవకాశం|భారీ అవకాశం|గొప్ప అవకాశం|సువర్ణావకాశం|Complete Details|Full Details|Best Guide|Complete Guide)\s*!*\s*$", "", t, flags=re.I)
     t = re.sub(r"!+", "", t)
     t = re.sub(r"\s*[—–:-]\s*$", "", t).strip()
     return re.sub(r"\s+", " ", t).strip()
+
+
+MID_POWER_RE = re.compile(
+    r"\s*[—–:|-]\s*(?:Official|Latest|New|Latest Update|Direct Link)\s+(?=[\u0c00-\u0c7f0-9])", re.I)
 
 
 def _hygiene(article: Dict) -> Dict:
@@ -1382,14 +1392,18 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     # a draft made only of house chrome (facts table + schema).
     _body_words = len([w for w in re.findall(r"[^\s<>]+", re.sub(r"<[^>]+>", " ", str(article.get("content_html") or "")))
                        if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)])
-    if _body_words < 120 and not article.get("_mock") and not article.get("_refresh_of"):
+    if (_body_words < 120 and not article.get("_mock") and not article.get("_refresh_of")
+            and article.get("article_type") != "quiz"):
         raise RuntimeError(f"SKIP-EMPTY-BODY: only {_body_words} words — {article.get('title', '')[:60]}")
     # v398: human-review flags on the draft title (stale year, English body,
     # sentence-as-title) — drafts only; a live publish is never renamed.
     _post_title = article["title"]
     try:
         from . import live_fix as _lf
-        _dflags = _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+        _dflags = [] if article.get("article_type") == "quiz" else \
+            _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+        if "foreign-script" in _dflags and not article.get("_mock"):
+            raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
         if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
             _post_title = f"REVIEW: {_post_title}"
             log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
@@ -2114,6 +2128,13 @@ def _duplicate_title_guard(article: Dict, wp=None) -> None:
     title = str(article.get("title") or "")
     norm = state.normalize_title(title)
     if not norm or article.get("_mock") or article.get("_refresh_of"):
+        return
+    # v399: the Daily Quiz title differs from yesterday's only by the date
+    # ("Daily Quiz – 22 October 2026 | GK Telugu (Easy)") → the 0.92 fuzzy
+    # match flagged it as a duplicate EVERY day since v391 and no quiz draft
+    # was created (owner report 23-Oct). create_quiz() has its own exact
+    # same-day guard; the fuzzy/topic guard is for notifications only.
+    if article.get("article_type") == "quiz":
         return
     try:
         if state.title_exists(config.STATE_PATH, title):

@@ -10,7 +10,6 @@ import re
 import sqlite3
 from pathlib import Path
 from typing import Dict, List
-from urllib.parse import urlparse
 
 from . import config
 

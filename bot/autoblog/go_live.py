@@ -28,7 +28,7 @@ import io
 import logging
 from contextlib import redirect_stdout
 from datetime import datetime
-from typing import Callable, Dict, List
+from typing import Dict, List
 
 from . import config
 

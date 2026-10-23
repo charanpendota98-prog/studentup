@@ -93,6 +93,52 @@ add_filter( 'the_excerpt', 'studentup_strip_foreign_block_placeholders', 9 );
  * @return string
  */
 function studentup_clean_legacy_bot_chrome( $html ) {
+	// 0) v1.9.172: facts table "Quick Overview:" heading prefix; "Official Source"
+	//    row naming a news/aggregator host (only gov/authority hosts may stay);
+	//    "Q1." / "Q:" prefixes on FAQ headings; empty &nbsp; paragraphs;
+	//    "ఇది చక్కని అవకాశం" / "… వివరాలు Notification‌లో ఉంటాయి" filler lines.
+	$html = preg_replace( '#(<h2[^>]*>)\s*Quick Overview\s*:\s*#iu', '$1', $html );
+	$html = preg_replace_callback( '#<tr[^>]*>\s*<t[hd][^>]*>\s*(?:Official Source|Source|మూలం)\s*</t[hd]>\s*<td[^>]*>(.*?)</td>\s*</tr>\s*#isu', function ( $m ) {
+		$host = strtolower( trim( wp_strip_all_tags( $m[1] ) ) );
+		$host = preg_replace( '#^www\.#', '', $host );
+		return preg_match( '#\.(gov\.in|nic\.in|gov|ac\.in|edu|edu\.in|res\.in)$#', $host ) ? $m[0] : '';
+	}, $html );
+	$html = preg_replace( '#(<h[2-4][^>]*>)\s*(?:Q\s*\.?\s*\d+\s*[.:)\-–]|Q\s*[.:]|ప్రశ్న\s*\d*\s*[.:)]|FAQ\s*\d+\s*[.:)])\s*#iu', '$1', $html );
+	$html = preg_replace( '#<p[^>]*>(?:\s|&nbsp;|\x{00a0}|<br\s*/?>)*</p>\s*#iu', '', $html );
+	$html = preg_replace( '#<li[^>]*>\s*(?:[A-Za-z ]{3,30}|[\x{0c00}-\x{0c7f} ]{3,30}) వివరాలు (?:Notification|నోటిఫికేషన్)\S{0,4} ?(?:లో|లోనే) ?(?:ఉంటాయి|చూడండి|చూడవచ్చు|ఉన్నాయి)\W*</li>\s*#iu', '', $html );
+	$html = preg_replace( '#(?<=[.!?]|>)\s*[^<.!?]{0,120}?(?<!\S)ఇది (?:ఒక )?(?:చక్కని|చక్కటి|మంచి|గొప్ప|అద్భుతమైన|అరుదైన|సువర్ణ)\s*అవకాశం\s*[.!]?\s*#u', '', $html );
+	// 0b) v1.9.173: "ముఖ్యాంశాలు" takeaways box whose bullets are copied from the
+	//     body (live TCS mela post: same 5 bullets twice). Normalised compare, ≥80 %.
+	if ( preg_match( '#<div class="su-takeaways">.*?</ul>\s*</div>\s*#is', $html, $tm, PREG_OFFSET_CAPTURE ) ) {
+		$box   = $tm[0][0];
+		$rest  = substr( $html, 0, $tm[0][1] ) . substr( $html, $tm[0][1] + strlen( $box ) );
+		$norm  = static function ( $x ) {
+			$x = wp_strip_all_tags( (string) $x );
+			$x = preg_replace( '/[\s\x{200c}\x{200d}]+/u', ' ', $x );
+			return mb_strtolower( trim( preg_replace( '/[^\p{L}\p{N} ]+/u', '', $x ) ) );
+		};
+		$items = array();
+		if ( preg_match_all( '#<li[^>]*>(.*?)</li>#is', $box, $lm ) ) {
+			foreach ( $lm[1] as $li ) {
+				$n = $norm( $li );
+				if ( '' !== $n ) {
+					$items[] = $n;
+				}
+			}
+		}
+		if ( $items ) {
+			$plain = $norm( $rest );
+			$hit   = 0;
+			foreach ( $items as $it ) {
+				if ( false !== mb_strpos( $plain, $it ) ) {
+					$hit++;
+				}
+			}
+			if ( $hit >= max( 1, (int) floor( 0.8 * count( $items ) ) ) ) {
+				$html = $rest;
+			}
+		}
+	}
 	// 1) "🔎 Source: domain, domain · checked …" line + legacy trust box.
 	$html = preg_replace( '#<p[^>]*class="[^"]*\bsu-source\b[^"]*"[^>]*>.*?</p>#is', '', $html );
 	$html = preg_replace( '#<section[^>]*class="[^"]*\bsu-trust-box\b[^"]*"[^>]*>.*?</section>#is', '', $html );
@@ -157,14 +203,27 @@ function studentup_clean_legacy_bot_chrome( $html ) {
 	$html = preg_replace( '#<p[^>]*>\s*<em>\s*చివరి అప్‌డేట్\s*:[^<]*</em>\s*</p>\s*#isu', '', $html );
 	$html = preg_replace( '#<p[^>]*>(?:(?!</p>).){0,400}?(?:ఆశిస్తున్నాము|కామెంట్స్ విభాగంలో|కామెంట్ చేయండి|స్నేహితులకు (?:మరియు )?(?:తోటి విద్యార్థులకు )?షేర్ చేయండి|చివరి వరకు చదవండి|పూర్తిగా ఇచ్చాము)(?:(?!</p>).)*</p>\s*#isu', '', $html );
 	// 11) The same image repeated in the body (featured + inline + "second"): keep the first.
-	if ( substr_count( $html, '<figure' ) > 1 ) {
-		$seen = array();
+	//     v1.9.173: the FEATURED image is already printed by the template above the
+	//     article — a body <figure> with that same file (live: every 22-Oct post)
+	//     is a duplicate too, so it is pre-seeded as "seen".
+	$seen = array();
+	if ( function_exists( 'get_post_thumbnail_id' ) && is_singular() ) {
+		$thumb_url = (string) wp_get_attachment_url( (int) get_post_thumbnail_id( get_the_ID() ) );
+		if ( '' !== $thumb_url ) {
+			$tk = strtolower( basename( strtok( $thumb_url, '?' ) ) );
+			$tk = preg_replace( '/-\d+x\d+(?=\.\w+$)/', '', $tk );
+			$tk = preg_replace( '/\.(?:jpe?g|png|webp|avif)(?:\.webp)?$/', '', $tk ); // imagify "x.jpg.webp"
+			$seen[ $tk ] = true;
+		}
+	}
+	if ( $seen || substr_count( $html, '<figure' ) > 1 ) {
 		$html = preg_replace_callback( '#<figure\b[^>]*>.*?</figure>\s*#is', function ( $f ) use ( &$seen ) {
 			if ( ! preg_match( '#src="([^"]+)"#', $f[0], $sm ) ) {
 				return $f[0];
 			}
 			$key = strtolower( basename( strtok( $sm[1], '?' ) ) );
 			$key = preg_replace( '/-\d+x\d+(?=\.\w+$)/', '', $key );
+			$key = preg_replace( '/\.(?:jpe?g|png|webp|avif)(?:\.webp)?$/', '', $key );
 			if ( isset( $seen[ $key ] ) ) {
 				return '';
 			}

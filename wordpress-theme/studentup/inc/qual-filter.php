@@ -413,18 +413,49 @@ function studentup_expired_notice( $post_id = 0 ) {
 	if ( $left >= 0 ) {
 		return '';
 	}
-	$cat  = '';
 	$cats = get_the_category( $post_id );
-	if ( $cats ) {
-		$cat = sprintf(
-			' <a href="%s">%s</a>',
-			esc_url( get_category_link( $cats[0] ) ),
-			esc_html( $cats[0]->name )
+	$cat  = $cats ? $cats[0] : null;
+	$out  = '<div class="su-expired" role="note">' . studentup_ui_icon( 'clock', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
+		. ' <strong>దరఖాస్తు గడువు ముగిసింది</strong> (' . esc_html( date_i18n( 'd M Y', strtotime( $iso ) ) ) . ').'
+		. ' ఈ Notificationకు ఇప్పుడు దరఖాస్తు చేయలేరు — కొత్త Notification వస్తే ఈ పేజీ అప్‌డేట్ అవుతుంది.';
+	/* v1.9.173: keep the reader — up to 3 LIVE (not expired, not guide) posts
+	 * from the same category, newest first. Nothing renders without data. */
+	if ( $cat ) {
+		$q = new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'post_status'         => 'publish',
+				'posts_per_page'      => 12,
+				'cat'                 => (int) $cat->term_id,
+				'post__not_in'        => array( $post_id ),
+				'ignore_sticky_posts' => true,
+				'no_found_rows'       => true,
+			)
 		);
+		$live = array();
+		foreach ( (array) $q->posts as $p ) {
+			$plast = trim( (string) get_post_meta( $p->ID, 'studentup_last_date', true ) );
+			if ( function_exists( 'studentup_opportunity_is_expired' ) && studentup_opportunity_is_expired( $plast ) ) {
+				continue;
+			}
+			if ( function_exists( 'studentup_is_guide_post' ) && studentup_is_guide_post( $p->ID ) ) {
+				continue;
+			}
+			$live[] = $p;
+			if ( count( $live ) >= 3 ) {
+				break;
+			}
+		}
+		if ( $live ) {
+			$out .= '<ul class="su-expired-live">';
+			foreach ( $live as $p ) {
+				$out .= '<li><a href="' . esc_url( get_permalink( $p ) ) . '">' . esc_html( wp_strip_all_tags( get_the_title( $p ) ) ) . '</a></li>';
+			}
+			$out .= '</ul>';
+		}
+		$out .= '<a class="su-expired-more" href="' . esc_url( get_category_link( $cat ) ) . '">' . esc_html( $cat->name ) . ' — ప్రస్తుత Notifications →</a>';
 	}
-	return '<div class="su-expired" role="note">' . studentup_ui_icon( 'clock', 14 ) . ' <strong>Gaduvu mugisindi (Expired).</strong>' // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
-		. ' Ee notification ki ippudu apply cheyyalem — kindha related current posts chudandi.'
-		. $cat . '</div>';
+	return $out . '</div>';
 }
 
 /**

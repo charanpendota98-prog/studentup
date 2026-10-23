@@ -10,3 +10,4 @@ bot/.env
 bot/state.db*
 bot/output/
 bot/log/
+Automation_*.zip

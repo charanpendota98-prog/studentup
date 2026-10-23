@@ -184,6 +184,15 @@ function studentup_doubt_post_handler() {
 	if ( ! wp_verify_nonce( $nonce, 'su_doubt_' . $post_id ) ) {
 		return;
 	}
+	// v1.9.173: per-IP rate limit — 5 questions / 10 min (nonce + honeypot alone
+	// do not stop a scripted flood of pending comments).
+	$ip_key = 'su_doubt_rl_' . md5( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$hits   = (int) get_transient( $ip_key );
+	if ( $hits >= 5 ) {
+		wp_safe_redirect( add_query_arg( 'su_doubt', 'err', get_permalink( $post_id ) ) . '#su-doubts' );
+		exit;
+	}
+	set_transient( $ip_key, $hits + 1, 10 * MINUTE_IN_SECONDS );
 	$res = studentup_save_doubt(
 		$post_id,
 		isset( $_POST['su_doubt_q'] ) ? wp_unslash( $_POST['su_doubt_q'] ) : '',
@@ -262,11 +271,7 @@ function studentup_doubts_block( $content ) {
 				: '<p class="su-doubt-pending">' . esc_html__( 'Answer coming soon — our editor is verifying it.', 'studentup' ) . '</p>' )
 			. '</div>';
 	}
-	if ( '' === $list ) {
-		$list = '<p class="su-doubt-empty">'
-			. esc_html__( 'No questions yet. Ask the first one — we answer with the official source.', 'studentup' )
-			. '</p>';
-	}
+	// v1.9.173: no empty-state filler line (owner rule: no hint texts) — the form alone is clear.
 
 	$form = '<form class="su-doubt-form" method="post" action="">'
 		. wp_nonce_field( 'su_doubt_' . $post_id, 'su_doubt_nonce', true, false )

@@ -37,7 +37,7 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from . import config
-from .wordpress_client import WordPressClient, WordPressError
+from .wordpress_client import WordPressClient
 
 log = logging.getLogger(__name__)
 

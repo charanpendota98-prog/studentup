@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 import json
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 from typing import Callable, Dict, List, Optional
 from urllib.parse import urlparse
