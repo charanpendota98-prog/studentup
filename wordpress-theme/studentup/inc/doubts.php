@@ -262,11 +262,7 @@ function studentup_doubts_block( $content ) {
 				: '<p class="su-doubt-pending">' . esc_html__( 'Answer coming soon — our editor is verifying it.', 'studentup' ) . '</p>' )
 			. '</div>';
 	}
-	if ( '' === $list ) {
-		$list = '<p class="su-doubt-empty">'
-			. esc_html__( 'No questions yet. Ask the first one — we answer with the official source.', 'studentup' )
-			. '</p>';
-	}
+	// v1.9.173: no empty-state filler line (owner rule: no hint texts) — the form alone is clear.
 
 	$form = '<form class="su-doubt-form" method="post" action="">'
 		. wp_nonce_field( 'su_doubt_' . $post_id, 'su_doubt_nonce', true, false )

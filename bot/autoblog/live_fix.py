@@ -191,10 +191,17 @@ def drop_duplicate_takeaways(html: str) -> Tuple[str, int]:
     m = re.search(r'<div class="su-takeaways">.*?</ul>\s*</div>\s*', html, flags=re.S)
     if not m:
         return html, 0
-    items = [re.sub(r"<[^>]+>", "", x).strip() for x in re.findall(r"<li[^>]*>(.*?)</li>", m.group(0), flags=re.S)]
+    def _norm(x: str) -> str:
+        x = re.sub(r"<[^>]+>", " ", x)
+        x = re.sub(r"[\s\u200c\u200d]+", " ", x)
+        return re.sub(r"[^\w\u0c00-\u0c7f ]+", "", x).strip().lower()
+    items = [_norm(x) for x in re.findall(r"<li[^>]*>(.*?)</li>", m.group(0), flags=re.S)]
+    items = [i for i in items if i]
     rest = html[:m.start()] + html[m.end():]
-    plain = re.sub(r"<[^>]+>", "", rest)
-    if items and all(i and i in plain for i in items):
+    plain = _norm(rest)
+    # v399: live 22-Oct TCS post — bullets were "**Qualification:** …" in the body
+    # and "Qualification: …" in the box; normalise, and 80 % overlap is enough.
+    if items and sum(1 for i in items if i in plain) >= max(1, int(0.8 * len(items))):
         return rest, 1
     return html, 0
 

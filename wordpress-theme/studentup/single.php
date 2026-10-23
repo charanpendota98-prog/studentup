@@ -287,7 +287,11 @@ get_header();
 				$su_picks = array_slice( $su_keep, 0, 4 );
 			}
 			echo '<aside id="su-recent" class="su-recent" hidden data-l="' . esc_attr__( 'Recently viewed', 'studentup' ) . '"></aside>'; // v1.9.135: device-local, JS fills only when ≥2 items
-			if ( $su_picks ) {
+			/* v1.9.173: owner rule = ONE related grid per post. Up-next (3 cards, above)
+			 * already is that grid; this second block only fills in when Up-next had
+			 * nothing to show (brand-new site / orphan category). */
+			$su_upnext_n = function_exists( 'studentup_upnext_shown_ids' ) ? count( studentup_upnext_shown_ids() ) : 0;
+			if ( $su_picks && $su_upnext_n < 2 ) {
 				echo '<div class="sectionhead"><div><h2>ఇవి కూడా చూడండి</h2></div></div><div class="newsgrid">';
 				$su_i = 0;
 				foreach ( $su_picks as $su_pid ) {
