@@ -112,3 +112,13 @@ def test_duplicate_takeaways_and_title_caption_and_faq_heading():
     assert "<figcaption>" not in out and rep["title_caption"] == 1
     assert "తరచుగా అడిగే ప్రశ్నలు (FAQ)" in out and "Frequently" not in out
     assert out.count("డిప్యూటీ తహశీల్దార్: 200") == 1
+
+
+def test_excerpt_prefix_and_title_flags():
+    t, n = live_fix.clean_excerpt("apslprb app 2026 prelims key – APSLPRB APP 2026 Preliminary Key అధికారికంగా విడుదల.")
+    assert n == 1 and t.startswith("APSLPRB APP 2026")
+    t2, n2 = live_fix.clean_excerpt("TGPSC Group 4 – 2,750 పోస్టులు")
+    assert n2 == 0 and t2.startswith("TGPSC")
+    assert "doubled-keyword" in live_fix.title_flags("Upsc 2026 Upcoming Vacancy UPSC 2026 Forthcoming Exams")
+    assert live_fix.title_flags("NIACL AO Recruitment 2025: 500 పోస్టుల భర్తీ") == ["stale-year:2025"]
+    assert live_fix.title_flags("APPSC Group 2 Notification 2026 686 పోస్టులు") == []

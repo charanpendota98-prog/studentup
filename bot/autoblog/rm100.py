@@ -221,6 +221,13 @@ def fix_meta(article: dict) -> bool:
     meta = _text(article.get("meta_description") or "")
     if not kw:
         return False
+    # v398: "apslprb app 2026 prelims key – APSLPRB APP 2026 … " (lower-case
+    # keyword glued in front of a description that already starts with it).
+    try:
+        from .live_fix import clean_excerpt
+        meta, _ = clean_excerpt(meta)
+    except Exception:  # noqa: BLE001
+        pass
     if kw.lower() not in meta.lower():
         meta = _text(f"{_kw_title(kw)} గురించి పూర్తి వివరాలు: {meta}")
     if len(meta) < 110:

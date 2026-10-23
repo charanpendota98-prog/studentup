@@ -202,6 +202,40 @@ def clean_body(html: str, title: str = "", featured_url: str = "") -> Tuple[str,
     return html, {k: v for k, v in rep.items() if v}
 
 
+_PREFIX_DASH = re.compile(r"^\s*([^–—:|]{3,70}?)\s*[–—|]\s+(?=\S)")
+
+
+def clean_excerpt(text: str) -> Tuple[str, int]:
+    """'apslprb app 2026 prelims key – APSLPRB APP 2026 Preliminary Key …' →
+    drop a keyword prefix that is repeated (case-insensitively) right after it."""
+    t = re.sub(r"\s+", " ", text or "").strip()
+    m = _PREFIX_DASH.match(t)
+    if not m:
+        return t, 0
+    prefix = m.group(1).strip()
+    rest = t[m.end():]
+    ptoks = [w for w in re.findall(r"[a-z0-9\u0c00-\u0c7f]+", prefix.lower()) if len(w) > 1]
+    head = rest.lower()[: len(prefix) + 60]
+    hit = sum(1 for w in ptoks if w in head or (len(w) > 4 and w[:5] in head))
+    if ptoks and hit >= max(2, int(len(ptoks) * 0.6 + 0.999)):
+        return rest.strip(), 1
+    return t, 0
+
+
+def title_flags(title: str) -> List[str]:
+    """Human-review flags (never auto-changed): stale year, doubled keyword."""
+    out: List[str] = []
+    from datetime import date as _d
+    yrs = [int(y) for y in re.findall(r"\b(20\d{2})\b", title or "")]
+    if yrs and max(yrs) < _d.today().year:
+        out.append(f"stale-year:{max(yrs)}")
+    low = [w.lower() for w in re.findall(r"[A-Za-z0-9]+", title or "")]
+    bigrams = [" ".join(low[i:i + 2]) for i in range(len(low) - 1)]
+    if any(bigrams.count(b) > 1 and re.search(r"[a-z]", b) for b in bigrams):
+        out.append("doubled-keyword")
+    return out
+
+
 # ------------------------------------------------------------------ live repair
 def canonical_for(link: str) -> str:
     return (link or "").split("?")[0].split("#")[0]
@@ -236,11 +270,17 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
         row = {"id": pid, "link": link, "canonical_fix": bool(stored and stored.rstrip("/") != want.rstrip("/")),
                "stored_canonical": stored, "changes": {}, "applied": False}
         new_html, changes = clean_body(html, title, featured)
+        exc_raw = (post.get("excerpt") or {}).get("raw") or ""
+        new_exc, exc_n = clean_excerpt(exc_raw)
+        if exc_n:
+            changes["excerpt"] = exc_n
         row["changes"] = changes
+        row["flags"] = title_flags(title)
         if apply and (row["canonical_fix"] or changes):
             new_meta = {"rank_math_canonical_url": want} if row["canonical_fix"] else None
             try:
-                wp.update_post(pid, new_html if changes else html, meta=new_meta)
+                wp.update_post(pid, new_html if changes else html, meta=new_meta,
+                               excerpt=new_exc if exc_n else None)
                 if new_meta:
                     try:
                         wp.write_seo_meta(pid, new_meta)
@@ -264,6 +304,7 @@ def run_cli(limit: int, apply: bool) -> int:
         if r["canonical_fix"]:
             issues.append("canonical→404")
         issues += [f"{k}×{v}" for k, v in r["changes"].items()]
+        issues += [f"REVIEW:{f}" for f in r.get("flags", [])]
         if issues:
             bad += 1
         mark = "✅" if r.get("applied") else ("⚠️" if issues else "·")
