@@ -290,6 +290,8 @@ def title_flags(title: str) -> List[str]:
     # here cannot apply; flag for a human look instead of a silent draft.
     low_t = (title or "").lower()
     if (OTHER_STATE_RE.search(low_t)
+            and not re.search(r"\bbank\b|\bltd\b|limited|pvt|infosys|tcs|wipro|off ?campus|"
+                              r"walk-?in|software|developer|engineer trainee", low_t)
             and not re.search(r"telangana|andhra|tgpsc|tspsc|appsc|hyderabad|vijayawada|"
                               r"తెలంగాణ|ఆంధ్ర|all india|india post|ssc|upsc|rrb|railway|ibps|"
                               r"sbi|army|navy|air force|isro|drdo|central", low_t)):
@@ -324,6 +326,11 @@ def draft_flags(title: str, html: str) -> List[str]:
     # v399: every full date in the body is already in the past (live 22-Oct:
     # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
     # ignore the house "last updated"/"published" stamps — they are always today.
+    # results / answer keys / hall-ticket-after-exam posts legitimately talk only
+    # about a past exam date — never flag those.
+    if re.search(r"result|ఫలిత|answer key|final key|prelims key|merit list|cut ?off|score ?card|"
+                 r"selection list|interview list|విడుదల", (title or "").lower()):
+        return flags
     ds = body_dates(re.sub(r"(?:చివరి అప్‌డేట్|చివరి అప్డేట్|Last updated|Updated on|Published on|Posted on)\s*[:\-–]?[^\n.]{0,40}",
                            " ", plain, flags=re.I))
     if ds:

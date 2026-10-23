@@ -98,3 +98,11 @@ def test_glued_power_word_removed_from_h1():
     assert clean_title_text("APPSC Group 2 Notification 2026 686 పోస్టులు Official వివరాలు") == \
         "APPSC Group 2 Notification 2026 686 పోస్టులు వివరాలు"
     assert clean_title_text("SSC CGL 2026 Official Notification") == "SSC CGL 2026 Official Notification"
+
+
+def test_flags_no_false_positives_results_and_all_india_bank():
+    from autoblog import live_fix as lf
+    body = "<p>" + "తెలుగు పదం " * 50 + " పరీక్ష 12 అక్టోబర్ 2026 న జరిగింది.</p>"
+    assert not any(f.startswith("past-dates") for f in lf.draft_flags("TGPSC Group 2 Result 2026 విడుదల", body))
+    assert "other-state" not in lf.draft_flags("Karnataka Bank Recruitment 2026 Clerk Posts", "")
+    assert "other-state" in lf.draft_flags("Kerala PSC LDC Recruitment 2026", "")
