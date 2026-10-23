@@ -43,6 +43,21 @@ from . import config, validator
 TOC_MARK = "su-toc"
 LEDE_MARK = "su-lede"
 TELUGU_TAIL = "Last Date · Eligibility · Apply Online"  # v327: no "Complete Guide" (owner rule)
+
+
+def _tail_for(article: dict) -> str:
+    """v398: short-title filler must match the post's intent — a RESULTS post
+    got "· Last Date · Eligibility" on live."""
+    blob = f"{article.get('focus_keyword') or ''} {article.get('title') or ''} {article.get('category') or ''}".lower()
+    if re.search(r"result|ఫలిత|merit list|answer key|final key|prelims key|cut ?off|score card", blob):
+        return "Direct Link · Cut Off · Merit List"
+    if re.search(r"hall ticket|admit card|హాల్ టికెట్|call letter", blob):
+        return "Download Link · Exam Date"
+    if re.search(r"scholarship|స్కాలర్|epass|nsp|fellowship", blob):
+        return "Eligibility · Amount · Last Date"
+    if re.search(r"syllabus|exam pattern|సిలబస్|preparation", blob):
+        return "PDF · Exam Pattern · Topics"
+    return TELUGU_TAIL
 CONNECTIVES = ("అలాగే", "అందువల్ల", "ఇంకా", "చివరగా", "కాబట్టి", "మరోవైపు")
 # keyword density band (validator: 0.4% - 3.0% ok). Target ~0.6% = natural.
 DENSITY_TARGET = 0.006
@@ -156,6 +171,13 @@ def fix_title(article: dict) -> bool:
     title = _text(re.sub(r"\s*(?:[—–-]\s*)?(?:Best|Complete|Ultimate|A to Z|Full)\s+(?:Guide|Details|Update)\b", "", title,
                          flags=re.I))
     title = _text(re.sub(r"\s*[—–·-]\s*$", "", title))  # v283: trailing "·" kuda strip (double "· ·" bug fix)
+    # v398: the keyword glued in front of a title that already starts with it
+    # ("tspsc group 4 results 2026 TSPSC Group 4 Results 2026 విడుదల") → once.
+    _dbl = re.match(r"^\s*(.{6,70}?)\s+\1(\b.*)$", title, flags=re.I | re.S)
+    if _dbl:
+        title = _text(title[len(_dbl.group(1)):])
+    elif kw and title.lower().startswith(kw.lower() + " " + kw.lower()):
+        title = _text(title[len(kw) + 1:])
 
     # 1) keyword ledu → front lo pettali (v391: first try to derive the keyword
     #    FROM the title so we never produce "Ap Pg Medical Fees AP PG Medical …")
@@ -186,13 +208,14 @@ def fix_title(article: dict) -> bool:
     # can carry a natural power word separately when Rank Math needs it.
     new = _trim_title(head)
     if len(new) < 40:                             # 40 chars minimum (Rank Math)
-        extra = TELUGU_TAIL.split(" · ")
+        _tail = _tail_for(article)
+        extra = _tail.split(" · ")
         for e in extra:
             if len(new) + 3 + len(e) > 62:
                 break
             new = f"{new} · {e}"
         if len(new) < 40:
-            new = (new + " · " + TELUGU_TAIL)[:62].rsplit(" ", 1)[0]
+            new = (new + " · " + _tail)[:62].rsplit(" ", 1)[0]
     new = re.sub(r"(\s*·\s*){2,}", " · ", new)             # v283: collapse "· ·"
     article["title"] = new.strip(" -—·") or kt
     # Keep the visible title natural. Rank Math's title field can use one
@@ -216,9 +239,38 @@ def fix_title(article: dict) -> bool:
     article["seo_title"] = seo_title
     return True
 
+def snippet_tail(article: dict) -> str:
+    """v398: intent-matched Telugu CTA tail for short meta descriptions."""
+    blob = f"{article.get('focus_keyword') or ''} {article.get('title') or ''} {article.get('category') or ''}".lower()
+    if re.search(r"result|ఫలిత|merit list|answer key|final key|prelims key|cut ?off|score card", blob):
+        return "ఫలితాలు చూసే విధానం, కటాఫ్, మెరిట్ లిస్ట్, డైరెక్ట్ లింక్ ఇక్కడ చూడండి."
+    if re.search(r"hall ticket|admit card|హాల్ టికెట్|call letter", blob):
+        return "హాల్ టికెట్ డౌన్‌లోడ్ విధానం, పరీక్ష తేదీ, డైరెక్ట్ లింక్ ఇక్కడ చూడండి."
+    if re.search(r"scholarship|స్కాలర్|epass|nsp|fellowship", blob):
+        return "అర్హత, స్కాలర్‌షిప్ మొత్తం, చివరి తేదీ, దరఖాస్తు విధానం ఇక్కడ చూడండి."
+    if re.search(r"syllabus|exam pattern|సిలబస్|preparation", blob):
+        return "సిలబస్ PDF, పరీక్షా విధానం, ముఖ్యమైన టాపిక్స్ ఇక్కడ చూడండి."
+    return "అర్హత, చివరి తేదీ, దరఖాస్తు విధానం వివరాలు ఇక్కడ చూడండి."
+
+
+def clean_snippet_base(text: str) -> str:
+    """v398: body text → snippet-safe text (no publisher attribution, no promo
+    sentences, no "ఇది X గురించి." opener, no leading "ఇది")."""
+    from . import content_quality, source_leak, validator
+    base = " ".join((text or "").split())
+    try:
+        _h, _ = content_quality.tidy(source_leak.clean_html(f"<p>{base}</p>"))
+        base = validator.strip_tags(_h)
+    except Exception:  # noqa: BLE001
+        pass
+    base = re.sub(r"^(?:ఇది\s+[^.!?]{0,80}?గురించి[^.!?]{0,30}[.!?]\s*)+", "", base).strip()
+    base = re.sub(r"^ఇది\s+", "", base)
+    return " ".join(base.split())
+
+
 def fix_meta(article: dict) -> bool:
     kw = _kw(article)
-    meta = _text(article.get("meta_description") or "")
+    meta = clean_snippet_base(_text(article.get("meta_description") or ""))
     if not kw:
         return False
     # v398: "apslprb app 2026 prelims key – APSLPRB APP 2026 … " (lower-case
@@ -228,15 +280,21 @@ def fix_meta(article: dict) -> bool:
         meta, _ = clean_excerpt(meta)
     except Exception:  # noqa: BLE001
         pass
-    if kw.lower() not in meta.lower():
+    if not meta:
+        meta = _text(f"{_kw_title(kw)}: {snippet_tail(article)}")
+    elif kw.lower() not in meta.lower():
         meta = _text(f"{_kw_title(kw)} గురించి పూర్తి వివరాలు: {meta}")
     if len(meta) < 110:
         # v398: pad only with phrases the description does not already carry
         # (live: "…అర్హత, తేదీలు, దరఖాస్తు విధానం. అర్హత, ముఖ్యమైన తేదీలు, దరఖాస్తు విధానం…").
-        tails = [t for t in ("అర్హత", "ముఖ్యమైన తేదీలు", "దరఖాస్తు విధానం", "అధికారిక లింక్")
-                 if t.split()[-1] not in meta]
-        if tails:
-            meta = _text(f"{meta.rstrip('. ')}. {', '.join(tails)} ఇక్కడ చూడండి.")
+        _tail = snippet_tail(article)
+        if _tail not in meta and _tail.split()[0] not in meta:
+            meta = _text(f"{meta.rstrip('. ')}. {_tail}")
+        elif _tail.startswith("అర్హత, చివరి"):  # job intent only
+            tails = [t for t in ("అర్హత", "ముఖ్యమైన తేదీలు", "దరఖాస్తు విధానం", "అధికారిక లింక్")
+                     if t.split()[-1] not in meta]
+            if tails:
+                meta = _text(f"{meta.rstrip('. ')}. {', '.join(tails)} ఇక్కడ చూడండి.")
     if len(meta) > 156:
         cut = meta[:156]
         meta = cut.rsplit(" ", 1)[0] if " " in cut[:-1] else cut
@@ -261,6 +319,15 @@ def _trim_slug(slug: str, limit: int = 75) -> str:
     ee helper tho fix (keyword tokens pakkana pettakunda, 20 chars minimum).
     """
     slug = re.sub(r"-{2,}", "-", (slug or "").strip("-"))
+    # v398: clickbait / stop tokens never belong in a URL
+    _junk = {"check", "here", "now", "today", "direct", "link", "full", "details", "complete",
+             "guide", "best", "latest", "new", "telugu", "students", "the", "and", "for", "of",
+             "to", "in", "on", "out", "released", "out-now", "click", "download", "pdf", "official"}
+    toks = [t for t in slug.split("-") if t]
+    if len(toks) > 5:
+        kept = [t for t in toks if t not in _junk]
+        if len(kept) >= 3:
+            slug = "-".join(kept)
     if len(slug) <= limit:
         return slug
     cut = slug[:limit]
@@ -723,6 +790,10 @@ def fix_takeaways(article: dict, html: str) -> str:
     cheyyadu**: existing list items leda short sentences theesukuntundi.
     """
     if "su-takeaways" in html:
+        return html
+    # v398: the box can only ever copy sentences/list items that are already in
+    # the body (owner: no duplicate chrome, no wasted space) → not emitted.
+    if not getattr(config, "TAKEAWAYS_BOX", False):
         return html
     # v392: with a quick answer (and/or facts card) on top, a second summary
     # box that copies the first <li>s verbatim ("tgpsc.gov.in వెబ్‌సైట్ ఓపెన్

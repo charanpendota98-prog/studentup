@@ -2234,16 +2234,22 @@ def harden(article: dict, keyword: str = "") -> Tuple[dict, dict]:
             article.get("content_html", "")) or meta)
         src = " ".join(validator.strip_tags(src).split())
         try:
+            from .rm100 import clean_snippet_base as _csb, snippet_tail as _st
+            src = _csb(src)
+        except Exception:  # noqa: BLE001
+            _st = None
+        try:
             from .kw_align import pretty_kw as _pk
             kw_disp = _pk(article.get("focus_keyword") or kw)
         except Exception:  # noqa: BLE001
             kw_disp = kw
-        new_meta = (f"{kw_disp}: {src}" if src and kw not in src.lower() else src)
+        new_meta = (f"{kw_disp}: {src}" if src and kw not in src.lower() else (src or kw_disp))
         if len(new_meta) > 160:
             new_meta = new_meta[:157].rsplit(" ", 1)[0] + "..."
         if len(new_meta) < 110:
             # v391: Telugu CTA tail (owner: no Tenglish "Telugu lo" strings)
-            new_meta = (new_meta.rstrip(". ") + " — అర్హత, చివరి తేదీ, దరఖాస్తు విధానం వివరాలు ఇక్కడ చూడండి.")[:160]
+            _tail = _st(article) if _st else "అర్హత, చివరి తేదీ, దరఖాస్తు విధానం వివరాలు ఇక్కడ చూడండి."
+            new_meta = (new_meta.rstrip(". ") + " — " + _tail)[:160]
         if new_meta and new_meta != meta:
             article["meta_description"] = new_meta
             changes.append("meta_description length/keyword fixed")

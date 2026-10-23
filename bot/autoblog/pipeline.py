@@ -622,8 +622,20 @@ def _hygiene(article: Dict) -> Dict:
             seen_secondary.add(key)
             secondary.append(phrase[:90])
     if focus:
-        for suffix in ("eligibility", "apply online", "official notification",
-                       "documents", "selection process"):
+        # v398: intent-aware suffixes — a RESULTS post must not get
+        # "apply online / eligibility" phrases (nonsense keywords on live).
+        _blob = f"{focus} {article.get('title') or ''} {article.get('category') or ''}".lower()
+        if re.search(r"result|ఫలిత|merit list|answer key|final key|prelims key|cut ?off|స్కోర్|score card", _blob):
+            _suffixes = ("cut off", "merit list", "download link", "pdf", "marks")
+        elif re.search(r"hall ticket|admit card|హాల్ టికెట్|call letter", _blob):
+            _suffixes = ("download", "exam date", "direct link", "instructions")
+        elif re.search(r"scholarship|స్కాలర్|epass|nsp|fellowship", _blob):
+            _suffixes = ("eligibility", "last date", "amount", "apply online", "documents")
+        elif re.search(r"syllabus|exam pattern|సిలబస్|preparation|books", _blob):
+            _suffixes = ("pdf", "exam pattern", "topic wise", "books")
+        else:
+            _suffixes = ("eligibility", "apply online", "official notification", "documents", "selection process")
+        for suffix in _suffixes:
             phrase = f"{focus} {suffix}".strip()
             key = phrase.casefold()
             if len(secondary) >= 8:
@@ -635,9 +647,15 @@ def _hygiene(article: Dict) -> Dict:
     # meta description fallback: quick_answer or first para nunchi
     md = (article.get("meta_description") or "").strip()
     if len(md) < 120:
-        base = article.get("quick_answer") or validator.strip_tags(
-            article.get("content_html", ""))
+        base = article.get("quick_answer") or ""
+        if not base:
+            # v398: paragraphs only (headings/FAQ questions leaked into the snippet)
+            _ps = [validator.strip_tags(m) for m in re.findall(r"<p\b[^>]*>(.*?)</p>", article.get("content_html", ""), flags=re.S | re.I)]
+            base = " ".join(t.strip() for t in _ps if len(t.split()) >= 4)[:600]
         base = " ".join(base.split())
+        # v398: never start the snippet with "ఇది X గురించి." / publisher
+        # attribution / promo lines (owner v322/v340 rules).
+        base = rm100.clean_snippet_base(base)
         article["meta_description"] = (base[:155].rsplit(" ", 1)[0]) if base else md
     return article
 

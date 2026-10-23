@@ -169,3 +169,63 @@ def test_facts_card_gets_deadline_from_body(fake_wp):
     html = fake_wp.created["content_html"]
     assert art["recruitment"]["apply_end"] == "2026-11-30"
     assert "30 నవంబర్ 2026" in re.sub(r"<[^>]+>", " ", html)
+
+
+# ---------------------------------------------------------------- scenario 2
+# RESULTS post: English-spelled publisher names, "ఇది X గురించి." opener,
+# lower-case doubled keyword in the title, click-bait slug, empty quick_answer,
+# YouTube promo line, triple "Frequently Asked Questions" H2.
+def _results_article():
+    return {
+        "title": "tspsc group 4 results 2026 TSPSC Group 4 Results 2026 విడుదల — Complete Guide",
+        "slug": "tspsc-group-4-results-2026-released-check-direct-link-here-now-today-telugu-students-full-details",
+        "meta_description": "TSPSC Group 4 Results.",
+        "content_html": (
+            '<p>ఇది TSPSC Group 4 Results 2026 గురించి. Sakshi Education ప్రకారం ఫలితాలు విడుదలయ్యాయి. '
+            'According to Eenadu Pratibha, cut off పెరిగింది.</p>'
+            '<h2>Frequently Asked Questions</h2>'
+            '<h2>TSPSC Group 4 Results 2026 ఎలా చూడాలి?</h2><ol><li>tspsc.gov.in వెబ్‌సైట్ ఓపెన్ చేయండి.</li>'
+            '<li>Result PDF download చేయండి.</li></ol>'
+            '<h2>Cut Off Marks</h2><table><tr><td>Category</td><td>OC</td></tr></table>'
+            '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
+            '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
+            '<p>మరిన్ని వివరాల కోసం మా YouTube ఛానల్ చూడండి: <a href="https://youtube.com/watch?v=abc">video</a>. '
+            'Source: https://www.sakshieducation.com/x</p>'
+        ),
+        "focus_keyword": "tspsc group 4 results 2026",
+        "secondary_keywords": [], "seo_title": "", "tags": [], "category": "Results",
+        "quick_answer": "", "faq": [{"question": "Results ఎప్పుడు?", "answer": "ఈ రోజు."}],
+        "external_links": [{"url": "https://youtube.com/watch?v=abc", "text": "video"},
+                           {"url": "https://www.tspsc.gov.in/", "text": "TSPSC"}],
+        "recruitment": {}, "_source_urls": ["https://www.sakshieducation.com/x"],
+        "source_url": "https://www.sakshieducation.com/x",
+    }
+
+
+def test_results_post_title_slug_and_intent(fake_wp):
+    pipeline.publish_article(_results_article())
+    title = fake_wp.created["title"]
+    assert title.lower().count("tspsc group 4 results 2026") == 1
+    assert title.startswith("TSPSC Group 4 Results 2026")
+    assert "Eligibility" not in title and "Apply Online" not in title
+    for junk in ("check", "here", "now", "today", "telugu", "students", "full", "details"):
+        assert f"-{junk}" not in fake_wp.created["slug"]
+    kws = fake_wp.created["meta"]["rank_math_focus_keyword"].lower()
+    assert "apply online" not in kws and "eligibility" not in kws
+    assert "cut off" in kws
+
+
+def test_results_post_no_publisher_names_or_promos(fake_wp):
+    pipeline.publish_article(_results_article())
+    html = fake_wp.created["content_html"]
+    meta = fake_wp.created["meta"]["rank_math_description"]
+    excerpt = fake_wp.created.get("excerpt") or ""
+    for bad in ("Sakshi", "Eenadu", "Pratibha", "According to", "YouTube", "youtube.com",
+                "Source:", "sakshieducation", "su-takeaways"):
+        assert bad not in html, bad
+        assert bad not in meta, bad
+        assert bad not in excerpt, bad
+    assert "ఇది" not in meta
+    assert not meta.startswith("ఇది")
+    assert "అర్హత, చివరి తేదీ" not in meta
+    assert html.count("Frequently Asked Questions") == 0
