@@ -57,7 +57,12 @@ $total = count( $rows );
 			<section class="su-op-section" id="su-<?php echo esc_attr( $key ); ?>" aria-labelledby="su-<?php echo esc_attr( $key ); ?>-title">
 				<div class="su-op-section-head">
 					<h2 id="su-<?php echo esc_attr( $key ); ?>-title"><span class="su-sec-ico" aria-hidden="true"><?php echo studentup_ui_icon( $section['icon'], 18 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></span> <?php echo esc_html( $section['label'] ); ?></h2>
-					<a href="<?php echo esc_url( home_url( '/?s=' . rawurlencode( $section['label'] ) ) ); ?>"><?php esc_html_e( 'See all', 'studentup' ); ?> →</a>
+					<?php
+					// 1.9.169: "See all" → the real category archive (was a site search for the label).
+					$su_sec_term = get_term_by( 'name', $section['label'], 'category' );
+					$su_sec_url  = ( $su_sec_term && ! is_wp_error( $su_sec_term ) ) ? get_category_link( $su_sec_term ) : home_url( '/?s=' . rawurlencode( $section['label'] ) );
+					?>
+					<a href="<?php echo esc_url( $su_sec_url ); ?>"><?php esc_html_e( 'See all', 'studentup' ); ?> →</a>
 				</div>
 				<div class="su-op-list">
 					<?php foreach ( $groups[ $key ] as $row ) : ?>

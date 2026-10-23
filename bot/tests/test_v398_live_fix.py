@@ -129,3 +129,21 @@ def test_orphan_shortcodes_and_closing_filler_removed():
             "<p>ఈ ఆర్టికల్ మీకు పూర్తి సమాచారాన్ని అందించిందని ఆశిస్తున్నాము. షేర్ చేయండి.</p>")
     out, n = live_fix.strip_filler(body)
     assert "[adinsert" not in out and "ఆశిస్తున్నాము" not in out and "నిజమైన para." in out and n == 3
+
+
+def test_last_date_from_body_text():
+    from datetime import date
+    from autoblog import qual
+    t = date(2026, 10, 23)
+    assert qual.last_date_from_text("నవంబర్ 10 నుండి నవంబర్ 30 వరకు Apply Online.", today=t) == "2026-11-30"
+    assert qual.last_date_from_text("<p>చివరి తేదీ: 15-11-2026</p>", today=t) == "2026-11-15"
+    assert qual.last_date_from_text("Applications open from 10 November 2026 till 30 November 2026", today=t) == "2026-11-30"
+    assert qual.last_date_from_text("The exam was held on 12 March 2026.", today=t) == ""     # past → never
+    assert qual.last_date_from_text("Published on October 22, 2026 by staff", today=t) == ""   # no deadline keyword
+    assert qual.last_date({"content_html": "<p>Last Date to apply is 05 December 2026.</p>"}) == "2026-12-05"
+
+
+def test_more_title_flags():
+    assert "sentence-title" in live_fix.title_flags(
+        "Electronics Mart India is conducting a walk‑in drive in Hyderabad for the role 2026 today")
+    assert "template-suffix" in live_fix.title_flags("Infor Recruitment 2026: సాఫ్ట్‌వేర్ ఇంజనీర్ — Best Guide")

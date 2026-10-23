@@ -355,9 +355,7 @@ function studentup_opportunity_render_card( $row ) {
 						<span><?php echo esc_html( 0 === $days ? __( 'Last date today', 'studentup' ) : sprintf( _n( '%s Day Left', '%s Days Left', $days, 'studentup' ), number_format_i18n( $days ) ) ); ?></span>
 					<?php endif; ?>
 				</p>
-			<?php else : ?>
-				<p class="su-op-date is-unknown"><?php echo studentup_ui_icon( 'calendar', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?> <?php esc_html_e( 'Last date:', 'studentup' ); ?> <strong><?php esc_html_e( 'Not announced', 'studentup' ); ?></strong></p>
-			<?php endif; ?>
+			<?php endif; // 1.9.169: no date → no row (owner rule: missing data is not rendered; "Not announced" read as a fact on live). ?>
 			<?php if ( $updated ) : ?>
 				<p class="su-op-updated"><?php esc_html_e( 'Updated', 'studentup' ); ?> <?php echo esc_html( wp_date( 'd M Y', $updated ) ); ?></p>
 			<?php endif; ?>

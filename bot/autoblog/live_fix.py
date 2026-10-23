@@ -241,6 +241,12 @@ def title_flags(title: str) -> List[str]:
     bigrams = [" ".join(low[i:i + 2]) for i in range(len(low) - 1)]
     if any(bigrams.count(b) > 1 and re.search(r"[a-z]", b) for b in bigrams):
         out.append("doubled-keyword")
+    # "Electronics Mart India is conducting a walk-in drive in Hyderabad for the role 2026 today"
+    en_words = re.findall(r"[A-Za-z]+", title or "")
+    if len(en_words) >= 9 and re.search(r"\b(?:is|are|has|have|will|conducting)\b", title or "", re.I):
+        out.append("sentence-title")
+    if re.search(r"(?:Best Guide|—\s*Complete|Complete Guide|Ultimate)\s*$", title or "", re.I):
+        out.append("template-suffix")
     return out
 
 
@@ -282,16 +288,30 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
         new_exc, exc_n = clean_excerpt(exc_raw)
         if exc_n:
             changes["excerpt"] = exc_n
+        # Missing studentup_last_date → read the deadline from the body (future only)
+        extra_meta: Dict[str, str] = {}
+        if not str(meta.get("studentup_last_date") or "").strip():
+            try:
+                from . import qual as _q
+                iso = _q.last_date_from_text(html)
+                if iso:
+                    extra_meta["studentup_last_date"] = iso
+                    changes["last_date"] = 1
+            except Exception:  # noqa: BLE001
+                pass
         row["changes"] = changes
         row["flags"] = title_flags(title)
         if apply and (row["canonical_fix"] or changes):
-            new_meta = {"rank_math_canonical_url": want} if row["canonical_fix"] else None
+            new_meta = dict(extra_meta)
+            if row["canonical_fix"]:
+                new_meta["rank_math_canonical_url"] = want
+            new_meta = new_meta or None
             try:
                 wp.update_post(pid, new_html if changes else html, meta=new_meta,
                                excerpt=new_exc if exc_n else None)
-                if new_meta:
+                if new_meta and row["canonical_fix"]:
                     try:
-                        wp.write_seo_meta(pid, new_meta)
+                        wp.write_seo_meta(pid, {"rank_math_canonical_url": want})
                     except Exception:  # noqa: BLE001
                         log.debug("canonical bridge write skip", exc_info=True)
                 row["applied"] = True
