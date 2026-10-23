@@ -89,3 +89,60 @@ function studentup_redirect_maybe() {
 	exit;
 }
 add_action( 'template_redirect', 'studentup_redirect_maybe', 2 );
+
+/**
+ * v1.9.173: duplicate-post 301. Bot `--dedupe-posts --apply` keeps ONE post
+ * per notification and turns the twins into drafts with their Rank Math
+ * canonical pointed at the keeper. A drafted twin's old URL (already indexed /
+ * shared on WhatsApp) would 404 — here it 301s to the keeper instead, so
+ * links and ranking signals consolidate. Only fires on a 404, only for a
+ * non-public post whose canonical is an internal URL on this site.
+ */
+function studentup_redirect_merged_duplicate() {
+	if ( is_admin() || ! is_404() ) {
+		return;
+	}
+	$path = trim( (string) wp_parse_url( $_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	if ( '' === $path || false !== strpos( $path, '/' ) ) {
+		return; // only top-level post slugs (permalink /%postname%/).
+	}
+	$slug = sanitize_title( $path );
+	if ( '' === $slug ) {
+		return;
+	}
+	$q = new WP_Query(
+		array(
+			'name'                   => $slug,
+			'post_type'              => 'post',
+			'post_status'            => array( 'draft', 'pending', 'private', 'future' ),
+			'posts_per_page'         => 1,
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'update_post_term_cache' => false,
+		)
+	);
+	if ( empty( $q->posts ) ) {
+		return;
+	}
+	$pid    = (int) $q->posts[0];
+	$target = trim( (string) get_post_meta( $pid, 'rank_math_canonical_url', true ) );
+	if ( '' === $target ) {
+		return;
+	}
+	$home = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+	$host = wp_parse_url( $target, PHP_URL_HOST );
+	if ( ! $host || strtolower( $host ) !== strtolower( (string) $home ) ) {
+		return; // internal targets only (open-redirect impossible).
+	}
+	$tpath = trailingslashit( (string) wp_parse_url( $target, PHP_URL_PATH ) );
+	if ( '/' . $slug . '/' === $tpath ) {
+		return; // self → loop; normal 404.
+	}
+	$dest = get_page_by_path( trim( $tpath, '/' ), OBJECT, 'post' );
+	if ( ! $dest || 'publish' !== $dest->post_status ) {
+		return; // keeper gone too → honest 404.
+	}
+	wp_safe_redirect( get_permalink( $dest ), 301 );
+	exit;
+}
+add_action( 'template_redirect', 'studentup_redirect_merged_duplicate', 3 );

@@ -31,3 +31,47 @@ def test_gemini_network_error_is_retryable(monkeypatch):
         pass  # signature differs — covered by source assertion below
     src = open(gc.__file__, encoding="utf-8").read()
     assert 'RETRYABLE:network:{type(exc).__name__}' in src
+
+
+def test_dedupe_slug_tidy_and_live_flags(monkeypatch, capsys):
+    from autoblog import dedupe_posts as d
+
+    class R:
+        def __init__(s, j): s.ok = True; s._j = j
+        def json(s): return s._j
+
+    calls = []
+
+    class WP:
+        def _request(s, m, path, **k):
+            if m == "GET":
+                return R([{"id": 1, "slug": "rrb-ntpc-2026-2", "title": {"raw": "RRB NTPC 2026 Notification 1688"},
+                           "content": {"raw": "<p>" + "word " * 300 + "</p>"}, "date": "2026-10-22",
+                           "link": "https://studentup.in/rrb-ntpc-2026-2/", "meta": {}},
+                          {"id": 4, "slug": "pakur-2026", "title": {"raw": "Pakur Crop Protector Recruitment 2026 Jharkhand"},
+                           "content": {"raw": "<p>" + "word " * 200 + "</p>"}, "date": "2026-10-22",
+                           "link": "https://studentup.in/pakur-2026/", "meta": {}}])
+            calls.append((path, k.get("json")))
+            j = k.get("json", {})
+            if "slug" in j:
+                return R({"slug": j["slug"], "link": "https://studentup.in/" + j["slug"] + "/"})
+            return R({})
+    import autoblog.wordpress_client as wc
+    monkeypatch.setattr(wc, "WordPressClient", WP)
+    d.run(apply=True, notify=False)
+    out = capsys.readouterr().out
+    assert "/rrb-ntpc-2026-2/ → /rrb-ntpc-2026/" in out
+    assert "other-state" in out
+    assert ("posts/1", {"slug": "rrb-ntpc-2026"}) in calls
+
+
+def test_past_dates_flag_and_mid_power_title():
+    from autoblog import live_fix as lf
+    from autoblog.pipeline import clean_title_text
+    body = "<p>" + "తెలుగు పదం " * 50 + " ఫిబ్రవరి 11, 2026 నాడు ఇంటర్వ్యూ.</p>"
+    assert any(f.startswith("past-dates") for f in lf.draft_flags("TCS Job Mela 2026", body))
+    body2 = "<p>" + "తెలుగు పదం " * 50 + " 30 నవంబర్ 2029 చివరి తేదీ. ఫిబ్రవరి 11, 2026 విడుదల.</p>"
+    assert not any(f.startswith("past-dates") for f in lf.draft_flags("X 2026", body2))
+    assert clean_title_text("TCS Mini Job Mela 2026 – Latest విశాఖపట్నంలో 200 ఉద్యోగాలు") == \
+        "TCS Mini Job Mela 2026: విశాఖపట్నంలో 200 ఉద్యోగాలు"
+    assert clean_title_text("SSC CGL 2026 Notification – Apply Online") == "SSC CGL 2026 Notification – Apply Online"

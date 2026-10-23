@@ -314,7 +314,50 @@ def draft_flags(title: str, html: str) -> List[str]:
         tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
         if tel / len(words) < 0.30:
             flags.append("english-body")
+    # v399: every full date in the body is already in the past (live 22-Oct:
+    # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
+    ds = body_dates(plain)
+    if ds:
+        from datetime import date as _d, timedelta as _td
+        if max(ds) < _d.today() - _td(days=3):
+            flags.append(f"past-dates:{max(ds).isoformat()}")
     return flags
+
+
+_MONTHS = {
+    "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7,
+    "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
+    "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "sept": 9,
+    "oct": 10, "nov": 11, "dec": 12,
+    "జనవరి": 1, "ఫిబ్రవరి": 2, "మార్చి": 3, "ఏప్రిల్": 4, "మే": 5, "జూన్": 6, "జులై": 7, "జూలై": 7,
+    "ఆగస్టు": 8, "ఆగస్ట్": 8, "సెప్టెంబర్": 9, "సెప్టెంబరు": 9, "అక్టోబర్": 10, "అక్టోబరు": 10,
+    "నవంబర్": 11, "నవంబరు": 11, "డిసెంబర్": 12, "డిసెంబరు": 12,
+}
+_MON_RE = "|".join(sorted(map(re.escape, _MONTHS), key=len, reverse=True))
+_DATE_RES = (
+    re.compile(rf"\b(\d{{1,2}})\s*(?:st|nd|rd|th)?\s+({_MON_RE})[,.]?\s+(20\d{{2}})", re.I),   # 11 February 2026 / 11 ఫిబ్రవరి 2026
+    re.compile(rf"({_MON_RE})\s+(\d{{1,2}})(?:st|nd|rd|th)?,?\s+(20\d{{2}})", re.I),         # February 11, 2026 / ఫిబ్రవరి 11, 2026
+    re.compile(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](20\d{2})\b"),                             # 11-02-2026
+)
+
+
+def body_dates(text: str) -> List:
+    """All full calendar dates (day+month+year) found in text, as date objects."""
+    from datetime import date as _d
+    out = []
+    for i, rx in enumerate(_DATE_RES):
+        for m in rx.finditer(text or ""):
+            try:
+                if i == 0:
+                    d, mo, y = int(m.group(1)), _MONTHS[m.group(2).lower()], int(m.group(3))
+                elif i == 1:
+                    mo, d, y = _MONTHS[m.group(1).lower()], int(m.group(2)), int(m.group(3))
+                else:
+                    d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+                out.append(_d(y, mo, d))
+            except (ValueError, KeyError):
+                continue
+    return out
 
 
 # ------------------------------------------------------------------ live repair
@@ -357,6 +400,17 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
             changes["excerpt"] = exc_n
         # Missing studentup_last_date → read the deadline from the body (future only)
         extra_meta: Dict[str, str] = {}
+        # v399: SERP title with a power word wedged mid-sentence ("… 2026 – Latest విశాఖ…")
+        try:
+            from .pipeline import MID_POWER_RE
+            rmt = str(meta.get("rank_math_title") or "")
+            if rmt and MID_POWER_RE.search(rmt):
+                fixed = re.sub(r"\s+", " ", MID_POWER_RE.sub(": ", rmt)).strip()
+                if fixed != rmt:
+                    extra_meta["rank_math_title"] = fixed
+                    changes["seo_title"] = 1
+        except Exception:  # noqa: BLE001
+            log.debug("mid power title fix skip", exc_info=True)
         if not str(meta.get("studentup_last_date") or "").strip():
             try:
                 from . import qual as _q
@@ -376,9 +430,10 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
             try:
                 wp.update_post(pid, new_html if changes else html, meta=new_meta,
                                excerpt=new_exc if exc_n else None)
-                if new_meta and row["canonical_fix"]:
+                if new_meta and (row["canonical_fix"] or "rank_math_title" in new_meta):
                     try:
-                        wp.write_seo_meta(pid, {"rank_math_canonical_url": want})
+                        bridge = {k: v for k, v in new_meta.items() if k.startswith("rank_math_")}
+                        wp.write_seo_meta(pid, bridge)
                     except Exception:  # noqa: BLE001
                         log.debug("canonical bridge write skip", exc_info=True)
                 row["applied"] = True

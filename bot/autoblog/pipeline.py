@@ -550,12 +550,19 @@ def clean_title_text(title: str) -> str:
     # word (rm100.fix_title); the visible headline must read naturally.
     t = re.sub(r"\s*(?:[—–:-]\s*)?\(?\b(?:Official|Latest|New|Direct Link|Latest Update)\)?"
                r"(?:\s+(?:జాబ్|జాబ్స్|అప్‌డేట్|అప్డేట్|Job|Jobs|Update|News))?\s*$", "", t, flags=re.I)
+    # v399: power word wedged INSIDE the title (live 22-Oct: "TCS Mini Job Mela
+    # 2026 – Latest విశాఖపట్నంలో 200 ఉద్యోగాలు") — reads broken in Telugu.
+    t = MID_POWER_RE.sub(": ", t)
     # v386: no hype in headlines (live: "అద్భుత అవకాశం!", "బంగారు అవకాశం!",
     # "— Complete Details"). Exclamation marks go; clickbait tails go.
     t = re.sub(r"(?:\s*[:—–-])?\s+(?:అద్భుత(?:మైన)? అవకాశం|బంగారు అవకాశం|భారీ అవకాశం|గొప్ప అవకాశం|సువర్ణావకాశం|Complete Details|Full Details|Best Guide|Complete Guide)\s*!*\s*$", "", t, flags=re.I)
     t = re.sub(r"!+", "", t)
     t = re.sub(r"\s*[—–:-]\s*$", "", t).strip()
     return re.sub(r"\s+", " ", t).strip()
+
+
+MID_POWER_RE = re.compile(
+    r"\s*[—–:|-]\s*(?:Official|Latest|New|Latest Update|Direct Link)\s+(?=[\u0c00-\u0c7f0-9])", re.I)
 
 
 def _hygiene(article: Dict) -> Dict:
