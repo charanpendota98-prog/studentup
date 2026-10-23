@@ -32,7 +32,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -349,7 +349,7 @@ def run_cli(days: int = 90, per_day: int = 3, notify: bool = False,
         return 1
     print(f"  candidates {rep['candidates']} · {rep['days']} days · "
           f"{rep['total_slots']} slots · per day {rep['per_day']}")
-    print(f"  sources: " + " · ".join(f"{k} {v}" for k, v in sorted(rep["by_source"].items())))
+    print("  sources: " + " · ".join(f"{k} {v}" for k, v in sorted(rep["by_source"].items())))
     path, md = save_plan(rep)
     print("-" * 74)
     for row in rep["schedule"][:7]:

@@ -166,7 +166,7 @@ def assets() -> List[Dict]:
                 "natural mentions.",
          "how": "theme `inc/remind.php` .ics + calendar page (already wired).",
          "effort": "low", "links": "medium"},
-        {"kind": "data", "title": f"TS/AP Recruitment & Scholarship Trends — original stats",
+        {"kind": "data", "title": "TS/AP Recruitment & Scholarship Trends — original stats",
          "why": "Original data = kotha information → news desks/data writers cite "
                 "chestharu (adi mee strongest link magnet).",
          "how": "state.db post counts + `--revenue-loop`/GSC numbers → yearly data story.",

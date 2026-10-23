@@ -25,7 +25,6 @@ import logging
 from datetime import date
 from typing import Dict, Optional
 
-from . import config
 from .wordpress_client import WordPressAuthError, WordPressClient, WordPressError
 
 log = logging.getLogger(__name__)

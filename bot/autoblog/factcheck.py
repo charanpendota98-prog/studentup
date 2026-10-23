@@ -24,7 +24,7 @@ from __future__ import annotations
 import html as _html
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 _TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")

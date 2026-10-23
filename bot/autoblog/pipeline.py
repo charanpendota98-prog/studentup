@@ -20,7 +20,7 @@ import requests
 from . import (config, content_quality, gemini_client, google_quality, image_gen,
                notifier, post_gate, qual, research, rm100, seo, sources, state,
                validator)
-from .notifier import esc, send_telegram
+from .notifier import send_telegram
 from .wordpress_client import WordPressClient
 
 log = logging.getLogger("autoblog.pipeline")

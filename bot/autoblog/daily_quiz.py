@@ -24,7 +24,7 @@ import logging
 import re
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from . import config, quiz_engine
 
