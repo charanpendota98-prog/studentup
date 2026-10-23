@@ -316,7 +316,9 @@ def draft_flags(title: str, html: str) -> List[str]:
             flags.append("english-body")
     # v399: every full date in the body is already in the past (live 22-Oct:
     # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
-    ds = body_dates(plain)
+    # ignore the house "last updated"/"published" stamps — they are always today.
+    ds = body_dates(re.sub(r"(?:చివరి అప్‌డేట్|చివరి అప్డేట్|Last updated|Updated on|Published on|Posted on)\s*[:\-–]?[^\n.]{0,40}",
+                           " ", plain, flags=re.I))
     if ds:
         from datetime import date as _d, timedelta as _td
         if max(ds) < _d.today() - _td(days=3):

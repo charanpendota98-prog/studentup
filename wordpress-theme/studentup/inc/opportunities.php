@@ -164,7 +164,7 @@ function studentup_is_guide_post( $post_id ) {
 	$markers = array(
 		'ప్రిపరేషన్', 'గైడ్', 'ఎలా చేయాలి', 'కెరీర్ ఆప్షన్స్', 'స్టడీ ప్లాన్', 'సిలబస్, పుస్తకాలు',
 		'preparation plan', 'preparation guide', 'preparation strategy', 'study plan',
-		'complete guide', 'how to apply', 'career options', 'step by step', 'స్టెప్ బై స్టెప్',
+		'complete guide', 'career options', 'step by step', 'స్టెప్ బై స్టెప్',
 	);
 	foreach ( $markers as $m ) {
 		if ( false !== mb_strpos( $title, mb_strtolower( $m ) ) ) {

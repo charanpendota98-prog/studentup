@@ -46,6 +46,25 @@ def _fetch_published(wp, days: int = 90, limit: int = 400) -> List[Dict]:
     return posts
 
 
+# "…-2026" is a year, "…-group-2"/"…-phase-2"/"…-paper-2" is a real name part —
+# only a bare 1-2 digit collision suffix after a WORD is a WordPress "-2".
+_KEEP_NUM_TAIL = re.compile(
+    r"(?:^|-)(?:group|phase|paper|tier|stage|class|set|part|level|grade|shift|round|"
+    r"batch|zone|region|division|series|version|v|no|sem|semester|year|week|day|month|"
+    r"std|standard|category|cat|grp|list|key|cycle|session|slot|notification|wave|quarter|q)$")
+
+
+def tidy_slug(slug: str) -> str:
+    """Return the clean slug for a WordPress collision slug ("foo-2" → "foo"), else ""."""
+    m = re.match(r"^(.*(?:[a-z]|\b20\d{2}))-(\d{1,2})$", slug or "")
+    if not m:
+        return ""
+    base = m.group(1)
+    if _KEEP_NUM_TAIL.search(base):
+        return ""
+    return base
+
+
 def group_duplicates(posts: List[Dict]) -> List[List[Dict]]:
     rows = []
     for p in posts:
@@ -104,11 +123,11 @@ def run(apply: bool = False, days: int = 90, notify: bool = True) -> int:
     # with a twin that is now draft/trash) gets its clean slug back when WordPress
     # lets it; core stores _wp_old_slug and 301s the old URL, so nothing breaks.
     dropped = {r["id"] for g in groups for r in g} - {sorted(g, key=lambda r: (-r["words"], r["date"]))[0]["id"] for g in groups}
-    tidy = [p for p in posts if p.get("id") not in dropped and re.search(r"-\d+$", str(p.get("slug") or ""))]
+    tidy = [p for p in posts if p.get("id") not in dropped and tidy_slug(str(p.get("slug") or ""))]
     if tidy:
         lines.append(f"\n🔗 SLUG TIDY — {len(tidy)} published post(s) with a -N suffix" + (" · APPLIED" if apply else ""))
         for p in tidy:
-            want = re.sub(r"-\d+$", "", str(p["slug"]))
+            want = tidy_slug(str(p["slug"]))
             if not apply:
                 lines.append(f"  /{p['slug']}/ → /{want}/ ?")
                 continue

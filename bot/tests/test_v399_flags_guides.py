@@ -75,3 +75,19 @@ def test_past_dates_flag_and_mid_power_title():
     assert clean_title_text("TCS Mini Job Mela 2026 – Latest విశాఖపట్నంలో 200 ఉద్యోగాలు") == \
         "TCS Mini Job Mela 2026: విశాఖపట్నంలో 200 ఉద్యోగాలు"
     assert clean_title_text("SSC CGL 2026 Notification – Apply Online") == "SSC CGL 2026 Notification – Apply Online"
+
+
+def test_tidy_slug_guards_years_and_named_numbers():
+    from autoblog.dedupe_posts import tidy_slug
+    assert tidy_slug("rrb-ntpc-2026-2") == "rrb-ntpc-2026"
+    assert tidy_slug("tgpsc-fbo-notification-2026-forest-beat-officer-posts-4") == "tgpsc-fbo-notification-2026-forest-beat-officer-posts"
+    assert tidy_slug("telangana-police-2026") == ""
+    assert tidy_slug("appsc-group-2") == ""
+    assert tidy_slug("ssc-cgl-tier-2") == ""
+    assert tidy_slug("3452-2") == ""
+
+
+def test_past_dates_ignores_house_stamp():
+    from autoblog import live_fix as lf
+    body = "<p>" + "తెలుగు పదం " * 50 + "</p><p><em>చివరి అప్‌డేట్: 22 అక్టోబర్ 2099 | studentup.in</em></p><p>ఫిబ్రవరి 11, 2026 నాడు ఇంటర్వ్యూ.</p>"
+    assert any(f.startswith("past-dates") for f in lf.draft_flags("X 2026", body))
