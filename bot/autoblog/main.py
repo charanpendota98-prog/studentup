@@ -541,6 +541,17 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                         log.warning("Daily quiz draft failed — retry next run: %s", exc)
                 except Exception:
                     _soft_fail("Daily quiz failed — regular posting continues")
+                    # v399: the promised daily slot must still produce a review
+                    # draft — fall back ONCE to the deterministic sample bank
+                    # (draft-locked; owner sees "sample" in the Telegram line).
+                    if not quiz_mock and getattr(config, "QUIZ_SAMPLE_FALLBACK", True):
+                        try:
+                            result = pipeline.create_quiz(mock=True)
+                            state.meta_set(config.STATE_PATH,
+                                           f"quizdate:{today.isoformat()}", "1")
+                            log.warning("DAILY QUIZ sample draft (AI failed) ✔ %s", result["link"])
+                        except Exception:
+                            _soft_fail("Daily quiz sample fallback failed too")
         # --- v15/v16: Breaking-News Radar — every RADAR_INTERVAL_HOURS ---
         if (config.RADAR_ENABLED
                 and (now_hour - config.RADAR_HOUR) % max(1, config.RADAR_INTERVAL_HOURS) == 0
