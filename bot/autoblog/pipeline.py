@@ -553,6 +553,9 @@ def clean_title_text(title: str) -> str:
     # v399: power word wedged INSIDE the title (live 22-Oct: "TCS Mini Job Mela
     # 2026 – Latest విశాఖపట్నంలో 200 ఉద్యోగాలు") — reads broken in Telugu.
     t = MID_POWER_RE.sub(": ", t)
+    # live H1 22-Oct: "… 686 పోస్టులు Official వివరాలు" — bare power word glued
+    # between Telugu/number words (no separator). Drop the word only.
+    t = re.sub(r"(?<=[\u0c00-\u0c7f0-9,])\s+(?:Official|Latest|New)\s+(?=[\u0c00-\u0c7f])", " ", t, flags=re.I)
     # v386: no hype in headlines (live: "అద్భుత అవకాశం!", "బంగారు అవకాశం!",
     # "— Complete Details"). Exclamation marks go; clickbait tails go.
     t = re.sub(r"(?:\s*[:—–-])?\s+(?:అద్భుత(?:మైన)? అవకాశం|బంగారు అవకాశం|భారీ అవకాశం|గొప్ప అవకాశం|సువర్ణావకాశం|Complete Details|Full Details|Best Guide|Complete Guide)\s*!*\s*$", "", t, flags=re.I)

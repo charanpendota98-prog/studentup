@@ -422,16 +422,32 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
                     changes["last_date"] = 1
             except Exception:  # noqa: BLE001
                 pass
+        # v399: H1 with a glued/wedged power word ("… 686 పోస్టులు Official వివరాలు",
+        # "… 2026 – Latest విశాఖ…") → natural headline (slug/URL untouched).
+        new_title = title
+        try:
+            from .pipeline import clean_title_text
+            cand = clean_title_text(title)
+            if cand and cand != title and len(cand) >= 20:
+                new_title = cand
+                changes["title"] = 1
+        except Exception:  # noqa: BLE001
+            log.debug("title clean skip", exc_info=True)
         row["changes"] = changes
-        row["flags"] = title_flags(title)
+        row["flags"] = title_flags(new_title)
         if apply and (row["canonical_fix"] or changes):
             new_meta = dict(extra_meta)
             if row["canonical_fix"]:
                 new_meta["rank_math_canonical_url"] = want
             new_meta = new_meta or None
             try:
-                wp.update_post(pid, new_html if changes else html, meta=new_meta,
-                               excerpt=new_exc if exc_n else None)
+                try:
+                    wp.update_post(pid, new_html if changes else html, meta=new_meta,
+                                   excerpt=new_exc if exc_n else None,
+                                   title=new_title if new_title != title else None)
+                except TypeError:  # update_post without title kwarg
+                    wp.update_post(pid, new_html if changes else html, meta=new_meta,
+                                   excerpt=new_exc if exc_n else None)
                 if new_meta and (row["canonical_fix"] or "rank_math_title" in new_meta):
                     try:
                         bridge = {k: v for k, v in new_meta.items() if k.startswith("rank_math_")}

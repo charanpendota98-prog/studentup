@@ -91,3 +91,10 @@ def test_past_dates_ignores_house_stamp():
     from autoblog import live_fix as lf
     body = "<p>" + "తెలుగు పదం " * 50 + "</p><p><em>చివరి అప్‌డేట్: 22 అక్టోబర్ 2099 | studentup.in</em></p><p>ఫిబ్రవరి 11, 2026 నాడు ఇంటర్వ్యూ.</p>"
     assert any(f.startswith("past-dates") for f in lf.draft_flags("X 2026", body))
+
+
+def test_glued_power_word_removed_from_h1():
+    from autoblog.pipeline import clean_title_text
+    assert clean_title_text("APPSC Group 2 Notification 2026 686 పోస్టులు Official వివరాలు") == \
+        "APPSC Group 2 Notification 2026 686 పోస్టులు వివరాలు"
+    assert clean_title_text("SSC CGL 2026 Official Notification") == "SSC CGL 2026 Official Notification"
