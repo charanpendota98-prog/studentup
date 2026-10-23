@@ -220,7 +220,7 @@ function studentup_mega_groups() {
 		),
 		'feature' => array(
 			'title' => 'Daily Quiz',
-			'desc'  => 'Roju kotha questions · explanations tho · login avasaram ledu.',
+			'desc'  => 'New questions every day · with explanations · no login needed.',
 			'url'   => $quiz_url,
 			'cta'   => 'Start quiz',
 		),

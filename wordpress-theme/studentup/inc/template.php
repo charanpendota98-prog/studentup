@@ -384,7 +384,7 @@ function studentup_menu_fallback() {
 		);
 	}
 	$pages = array(
-		array( 'slug' => 'saved',   'label' => 'Saved posts', 'desc' => 'Padhukoni tarvata chudandi' ),
+		array( 'slug' => 'saved',   'label' => 'Saved posts', 'desc' => 'Save now, read later' ),
 		array( 'slug' => 'contact', 'label' => 'Contact',     'desc' => 'Corrections · suggestions' ),
 		array( 'slug' => 'about',   'label' => 'About',       'desc' => 'Who writes this' ),
 		array( 'slug' => 'quiz',    'label' => 'Daily Quiz',  'desc' => 'Practice questions' ),

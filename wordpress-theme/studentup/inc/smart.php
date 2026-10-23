@@ -192,7 +192,7 @@ function studentup_job_finder() {
 		</form>
 
 		<div class="su-finder-results" data-su-finder-results></div>
-		<p class="su-finder-note">Eligibility is a guide from the data we publish — apply cheyyadaniki mundu official notification lo okasari confirm cheyandi.</p>
+		<p class="su-finder-note">అర్హత మేము ప్రచురించిన డేటా ఆధారంగా సూచన మాత్రమే — దరఖాస్తుకు ముందు అధికారిక Notificationలో ఒకసారి నిర్ధారించుకోండి.</p>
 	</section>
 	<?php
 }

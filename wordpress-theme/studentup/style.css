@@ -570,7 +570,7 @@ body.dark .su-subcats a{background:#16213a;border-color:#25406b;color:#9ec4ff}
 .su-404latest a:hover{text-decoration:underline}
 body.dark .su-404latest a{color:#9ec4ff}
 .su-expired{background:#fff4ec;border:1px solid #f3c39f;border-left:4px solid #d95b29;border-radius:10px;padding:12px 16px;margin:14px 0;font-size:15px}
-.su-expired a{color:#1c4d8f}
+.su-expired a{color:var(--link)}.su-expired-live{margin:10px 0 6px;padding:0 0 0 18px}.su-expired-live li{margin:4px 0;line-height:1.45}.su-expired-live a{font-weight:600;text-decoration:none}.su-expired-live a:hover{text-decoration:underline}.su-expired-more{display:inline-block;margin-top:4px;font-weight:700}
 body.dark .su-expired{background:#2a1a10;border-color:#7a3c1a;color:#f5d9c4}
 
 /* ================= v72: search panel (menu pakkana) ================= */

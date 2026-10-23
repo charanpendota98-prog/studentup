@@ -1,6 +1,6 @@
 ## theme 1.9.173 + bot v399 — FIX ALL round 3 (2026-10-23)
 
-- **Theme 1.9.173**: preparation/guide posts (bot `--calendar` evergreen guides) are excluded from the Latest Jobs board + ticker (`studentup_is_guide_post`, title-only test); saffron `screenshot.png`. Upload `studentup-theme-1.9.173.zip` → Activate → LiteSpeed Purge All → hard refresh.
+- **Theme 1.9.173**: preparation/guide posts (bot `--calendar` evergreen guides) are excluded from the Latest Jobs board + ticker (`studentup_is_guide_post`, title-only test); saffron `screenshot.png`; expired-post notice now fully Telugu + shows up to 3 LIVE same-category posts (keeps the reader; expired/guide posts excluded); last Tenglish UI strings (mega-menu quiz desc, Saved-posts desc, eligibility finder note) fixed. Upload `studentup-theme-1.9.173.zip` → Activate → LiteSpeed Purge All → hard refresh.
 - **Bot v399**: `SKIP-FOREIGN-TITLE` hard skip for Hindi/Tamil/Kannada/Malayalam/Bengali/Urdu-script titles; `other-state` REVIEW flag (Kerala PSC/TNPSC/UPPSC… without an AP/TS/central anchor); Gemini network timeouts now `RETRYABLE:network` (rotate key/model instead of aborting the run) + 15 s connect timeout; hooks.py docstring updated. Tests 141 pass.
 
 
