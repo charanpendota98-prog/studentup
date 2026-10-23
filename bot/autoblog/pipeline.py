@@ -1810,6 +1810,16 @@ def _append_official_sources(article: dict) -> None:
     visible = []
     for item in resolved:
         kind = item.get("link_type", "unknown")
+        # v398: the PUBLIC "అధికారిక లింక్స్" box is official domains ONLY.
+        # Live post showed "education-and-career → etvbharat.com" (an outbound
+        # link scraped from a news source page) — that leaks the source and is
+        # not an official link. Non-gov links stay in the private ledger.
+        try:
+            _host = urlparse(str(item.get("url") or "")).netloc
+        except Exception:  # noqa: BLE001
+            _host = ""
+        if sources._official_score(_host) < 2:
+            continue
         visible.append({
             "text": item.get("anchor_text") or item.get("text") or
                     f"Official link — {urlparse(item['url']).netloc}",

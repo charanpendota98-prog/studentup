@@ -88,6 +88,13 @@ def trim_official_links(html: str, title: str, max_links: int = 4) -> Tuple[str,
         if not a:
             continue
         url, attrs, text = a.group(1), a.group(2), a.group(3)
+        try:
+            from . import sources as _src
+            from urllib.parse import urlparse as _up
+            if _src._official_score(_up(url).netloc) < 2:   # news/blog host → never "official"
+                continue
+        except Exception:  # noqa: BLE001
+            pass
         clean = _FILE_NOISE.sub("", re.sub(r"\s+", " ", text)).strip(" -–|·")
         if not clean or len(clean) < 3:
             clean = "Official Website"
@@ -109,6 +116,8 @@ def trim_official_links(html: str, title: str, max_links: int = 4) -> Tuple[str,
             break
     if len(kept) == len(items) and all(k in m.group(2) for k in kept):
         return html, 0
+    if not kept:   # nothing official left → drop the whole box (no empty heading)
+        return html[:m.start()] + html[m.end():], len(items)
     new = m.group(1) + "".join(kept) + m.group(3)
     return html[:m.start()] + new + html[m.end():], len(items) - len(kept)
 
@@ -144,7 +153,41 @@ def strip_filler(html: str) -> Tuple[str, int]:
     n += k
     out, k = _LAST_UPDATE_P.subn("", out)
     n += k
+    # English FAQ heading inside a Telugu article (live: "Frequently Asked Questions (FAQ)")
+    out, k = re.subn(r"(<h2\b[^>]*>)\s*Frequently Asked Questions(?:\s*\(FAQ\))?\s*(</h2>)",
+                     r"\1తరచుగా అడిగే ప్రశ్నలు (FAQ)\2", out, flags=re.I)
+    n += k
     return out, n
+
+
+def drop_duplicate_takeaways(html: str) -> Tuple[str, int]:
+    """Remove the 'ముఖ్యాంశాలు' box when every bullet is copied verbatim from the body."""
+    m = re.search(r'<div class="su-takeaways">.*?</ul>\s*</div>\s*', html, flags=re.S)
+    if not m:
+        return html, 0
+    items = [re.sub(r"<[^>]+>", "", x).strip() for x in re.findall(r"<li[^>]*>(.*?)</li>", m.group(0), flags=re.S)]
+    rest = html[:m.start()] + html[m.end():]
+    plain = re.sub(r"<[^>]+>", "", rest)
+    if items and all(i and i in plain for i in items):
+        return rest, 1
+    return html, 0
+
+
+def drop_title_captions(html: str, title: str) -> Tuple[str, int]:
+    """A figcaption that merely repeats the H1 is noise."""
+    if not title:
+        return html, 0
+    t = re.sub(r"\s+", " ", title).strip().lower()
+    n = 0
+
+    def _cap(m: re.Match) -> str:
+        nonlocal n
+        if re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m.group(1))).strip().lower() == t:
+            n += 1
+            return ""
+        return m.group(0)
+
+    return re.sub(r"<figcaption>(.*?)</figcaption>", _cap, html, flags=re.S), n
 
 
 def clean_body(html: str, title: str = "", featured_url: str = "") -> Tuple[str, Dict[str, int]]:
@@ -154,6 +197,8 @@ def clean_body(html: str, title: str = "", featured_url: str = "") -> Tuple[str,
     html, rep["official_links"] = trim_official_links(html, title)
     html, rep["figures"] = dedupe_figures(html, featured_url)
     html, rep["filler"] = strip_filler(html)
+    html, rep["takeaways_dup"] = drop_duplicate_takeaways(html)
+    html, rep["title_caption"] = drop_title_captions(html, title)
     return html, {k: v for k, v in rep.items() if v}
 
 

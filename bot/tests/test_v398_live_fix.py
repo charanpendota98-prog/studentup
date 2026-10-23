@@ -89,3 +89,26 @@ def test_inline_image_mid_article_not_under_hero():
 
 def test_canonical_for_strips_query():
     assert live_fix.canonical_for("https://studentup.in/a-2/?x=1#f") == "https://studentup.in/a-2/"
+
+
+def test_news_domain_never_in_official_links():
+    html = ('<section class="su-official-links" aria-labelledby="official-links">'
+            '<h2 id="official-links">అధికారిక లింక్స్ (Official Links)</h2><ul>'
+            '<li><a href="https://www.etvbharat.com/te/andhra-pradesh/!education-and-career" '
+            'target="_blank" rel="noopener">education-and-career</a></li></ul></section>')
+    out, dropped = live_fix.trim_official_links("<p>x</p>" + html, "APPSC Group 2 Notification 2026")
+    assert dropped == 1 and "etvbharat" not in out and "su-official-links" not in out
+
+
+def test_duplicate_takeaways_and_title_caption_and_faq_heading():
+    body = ('<p>intro</p><div class="su-takeaways"><div class="su-takeaways-title">ముఖ్యాంశాలు</div>'
+            '<ul><li>డిప్యూటీ తహశీల్దార్: 200</li><li>సీనియర్ అకౌంటెంట్: 90</li></ul></div>'
+            '<h2>Vacancy</h2><figure class="su-figure"><img src="a.webp" alt="k" />'
+            '<figcaption>APPSC Group 2 Notification 2026 686 పోస్టులు</figcaption></figure>'
+            '<ul><li>డిప్యూటీ తహశీల్దార్: 200</li><li>సీనియర్ అకౌంటెంట్: 90</li></ul>'
+            '<h2>Frequently Asked Questions (FAQ)</h2>')
+    out, rep = live_fix.clean_body(body, "APPSC Group 2 Notification 2026 686 పోస్టులు")
+    assert "su-takeaways" not in out and rep["takeaways_dup"] == 1
+    assert "<figcaption>" not in out and rep["title_caption"] == 1
+    assert "తరచుగా అడిగే ప్రశ్నలు (FAQ)" in out and "Frequently" not in out
+    assert out.count("డిప్యూటీ తహశీల్దార్: 200") == 1
