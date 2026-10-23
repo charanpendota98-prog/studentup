@@ -110,7 +110,6 @@ def _coverage_block(district: str, posts: List[Dict]) -> str:
     "త్వరలో" ga chupistam (fake claim ledu).
     """
     esc = seo._esc
-    blob = " ".join((p.get("title") or "") for p in posts).lower()
     have, soon = [], []
     for label, keys in _COVERAGE:
         hits = sum(1 for p in posts

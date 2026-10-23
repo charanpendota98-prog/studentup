@@ -167,8 +167,6 @@ def trend(window: int = 7, path: Optional[Path] = None) -> Dict:
                       "clicks_delta": click_delta, "click_pct": round(pct, 3),
                       "position": pc, "position_before": pb, "position_delta": pos_delta,
                       "impressions": cur["impressions"]})
-    bucket = lambda s: sorted([m for m in moves if m["state"] == s],
-                              key=lambda m: m["clicks_delta"])  # noqa: E731
     decaying = [m for m in moves if m["state"] == "DECAYING"]
     decaying.sort(key=lambda m: (m["clicks_delta"], -m["position_delta"]))
     return {"ready": True, "latest": latest["date"], "baseline": base["date"],

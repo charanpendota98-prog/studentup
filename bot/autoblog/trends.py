@@ -107,7 +107,7 @@ def parse_trends_rss(xml: str) -> List[Dict[str, str]]:
         log.info("trends RSS ET fail (%s) — regex fallback", str(exc)[:60])
         rows: List[Dict[str, str]] = []
         for blk in re.findall(r"<item>(.*?)</item>", xml, flags=re.S):
-            def _g(tag):
+            def _g(tag, blk=blk):
                 m = re.search(tag + r">(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</" + tag,
                               blk, flags=re.S)
                 return _text(m.group(1)) if m else ""

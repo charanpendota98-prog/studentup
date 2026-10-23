@@ -337,7 +337,55 @@ def draft_flags(title: str, html: str) -> List[str]:
         from datetime import date as _d, timedelta as _td
         if max(ds) < _d.today() - _td(days=3):
             flags.append(f"past-dates:{max(ds).isoformat()}")
+    flags.extend(consistency_flags(title, plain))
     return flags
+
+
+_LAST_DATE_RE = re.compile(
+    r"(?:చివరి తేదీ|ఆఖరి తేదీ|last date|closing date|దరఖాస్తు గడువు)[^.\n]{0,40}?"
+    r"(\d{1,2}[\-/ ](?:\d{1,2}|[A-Za-z]{3,9}|[\u0c00-\u0c7f]+)[\-/ ,]*\d{4}|[A-Za-z]{3,9} \d{1,2},? \d{4})",
+    re.I)
+_POSTS_RE = re.compile(r"(?:మొత్తం|total)\s*(?:పోస్టులు|posts|vacancies|ఖాళీలు)?\s*[:\-–]?\s*(\d[\d,]{1,6})"
+                       r"|(\d[\d,]{1,6})\s*(?:పోస్టులు|posts|vacancies|ఖాళీలు)", re.I)
+_FEE_RE = re.compile(r"(?:ఫీజు|fee)[^.\n]{0,30}?(?:₹|rs\.?)\s*(\d[\d,]{1,5})", re.I)
+
+
+def consistency_flags(title: str, plain: str) -> List[str]:
+    """v400 fact-diff: the same fact stated two different ways inside ONE post
+    (live 22-Oct: TCS post said Visakhapatnam in the title, Hyderabad in the
+    body; another gave two different last dates). Gemini drifts between the
+    source and its own memory — we cannot know which is right, but we CAN
+    see that they disagree → REVIEW flag with both values. No auto-change."""
+    out: List[str] = []
+    txt = plain or ""
+    def _norm_num(x: str) -> str:
+        return x.replace(",", "").lstrip("0") or "0"
+    # a) two different "last date" values
+    lds = {re.sub(r"\s+", " ", m.group(1)).strip().lower() for m in _LAST_DATE_RE.finditer(txt)}
+    lds = {d for d in lds if re.search(r"\d{4}", d)}
+    if len(lds) >= 2:
+        parsed = {d.isoformat() for d in body_dates(" . ".join(lds))}
+        if len(parsed) >= 2:
+            out.append("conflict-last-date:" + "|".join(sorted(parsed)))
+    # b) two different "total posts" numbers (title vs body counts too)
+    nums = set()
+    for m in _POSTS_RE.finditer((title or "") + " . " + txt):
+        v = _norm_num(m.group(1) or m.group(2) or "")
+        if v.isdigit() and 1 <= int(v) <= 500000:
+            nums.add(int(v))
+    if len(nums) >= 2 and (max(nums) - min(nums)) > 0.05 * max(nums):
+        # 500 vs 501 (typo / per-category sum) is not worth a human; 500 vs 5000 is
+        out.append("conflict-posts:" + "|".join(str(n) for n in sorted(nums)))
+    # c) title says city/state A, body never mentions A but names another TS/AP city
+    cities = ["హైదరాబాద్", "విశాఖపట్నం", "విజయవాడ", "వరంగల్", "తిరుపతి", "గుంటూరు", "కరీంనగర్", "నిజామాబాద్",
+              "hyderabad", "visakhapatnam", "vizag", "vijayawada", "warangal", "tirupati", "guntur"]
+    tl = (title or "").lower(); bl = txt.lower()
+    in_title = [c for c in cities if c in tl]
+    if in_title and not any(c in bl for c in in_title):
+        other = [c for c in cities if c in bl and c not in in_title]
+        if other:
+            out.append(f"conflict-place:{in_title[0]}|{other[0]}")
+    return out
 
 
 _MONTHS = {
