@@ -58,7 +58,7 @@ def validate() -> list[str]:
     for field in ("Theme Name:", "Version:", "License:", "Text Domain: studentup"):
         if field not in css:
             problems.append("style.css header lo ledu: " + field)
-    for token in ("--navy:#0f2e62", "--orange:#ed8a32", ".tickerwrap", ".usedgrid",
+    for token in ("--navy:#9d174d", "--orange:#ed8a32", ".tickerwrap", ".usedgrid",
                   ".newsgrid", ".su-ad", "body.dark"):
         if token not in css:
             problems.append("style.css lo design token ledu: " + token)

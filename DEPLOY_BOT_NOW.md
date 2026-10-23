@@ -1,4 +1,6 @@
 
+## theme 1.9.171 — PINK theme (owner: "YES BUILD"): navy palette → pink/rose (primary #9d174d, accent #db2777, links #be185d, dark bg #4a0d2a), PWA theme-color, share-image gradient, dark variants — AA contrast (white on #9d174d 7.6:1, #be185d text 5.9:1). 1.9.170 related-dedupe fixes కూడా ఇందులో ఉన్నాయి. Upload `studentup-theme-1.9.171.zip` → Activate → LiteSpeed Purge All → hard refresh.
+
 ## theme 1.9.170 — post page లో రెండు related lists ("తర్వాత చదవండి" + "ఇవి కూడా చూడండి") ఒకే 3 posts చూపించేవి + post యొక్క duplicate twin ("APPSC Group 2 … 686" ×2) కూడా related లో వచ్చేది → `studentup_same_topic()` title match తో twin posts skip, Up-next లో చూపినవి related grid లో మళ్ళీ రావు, తక్కువైతే fresh posts తో fill. Upload `studentup-theme-1.9.170.zip` → Activate → LiteSpeed Purge All. (1.9.169 లోవి కూడా ఇందులో ఉన్నాయి.)
 
 ## theme 1.9.169 — latest-jobs: "చివరి తేదీ: ప్రకటించలేదు" row (తప్పు fact) → date లేకపోతే row లేదు; "See all" → real category link; render-time cleaners for ALL already-published posts (re-save అవసరం లేదు): orphan `[adinsert block=1]` text, Kannada/Hindi rupee → ₹, English FAQ heading → తెలుగు, Quick Overview/చివరి అప్‌డేట్/closing filler paragraphs, repeated figures, title-repeating captions, "అధికారిక లింక్స్" లో non-gov hosts (etvbharat) → removed. Upload `studentup-theme-1.9.169.zip` → Activate → LiteSpeed Purge All.

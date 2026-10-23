@@ -41,7 +41,7 @@
   function drawCard(o) {
     var W = 1080, H = 1920, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     var c = cv.getContext("2d"); if (!c) throw new Error("no-canvas"); var pct = Math.round((o.score / o.total) * 100);
-    var g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#1e1b4b"); g.addColorStop(.55, "#4f46e5"); g.addColorStop(1, "#06b6d4");
+    var g = c.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#1e1b4b"); g.addColorStop(.55, "#e11d48"); g.addColorStop(1, "#06b6d4");
     c.fillStyle = g; c.fillRect(0, 0, W, H);
     // soft glow orbs
     c.globalAlpha = .18; c.fillStyle = "#fff";
@@ -70,7 +70,7 @@
     c.font = "800 44px system-ui, sans-serif"; c.fillStyle = "#16a34a"; c.fillText(pct + "%", cx, cy + 95);
     // title pill
     var t = title(pct); c.font = "800 46px system-ui, sans-serif"; var tw = c.measureText(t).width + 90;
-    roundRect(c, cx - tw / 2, 1120, tw, 92, 46); c.fillStyle = "#eef2ff"; c.fill(); c.fillStyle = "#4338ca"; c.fillText(t, cx, 1168);
+    roundRect(c, cx - tw / 2, 1120, tw, 92, 46); c.fillStyle = "#fdf2f8"; c.fill(); c.fillStyle = "#be123c"; c.fillText(t, cx, 1168);
     // challenge
     // score squares (status-friendly, like Wordle)
     var sq = 54, gap = 14, bw = o.total * sq + (o.total - 1) * gap, bx = cx - bw / 2;
