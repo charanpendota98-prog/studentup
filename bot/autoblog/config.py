@@ -571,6 +571,7 @@ FACT_STRICT = _get("FACT_STRICT", "1") not in ("0", "false", "no")
 
 # --- Schedule ------------------------------------------------------------
 # Draft-first quality default: do not create a scaled-content firehose.
+DRAFTS_SLO = int(_get("DRAFTS_SLO", "2"))      # v399: alert if fewer drafts by 14:00 IST
 DAILY_MIN = int(_get("DAILY_MIN", "3"))      # min draft slots per day
 DAILY_MAX = int(_get("DAILY_MAX", "5"))      # max draft slots per day
 ACTIVE_HOUR_START = int(_get("ACTIVE_HOUR_START", "6"))   # first posting hour (local)

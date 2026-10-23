@@ -68,6 +68,7 @@ require_once get_template_directory() . '/inc/indexnow.php';
 require_once get_template_directory() . '/inc/pwa.php';
 require_once get_template_directory() . '/inc/cta.php';
 require_once get_template_directory() . '/inc/editor.php';
+require_once get_template_directory() . '/inc/publish-gate.php'; // v1.9.173: WP-side publish gate (REVIEW:/duplicate/foreign-script → stays draft)
 require_once get_template_directory() . '/inc/redirects.php';  // v80: 301 redirect manager
 require_once get_template_directory() . '/inc/health.php';     // v81: admin SEO-health widget
 require_once get_template_directory() . '/inc/notify.php';    // v90: alert queue (admin notices + critical public banner + REST)

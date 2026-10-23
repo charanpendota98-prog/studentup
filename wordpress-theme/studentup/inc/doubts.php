@@ -184,6 +184,15 @@ function studentup_doubt_post_handler() {
 	if ( ! wp_verify_nonce( $nonce, 'su_doubt_' . $post_id ) ) {
 		return;
 	}
+	// v1.9.173: per-IP rate limit — 5 questions / 10 min (nonce + honeypot alone
+	// do not stop a scripted flood of pending comments).
+	$ip_key = 'su_doubt_rl_' . md5( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$hits   = (int) get_transient( $ip_key );
+	if ( $hits >= 5 ) {
+		wp_safe_redirect( add_query_arg( 'su_doubt', 'err', get_permalink( $post_id ) ) . '#su-doubts' );
+		exit;
+	}
+	set_transient( $ip_key, $hits + 1, 10 * MINUTE_IN_SECONDS );
 	$res = studentup_save_doubt(
 		$post_id,
 		isset( $_POST['su_doubt_q'] ) ? wp_unslash( $_POST['su_doubt_q'] ) : '',
