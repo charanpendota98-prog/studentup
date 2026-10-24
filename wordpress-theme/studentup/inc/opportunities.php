@@ -482,3 +482,65 @@ add_filter( 'studentup_seo_list_title', function ( $t ) {
 add_filter( 'studentup_seo_list_desc', function ( $d ) {
 	return studentup_opportunities_is_route() ? studentup_opportunities_seo_desc() : $d;
 } );
+
+/**
+ * 1.9.177: official hosts that are NOT .gov.in/.nic.in/.ac.in — banks, PSUs,
+ * boards, NTA/NBEMS. Live 24-Oct: sbi.co.in select-list PDF was the real source
+ * yet the post showed no "Official Notification" link. Shared with the bot's
+ * OFFICIAL_HOSTS list (autoblog/sources.py) — keep both in sync.
+ */
+function studentup_official_hosts_extra() {
+	return array(
+		'agnipathvayu.cdac.in', 'aiims.edu', 'aiimsexams.ac.in', 'airindia.com',
+		'apcob.org', 'apcpdcl.in', 'apdsc.apcfss.in', 'apepdcl.in',
+		'apgenco.gov.in', 'apmsrb.ap.gov.in', 'appsc.gov.in', 'apspdcl.in',
+		'apsrtc.ap.gov.in', 'aptransco.co.in', 'bankofbaroda.in', 'bankofindia.co.in',
+		'bankofmaharashtra.in', 'barc.gov.in', 'bdl-india.in', 'becil.com',
+		'bel-india.in', 'bemlindia.in', 'bharatpetroleum.in', 'bhel.com',
+		'bpcl.in', 'bsnl.co.in', 'canarabank.com', 'careerindianairforce.cdac.in',
+		'cbse.gov.in', 'centralbankofindia.co.in', 'cfw.ap.gov.in', 'cfw.telangana.gov.in',
+		'coalindia.in', 'cochinshipyard.in', 'cse.ap.gov.in', 'csir.res.in',
+		'cwc.gov.in', 'dae.gov.in', 'drdo.gov.in', 'ecil.co.in',
+		'ecourts.gov.in', 'employment.ap.gov.in', 'employment.telangana.gov.in', 'epfindia.gov.in',
+		'esic.gov.in', 'exams.nta.ac.in', 'eximbankindia.in', 'fci.gov.in',
+		'gailonline.com', 'gicofindia.com', 'grse.in', 'gsl.in',
+		'hal-india.co.in', 'hc.ap.nic.in', 'hindustanpetroleum.com', 'hsl.gov.in',
+		'ibps.in', 'icar.org.in', 'icmr.gov.in', 'idbibank.in',
+		'indianbank.in', 'indianrailways.gov.in', 'indiapost.gov.in', 'indiapostgdsonline.gov.in',
+		'iob.in', 'iocl.com', 'irel.co.in', 'ireltd.in',
+		'isro.gov.in', 'itpo.gov.in', 'jeemain.nta.nic.in', 'jipmer.edu.in',
+		'jnanabhumi.ap.gov.in', 'joinindianarmy.nic.in', 'joinindiannavy.gov.in', 'kvsangathan.nic.in',
+		'licindia.in', 'mazagondock.in', 'mcl.gov.in', 'mhsrb.telangana.gov.in',
+		'midhani-india.in', 'mtnl.net.in', 'mudra.org.in', 'nabard.org',
+		'nabcons.com', 'nabfid.org', 'natboard.edu.in', 'nationalinsurance.nic.co.in',
+		'navodaya.gov.in', 'ncert.nic.in', 'ncs.gov.in', 'neet.nta.nic.in',
+		'newindia.co.in', 'nfdcindia.com', 'nfl.co.in', 'nhai.gov.in',
+		'nhm.ap.gov.in', 'nhm.gov.in', 'nhpc.in', 'nhpcindia.com',
+		'nimhans.ac.in', 'nios.ac.in', 'nlcindia.in', 'nmdc.co.in',
+		'npcil.nic.in', 'nsp.gov.in', 'nta.ac.in', 'ntpc.co.in',
+		'ongcindia.com', 'pgimer.edu.in', 'pnbindia.in', 'powergrid.in',
+		'psbindia.com', 'psc.ap.gov.in', 'rbi.org.in', 'rcfltd.com',
+		'rrbapply.gov.in', 'rrbcdg.gov.in', 'rrbsecunderabad.gov.in', 'sail.co.in',
+		'sbi.co.in', 'scclmines.com', 'scholarships.gov.in', 'schooledu.telangana.gov.in',
+		'sci.gov.in', 'secl-cil.in', 'shar.gov.in', 'sidbi.in',
+		'slprb.ap.gov.in', 'ssc.gov.in', 'ssc.nic.in', 'telanganaepass.cgg.gov.in',
+		'tg.gov.in', 'tgdsc.aptonline.in', 'tgnpdcl.in', 'tgprb.in',
+		'tgpsc.gov.in', 'tgsrtc.telangana.gov.in', 'tgtransco.in', 'tscab.org',
+		'tsgenco.co.in', 'tshc.gov.in', 'tslprb.in', 'tsnpdcl.in',
+		'tspsc.gov.in', 'tssouthernpower.com', 'tssouthernpower.in', 'tstransco.in',
+		'ucobank.com', 'uiic.co.in', 'unionbankofindia.co.in', 'upsc.gov.in',
+		'upsconline.nic.in',
+	);
+}
+add_filter( 'studentup_is_official_url', function ( $ok, $url, $host, $post_id ) {
+	if ( $ok ) {
+		return true;
+	}
+	$host = preg_replace( '/^www\./', '', strtolower( (string) $host ) );
+	foreach ( studentup_official_hosts_extra() as $h ) {
+		if ( $host === $h || substr( $host, -strlen( '.' . $h ) ) === '.' . $h ) {
+			return true;
+		}
+	}
+	return false;
+}, 10, 4 );

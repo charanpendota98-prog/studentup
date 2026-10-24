@@ -240,12 +240,16 @@ def test_empty_body_is_skipped_not_drafted(fake_wp):
     assert not fake_wp.created
 
 
-def test_stale_year_draft_gets_review_prefix(fake_wp):
+def test_stale_year_draft_is_skipped(fake_wp):
     art = _results_article()
     art["title"] = "TSPSC Group 4 Results 2025 విడుదల"
     art["focus_keyword"] = "TSPSC Group 4 Results 2025"
-    pipeline.publish_article(art)
-    assert fake_wp.created["title"].startswith("REVIEW: ")
+    # v401: a last-year notice is a HARD skip (live 24-Oct: "SBI SCO … Result
+    # 2025" with a 1-Apr-2025 result date went live in Oct 2026).
+    import pytest
+    with pytest.raises(RuntimeError, match="stale notice"):
+        pipeline.publish_article(art)
+    assert fake_wp.created is None or not fake_wp.created
 
 
 def test_slug_collision_marks_draft_as_possible_duplicate(fake_wp):

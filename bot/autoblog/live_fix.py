@@ -507,7 +507,7 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
         new_title = title
         try:
             from .pipeline import clean_title_text
-            cand = clean_title_text(title)
+            cand = clean_title_text(re.sub(r"^\s*REVIEW:\s*(?:duplicate\?\s*)?", "", title))
             if cand and cand != title and len(cand) >= 20:
                 new_title = cand
                 changes["title"] = 1

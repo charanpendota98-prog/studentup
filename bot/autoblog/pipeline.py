@@ -1469,13 +1469,11 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                            getattr(config, "DEFAULT_POST_STATUS", "draft")).lower()
     stage_for_seo = requested_status == "publish"
     _duplicate_title_guard(article, wp)
-    try:
-        from . import content_fp as _fp
-        if not article.get("_mock"):
-            _fp.remember(config.STATE_PATH, _fp.simhash(str(article.get("content_html") or "")),
-                         str(article.get("title") or ""))
-    except Exception:  # noqa: BLE001
-        log.debug("body fingerprint store skip", exc_info=True)
+    # v401: the body fingerprint is remembered only AFTER WordPress accepted the
+    # draft (below). Remembering it here meant a story skipped by a later gate
+    # (empty body / foreign script / stale / geo) poisoned the next, correct
+    # attempt with SKIP-DUPLICATE-BODY.
+    _fp_html = str(article.get("content_html") or "")
     # v398: deterministic cleaners (foreign-script rupee/words, unrelated official
     # PDFs, repeated figures, filler lines) — last thing before WordPress.
     try:
@@ -1499,18 +1497,37 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     try:
         from . import live_fix as _lf
         _dflags = [] if article.get("article_type") == "quiz" else \
-            _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+            _lf.draft_flags(_post_title, str(final_html or article.get("content_html") or ""))
         if "foreign-script" in _dflags and not article.get("_mock"):
             raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
         if "foreign-script-body" in _dflags and not article.get("_mock"):
             raise RuntimeError(f"SKIP-FOREIGN-BODY: non-Telugu Indic script in body — {_post_title[:60]}")
+        # v401: a notice whose year is already over (live 24-Oct: "SBI SCO …
+        # Result 2025" with a 1-April-2025 result date published in Oct 2026)
+        # is not news for anyone — hard skip, not a REVIEW label.
+        _stale = [f for f in _dflags if f.startswith("stale-year") or f.startswith("past-dates")]
+        if _stale and not article.get("_mock") and not article.get("_refresh_of"):
+            from datetime import date as _d, timedelta as _td
+            _hard = False
+            for f in _stale:
+                if f.startswith("stale-year"):
+                    _hard = True
+                else:
+                    try:
+                        _hard = _hard or _d.fromisoformat(f.split(":", 1)[1]) < _d.today() - _td(days=120)
+                    except Exception:  # noqa: BLE001
+                        pass
+            if _hard:
+                raise RuntimeError(f"stale notice ({', '.join(_stale)}) — {_post_title[:60]}")
         if "other-state" in _dflags and not article.get("_mock") and getattr(config, "GEO_GATE", True):
             raise RuntimeError(f"geo-skip other-state at draft stage — {_post_title[:60]}")
         if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
             _post_title = f"REVIEW: {_post_title}"
             log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
             article["_review_flags"] = _dflags
-    except Exception:  # noqa: BLE001
+    except RuntimeError:
+        raise  # v401: hard skips (foreign script / stale / other-state) MUST propagate
+    except Exception:  # noqa: BLE001 — flag computation itself failed → draft anyway
         log.debug("draft_flags skip", exc_info=True)
     result = wp.create_post(
         title=_post_title,
@@ -1523,6 +1540,12 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         status="draft" if stage_for_seo else requested_status,
         meta=meta,
     )
+    try:
+        from . import content_fp as _fp
+        if not article.get("_mock"):
+            _fp.remember(config.STATE_PATH, _fp.simhash(_fp_html), str(article.get("title") or ""))
+    except Exception:  # noqa: BLE001
+        log.debug("body fingerprint store skip", exc_info=True)
     # v398: WordPress may change the slug on collision ("…-2"); the canonical we
     # pre-computed from the intended slug then points at a 404. Always re-point
     # it at the real permalink (live: all six published posts had this).

@@ -92,3 +92,45 @@ def test_tag_not_cut_mid_word():
            "meta_description": "తెలుగు వివరాలు", "content_html": "<p>x</p>", "category": "Walkin Jobs"}
     pipeline._hygiene(art)
     assert all(not t.endswith("Recru") and len(t) <= 32 for t in art["tags"])
+
+
+def test_banner_english_and_official_hosts():
+    from autoblog import image_gen, sources
+    assert image_gen.banner_english("TGPSC Group 2 Notification 2026: 500 పోస్టులు") == "TGPSC Group 2 Notification 2026: 500 Posts"
+    assert "postulu" not in image_gen.banner_english("500 పోస్టులు")
+    assert sources.is_official_domain("https://sbi.co.in/documents/x.pdf")
+    assert sources.is_official_domain("https://www.ibps.in/x")
+    assert not sources.is_official_domain("https://www.freejobalert.com/x")
+
+
+def test_stale_year_is_hard_skip_at_draft():
+    from autoblog import live_fix
+    assert any(f.startswith("stale-year") for f in live_fix.draft_flags("SBI SCO Deputy Manager Result 2025", "<p>" + "తెలుగు " * 50 + "</p>"))
+
+
+def test_fix_live_strips_review_prefix_from_published_title():
+    from autoblog.pipeline import clean_title_text
+    import re
+    t = "REVIEW: Haryana Police SPO 2026 Notification: 170 పోస్టులు"
+    assert clean_title_text(re.sub(r"^\s*REVIEW:\s*(?:duplicate\?\s*)?", "", t)).startswith("Haryana Police")
+
+
+def test_hard_skips_propagate_from_publish_article(monkeypatch, tmp_path):
+    """Regression: the except-Exception around draft_flags swallowed every hard skip."""
+    import pytest
+    from autoblog import pipeline
+    import tests.test_v398_end_to_end as e2e
+    fake = e2e.FakeWP()
+    monkeypatch.setattr(pipeline, "WordPressClient", lambda *a, **k: fake)
+    monkeypatch.setattr(pipeline.config, "IMAGE_ENABLED", False, raising=False)
+    monkeypatch.setattr(pipeline.config, "STATE_PATH", str(tmp_path / "state.db"), raising=False)
+    art = e2e._results_article()
+    art["title"] = "ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ನೇಮಕಾತಿ 2026 Notification"
+    art["focus_keyword"] = "karnataka police 2026"
+    with pytest.raises(RuntimeError, match="SKIP-FOREIGN-TITLE"):
+        pipeline.publish_article(art)
+    art = e2e._results_article()
+    art["title"] = "Haryana Police SPO 2026 Notification"
+    art["focus_keyword"] = "Haryana Police SPO 2026"
+    with pytest.raises(RuntimeError, match="geo-skip"):
+        pipeline.publish_article(art)
