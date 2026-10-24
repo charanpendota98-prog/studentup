@@ -424,7 +424,21 @@ class ApprovalBot:
             post = self.wp.get_post(int(post_id))
             raw_title = str((post.get("title") or {}).get("raw") or (post.get("title") or {}).get("rendered") or "")
             from . import geo_gate as _geo
-            region, why = _geo.classify(raw_title, str((post.get("excerpt") or {}).get("raw") or ""))
+            _body = str((post.get("content") or {}).get("raw") or (post.get("content") or {}).get("rendered") or "")
+            region, why = _geo.classify(raw_title, str((post.get("excerpt") or {}).get("raw") or "") + " " + re.sub(r"<[^>]+>", " ", _body)[:600])
+            # v401c: last-year notice (live: "SBI SCO … Result 2025" published Oct-2026)
+            from . import live_fix as _lfx
+            _stale = [f for f in _lfx.title_flags(raw_title) if f.startswith("stale-year")]
+            if _stale:
+                self._recent_blocks[int(post_id)] = _time.time()
+                self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),
+                                                "text": "⛔ paata notice (last year) — publish block"})
+                self.tg("sendMessage", {
+                    "chat_id": str(cb.get("message", {}).get("chat", {}).get("id", "")),
+                    "text": (f"⛔ Post {post_id} publish block — <b>{_stale[0]}</b>: ee notice gata samvatsaram di.\n"
+                             "Trash cheyandi; nijam ga current aithe WordPress lo title/dates sari chesi publish cheyandi."),
+                    "parse_mode": "HTML"})
+                return
             if region == "other":
                 self._recent_blocks[int(post_id)] = _time.time()
                 self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),

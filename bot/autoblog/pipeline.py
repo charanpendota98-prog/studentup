@@ -72,6 +72,25 @@ def _source_identity_meta(article: Dict) -> Dict[str, str]:
     # verified evidence map. Never persist the model's raw recruitment URL.
     apply_url = str(article.get("application_url") or "").strip()
     org_url = str(article.get("verified_org_url") or "").strip()
+    rec = article.get("recruitment") or {}
+    # v401c: fall back to any OFFICIAL host the article already carries
+    # (recruitment.org_url / apply_url, official external links, an official
+    # primary source). Live: posts whose only link was an official PDF or whose
+    # recruitment block named psc.ap.gov.in still rendered no Important Links
+    # because verified_org_url was empty and source_url was a publisher.
+    def _official(u: str) -> str:
+        u = str(u or "").strip()
+        return u if u and sources.is_valid_source_url(u) and sources.is_official_domain(u) else ""
+    if not _official(apply_url):
+        apply_url = _official(rec.get("apply_url") or rec.get("application_url") or "")
+    if not _official(org_url):
+        cands = [rec.get("org_url") or "", primary] + \
+                [str((l or {}).get("url") or "") for l in (article.get("external_links") or []) if isinstance(l, dict)] + urls
+        org_url = next((c for c in (_official(c) for c in cands) if c), "")
+        if org_url:
+            from urllib.parse import urlparse as _up
+            _pu = _up(org_url)
+            org_url = f"{_pu.scheme or 'https'}://{_pu.netloc}/"
     if sources.is_valid_source_url(apply_url):
         out["studentup_apply_url"] = apply_url
     if sources.is_valid_source_url(org_url):
@@ -512,6 +531,11 @@ def classify_source_category(url: str, title: str = "", text: str = "") -> str:
 
 
 def reconcile_category(article: Dict) -> Dict:
+    """Repair a model/category mismatch, then enforce region/kind consistency."""
+    return _geo_category_pass(_reconcile_category_rules(article))
+
+
+def _reconcile_category_rules(article: Dict) -> Dict:
     """Repair a model/category mismatch before taxonomy terms are created.
 
     A requested source-grid category is authoritative and is handled by the
@@ -568,6 +592,53 @@ def reconcile_category(article: Dict) -> Dict:
     return article
 
 
+_KIND_RX = (
+    ("Hall Tickets", re.compile(r"hall ?ticket|admit ?card|హాల్ ?టికెట్|అడ్మిట్ ?కార్డ్|call letter", re.I)),
+    ("Results", re.compile(r"\bresults?\b|merit list|select(?:ion)? list|answer key|final key|cut ?off|ఫలితా|మెరిట్|ఎంపిక జాబితా|కీ విడుదల", re.I)),
+    ("Upcoming Exams", re.compile(r"\b(?:TET|EAMCET|EAPCET|ECET|ICET|PGECET|LAWCET|EDCET|PECET|POLYCET|NEET|JEE|CUET|UGC NET|CSIR NET|GATE|CAT|CLAT)\b"
+                                  r"(?!.*(?:recruit|vacanc|పోస్టుల|ఉద్యోగ|hall ?ticket|admit|result|ఫలితా|answer key|counsell|కౌన్సెలింగ్))", re.I)),
+)
+
+
+def _geo_category_pass(article: Dict) -> Dict:
+    """v401: region/kind consistency after the rule classifier.
+
+    Live 24-Oct: an AP story filed under TS Govt Jobs, "TS TET Notification"
+    under Central Govt Jobs, "AP DSC Hall Ticket" under AP Govt Jobs. Title is
+    the evidence: kind (hall ticket / result / exam) wins over region, and a
+    state-government job can never sit in the Central category.
+    """
+    cat = str(article.get("category") or "")
+    title = str(article.get("title") or "")
+    if not title:
+        return article
+    want = ""
+    for name, rx in _KIND_RX:
+        if rx.search(title):
+            want = name
+            break
+    if not want and cat in ("Central Govt Jobs", "TS Govt Jobs", "AP Govt Jobs"):
+        try:
+            from . import geo_gate as _geo
+            region, _why = _geo.classify(title)
+            if _geo._CENTRAL_RE.search(title):
+                region = "central"   # "Indian Army Agniveer Hyderabad Rally" stays Central
+        except Exception:  # noqa: BLE001
+            region = "unknown"
+        if region == "ts":
+            want = "TS Govt Jobs"
+        elif region == "ap":
+            want = "AP Govt Jobs"
+        elif region == "central" and cat != "Central Govt Jobs" and not re.search(
+                r"telangana|andhra|తెలంగాణ|ఆంధ్ర|\b(?:TS|TG|AP)\b", title, re.I):
+            want = "Central Govt Jobs"
+    if want and want in config.CATEGORIES and want != cat:
+        log.info("CATEGORY FIX (geo/kind): %r → %r (%s)", cat, want, title[:60])
+        article.setdefault("_category_model", cat)
+        article["category"] = want
+    return article
+
+
 # v15 tag hygiene: brand/junk tags create cheyakudadu (SEO value undadu)
 JUNK_TAGS = {"studentup", "studentup.in", "studentupin", "news", "latest",
              "update", "updates", "breaking", "breaking news", "viral",
@@ -595,6 +666,24 @@ def suggest_tags(article: Dict) -> list:
         if c and c not in tags:
             tags.append(c)
     return tags
+
+
+def link_official_mentions(html: str, url: str) -> str:
+    """v401c: "Official Website పోర్టల్ సందర్శించండి" in the apply steps with
+    no link (live SBI SCO post) → the first bare mention links the official
+    site. Only text outside anchors, only once, only when the URL is official.
+    """
+    if not html or not url or not sources.is_official_domain(url):
+        return html
+    rx = re.compile(r"(?<!\w)(Official\s+(?:Website|Site|Portal)|అధికారిక\s+వెబ్‌?సైట్)(?![^<]*</a>)", re.I)
+    done = {"n": 0}
+
+    def _sub(m):
+        if done["n"]:
+            return m.group(0)
+        done["n"] = 1
+        return f'<a href="{url}" target="_blank" rel="noopener">{m.group(1)}</a>'
+    return rx.sub(_sub, html, count=1)
 
 
 def clean_title_text(title: str) -> str:
@@ -625,6 +714,9 @@ def clean_title_text(title: str) -> str:
     t = re.sub(r"!+", "", t)
     t = re.sub(r"\s*[—–:-]\s*$", "", t).strip()
     t = strip_dangling_tail(t)
+    # v401c: "Notification 2026 686 పోస్టులు" — two numbers glued (year then
+    # vacancy count) reads like one figure. Put the colon the model forgot.
+    t = re.sub(r"\b(20\d{2})\s+(\d[\d,]*)\s*(?=(?:పోస్టు|ఖాళీ|ఉద్యోగ|posts?\b|vacanc))", r"\1: \2 ", t, flags=re.I)
     return re.sub(r"\s+", " ", t).strip()
 
 
@@ -1410,6 +1502,8 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         if meta is None:
             meta = {}
         meta.update(source_meta)
+        final_html = link_official_mentions(final_html, source_meta.get("studentup_apply_url")
+                                            or source_meta.get("studentup_org_url") or "")
         article["_source_identity"] = dict(source_meta)
 
     # --- v77 ORIGINALITY: donor sources vs final article (REAL copy %, not claim) ---

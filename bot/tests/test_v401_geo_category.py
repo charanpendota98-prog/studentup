@@ -51,7 +51,7 @@ def test_substring_signals_no_longer_fire():
 @pytest.mark.parametrize("raw,clean", [
     ("UCMS Recruitment 2026: 21 పోస్టుల Deputation నోటిఫికేషన్ Last", "UCMS Recruitment 2026: 21 పోస్టుల Deputation నోటిఫికేషన్"),
     ("DAVV Visiting Faculty 2026 Notification 16 పోస్టులు - Last", "DAVV Visiting Faculty 2026 Notification 16 పోస్టులు"),
-    ("ESIC Baddi Recruitment 2026 45 పోస్టులు –", "ESIC Baddi Recruitment 2026 45 పోస్టులు"),
+    ("ESIC Baddi Recruitment 2026 45 పోస్టులు –", "ESIC Baddi Recruitment 2026: 45 పోస్టులు"),
     ("IPR Recruitment 2026 Notification: 58 పోస్టులు Last", "IPR Recruitment 2026 Notification: 58 పోస్టులు"),
     ("TGPSC Group 2 Notification 2026: 500 పోస్టులు", "TGPSC Group 2 Notification 2026: 500 పోస్టులు"),
 ])
@@ -153,3 +153,40 @@ def test_review_today_audit_flags_bad_post():
             "categories": [1], "tags": [1, 2], "featured_media": 5, "date": "2026-10-24T09:00:00"}
     row = review_today.audit_post(good, {1: "TS Govt Jobs"})
     assert row["issues"] == [], row["issues"]
+
+
+def test_geo_kind_category_pass():
+    from autoblog import pipeline
+    cases = [
+        ("AP DSC 2026 Hall Ticket విడుదల", "AP Govt Jobs", "Hall Tickets"),
+        ("TS TET 2026 Notification", "Central Govt Jobs", "Upcoming Exams"),
+        ("Indian Army Agniveer 2026 Hyderabad Rally", "Central Govt Jobs", "Central Govt Jobs"),
+        ("APPSC Group 2 Notification 2026: 686 పోస్టులు", "TS Govt Jobs", "AP Govt Jobs"),
+        ("Kamareddy జిల్లా ఆయుష్ వైద్యుల భర్తీ 2026", "Central Govt Jobs", "TS Govt Jobs"),
+        ("SSC CGL 2026 Notification", "TS Govt Jobs", "Central Govt Jobs"),
+        ("TGPSC Group 2 Results 2026 విడుదల", "TS Govt Jobs", "Results"),
+    ]
+    for title, given, want in cases:
+        assert pipeline.reconcile_category({"title": title, "category": given})["category"] == want, title
+
+
+def test_title_year_count_colon_and_official_meta_fallback():
+    from autoblog import pipeline
+    assert pipeline.clean_title_text("APPSC Group 2 Notification 2026 686 పోస్టులు") == "APPSC Group 2 Notification 2026: 686 పోస్టులు"
+    assert pipeline.clean_title_text("SSC CGL 2026 Notification") == "SSC CGL 2026 Notification"
+    meta = pipeline._source_identity_meta({
+        "source_url": "https://www.etvbharat.com/te/x", "_source_urls": ["https://www.etvbharat.com/te/x"],
+        "recruitment": {"org_url": "https://psc.ap.gov.in/"},
+    })
+    assert meta.get("studentup_org_url") == "https://psc.ap.gov.in/"
+    meta = pipeline._source_identity_meta({"source_url": "https://sbi.co.in/documents/77530/x.pdf"})
+    assert meta.get("studentup_org_url") == "https://sbi.co.in/"
+
+
+def test_link_official_mentions_once_outside_anchors():
+    from autoblog import pipeline
+    html = '<ol><li>Official Website పోర్టల్ సందర్శించండి.</li><li>Official Website లో లాగిన్.</li></ol><a href="https://sbi.co.in/">SBI Official Website</a>'
+    out = pipeline.link_official_mentions(html, "https://sbi.co.in/careers")
+    assert out.count('href="https://sbi.co.in/careers"') == 1
+    assert out.startswith('<ol><li><a href="https://sbi.co.in/careers"')
+    assert pipeline.link_official_mentions(html, "https://freejobalert.com/") == html

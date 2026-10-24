@@ -493,6 +493,23 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
                     changes["seo_title"] = 1
         except Exception:  # noqa: BLE001
             log.debug("mid power title fix skip", exc_info=True)
+        # v401c: no official-link meta → Important Links box never renders. Take
+        # the first OFFICIAL host already linked in the body (live: SBI SCO post
+        # linked sbi.co.in yet showed "Official Website" without a URL).
+        if not any(str(meta.get(k) or "").strip() for k in ("studentup_org_url", "studentup_apply_url")):
+            try:
+                from . import sources as _src
+                from urllib.parse import urlparse as _up
+                for href in re.findall(r'href="(https?://[^"]+)"', new_html):
+                    if _src.is_valid_source_url(href) and _src.is_official_domain(href):
+                        pu = _up(href)
+                        extra_meta["studentup_org_url"] = f"{pu.scheme}://{pu.netloc}/"
+                        if re.search(r"apply|register|online|recruit|career", href, re.I) and not href.lower().endswith(".pdf"):
+                            extra_meta["studentup_apply_url"] = href
+                        changes["official_link_meta"] = 1
+                        break
+            except Exception:  # noqa: BLE001
+                log.debug("official link meta skip", exc_info=True)
         if not str(meta.get("studentup_last_date") or "").strip():
             try:
                 from . import qual as _q
