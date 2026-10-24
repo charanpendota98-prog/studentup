@@ -571,6 +571,7 @@ FACT_STRICT = _get("FACT_STRICT", "1") not in ("0", "false", "no")
 
 # --- Schedule ------------------------------------------------------------
 # Draft-first quality default: do not create a scaled-content firehose.
+GEO_GATE = _get("GEO_GATE", "1") not in ("0", "false", "no")  # v401 TS/AP/Central only
 DRAFTS_SLO = int(_get("DRAFTS_SLO", "2"))      # v399: alert if fewer drafts by 14:00 IST
 DAILY_MIN = int(_get("DAILY_MIN", "3"))      # min draft slots per day
 DAILY_MAX = int(_get("DAILY_MAX", "5"))      # max draft slots per day

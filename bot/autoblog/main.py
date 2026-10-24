@@ -260,7 +260,7 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                 low = failure_details.lower()
                 if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                     failure_type = "fetch_failure"
-                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                     failure_type = "stale_notice"
                 log.error("Queue URL failed (%s): %s — retryable; keep opportunity open", url[:60], exc)
             finally:
@@ -674,7 +674,7 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                 low = failure_details.lower()
                 if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                     failure_type = "fetch_failure"
-                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                     failure_type = "stale_notice"
                 log.error("Queue URL failed (%s) — retryable; normal flow continues: %s",
                           queued, exc)
@@ -981,7 +981,7 @@ def show_status() -> int:
               f"retry={source_counts.get('retry', 0)}")
         print("Radar audit : " + ", ".join(
             f"{name}={event_counts[name]}" for name in (
-                "queued", "duplicate_opportunity", "duplicate_url", "stale_notice",
+                "queued", "duplicate_opportunity", "duplicate_url", "stale_notice", "geo_skip",
                 "fetch_failure", "validation_blocked", "draft_failed", "draft_deferred",
                 "draft_ready") if event_counts[name]
         ) or "no events")
@@ -1632,7 +1632,7 @@ def drain_source_queue(limit: int) -> int:
             low = details.lower()
             if any(w in low for w in ("fetch", "http ", "timeout", "connection")):
                 failure_type = "fetch_failure"
-            elif any(w in low for w in ("stale", "expired", "deadline passed")):
+            elif any(w in low for w in ("stale", "expired", "deadline passed", "geo-skip")):
                 failure_type = "stale_notice"
             elif any(w in low for w in ("conflict", "unsupported", "preflight", "evidence", "validation")):
                 failure_type = "validation_blocked"
@@ -1842,7 +1842,7 @@ def radar_run(process_posts: bool = True) -> int:
             low = details.lower()
             if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                 failure_type = "fetch_failure"
-            elif any(word in low for word in ("stale", "expired", "deadline passed")):
+            elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                 failure_type = "stale_notice"
             elif any(word in low for word in ("conflict", "unsupported", "preflight", "evidence", "validation")):
                 failure_type = "validation_blocked"
@@ -2690,6 +2690,9 @@ def main() -> int:
                              "WP connection · 20 categories · site settings/menus/SEO · "
                              "IndexNow · AdSense readiness · production audit "
                              "(default preview; nijam ga apply cheyyadaniki --apply)")
+    parser.add_argument("--review-today", type=int, nargs="?", const=24, metavar="HOURS",
+                        help="v401: pin-to-pin audit of every draft/published post from the last "
+                             "HOURS (default 24): geo, category, tags, flags, meta, links. Read-only.")
     parser.add_argument("--fix-live", type=int, metavar="N",
                         help="v398: last N published posts — canonical→404 + body cleanup "
                              "(foreign script, unrelated PDFs, repeated images, filler); "
@@ -3041,6 +3044,10 @@ def main() -> int:
         from . import live_fix
 
         return live_fix.run_cli(args.fix_live, apply=bool(args.apply))
+    if args.review_today:
+        from . import review_today
+
+        return review_today.run_cli(int(args.review_today))
     if args.live_seo_recent:
         from . import live_seo
 

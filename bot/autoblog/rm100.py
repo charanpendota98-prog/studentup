@@ -79,12 +79,16 @@ def _kw(article: dict) -> str:
 
 
 
+_CASE_REF = {"text": ""}
+
+
 def _kw_title(kw: str) -> str:
     """Keyword ni title-la ready cheyyadam — already proper-case (TSPSC) unte as-is.
-    v391: acronym-aware (ap pg → AP PG, dic → DIC, nmms → NMMS)."""
+    v391: acronym-aware (ap pg → AP PG, dic → DIC, nmms → NMMS).
+    v401: casing copied from the article/source title when available."""
     try:
         from .kw_align import pretty_kw
-        return pretty_kw(kw)
+        return pretty_kw(kw, _CASE_REF.get("text", ""))
     except Exception:  # noqa: BLE001
         pass
     out = []
@@ -151,7 +155,13 @@ def _trim_title(t: str, limit: int = 62) -> str:
     if not best:
         cut = t[:limit]
         best = cut.rsplit(" ", 1)[0] if " " in cut[:-1] else cut
-    return best.rstrip(" ,:;–—-·(")
+    best = best.rstrip(" ,:;–—-·(")
+    try:
+        from .pipeline import strip_dangling_tail
+        best = strip_dangling_tail(best)
+    except Exception:  # noqa: BLE001
+        pass
+    return best
 
 
 def fix_title(article: dict) -> bool:
@@ -163,6 +173,7 @@ def fix_title(article: dict) -> bool:
     kw = _kw(article)
     if not kw:
         return False
+    _CASE_REF["text"] = " ".join(str(article.get(k) or "") for k in ("title", "source_title", "seo_title"))
     kt = _kw_title(kw)
     title = _text(article.get("title") or kt)
     # Do not append or preserve artificial publisher-style hooks. A title is

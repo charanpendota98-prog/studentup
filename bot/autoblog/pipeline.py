@@ -72,6 +72,25 @@ def _source_identity_meta(article: Dict) -> Dict[str, str]:
     # verified evidence map. Never persist the model's raw recruitment URL.
     apply_url = str(article.get("application_url") or "").strip()
     org_url = str(article.get("verified_org_url") or "").strip()
+    rec = article.get("recruitment") or {}
+    # v401c: fall back to any OFFICIAL host the article already carries
+    # (recruitment.org_url / apply_url, official external links, an official
+    # primary source). Live: posts whose only link was an official PDF or whose
+    # recruitment block named psc.ap.gov.in still rendered no Important Links
+    # because verified_org_url was empty and source_url was a publisher.
+    def _official(u: str) -> str:
+        u = str(u or "").strip()
+        return u if u and sources.is_valid_source_url(u) and sources.is_official_domain(u) else ""
+    if not _official(apply_url):
+        apply_url = _official(rec.get("apply_url") or rec.get("application_url") or "")
+    if not _official(org_url):
+        cands = [rec.get("org_url") or "", primary] + \
+                [str((l or {}).get("url") or "") for l in (article.get("external_links") or []) if isinstance(l, dict)] + urls
+        org_url = next((c for c in (_official(c) for c in cands) if c), "")
+        if org_url:
+            from urllib.parse import urlparse as _up
+            _pu = _up(org_url)
+            org_url = f"{_pu.scheme or 'https'}://{_pu.netloc}/"
     if sources.is_valid_source_url(apply_url):
         out["studentup_apply_url"] = apply_url
     if sources.is_valid_source_url(org_url):
@@ -242,7 +261,18 @@ _JOB_CONTEXT = (
 
 
 def _has_any(blob: str, signals: tuple[str, ...]) -> bool:
-    return any(signal.lower() in blob for signal in signals)
+    """v401: short ASCII signals match on WORD boundaries — live 24-Oct showed
+    "lic" inside "application" making every post "central", "pte" inside
+    "September" / "passport" (size photo) making admit cards "Abroad Jobs",
+    "army" inside "pharmacy", "oman" inside "woman"."""
+    for signal in signals:
+        sig = signal.lower()
+        if len(sig) <= 5 and sig.isascii() and sig.isalpha():
+            if re.search(r"(?<![a-z])" + re.escape(sig) + r"(?![a-z])", blob):
+                return True
+        elif sig in blob:
+            return True
+    return False
 
 
 def _rule_weight(word: str) -> float:
@@ -273,6 +303,30 @@ def classify_category(title: str, text: str = "") -> str:
       broad jobs label where that is the reader's real task.
     """
     blob = re.sub(r"\s+", " ", f"{title} {title} {text[:900]}".lower()).strip()
+    blob = re.sub(r"passport[- ]size[d]?(?: photo(?:graph)?s?)?", " photo ", blob)  # v401 not "abroad"
+    title_l = (title or "").lower()
+    # v401 TITLE-FIRST intents: the reader's task is in the headline. Body
+    # words ("hall ticket" inside a result post, "merit list" inside a
+    # recruitment post) must not re-file it (live: KSLU Result → Hall Tickets,
+    # IREL Recruitment → Results, SBI admit card → Abroad Jobs).
+    if _has_any(title_l, ("hall ticket", "admit card", "call letter", "city intimation", "exam city slip",
+                          "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
+        if _has_any(title_l, ("tspsc", "tgpsc", "tslprb", "tgprb")):
+            return "TS Govt Jobs"
+        if _has_any(title_l, ("appsc", "apslprb", "ap dsc", "apdsc")):
+            return "AP Govt Jobs"
+        return "Hall Tickets"
+    if _has_any(title_l, ("result", "results", "scorecard", "merit list", "answer key", "final key",
+                          "select list", "selection list", "cut-off", "cutoff", "ఫలిత", "ఎంపిక జాబితా")):
+        return "Results"
+    if _has_any(title_l, ("exam date", "exam dates", "exam schedule", "exam calendar", "time table",
+                          "పరీక్ష తేదీ", "పరీక్షల షెడ్యూల్")) and not _has_any(title_l, ("recruitment", "notification")):
+        return "Upcoming Exams"
+    if _has_any(title_l, ("admission", "admissions", "counselling", "counseling", "ప్రవేశ", "కౌన్సెలింగ్")) \
+            and not _has_any(title_l, ("recruitment", "vacanc", "పోస్టుల", "ఉద్యోగ")):
+        return "Online Education"
+    if _has_any(title_l, ("exam centre", "exam centres", "exam center", "exam centers", "syllabus", "exam pattern")):
+        return "Exam Tips"
     has_job = _has_any(blob, _JOB_CONTEXT)
     has_software = _has_any(blob, _SOFTWARE_SIGNALS)
     has_central = _has_any(blob, _CENTRAL_SIGNALS)
@@ -281,10 +335,10 @@ def classify_category(title: str, text: str = "") -> str:
 
     # High-precision non-job intents first. This avoids an "SSC calendar"
     # becoming Central Govt Jobs and an "NSP last date" becoming a job post.
-    if _has_any(blob, ("gulf", "abroad", "overseas", "work visa", "visa appointment",
-                       "ielts", "pte", "toefl", "emigrate", "nri", "passport",
-                       "saudi", "uae", "dubai", "qatar", "kuwait", "oman",
-                       "bahrain", "విదేశీ", "గల్ఫ్", "వీసా")):
+    if _has_any(title_l, ("gulf", "abroad", "overseas", "work visa", "visa", "ielts", "toefl",
+                          "emigrate", "nri", "saudi", "uae", "dubai", "qatar", "kuwait", "oman",
+                          "bahrain", "విదేశీ", "గల్ఫ్", "వీసా")) \
+            and not _has_any(title_l, ("fmge", "foreign medical graduate")):
         return "Abroad Jobs"
     # A press release/current-affairs story about a scholarship is not a
     # scholarship application guide. Keep the six daily-current streams in
@@ -329,8 +383,8 @@ def classify_category(title: str, text: str = "") -> str:
                        "fitness", "physical test", "ఎలా సిద్ధం", "ఫిట్‌నెస్", "ప్రిపరేషన్",
                        "పరీక్షా చిట్కాలు", "సన్నద్ధత")) and not has_software:
         return "Exam Tips"
-    if _has_any(blob, ("hall ticket", "hall tickets", "admit card", "call letter",
-                       "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
+    if _has_any(title_l, ("hall ticket", "hall tickets", "admit card", "call letter",
+                          "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
         # Recruitment-board admit cards can stay with the state/central jobs
         # archive (the existing site contract); generic exam/university cards
         # use the dedicated Hall Tickets archive.
@@ -341,8 +395,8 @@ def classify_category(title: str, text: str = "") -> str:
         if has_central and _has_any(blob, ("ssc", "upsc", "rrb", "ibps", "sbi", "railway")):
             return "Central Govt Jobs"
         return "Hall Tickets"
-    if _has_any(blob, ("result", "results", "scorecard", "merit list", "answer key",
-                       "cut-off", "cutoff", "ఫలిత")):
+    if _has_any(title_l, ("result", "results", "scorecard", "merit list", "answer key",
+                          "cut-off", "cutoff", "ఫలిత")):
         return "Results"
     if _has_any(blob, ("internship", "internships", "apprenticeship", "apprentice", "ఇంటర్న్", "అప్రెంటిస్")):
         return "Internships"
@@ -376,6 +430,34 @@ def classify_category(title: str, text: str = "") -> str:
                        "agriculture", "women welfare", "ప్రస్తుతాంశాలు", "కరెంట్ అఫైర్స్",
                        "పథకం", "రైతు", "మహిళ")) and not has_job:
         return "Current Affairs"
+    # v401: the geo gate already knows every all-India body / PSU / central
+    # institute (IREL, BECIL, ITPO, NABCONS, AIIMS, PGIMER, NIT …) — reuse it.
+    if has_job and not _has_any(blob, _PRIVATE_SIGNALS):
+        try:
+            from . import geo_gate as _geo
+            _region = _geo.classify(title, text[:600])[0]
+        except Exception:  # noqa: BLE001
+            _region = "unknown"
+        if _region == "central" and not has_ts and not has_ap:
+            return "Central Govt Jobs"
+        if _region == "ts" and not has_ap:
+            return "TS Govt Jobs"
+        if _region == "ap" and not has_ts:
+            return "AP Govt Jobs"
+    # v401: public institutions are not "Private Jobs" (live: PGIMER, UCMS,
+    # DAVV, NIT Kurukshetra, NFDC, Dhs Lakshadweep all filed under Private).
+    if has_job and _has_any(blob, ("university", "institute", "college", "hospital", "medical college",
+                                   "aiims", "pgimer", "nit ", "iit ", "iiit", "iim ", "iiser", "csir", "icmr",
+                                   "icar", "esic", "isro", "drdo", "municipal", "corporation", "zilla",
+                                   "district", "department", "directorate", "commission", "board",
+                                   "council", "authority", "nigam", "ministry", "govt", "government",
+                                   "ప్రభుత్వ", "విశ్వవిద్యాలయ", "జిల్లా")) \
+            and not _has_any(blob, _PRIVATE_SIGNALS):
+        if has_ts and not has_ap:
+            return "TS Govt Jobs"
+        if has_ap and not has_ts:
+            return "AP Govt Jobs"
+        return "Central Govt Jobs"
     if (has_job or _has_any(blob, ("hiring", "drive", "careers", "fresher", "recruit"))) and _has_any(blob, _PRIVATE_SIGNALS):
         return "Private Jobs"
 
@@ -449,6 +531,11 @@ def classify_source_category(url: str, title: str = "", text: str = "") -> str:
 
 
 def reconcile_category(article: Dict) -> Dict:
+    """Repair a model/category mismatch, then enforce region/kind consistency."""
+    return _geo_category_pass(_reconcile_category_rules(article))
+
+
+def _reconcile_category_rules(article: Dict) -> Dict:
     """Repair a model/category mismatch before taxonomy terms are created.
 
     A requested source-grid category is authoritative and is handled by the
@@ -505,6 +592,53 @@ def reconcile_category(article: Dict) -> Dict:
     return article
 
 
+_KIND_RX = (
+    ("Hall Tickets", re.compile(r"hall ?ticket|admit ?card|హాల్ ?టికెట్|అడ్మిట్ ?కార్డ్|call letter", re.I)),
+    ("Results", re.compile(r"\bresults?\b|merit list|select(?:ion)? list|answer key|final key|cut ?off|ఫలితా|మెరిట్|ఎంపిక జాబితా|కీ విడుదల", re.I)),
+    ("Upcoming Exams", re.compile(r"\b(?:TET|EAMCET|EAPCET|ECET|ICET|PGECET|LAWCET|EDCET|PECET|POLYCET|NEET|JEE|CUET|UGC NET|CSIR NET|GATE|CAT|CLAT)\b"
+                                  r"(?!.*(?:recruit|vacanc|పోస్టుల|ఉద్యోగ|hall ?ticket|admit|result|ఫలితా|answer key|counsell|కౌన్సెలింగ్))", re.I)),
+)
+
+
+def _geo_category_pass(article: Dict) -> Dict:
+    """v401: region/kind consistency after the rule classifier.
+
+    Live 24-Oct: an AP story filed under TS Govt Jobs, "TS TET Notification"
+    under Central Govt Jobs, "AP DSC Hall Ticket" under AP Govt Jobs. Title is
+    the evidence: kind (hall ticket / result / exam) wins over region, and a
+    state-government job can never sit in the Central category.
+    """
+    cat = str(article.get("category") or "")
+    title = str(article.get("title") or "")
+    if not title:
+        return article
+    want = ""
+    for name, rx in _KIND_RX:
+        if rx.search(title):
+            want = name
+            break
+    if not want and cat in ("Central Govt Jobs", "TS Govt Jobs", "AP Govt Jobs"):
+        try:
+            from . import geo_gate as _geo
+            region, _why = _geo.classify(title)
+            if _geo._CENTRAL_RE.search(title):
+                region = "central"   # "Indian Army Agniveer Hyderabad Rally" stays Central
+        except Exception:  # noqa: BLE001
+            region = "unknown"
+        if region == "ts":
+            want = "TS Govt Jobs"
+        elif region == "ap":
+            want = "AP Govt Jobs"
+        elif region == "central" and cat != "Central Govt Jobs" and not re.search(
+                r"telangana|andhra|తెలంగాణ|ఆంధ్ర|\b(?:TS|TG|AP)\b", title, re.I):
+            want = "Central Govt Jobs"
+    if want and want in config.CATEGORIES and want != cat:
+        log.info("CATEGORY FIX (geo/kind): %r → %r (%s)", cat, want, title[:60])
+        article.setdefault("_category_model", cat)
+        article["category"] = want
+    return article
+
+
 # v15 tag hygiene: brand/junk tags create cheyakudadu (SEO value undadu)
 JUNK_TAGS = {"studentup", "studentup.in", "studentupin", "news", "latest",
              "update", "updates", "breaking", "breaking news", "viral",
@@ -534,6 +668,24 @@ def suggest_tags(article: Dict) -> list:
     return tags
 
 
+def link_official_mentions(html: str, url: str) -> str:
+    """v401c: "Official Website పోర్టల్ సందర్శించండి" in the apply steps with
+    no link (live SBI SCO post) → the first bare mention links the official
+    site. Only text outside anchors, only once, only when the URL is official.
+    """
+    if not html or not url or not sources.is_official_domain(url):
+        return html
+    rx = re.compile(r"(?<!\w)(Official\s+(?:Website|Site|Portal)|అధికారిక\s+వెబ్‌?సైట్)(?![^<]*</a>)", re.I)
+    done = {"n": 0}
+
+    def _sub(m):
+        if done["n"]:
+            return m.group(0)
+        done["n"] = 1
+        return f'<a href="{url}" target="_blank" rel="noopener">{m.group(1)}</a>'
+    return rx.sub(_sub, html, count=1)
+
+
 def clean_title_text(title: str) -> str:
     """Clean artificial suffixes, unescape entities, and normalize whitespace."""
     if not title:
@@ -561,7 +713,26 @@ def clean_title_text(title: str) -> str:
     t = re.sub(r"(?:\s*[:—–-])?\s+(?:అద్భుత(?:మైన)? అవకాశం|బంగారు అవకాశం|భారీ అవకాశం|గొప్ప అవకాశం|సువర్ణావకాశం|Complete Details|Full Details|Best Guide|Complete Guide)\s*!*\s*$", "", t, flags=re.I)
     t = re.sub(r"!+", "", t)
     t = re.sub(r"\s*[—–:-]\s*$", "", t).strip()
+    t = strip_dangling_tail(t)
+    # v401c: "Notification 2026 686 పోస్టులు" — two numbers glued (year then
+    # vacancy count) reads like one figure. Put the colon the model forgot.
+    t = re.sub(r"\b(20\d{2})\s+(\d[\d,]*)\s*(?=(?:పోస్టు|ఖాళీ|ఉద్యోగ|posts?\b|vacanc))", r"\1: \2 ", t, flags=re.I)
     return re.sub(r"\s+", " ", t).strip()
+
+
+_DANGLING_TAIL_RE = re.compile(
+    r"(?:\s*[—–:|·-])?\s+(?:Last|Direct|Apply|Check|Download|and|or|for|of|the|to|with|in|on|at|"
+    r"మరియు|కోసం|నుంచి|వరకు)\s*$", re.I)
+
+
+def strip_dangling_tail(t: str) -> str:
+    """v401: a length-trimmed title must not end on a half phrase — live 24-Oct
+    H1s: "… Deputation నోటిఫికేషన్ Last", "… 16 పోస్టులు - Last", "… 45 పోస్టులు –"."""
+    prev = None
+    while t and t != prev:
+        prev = t
+        t = _DANGLING_TAIL_RE.sub("", t).rstrip(" ,:;–—-·|(")
+    return t
 
 
 MID_POWER_RE = re.compile(
@@ -583,6 +754,23 @@ def _hygiene(article: Dict) -> Dict:
         article["title"] = title
     if seo_title:
         article["seo_title"] = seo_title
+    # v401: meta description must be Telugu (owner rule; live 24-Oct: Bihar
+    # STET / ISRO / AIIMS / PSSSB descriptions were fully English). No AI
+    # retry — deterministic Telugu template built from the focus keyword.
+    _md = str(article.get("meta_description") or "")
+    _md_words = re.findall(r"[A-Za-z\u0c00-\u0c7f]+", _md)
+    if _md_words and sum(1 for w in _md_words if re.search(r"[\u0c00-\u0c7f]", w)) / len(_md_words) < 0.25:
+        _fk = str(article.get("focus_keyword") or article.get("title") or "").strip()[:70]
+        _rec = article.get("recruitment") if isinstance(article.get("recruitment"), dict) else {}
+        _bits = []
+        if str(_rec.get("vacancies") or "").strip():
+            _bits.append(f"{_rec['vacancies']} పోస్టులు")
+        if str(_rec.get("apply_end") or "").strip():
+            _bits.append(f"చివరి తేదీ {_rec['apply_end']}")
+        _tail = (", ".join(_bits) + ". ") if _bits else ""
+        article["meta_description"] = (f"{_fk}: {_tail}అర్హత, ఎంపిక విధానం, దరఖాస్తు విధానం, "
+                                       f"ముఖ్యమైన తేదీలు — పూర్తి వివరాలు తెలుగులో StudentUp లో.")[:158]
+        log.info("v401 meta description → Telugu template (was English)")
     # tags: remove a different canonical category tag (e.g. Central Govt Jobs
     # accidentally returned for a Software Jobs article), then dedupe/cap.
     # Category and tags serve different jobs: keep the selected category tag,
@@ -592,7 +780,9 @@ def _hygiene(article: Dict) -> Dict:
     conflicting_categories = canonical_categories - ({category} if category else set())
     seen, tags = set(), []
     for t in article.get("tags", []):
-        t = str(t).strip()[:32]
+        t = str(t).strip()
+        if len(t) > 32:  # v401: never cut a tag mid-word ("… Associate-II Recru")
+            t = t[:32].rsplit(" ", 1)[0].strip(" -–,:")
         low = t.lower()
         if (not t or low in JUNK_TAGS or low in seen or
                 (low in conflicting_categories and category in canonical_categories)):
@@ -1312,6 +1502,8 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         if meta is None:
             meta = {}
         meta.update(source_meta)
+        final_html = link_official_mentions(final_html, source_meta.get("studentup_apply_url")
+                                            or source_meta.get("studentup_org_url") or "")
         article["_source_identity"] = dict(source_meta)
 
     # --- v77 ORIGINALITY: donor sources vs final article (REAL copy %, not claim) ---
@@ -1371,13 +1563,11 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                            getattr(config, "DEFAULT_POST_STATUS", "draft")).lower()
     stage_for_seo = requested_status == "publish"
     _duplicate_title_guard(article, wp)
-    try:
-        from . import content_fp as _fp
-        if not article.get("_mock"):
-            _fp.remember(config.STATE_PATH, _fp.simhash(str(article.get("content_html") or "")),
-                         str(article.get("title") or ""))
-    except Exception:  # noqa: BLE001
-        log.debug("body fingerprint store skip", exc_info=True)
+    # v401: the body fingerprint is remembered only AFTER WordPress accepted the
+    # draft (below). Remembering it here meant a story skipped by a later gate
+    # (empty body / foreign script / stale / geo) poisoned the next, correct
+    # attempt with SKIP-DUPLICATE-BODY.
+    _fp_html = str(article.get("content_html") or "")
     # v398: deterministic cleaners (foreign-script rupee/words, unrelated official
     # PDFs, repeated figures, filler lines) — last thing before WordPress.
     try:
@@ -1401,14 +1591,37 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     try:
         from . import live_fix as _lf
         _dflags = [] if article.get("article_type") == "quiz" else \
-            _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
+            _lf.draft_flags(_post_title, str(final_html or article.get("content_html") or ""))
         if "foreign-script" in _dflags and not article.get("_mock"):
             raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
+        if "foreign-script-body" in _dflags and not article.get("_mock"):
+            raise RuntimeError(f"SKIP-FOREIGN-BODY: non-Telugu Indic script in body — {_post_title[:60]}")
+        # v401: a notice whose year is already over (live 24-Oct: "SBI SCO …
+        # Result 2025" with a 1-April-2025 result date published in Oct 2026)
+        # is not news for anyone — hard skip, not a REVIEW label.
+        _stale = [f for f in _dflags if f.startswith("stale-year") or f.startswith("past-dates")]
+        if _stale and not article.get("_mock") and not article.get("_refresh_of"):
+            from datetime import date as _d, timedelta as _td
+            _hard = False
+            for f in _stale:
+                if f.startswith("stale-year"):
+                    _hard = True
+                else:
+                    try:
+                        _hard = _hard or _d.fromisoformat(f.split(":", 1)[1]) < _d.today() - _td(days=120)
+                    except Exception:  # noqa: BLE001
+                        pass
+            if _hard:
+                raise RuntimeError(f"stale notice ({', '.join(_stale)}) — {_post_title[:60]}")
+        if "other-state" in _dflags and not article.get("_mock") and getattr(config, "GEO_GATE", True):
+            raise RuntimeError(f"geo-skip other-state at draft stage — {_post_title[:60]}")
         if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
             _post_title = f"REVIEW: {_post_title}"
             log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
             article["_review_flags"] = _dflags
-    except Exception:  # noqa: BLE001
+    except RuntimeError:
+        raise  # v401: hard skips (foreign script / stale / other-state) MUST propagate
+    except Exception:  # noqa: BLE001 — flag computation itself failed → draft anyway
         log.debug("draft_flags skip", exc_info=True)
     result = wp.create_post(
         title=_post_title,
@@ -1421,6 +1634,12 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
         status="draft" if stage_for_seo else requested_status,
         meta=meta,
     )
+    try:
+        from . import content_fp as _fp
+        if not article.get("_mock"):
+            _fp.remember(config.STATE_PATH, _fp.simhash(_fp_html), str(article.get("title") or ""))
+    except Exception:  # noqa: BLE001
+        log.debug("body fingerprint store skip", exc_info=True)
     # v398: WordPress may change the slug on collision ("…-2"); the canonical we
     # pre-computed from the intended slug then points at a 404. Always re-point
     # it at the real permalink (live: all six published posts had this).
@@ -2229,6 +2448,12 @@ def create_from_source(url: str, mock: bool = False, category: str = "",
     if not mock:
         from . import stale_gate
         stale_gate.assert_fresh(src, category or classify_source_category(url, src.title, src.text))
+        # v401: other-state content never reaches Gemini (live 24-Oct: Bihar,
+        # Haryana, Ladakh, WBPSC, Punjab, Karnataka, Gujarat drafts + publishes).
+        if getattr(config, "GEO_GATE", True):
+            from . import geo_gate
+            _geo = geo_gate.assert_relevant(src.title, src.text, url)
+            log.info("GEO GATE ✔ %s (%s)", _geo["region"], _geo["evidence"] or "-")
 
     # v318: same opportunity from a DIFFERENT publisher URL (Telegram links /
     # radar) → refresh the existing StudentUp post instead of a duplicate draft.
