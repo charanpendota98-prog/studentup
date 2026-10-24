@@ -134,3 +134,22 @@ def test_hard_skips_propagate_from_publish_article(monkeypatch, tmp_path):
     art["focus_keyword"] = "Haryana Police SPO 2026"
     with pytest.raises(RuntimeError, match="geo-skip"):
         pipeline.publish_article(art)
+
+
+def test_review_today_audit_flags_bad_post():
+    from autoblog import review_today
+    post = {"id": 7, "status": "publish", "title": {"raw": "REVIEW: Haryana Police SPO 2026 Notification"},
+            "content": {"raw": "<p>" + "హర్యానా పోలీస్ ఎస్‌పీఓ దరఖాస్తు freejobalert ఇది " * 60 + "</p>"},
+            "excerpt": {"raw": "Apply for Haryana SPO posts now"}, "meta": {}, "categories": [], "tags": [],
+            "featured_media": 0, "date": "2026-10-24T09:00:00", "link": "https://studentup.in/x/"}
+    row = review_today.audit_post(post, {})
+    joined = " ".join(row["issues"])
+    for want in ("OTHER-STATE", "REVIEW-prefix", "source-leak", "idi×", "no-category", "no-tags",
+                 "meta-desc-english", "no-official-link-meta", "no-featured-image"):
+        assert want in joined, (want, joined)
+    good = {"id": 8, "status": "draft", "title": {"raw": "TGPSC Group 2 Notification 2026: 500 పోస్టులు"},
+            "content": {"raw": "<h2>అర్హత</h2><p>" + "తెలంగాణ అభ్యర్థులు దరఖాస్తు చేసుకోవచ్చు. " * 80 + "</p><h2>తేదీలు</h2><p>x</p><h2>ఫీజు</h2><p>y</p>"},
+            "excerpt": {"raw": ""}, "meta": {"rank_math_description": "TGPSC Group 2 Notification 2026 ద్వారా 500 పోస్టుల భర్తీ. అర్హత, తేదీలు, దరఖాస్తు విధానం పూర్తి వివరాలు.", "rank_math_focus_keyword": "tgpsc group 2", "studentup_org_url": "https://tgpsc.gov.in/"},
+            "categories": [1], "tags": [1, 2], "featured_media": 5, "date": "2026-10-24T09:00:00"}
+    row = review_today.audit_post(good, {1: "TS Govt Jobs"})
+    assert row["issues"] == [], row["issues"]

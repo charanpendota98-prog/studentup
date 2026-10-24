@@ -2690,6 +2690,9 @@ def main() -> int:
                              "WP connection · 20 categories · site settings/menus/SEO · "
                              "IndexNow · AdSense readiness · production audit "
                              "(default preview; nijam ga apply cheyyadaniki --apply)")
+    parser.add_argument("--review-today", type=int, nargs="?", const=24, metavar="HOURS",
+                        help="v401: pin-to-pin audit of every draft/published post from the last "
+                             "HOURS (default 24): geo, category, tags, flags, meta, links. Read-only.")
     parser.add_argument("--fix-live", type=int, metavar="N",
                         help="v398: last N published posts — canonical→404 + body cleanup "
                              "(foreign script, unrelated PDFs, repeated images, filler); "
@@ -3041,6 +3044,10 @@ def main() -> int:
         from . import live_fix
 
         return live_fix.run_cli(args.fix_live, apply=bool(args.apply))
+    if args.review_today:
+        from . import review_today
+
+        return review_today.run_cli(int(args.review_today))
     if args.live_seo_recent:
         from . import live_seo
 
