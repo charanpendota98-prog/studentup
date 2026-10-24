@@ -151,7 +151,13 @@ def _trim_title(t: str, limit: int = 62) -> str:
     if not best:
         cut = t[:limit]
         best = cut.rsplit(" ", 1)[0] if " " in cut[:-1] else cut
-    return best.rstrip(" ,:;–—-·(")
+    best = best.rstrip(" ,:;–—-·(")
+    try:
+        from .pipeline import strip_dangling_tail
+        best = strip_dangling_tail(best)
+    except Exception:  # noqa: BLE001
+        pass
+    return best
 
 
 def fix_title(article: dict) -> bool:

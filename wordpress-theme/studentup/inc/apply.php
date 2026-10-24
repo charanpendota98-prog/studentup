@@ -116,6 +116,11 @@ function studentup_apply_cta( $post_id = 0 ) {
  * @return bool
  */
 function studentup_apply_is_job( $meta ) {
+	// 1.9.175: the headline says what the post IS — a result / admit card /
+	// admission story is never a JobPosting even when it carries a last date.
+	if ( preg_match( '/result|answer key|final key|merit list|select(?:ion)? list|cut[- ]?off|score ?card|hall ticket|admit card|call letter|city (?:intimation|slip)|admission|counsell?ing|exam date|exam centre|exam center|syllabus|ఫలిత|హాల్ టికెట్|అడ్మిట్|ప్రవేశ|కౌన్సెలింగ్/iu', get_the_title() ) ) {
+		return false;
+	}
 	if ( function_exists( 'studentup_used_term' ) ) {
 		$ids    = array_map( 'intval', wp_get_post_categories( get_the_ID() ) );
 		$nonjob = array( 'hall-tickets', 'hall-ticket', 'results', 'success-stories', 'current-affairs', 'daily-quiz', 'exam-tips', 'online-education', 'admissions' );

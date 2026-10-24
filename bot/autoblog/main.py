@@ -260,7 +260,7 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                 low = failure_details.lower()
                 if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                     failure_type = "fetch_failure"
-                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                     failure_type = "stale_notice"
                 log.error("Queue URL failed (%s): %s — retryable; keep opportunity open", url[:60], exc)
             finally:
@@ -674,7 +674,7 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                 low = failure_details.lower()
                 if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                     failure_type = "fetch_failure"
-                elif any(word in low for word in ("stale", "expired", "deadline passed")):
+                elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                     failure_type = "stale_notice"
                 log.error("Queue URL failed (%s) — retryable; normal flow continues: %s",
                           queued, exc)
@@ -1632,7 +1632,7 @@ def drain_source_queue(limit: int) -> int:
             low = details.lower()
             if any(w in low for w in ("fetch", "http ", "timeout", "connection")):
                 failure_type = "fetch_failure"
-            elif any(w in low for w in ("stale", "expired", "deadline passed")):
+            elif any(w in low for w in ("stale", "expired", "deadline passed", "geo-skip")):
                 failure_type = "stale_notice"
             elif any(w in low for w in ("conflict", "unsupported", "preflight", "evidence", "validation")):
                 failure_type = "validation_blocked"
@@ -1842,7 +1842,7 @@ def radar_run(process_posts: bool = True) -> int:
             low = details.lower()
             if any(word in low for word in ("fetch", "http ", "timeout", "connection")):
                 failure_type = "fetch_failure"
-            elif any(word in low for word in ("stale", "expired", "deadline passed")):
+            elif any(word in low for word in ("stale", "expired", "deadline passed", "geo-skip")):
                 failure_type = "stale_notice"
             elif any(word in low for word in ("conflict", "unsupported", "preflight", "evidence", "validation")):
                 failure_type = "validation_blocked"

@@ -406,7 +406,44 @@ class ApprovalBot:
         except Exception:  # noqa: BLE001 — never block the owner's publish
             log.debug("pre-publish clean skipped", exc_info=True)
 
+    _recent_blocks: dict = {}
+
     def do_publish(self, cb: dict, post_id: int) -> None:
+        # v401: a double-tap on ✅ sent the same ⛔ message twice (live 24-Oct,
+        # posts 4883 / 4814) — one answer per post per 90 s.
+        import time as _time
+        _last = self._recent_blocks.get(int(post_id), 0.0)
+        if _time.time() - _last < 90:
+            self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),
+                                            "text": "⏳ already answered — WordPress lo chudandi"})
+            return
+        # v401 GEO + REVIEW hard gate: a "REVIEW:" draft for another state
+        # (Bihar / Haryana / Ladakh / WBPSC … live 24-Oct) must not go live
+        # from a Telegram tap; owner can still publish from WordPress.
+        try:
+            post = self.wp.get_post(int(post_id))
+            raw_title = str((post.get("title") or {}).get("raw") or (post.get("title") or {}).get("rendered") or "")
+            from . import geo_gate as _geo
+            region, why = _geo.classify(raw_title, str((post.get("excerpt") or {}).get("raw") or ""))
+            if region == "other":
+                self._recent_blocks[int(post_id)] = _time.time()
+                self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),
+                                                "text": "⛔ other-state post — TS/AP readers ki kaadu"})
+                self.tg("sendMessage", {
+                    "chat_id": str(cb.get("message", {}).get("chat", {}).get("id", "")),
+                    "text": (f"⛔ Post {post_id} publish block — <b>{why}</b> (other state).\n"
+                             "StudentUp readers TS/AP lo untaru; ee post vallaki apply cheyaleru.\n"
+                             "Trash cheyandi. Nijam ga all-India eligible aithe WordPress lo publish cheyandi."),
+                    "parse_mode": "HTML"})
+                return
+            clean_t = re.sub(r"^\s*REVIEW:\s*(?:duplicate\?\s*)?", "", raw_title).strip()
+            if clean_t and clean_t != raw_title:
+                # REVIEW: prefix is an editor label, never a live H1 (live 24-Oct:
+                # 5 published titles started with "REVIEW:").
+                self.wp._request("POST", f"posts/{post_id}", json={"title": clean_t}, timeout=60)
+                log.info("REVIEW prefix stripped before publish: %s", clean_t[:70])
+        except Exception:  # noqa: BLE001 — gate failure must not block the owner
+            log.debug("v401 publish gate skipped", exc_info=True)
         warn = state.meta_get(config.STATE_PATH, f"gate:warn:{post_id}")
         review_note = ""
         if warn and not state.meta_get(config.STATE_PATH, f"gate:cleared:{post_id}"):
@@ -416,6 +453,7 @@ class ApprovalBot:
                 # WordPress first; then /clear POST_ID to allow one-tap publish.
                 self.tg("answerCallbackQuery", {"callback_query_id": cb.get("id", ""),
                                                 "text": "⚠️ Copy/fact warnings unnayi — WordPress lo edit chesi publish cheyandi"})
+                self._recent_blocks[int(post_id)] = _time.time()
                 self.tg("sendMessage", {
                     "chat_id": str(cb.get("message", {}).get("chat", {}).get("id", "")),
                     "text": (f"⛔ Post {post_id} direct publish block — ఇవి fix అయ్యాకే publish:\n"

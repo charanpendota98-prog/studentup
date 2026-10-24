@@ -296,6 +296,14 @@ def title_flags(title: str) -> List[str]:
                               r"తెలంగాణ|ఆంధ్ర|all india|india post|ssc|upsc|rrb|railway|ibps|"
                               r"sbi|army|navy|air force|isro|drdo|central", low_t)):
         out.append("other-state")
+    else:
+        try:
+            from . import geo_gate as _geo
+            _r, _why = _geo.classify(title or "")
+            if _r == "other":
+                out.append(f"other-state:{_why}")
+        except Exception:  # noqa: BLE001
+            pass
     return out
 
 
@@ -323,6 +331,16 @@ def draft_flags(title: str, html: str) -> List[str]:
         tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
         if tel / len(words) < 0.30:
             flags.append("english-body")
+    # v401: non-Telugu Indic script in the BODY (live 24-Oct: Kannada phrases
+    # copied verbatim into a KSLU result post) — ≥ 12 foreign letters = hard skip.
+    if len(FOREIGN_SCRIPT_RE.findall(plain)) >= 12:
+        flags.append("foreign-script-body")
+    try:
+        from . import geo_gate as _geo
+        if _geo.classify(title, plain[:600])[0] == "other" and "other-state" not in flags:
+            flags.append("other-state")
+    except Exception:  # noqa: BLE001
+        pass
     # v399: every full date in the body is already in the past (live 22-Oct:
     # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
     # ignore the house "last updated"/"published" stamps — they are always today.

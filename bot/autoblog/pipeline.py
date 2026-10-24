@@ -242,7 +242,18 @@ _JOB_CONTEXT = (
 
 
 def _has_any(blob: str, signals: tuple[str, ...]) -> bool:
-    return any(signal.lower() in blob for signal in signals)
+    """v401: short ASCII signals match on WORD boundaries — live 24-Oct showed
+    "lic" inside "application" making every post "central", "pte" inside
+    "September" / "passport" (size photo) making admit cards "Abroad Jobs",
+    "army" inside "pharmacy", "oman" inside "woman"."""
+    for signal in signals:
+        sig = signal.lower()
+        if len(sig) <= 5 and sig.isascii() and sig.isalpha():
+            if re.search(r"(?<![a-z])" + re.escape(sig) + r"(?![a-z])", blob):
+                return True
+        elif sig in blob:
+            return True
+    return False
 
 
 def _rule_weight(word: str) -> float:
@@ -273,6 +284,30 @@ def classify_category(title: str, text: str = "") -> str:
       broad jobs label where that is the reader's real task.
     """
     blob = re.sub(r"\s+", " ", f"{title} {title} {text[:900]}".lower()).strip()
+    blob = re.sub(r"passport[- ]size[d]?(?: photo(?:graph)?s?)?", " photo ", blob)  # v401 not "abroad"
+    title_l = (title or "").lower()
+    # v401 TITLE-FIRST intents: the reader's task is in the headline. Body
+    # words ("hall ticket" inside a result post, "merit list" inside a
+    # recruitment post) must not re-file it (live: KSLU Result → Hall Tickets,
+    # IREL Recruitment → Results, SBI admit card → Abroad Jobs).
+    if _has_any(title_l, ("hall ticket", "admit card", "call letter", "city intimation", "exam city slip",
+                          "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
+        if _has_any(title_l, ("tspsc", "tgpsc", "tslprb", "tgprb")):
+            return "TS Govt Jobs"
+        if _has_any(title_l, ("appsc", "apslprb", "ap dsc", "apdsc")):
+            return "AP Govt Jobs"
+        return "Hall Tickets"
+    if _has_any(title_l, ("result", "results", "scorecard", "merit list", "answer key", "final key",
+                          "select list", "selection list", "cut-off", "cutoff", "ఫలిత", "ఎంపిక జాబితా")):
+        return "Results"
+    if _has_any(title_l, ("exam date", "exam dates", "exam schedule", "exam calendar", "time table",
+                          "పరీక్ష తేదీ", "పరీక్షల షెడ్యూల్")) and not _has_any(title_l, ("recruitment", "notification")):
+        return "Upcoming Exams"
+    if _has_any(title_l, ("admission", "admissions", "counselling", "counseling", "ప్రవేశ", "కౌన్సెలింగ్")) \
+            and not _has_any(title_l, ("recruitment", "vacanc", "పోస్టుల", "ఉద్యోగ")):
+        return "Online Education"
+    if _has_any(title_l, ("exam centre", "exam centres", "exam center", "exam centers", "syllabus", "exam pattern")):
+        return "Exam Tips"
     has_job = _has_any(blob, _JOB_CONTEXT)
     has_software = _has_any(blob, _SOFTWARE_SIGNALS)
     has_central = _has_any(blob, _CENTRAL_SIGNALS)
@@ -281,10 +316,10 @@ def classify_category(title: str, text: str = "") -> str:
 
     # High-precision non-job intents first. This avoids an "SSC calendar"
     # becoming Central Govt Jobs and an "NSP last date" becoming a job post.
-    if _has_any(blob, ("gulf", "abroad", "overseas", "work visa", "visa appointment",
-                       "ielts", "pte", "toefl", "emigrate", "nri", "passport",
-                       "saudi", "uae", "dubai", "qatar", "kuwait", "oman",
-                       "bahrain", "విదేశీ", "గల్ఫ్", "వీసా")):
+    if _has_any(title_l, ("gulf", "abroad", "overseas", "work visa", "visa", "ielts", "toefl",
+                          "emigrate", "nri", "saudi", "uae", "dubai", "qatar", "kuwait", "oman",
+                          "bahrain", "విదేశీ", "గల్ఫ్", "వీసా")) \
+            and not _has_any(title_l, ("fmge", "foreign medical graduate")):
         return "Abroad Jobs"
     # A press release/current-affairs story about a scholarship is not a
     # scholarship application guide. Keep the six daily-current streams in
@@ -329,8 +364,8 @@ def classify_category(title: str, text: str = "") -> str:
                        "fitness", "physical test", "ఎలా సిద్ధం", "ఫిట్‌నెస్", "ప్రిపరేషన్",
                        "పరీక్షా చిట్కాలు", "సన్నద్ధత")) and not has_software:
         return "Exam Tips"
-    if _has_any(blob, ("hall ticket", "hall tickets", "admit card", "call letter",
-                       "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
+    if _has_any(title_l, ("hall ticket", "hall tickets", "admit card", "call letter",
+                          "హాల్ టికెట్", "అడ్మిట్ కార్డ్")):
         # Recruitment-board admit cards can stay with the state/central jobs
         # archive (the existing site contract); generic exam/university cards
         # use the dedicated Hall Tickets archive.
@@ -341,8 +376,8 @@ def classify_category(title: str, text: str = "") -> str:
         if has_central and _has_any(blob, ("ssc", "upsc", "rrb", "ibps", "sbi", "railway")):
             return "Central Govt Jobs"
         return "Hall Tickets"
-    if _has_any(blob, ("result", "results", "scorecard", "merit list", "answer key",
-                       "cut-off", "cutoff", "ఫలిత")):
+    if _has_any(title_l, ("result", "results", "scorecard", "merit list", "answer key",
+                          "cut-off", "cutoff", "ఫలిత")):
         return "Results"
     if _has_any(blob, ("internship", "internships", "apprenticeship", "apprentice", "ఇంటర్న్", "అప్రెంటిస్")):
         return "Internships"
@@ -376,6 +411,34 @@ def classify_category(title: str, text: str = "") -> str:
                        "agriculture", "women welfare", "ప్రస్తుతాంశాలు", "కరెంట్ అఫైర్స్",
                        "పథకం", "రైతు", "మహిళ")) and not has_job:
         return "Current Affairs"
+    # v401: the geo gate already knows every all-India body / PSU / central
+    # institute (IREL, BECIL, ITPO, NABCONS, AIIMS, PGIMER, NIT …) — reuse it.
+    if has_job and not _has_any(blob, _PRIVATE_SIGNALS):
+        try:
+            from . import geo_gate as _geo
+            _region = _geo.classify(title, text[:600])[0]
+        except Exception:  # noqa: BLE001
+            _region = "unknown"
+        if _region == "central" and not has_ts and not has_ap:
+            return "Central Govt Jobs"
+        if _region == "ts" and not has_ap:
+            return "TS Govt Jobs"
+        if _region == "ap" and not has_ts:
+            return "AP Govt Jobs"
+    # v401: public institutions are not "Private Jobs" (live: PGIMER, UCMS,
+    # DAVV, NIT Kurukshetra, NFDC, Dhs Lakshadweep all filed under Private).
+    if has_job and _has_any(blob, ("university", "institute", "college", "hospital", "medical college",
+                                   "aiims", "pgimer", "nit ", "iit ", "iiit", "iim ", "iiser", "csir", "icmr",
+                                   "icar", "esic", "isro", "drdo", "municipal", "corporation", "zilla",
+                                   "district", "department", "directorate", "commission", "board",
+                                   "council", "authority", "nigam", "ministry", "govt", "government",
+                                   "ప్రభుత్వ", "విశ్వవిద్యాలయ", "జిల్లా")) \
+            and not _has_any(blob, _PRIVATE_SIGNALS):
+        if has_ts and not has_ap:
+            return "TS Govt Jobs"
+        if has_ap and not has_ts:
+            return "AP Govt Jobs"
+        return "Central Govt Jobs"
     if (has_job or _has_any(blob, ("hiring", "drive", "careers", "fresher", "recruit"))) and _has_any(blob, _PRIVATE_SIGNALS):
         return "Private Jobs"
 
@@ -561,7 +624,23 @@ def clean_title_text(title: str) -> str:
     t = re.sub(r"(?:\s*[:—–-])?\s+(?:అద్భుత(?:మైన)? అవకాశం|బంగారు అవకాశం|భారీ అవకాశం|గొప్ప అవకాశం|సువర్ణావకాశం|Complete Details|Full Details|Best Guide|Complete Guide)\s*!*\s*$", "", t, flags=re.I)
     t = re.sub(r"!+", "", t)
     t = re.sub(r"\s*[—–:-]\s*$", "", t).strip()
+    t = strip_dangling_tail(t)
     return re.sub(r"\s+", " ", t).strip()
+
+
+_DANGLING_TAIL_RE = re.compile(
+    r"(?:\s*[—–:|·-])?\s+(?:Last|Direct|Apply|Check|Download|and|or|for|of|the|to|with|in|on|at|"
+    r"మరియు|కోసం|నుంచి|వరకు)\s*$", re.I)
+
+
+def strip_dangling_tail(t: str) -> str:
+    """v401: a length-trimmed title must not end on a half phrase — live 24-Oct
+    H1s: "… Deputation నోటిఫికేషన్ Last", "… 16 పోస్టులు - Last", "… 45 పోస్టులు –"."""
+    prev = None
+    while t and t != prev:
+        prev = t
+        t = _DANGLING_TAIL_RE.sub("", t).rstrip(" ,:;–—-·|(")
+    return t
 
 
 MID_POWER_RE = re.compile(
@@ -583,6 +662,23 @@ def _hygiene(article: Dict) -> Dict:
         article["title"] = title
     if seo_title:
         article["seo_title"] = seo_title
+    # v401: meta description must be Telugu (owner rule; live 24-Oct: Bihar
+    # STET / ISRO / AIIMS / PSSSB descriptions were fully English). No AI
+    # retry — deterministic Telugu template built from the focus keyword.
+    _md = str(article.get("meta_description") or "")
+    _md_words = re.findall(r"[A-Za-z\u0c00-\u0c7f]+", _md)
+    if _md_words and sum(1 for w in _md_words if re.search(r"[\u0c00-\u0c7f]", w)) / len(_md_words) < 0.25:
+        _fk = str(article.get("focus_keyword") or article.get("title") or "").strip()[:70]
+        _rec = article.get("recruitment") if isinstance(article.get("recruitment"), dict) else {}
+        _bits = []
+        if str(_rec.get("vacancies") or "").strip():
+            _bits.append(f"{_rec['vacancies']} పోస్టులు")
+        if str(_rec.get("apply_end") or "").strip():
+            _bits.append(f"చివరి తేదీ {_rec['apply_end']}")
+        _tail = (", ".join(_bits) + ". ") if _bits else ""
+        article["meta_description"] = (f"{_fk}: {_tail}అర్హత, ఎంపిక విధానం, దరఖాస్తు విధానం, "
+                                       f"ముఖ్యమైన తేదీలు — పూర్తి వివరాలు తెలుగులో StudentUp లో.")[:158]
+        log.info("v401 meta description → Telugu template (was English)")
     # tags: remove a different canonical category tag (e.g. Central Govt Jobs
     # accidentally returned for a Software Jobs article), then dedupe/cap.
     # Category and tags serve different jobs: keep the selected category tag,
@@ -1404,6 +1500,10 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             _lf.draft_flags(_post_title, str(article.get("content_html") or ""))
         if "foreign-script" in _dflags and not article.get("_mock"):
             raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
+        if "foreign-script-body" in _dflags and not article.get("_mock"):
+            raise RuntimeError(f"SKIP-FOREIGN-BODY: non-Telugu Indic script in body — {_post_title[:60]}")
+        if "other-state" in _dflags and not article.get("_mock") and getattr(config, "GEO_GATE", True):
+            raise RuntimeError(f"geo-skip other-state at draft stage — {_post_title[:60]}")
         if _dflags and requested_status != "publish" and not _post_title.startswith("REVIEW:"):
             _post_title = f"REVIEW: {_post_title}"
             log.warning("draft flagged for review (%s): %s", ", ".join(_dflags), article["title"][:70])
@@ -2229,6 +2329,12 @@ def create_from_source(url: str, mock: bool = False, category: str = "",
     if not mock:
         from . import stale_gate
         stale_gate.assert_fresh(src, category or classify_source_category(url, src.title, src.text))
+        # v401: other-state content never reaches Gemini (live 24-Oct: Bihar,
+        # Haryana, Ladakh, WBPSC, Punjab, Karnataka, Gujarat drafts + publishes).
+        if getattr(config, "GEO_GATE", True):
+            from . import geo_gate
+            _geo = geo_gate.assert_relevant(src.title, src.text, url)
+            log.info("GEO GATE ✔ %s (%s)", _geo["region"], _geo["evidence"] or "-")
 
     # v318: same opportunity from a DIFFERENT publisher URL (Telegram links /
     # radar) → refresh the existing StudentUp post instead of a duplicate draft.
