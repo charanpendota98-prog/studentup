@@ -291,6 +291,12 @@ function studentup_ad( $place = 'mid' ) {
 	if ( is_singular( 'post' ) && 'below-content' !== $place ) {
 		return;
 	}
+	// 1.9.176 owner rule (live 24-Oct "ads gap"): until AdSense is approved
+	// (no client id) NOTHING ad-shaped renders on home/archive — no house
+	// boxes, no reserved heights. The single end-of-post house box stays.
+	if ( ! $client && ! is_singular( 'post' ) ) {
+		return;
+	}
 	$house = studentup_rotate_house( studentup_house_ads(), $place );
 	if ( ! $house ) {
 		return;
@@ -301,7 +307,8 @@ function studentup_ad( $place = 'mid' ) {
 		: ( 'below-content' === $place ? 'su-ad su-ad-below'
 		: ( 'sidebar' === $place ? 'su-ad su-ad-sticky' : 'su-ad' ) ) );
 
-	echo '<div class="su-ad-reserved" style="min-height:' . (int) $height . 'px" data-su-height="' . (int) $height . '">';
+	// house box = our own content → sized by its content, never a reserved gap.
+	echo '<div class="su-ad-house">';
 	// v1.9.114: house blocks = StudentUp's own sections. Never "SPONSORED"/"Advertisement"
 	// labels without a real paid partner (owner rule: no fake sponsored).
 	echo '<aside class="' . esc_attr( $cls ) . '" aria-label="' . esc_attr__( 'StudentUp section', 'studentup' ) . '">';
@@ -513,6 +520,9 @@ function studentup_ad_available( $place ) {
 	}
 	if ( studentup_adsense_client() && $slot && studentup_consent_ok() ) {
 		return true;
+	}
+	if ( ! studentup_adsense_client() && ! is_singular( 'post' ) ) {
+		return false; // 1.9.176: no ad-shaped blocks before approval
 	}
 	return (bool) studentup_rotate_house( studentup_house_ads(), $place );
 }

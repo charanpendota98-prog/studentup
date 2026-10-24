@@ -32,17 +32,17 @@ def test_detects_old_theme_review_title_dup_slug_and_tenglish(monkeypatch, capsy
     posts = [{"id": 1, "slug": "rrb-ntpc-2026-2", "title": {"rendered": "REVIEW: RRB NTPC 2026 Notification 1688"}},
              {"id": 2, "slug": "rrb-ntpc-ug-2026", "title": {"rendered": "RRB NTPC UG 2026 Notification 1688 Posts"}}]
     _patch(monkeypatch, home, posts, [])
-    rc = pdc.run(expected_theme="1.9.175", notify=False)
+    rc = pdc.run(expected_theme="1.9.176", notify=False)
     out = capsys.readouterr().out
     assert rc == 1
     assert "❌ theme-version" in out and "❌ no-review-live" in out and "❌ no-dup-slugs" in out and "❌ no-tenglish" in out
 
 
 def test_clean_site_passes(monkeypatch, capsys):
-    home = '<link href="/wp-content/themes/studentup/style.min.css?ver=1.9.175"><p>దరఖాస్తు గడువు ముగిసింది</p>'
+    home = '<link href="/wp-content/themes/studentup/style.min.css?ver=1.9.176"><p>దరఖాస్తు గడువు ముగిసింది</p>'
     posts = [{"id": 1, "slug": "tgpsc-group-2-2026", "title": {"rendered": "TGPSC Group 2 Notification 2026: 500 పోస్టులు"}},
              {"id": 2, "slug": "ssc-cgl-2026", "title": {"rendered": "SSC CGL 2026 Notification"}}]
     _patch(monkeypatch, home, posts, [{"id": 9, "title": {"raw": "Daily Quiz – today"}}] * 3)
-    rc = pdc.run(expected_theme="1.9.175", notify=False)
+    rc = pdc.run(expected_theme="1.9.176", notify=False)
     out = capsys.readouterr().out
     assert rc == 0, out

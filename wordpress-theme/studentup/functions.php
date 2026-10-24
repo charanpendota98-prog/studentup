@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.175' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.176' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -68,14 +68,14 @@ require_once get_template_directory() . '/inc/indexnow.php';
 require_once get_template_directory() . '/inc/pwa.php';
 require_once get_template_directory() . '/inc/cta.php';
 require_once get_template_directory() . '/inc/editor.php';
-require_once get_template_directory() . '/inc/publish-gate.php'; // v1.9.175: WP-side publish gate (REVIEW:/duplicate/foreign-script → stays draft)
+require_once get_template_directory() . '/inc/publish-gate.php'; // v1.9.176: WP-side publish gate (REVIEW:/duplicate/foreign-script → stays draft)
 require_once get_template_directory() . '/inc/redirects.php';  // v80: 301 redirect manager
 require_once get_template_directory() . '/inc/health.php';     // v81: admin SEO-health widget
 require_once get_template_directory() . '/inc/notify.php';    // v90: alert queue (admin notices + critical public banner + REST)
 require_once get_template_directory() . '/inc/telegram.php';  // v91: Telegram channel join/share (private channel support)
 require_once get_template_directory() . '/inc/saved.php';     // v92: reader bookmarks (localStorage) + saved panel/page
 require_once get_template_directory() . '/inc/discover.php';  // v94: Discover large-card image + og dims + CLS/INP
-require_once get_template_directory() . '/inc/brand.php';     // v1.9.175: brand palette (Customizer colour)
+require_once get_template_directory() . '/inc/brand.php';     // v1.9.176: brand palette (Customizer colour)
 require_once get_template_directory() . '/inc/upnext.php';    // v96: Up Next session-depth (real pageviews, policy-safe ad refresh)
 require_once get_template_directory() . '/inc/share.php';     // v98: viral share engine (in-content share bar + native sheet)
 require_once get_template_directory() . '/inc/success-stories.php'; // v117: consented TS/AP story intake CTA
