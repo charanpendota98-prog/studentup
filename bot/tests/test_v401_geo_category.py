@@ -71,3 +71,24 @@ def test_telugu_meta_fallback():
     pipeline._hygiene(art)
     md = art["meta_description"]
     assert "ISRO SDSC SHAR Recruitment 2026" in md and "97 పోస్టులు" in md and len(md) <= 160
+
+
+def test_pretty_kw_casing_from_reference():
+    from autoblog.kw_align import pretty_kw
+    assert pretty_kw("upsc 2026 upcoming vacancy") == "UPSC 2026 Upcoming Vacancy"
+    assert pretty_kw("dhs lakshadweep recruitment 2026", "DHS Lakshadweep Recruitment 2026") == "DHS Lakshadweep Recruitment 2026"
+    assert pretty_kw("isro sdsc shar recruitment 2026", "ISRO SDSC SHAR Recruitment 2026 Out") == "ISRO SDSC SHAR Recruitment 2026"
+
+
+def test_radar_queue_rejects_other_state(monkeypatch, tmp_path):
+    from autoblog import news_radar, config
+    monkeypatch.setattr(config, "STATE_PATH", str(tmp_path / "s.db"))
+    assert news_radar._queue_url("https://www.freejobalert.com/articles/bihar-stet-admit-card-2026-1", "Bihar STET Admit Card 2026") is False
+
+
+def test_tag_not_cut_mid_word():
+    from autoblog import pipeline
+    art = {"title": "DPSRU Recruitment 2026", "tags": ["DPSRU Project Associate-II Recruitment 2026 Walk-in"],
+           "meta_description": "తెలుగు వివరాలు", "content_html": "<p>x</p>", "category": "Walkin Jobs"}
+    pipeline._hygiene(art)
+    assert all(not t.endswith("Recru") and len(t) <= 32 for t in art["tags"])

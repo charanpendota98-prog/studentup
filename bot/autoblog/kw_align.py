@@ -58,12 +58,38 @@ _NOUNS = {
 }
 
 
-def pretty_kw(kw: str) -> str:
-    """'ap pg medical fees' → 'AP PG Medical Fees'; Telugu/pre-cased tokens as-is."""
+ACRONYMS |= {
+    # v401: live 24-Oct H1s "Upsc 2026 …", "Dhs Lakshadweep", "Kea Vao", "Nit Kurukshetra"
+    "dhs", "nit", "iit", "iiit", "iim", "iiser", "nift", "niftem", "kea", "vao", "sdsc", "shar", "bsf",
+    "crpf", "cisf", "itbp", "ssb", "capf", "nia", "cbi", "hc", "ro", "rm", "cbt", "stet", "ctet", "jrf",
+    "srf", "pa", "ra", "becil", "itpo", "irel", "ipr", "nfdc", "ucms", "pgimer", "jipmer", "nimhans",
+    "uiic", "niacl", "nicl", "gic", "nabcons", "dmho", "dcho", "phc", "chc", "anm", "gnm", "mpw", "mphw",
+    "asha", "icds", "cdpo", "aww", "awh", "nrega", "pmgsy", "rwd", "spo", "apo", "dm", "gm", "agm", "dgm",
+    "sccl", "tgsrtc", "mhsrb", "apmsrb", "apsche", "aptet", "tstet", "tgtet", "dsc", "trt", "pet", "pst",
+    "ssc", "cds", "nda", "afcat", "kvs", "nvs", "jnv", "nios", "fmge", "nbems", "neet", "pg", "ug", "mds",
+    "pmo", "goi", "psu", "dae", "dst", "dbt", "barc", "npcil", "nmdc", "nhpc", "pgcil", "secl", "mcl", "wcl",
+    "ongc", "oil", "hpcl", "rites", "ircon", "irctc", "rrc", "dfccil", "konkan", "nfr", "scr", "ecor",
+    "upsssc", "uppsc", "bpsc", "wbpsc", "opsc", "rpsc", "gpsc", "hpsc", "hssc", "ppsc", "psssb", "jkssb",
+    "mppsc", "mpesb", "cgpsc", "ukpsc", "uksssc", "kpsc", "tnpsc", "mpsc", "jpsc", "jssc", "hppsc", "sggu",
+    "bknmu", "baou", "davv", "kslu", "rguhs", "vtu", "osmania", "ou", "svu", "anu", "jntu", "jntuh", "jntuk",
+    "jntua", "kuk", "ku", "su", "tu", "pu", "bhu", "jnu", "amu", "du", "ignou", "braou", "apou",
+}
+
+
+def pretty_kw(kw: str, reference: str = "") -> str:
+    """'ap pg medical fees' → 'AP PG Medical Fees'; Telugu/pre-cased tokens as-is.
+    v401: `reference` (the article/source title) wins — whatever casing the
+    official title used for a token is reused ("SDSC SHAR", "DHFWS")."""
+    ref_case = {}
+    for tok in re.findall(r"[A-Za-z][A-Za-z0-9.&-]*", reference or ""):
+        if tok.lower() not in ref_case and (tok.isupper() or not tok.islower()):
+            ref_case[tok.lower()] = tok
     out: List[str] = []
     for w in (kw or "").split():
         if re.search(r"[\u0c00-\u0c7f]", w):
             out.append(w)
+        elif w.lower() in ref_case:
+            out.append(ref_case[w.lower()])
         elif w.lower() in ACRONYMS and len(w) <= 6:
             out.append(w.upper())
         elif w.islower() and len(w) > 1:

@@ -981,7 +981,7 @@ def show_status() -> int:
               f"retry={source_counts.get('retry', 0)}")
         print("Radar audit : " + ", ".join(
             f"{name}={event_counts[name]}" for name in (
-                "queued", "duplicate_opportunity", "duplicate_url", "stale_notice",
+                "queued", "duplicate_opportunity", "duplicate_url", "stale_notice", "geo_skip",
                 "fetch_failure", "validation_blocked", "draft_failed", "draft_deferred",
                 "draft_ready") if event_counts[name]
         ) or "no events")

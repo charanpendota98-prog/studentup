@@ -688,7 +688,9 @@ def _hygiene(article: Dict) -> Dict:
     conflicting_categories = canonical_categories - ({category} if category else set())
     seen, tags = set(), []
     for t in article.get("tags", []):
-        t = str(t).strip()[:32]
+        t = str(t).strip()
+        if len(t) > 32:  # v401: never cut a tag mid-word ("… Associate-II Recru")
+            t = t[:32].rsplit(" ", 1)[0].strip(" -–,:")
         low = t.lower()
         if (not t or low in JUNK_TAGS or low in seen or
                 (low in conflicting_categories and category in canonical_categories)):
