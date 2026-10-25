@@ -25,6 +25,7 @@ CLI:
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from datetime import date
 from typing import Dict, List, Optional
@@ -138,7 +139,7 @@ def build_hub_html(district: str, state: str, posts: List[Dict],
 
     posts: [{"title":…, "link":…, "date":…}]
     """
-    year = year or date.today().year
+    year = year or clock.today().year
     site = (site or getattr(config, "WP_SITE", "") or "").rstrip("/")
     esc = seo._esc
     state_full = STATE_NAME.get(state, state)
@@ -179,7 +180,7 @@ def build_hub_html(district: str, state: str, posts: List[Dict],
         f'<h2 id="nearby-districts">{esc(state_full)} — Nearby District Pages</h2>'
         f"<ul>{near}</ul>"
         '<p style="font-size:13px;color:#57616B;">🔄 Last updated: '
-        f"{date.today().isoformat()} · తప్పు కనిపిస్తే "
+        f"{clock.today().isoformat()} · తప్పు కనిపిస్తే "
         f'<a href="mailto:{esc(config.SUPPORT_EMAIL)}">{esc(config.SUPPORT_EMAIL)}</a>'
         " — 24 గంటల్లో సరిచేస్తాం.</p>"
     )
@@ -215,7 +216,7 @@ def rebuild(state: str = "", apply: bool = False,
             wp: Optional[WordPressClient] = None) -> List[Dict]:
     """Hubs build chey. apply=False → dry-run plan matrame."""
     wp = wp or WordPressClient()
-    year = date.today().year
+    year = clock.today().year
     rows = plan(state, wp=wp)
     built = 0
     for row in rows:

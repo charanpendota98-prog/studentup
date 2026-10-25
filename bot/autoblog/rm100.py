@@ -33,6 +33,7 @@ Run proof: python run.py --rm100
 from __future__ import annotations
 
 import html as _html
+from . import clock
 import re
 from datetime import date
 from typing import Dict, List
@@ -212,7 +213,7 @@ def fix_title(article: dict) -> bool:
     head = title
     if not re.search(r"\d", head):
         yr = re.search(r"\b(20\d{2})\b", kw) or re.search(r"\b(20\d{2})\b", title)
-        year = yr.group(1) if yr else str(date.today().year)
+        year = yr.group(1) if yr else str(clock.today().year)
         rest = _text(head[len(kt):]) if head.lower().startswith(kt.lower()) else head
         head = _text(f"{kt} {year} {rest}") if rest else _text(f"{kt} {year}")
     # 4) Do not force a promotional suffix into the visible H1. The SEO title

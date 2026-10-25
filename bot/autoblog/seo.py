@@ -732,6 +732,26 @@ def _faq_schema_items(faq: List[Dict[str, str]]) -> List[Dict]:
     return out
 
 
+_HOWTO_H2 = re.compile(r"<h2[^>]*>([^<]*(?:దరఖాస్తు (?:విధానం|ఎలా)|ఎలా అప్లై|how to apply|apply online|దరఖాస్తు చేయడం ఎలా)[^<]*)</h2>\s*(?:<p[^>]*>.*?</p>\s*)?<ol[^>]*>(.*?)</ol>", re.I | re.S)
+
+
+def howto_steps(html: str) -> List[str]:
+    """v402: ordered steps under the 'how to apply' H2 (visible <ol> only)."""
+    m = _HOWTO_H2.search(html or "")
+    if not m:
+        return []
+    steps = [re.sub(r"<[^>]+>", "", li).strip() for li in re.findall(r"<li[^>]*>(.*?)</li>", m.group(2), re.S)]
+    steps = [s for s in steps if 8 <= len(s) <= 300]
+    return steps if len(steps) >= 3 else []
+
+
+def howto_schema(name: str, steps: List[str], slug: str) -> Dict:
+    base = config.WP_SITE.rstrip("/")
+    return {"@context": "https://schema.org", "@type": "HowTo", "name": name[:110], "inLanguage": "te",
+            "step": [{"@type": "HowToStep", "position": i, "name": st[:80], "text": st,
+                      "url": f"{base}/{slug}/#apply-step-{i}"} for i, st in enumerate(steps, 1)]}
+
+
 def visible_faq_pairs(html: str) -> List[Dict[str, str]]:
     """v392: Q/A pairs as the READER sees them (<h3>question?</h3><p>answer</p>)
     so FAQPage schema never lists a question the page does not show (Google
@@ -1021,6 +1041,16 @@ def enhance(
                           date_str, slug, category=category,
                           date_modified=date_modified, list_items=list_items,
                           recruitment=recruitment)
+    # v402: HowTo for posts with a real visible step list under "how to apply"
+    try:
+        _steps = howto_steps(html) if getattr(config, "HOWTO_SCHEMA_ENABLED", True) else []
+        if _steps:
+            import json as _json
+            html += ('<script type="application/ld+json">' +
+                     _json.dumps(howto_schema(f"{title or focus_keyword} — దరఖాస్తు విధానం", _steps, slug),
+                                 ensure_ascii=False, separators=(",", ":")) + "</script>")
+    except Exception:  # noqa: BLE001
+        log.debug("howto schema skip", exc_info=True)
     log.info("SEO enhanced: %d words, keyword=%r", words, focus_keyword)
     min_words = int(getattr(config, "RM_MIN_WORDS", 600))
     if words < min_words:

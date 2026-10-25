@@ -15,6 +15,7 @@ Never touches posts whose topic appears only once.
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from datetime import datetime, timedelta
 from typing import Dict, List
@@ -26,7 +27,7 @@ log = logging.getLogger("autoblog.dedupe")
 
 
 def _fetch_published(wp, days: int = 90, limit: int = 400) -> List[Dict]:
-    after = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00")
+    after = (clock.utcnow() - timedelta(days=days)).strftime("%Y-%m-%dT00:00:00")
     posts: List[Dict] = []
     page = 1
     while len(posts) < limit:

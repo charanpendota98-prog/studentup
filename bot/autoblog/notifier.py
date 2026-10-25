@@ -822,6 +822,16 @@ def notify_new_post(article: dict, result: dict) -> None:
         lines.append(f"💰 <b>వేతనం (Salary):</b> {esc(sal)}")
     if deadline:
         lines.append(f"⏳ <b>చివరి తేదీ (Last Date):</b> {esc(deadline)}")
+    # v402: review tier + machine review notes (grounding / schema / injection)
+    tier = str(article.get("_review_tier") or "")
+    if tier:
+        badge = {"HIGH": "🔴 HIGH — dates/fees/hall ticket: ప్రతి సంఖ్య చెక్ చేయండి",
+                 "MEDIUM": "🟡 MEDIUM — facts table + links చూడండి",
+                 "LOW": "🟢 LOW — evergreen; quick read చాలు"}.get(tier, tier)
+        lines.append(f"🧭 <b>Review tier:</b> {esc(badge)}")
+    notes = [n for n in (article.get("_review_notes") or []) if not str(n).startswith("review-tier:")]
+    if notes:
+        lines.append("🛠 <b>Auto-checks:</b> " + esc(" · ".join(str(n)[:70] for n in notes[:4])))
     # QA report — review easy ga avtaniki
     qa = article.get("_qa") or {}
     qa_bits = []

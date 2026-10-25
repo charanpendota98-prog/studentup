@@ -6,6 +6,7 @@ source-name leaks, duplicate FAQ, "idi" filler, H2 count. Read-only."""
 from __future__ import annotations
 
 import html as _html
+from . import clock
 import re
 from datetime import datetime, timedelta
 from typing import Dict, List
@@ -102,7 +103,7 @@ def audit_post(post: Dict, cat_names: Dict[int, str]) -> Dict:
         dates = live_fix.body_dates(plain)
         if dates:
             newest = max(dates)
-            if hasattr(newest, "year") and newest < (datetime.now().date() - timedelta(days=120)):
+            if hasattr(newest, "year") and newest < (clock.now().date() - timedelta(days=120)):
                 issues.append(f"all-dates-old:{newest}")
     except Exception:  # noqa: BLE001
         pass
@@ -115,7 +116,7 @@ def run_cli(hours: int = 24) -> int:
     from .wordpress_client import WordPressClient
 
     wp = WordPressClient()
-    after = (datetime.now() - timedelta(hours=max(1, hours))).strftime("%Y-%m-%dT%H:%M:%S")
+    after = (clock.now() - timedelta(hours=max(1, hours))).strftime("%Y-%m-%dT%H:%M:%S")
     cat_names: Dict[int, str] = {}
     try:
         r = wp._request("GET", "categories", params={"per_page": 100, "_fields": "id,name"})

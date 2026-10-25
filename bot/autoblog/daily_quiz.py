@@ -19,6 +19,7 @@ Deliberate rules:
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import json
 import logging
 import re
@@ -102,12 +103,12 @@ def _ai_quiz(topic_en: str, topic_te: str, level: int, n: int,
 
 
 def slug_for(day: Optional[date] = None) -> str:
-    day = day or date.today()
+    day = day or clock.today()
     return f"daily-quiz-{day.isoformat()}"
 
 
 def title_for(day: Optional[date] = None, topic_te: str = "") -> str:
-    day = day or date.today()
+    day = day or clock.today()
     nice = day.strftime("%d %b %Y")
     if topic_te:
         return f"డైలీ క్విజ్ {nice} — {topic_te}"
@@ -126,7 +127,7 @@ def build(day: Optional[date] = None, use_ai: Optional[bool] = None) -> Dict:
       4) Final set ni memory lo raasi pedtam — repo bank nunchi vachhina
          prashnalu kuda malli vente raavu.
     """
-    day = day or date.today()
+    day = day or clock.today()
     topic_en, topic_te, level, n = quiz_engine.pick_daily_topic(day)
     seen = _load_seen()
     source = "bank"
@@ -142,6 +143,19 @@ def build(day: Optional[date] = None, use_ai: Optional[bool] = None) -> Dict:
                 quiz, source = candidate, "ai"
                 break
             log.info("daily quiz: generated paper repeated old questions — retry")
+    if quiz is None:
+        # v402: persistent generated bank (hundreds of reviewed items) before
+        # the tiny repo MOCK_BANK — exclude the 90-day memory.
+        try:
+            from . import quiz_bank
+            pool = quiz_bank.draw_any(n * 3, seed=int(day.strftime("%Y%m%d")), mark_used=False) if hasattr(quiz_bank, "draw_any") else []
+            picked = [q for q in pool if _qkey(q.get("q", "")) not in seen][:n]
+            if len(picked) >= n:
+                with quiz_bank._conn() as _c:
+                    _c.executemany("UPDATE quiz_bank SET used=used+1 WHERE qhash=?", [(q["_qhash"],) for q in picked])
+                quiz, source = {"topic": topic_en, "topic_te": topic_te, "questions": picked}, "bank-db"
+        except Exception:  # noqa: BLE001
+            log.debug("quiz bank draw skip", exc_info=True)
     if quiz is None:
         # Bank path kuda repeat-aware: date-seed shift chesi vere set
         # teesukuntam (AI key leni rojullo kuda paper fresh ga untundi).
@@ -176,7 +190,7 @@ def build(day: Optional[date] = None, use_ai: Optional[bool] = None) -> Dict:
 
 def run(wp=None, day: Optional[date] = None, dry: bool = False) -> Dict:
     """Create today's quiz as a WordPress draft (or report what would happen)."""
-    day = day or date.today()
+    day = day or clock.today()
     plan = build(day)
     result = {
         "version": "v148",

@@ -15,6 +15,8 @@ Commands:
   /stats     – poster statistics
 """
 
+import hmac
+from . import clock
 import json
 import logging
 import re
@@ -77,13 +79,20 @@ class ApprovalBot:
 
         registered = self.registered_chat()
         if not registered:
-            # first user to talk to the bot becomes the owner
+            # v401d (audit S-1): no first-claimer ownership. Claim only with
+            # `/start <TELEGRAM_SETUP_TOKEN>`; wrong/missing token → ignored
+            # (no reply, so the bot stays invisible to strangers).
+            token = str(getattr(config, "TELEGRAM_SETUP_TOKEN", "") or "")
+            parts = text.split(None, 1)
+            given = parts[1].strip() if len(parts) == 2 and parts[0].startswith("/start") else ""
+            if not token or not given or not hmac.compare_digest(given, token):
+                log.warning("Telegram claim refused from chat %s (set TELEGRAM_CHAT_ID or send "
+                            "/start <TELEGRAM_SETUP_TOKEN>)", chat_id)
+                return
             state.meta_set(config.STATE_PATH, CHAT_KEY, chat_id)
             registered = chat_id
-            # v82: first-claimer risk — loud warning (terminal/log)
-            log.warning("Telegram owner auto-registered: %s — .env lo "
-                        "TELEGRAM_CHAT_ID=%s set chesi lock cheyandi!",
-                        chat_id, chat_id)
+            log.warning("Telegram owner registered via setup token: %s — .env lo "
+                        "TELEGRAM_CHAT_ID=%s set chesi lock cheyandi!", chat_id, chat_id)
         elif not self.is_owner(chat_id):
             self.tg("sendMessage", {"chat_id": chat_id,
                                     "text": ("⚠️ Ee bot already owner ni untundi. Access ledu.\n"
@@ -691,7 +700,7 @@ class ApprovalBot:
         age_h = (datetime.now(last.tzinfo) - last).total_seconds() / 3600
         if age_h < config.WATCHDOG_HOURS:
             return
-        today_key = f"watchdog:{datetime.now().date().isoformat()}"
+        today_key = f"watchdog:{clock.now().date().isoformat()}"
         if state.meta_get(config.STATE_PATH, today_key):
             return  # roju okke alert
         chat = self.registered_chat()

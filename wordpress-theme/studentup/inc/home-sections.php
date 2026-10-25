@@ -21,7 +21,7 @@ function studentup_home_sectionwise( $exclude = 0, $heading = '' ) {
 		return;
 	}
 	$exclude = (int) $exclude;
-	$slugs = array( 'results', 'hall-tickets', 'scholarships', 'admissions', 'ts-govt-jobs', 'ap-govt-jobs', 'central-govt-jobs' );
+	$slugs = array( 'results', 'hall-tickets', 'scholarships', 'admissions', 'ts-jobs', 'ap-jobs', 'central-jobs' ); // 1.9.178 (audit FE-4): alias-map keys, not seed slugs
 	$cols  = array();
 	foreach ( $slugs as $slug ) {
 		$term = function_exists( 'studentup_used_term' ) ? studentup_used_term( $slug ) : get_category_by_slug( $slug );

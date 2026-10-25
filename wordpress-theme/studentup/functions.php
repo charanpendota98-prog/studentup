@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'STUDENTUP_VERSION', '1.9.177' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
+define( 'STUDENTUP_VERSION', '1.9.178' );  // v358 PIN-TO-PIN: Telugu category/menu/qual/date labels, 47 hard-coded English strings, fake 'Open today' removed, phone floating-stack overlap fix.
 
 require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/icons.php';        // v171: pro SVG UI icons (emoji UI badulu).
@@ -68,14 +68,14 @@ require_once get_template_directory() . '/inc/indexnow.php';
 require_once get_template_directory() . '/inc/pwa.php';
 require_once get_template_directory() . '/inc/cta.php';
 require_once get_template_directory() . '/inc/editor.php';
-require_once get_template_directory() . '/inc/publish-gate.php'; // v1.9.177: WP-side publish gate (REVIEW:/duplicate/foreign-script → stays draft)
+require_once get_template_directory() . '/inc/publish-gate.php'; // v1.9.178: WP-side publish gate (REVIEW:/duplicate/foreign-script → stays draft)
 require_once get_template_directory() . '/inc/redirects.php';  // v80: 301 redirect manager
 require_once get_template_directory() . '/inc/health.php';     // v81: admin SEO-health widget
 require_once get_template_directory() . '/inc/notify.php';    // v90: alert queue (admin notices + critical public banner + REST)
 require_once get_template_directory() . '/inc/telegram.php';  // v91: Telegram channel join/share (private channel support)
 require_once get_template_directory() . '/inc/saved.php';     // v92: reader bookmarks (localStorage) + saved panel/page
 require_once get_template_directory() . '/inc/discover.php';  // v94: Discover large-card image + og dims + CLS/INP
-require_once get_template_directory() . '/inc/brand.php';     // v1.9.177: brand palette (Customizer colour)
+require_once get_template_directory() . '/inc/brand.php';     // v1.9.178: brand palette (Customizer colour)
 require_once get_template_directory() . '/inc/upnext.php';    // v96: Up Next session-depth (real pageviews, policy-safe ad refresh)
 require_once get_template_directory() . '/inc/share.php';     // v98: viral share engine (in-content share bar + native sheet)
 require_once get_template_directory() . '/inc/success-stories.php'; // v117: consented TS/AP story intake CTA
@@ -181,10 +181,30 @@ function studentup_cat_aliases() {
  * @param string $slug theme slug (studentup_most_used).
  * @return WP_Term|null
  */
+/**
+ * 1.9.178 (audit F-1): resolve ANY alias candidate ("central", "walkin") to
+ * its family key so callers that pass a short slug still get the whole family
+ * instead of a silent miss (mobile drawer lost 4 of 11 rows on a fresh install).
+ */
+function studentup_alias_family_key( $slug ) {
+	$slug = (string) $slug;
+	$map  = studentup_cat_aliases();
+	if ( isset( $map[ $slug ] ) ) {
+		return $slug;
+	}
+	foreach ( $map as $key => $cands ) {
+		if ( in_array( $slug, (array) $cands, true ) ) {
+			return $key;
+		}
+	}
+	return $slug;
+}
+
 function studentup_used_term( $slug ) {
 	$map    = studentup_cat_aliases();
 	$tried  = array();
-	$cands  = isset( $map[ $slug ] ) ? $map[ $slug ] : array( $slug );
+	$family = studentup_alias_family_key( $slug );
+	$cands  = isset( $map[ $family ] ) ? array_merge( array( $slug ), $map[ $family ] ) : array( $slug );
 	foreach ( $cands as $cand ) {
 		if ( isset( $tried[ $cand ] ) ) {
 			continue;

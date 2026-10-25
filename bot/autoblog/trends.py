@@ -21,6 +21,7 @@ Run proof: python run.py --trends            (capture + print, queue rాయadu)
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 import re
 import xml.etree.ElementTree as ET
@@ -270,8 +271,8 @@ def queue_topics(items: List[Dict[str, str]], suggestions: Optional[List[str]] =
     Returns {"added": n, "total": n, "path": "..."}.
     """
     data = _load(path)
-    today = date.today().isoformat()
-    cutoff = (date.today() - timedelta(days=keep_days)).isoformat()
+    today = clock.today().isoformat()
+    cutoff = (clock.today() - timedelta(days=keep_days)).isoformat()
     data["used"] = [u for u in data["used"] if str(u.get("used_on", today)) >= cutoff]
 
     seen = {str(t.get("title", "")).lower() for t in data["topics"]}
@@ -325,7 +326,7 @@ def consume(title: str, path: Optional[Path] = None) -> bool:
     for i, t in enumerate(data["topics"]):
         if str(t.get("title", "")).lower() == (title or "").lower():
             row = data["topics"].pop(i)
-            row["used_on"] = date.today().isoformat()
+            row["used_on"] = clock.today().isoformat()
             data["used"].append(row)
             _save(data, path)
             return True

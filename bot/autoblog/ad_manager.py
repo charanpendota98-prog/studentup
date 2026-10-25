@@ -21,6 +21,7 @@ CLI:     run.py --ads        → inventory status + slot plan (dry)
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import html as _html
 import json
 import os
@@ -70,7 +71,7 @@ def policy_of(inv: Dict) -> Dict:
 
 
 def active_ads(inv: Dict, today: Optional[date] = None) -> List[Dict]:
-    today = today or date.today()
+    today = today or clock.today()
     out = []
     for ad in inv.get("ads", []):
         if not isinstance(ad, dict) or not ad.get("active", False):
@@ -89,7 +90,7 @@ def active_ads(inv: Dict, today: Optional[date] = None) -> List[Dict]:
 
 def _day_seed(art: Dict) -> int:
     """Deterministic daily rotation seed (date + category)."""
-    key = f"{date.today().isoformat()}|{(art.get('category') or '')[:40]}"
+    key = f"{clock.today().isoformat()}|{(art.get('category') or '')[:40]}"
     return int(hashlib.sha256(key.encode("utf-8")).hexdigest(), 16) % 10_000
 
 
@@ -175,7 +176,7 @@ def select_house_ads(inv: Optional[Dict] = None, today: Optional[date] = None,
     ads = load_house_ads(path)
     if not ads:
         return []
-    today = today or date.today()
+    today = today or clock.today()
     rot = _load_rotation()
     ads = sorted(ads, key=lambda a: (_fairness_key(a, rot), a.get("id", "")))
     picked = ads[:max(1, limit)]
@@ -200,7 +201,7 @@ def select_ads(art: Dict, inv: Dict, today: Optional[date] = None,
               int(getattr(config, "MAX_PERSONAL_AD_SLOTS", 2)))
     if getattr(config, "ADSENSE_APPROVED", False):
         cap = min(cap, 1)
-    today = today or date.today()
+    today = today or clock.today()
     live = active_ads(inv, today)
     if not live:
         return []  # nothing active anywhere → honest empty

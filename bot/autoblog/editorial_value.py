@@ -12,6 +12,7 @@ The ledger is machine evidence for human review — not a fake E-E-A-T badge.
 from __future__ import annotations
 
 import re
+from . import clock
 from datetime import date
 from typing import Dict, Iterable, List
 from urllib.parse import urlparse
@@ -44,7 +45,7 @@ def _source_obj(source, index: int) -> Dict:
         "title": title,
         "domain": urlparse(url).netloc.lower().replace("www.", ""),
         "tier": deep_research.source_tier(url) if url else 3,
-        "checked_at": date.today().isoformat(),
+        "checked_at": clock.today().isoformat(),
         "word_count": len((text or "").split()),
         "has_text": bool(text),
     }
@@ -117,7 +118,7 @@ def build_ledger(article: Dict, html: str, sources: Iterable) -> Dict:
 
     return {
         "version": "v104",
-        "checked_at": date.today().isoformat(),
+        "checked_at": clock.today().isoformat(),
         "score": score,
         "grade": "strong" if score >= 75 else "review" if score >= 55 else "thin-risk",
         "sources": records,

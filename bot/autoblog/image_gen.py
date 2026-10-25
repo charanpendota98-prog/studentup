@@ -14,6 +14,7 @@ brand pill + year chip — Adda247/Sakshi thumbnail style, mana own rendering.
 """
 
 import logging
+from . import clock
 import random
 import re
 from datetime import date
@@ -360,7 +361,7 @@ def _pro_polish(img: "Image.Image", w: int, h: int) -> "Image.Image":
 def _draw_layout(img: Image.Image, draw: ImageDraw.ImageDraw, w: int, h: int,
                  banner_text: str, category: str, variant: str) -> None:
     """v24 layouts — every glyph centered inside the safe band."""
-    year = str(date.today().year)
+    year = str(clock.today().year)
     label_font = _load_font(int(h * 0.044))
     brand_font = _load_font(int(h * 0.036))
     label = banner_english(_pill_label(category, banner_text))

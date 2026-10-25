@@ -167,7 +167,7 @@ add_action( 'rest_api_init', function () {
 	) );
 } );
 function studentup_csp_report_sink( $request ) {
-	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+	$ip  = studentup_client_ip();
 	$key = 'su_csp_' . md5( $ip );
 	if ( (int) get_transient( $key ) >= 20 ) {
 		return new WP_REST_Response( null, 429 );
@@ -209,3 +209,27 @@ add_action( 'admin_notices', function () {
 	}
 	echo '</ol></div>';
 } );
+
+/**
+ * 1.9.178 (audit H8): client IP that respects a TRUSTED reverse proxy /
+ * Cloudflare. Rate limits keyed on REMOTE_ADDR alone collapse to one bucket
+ * behind a CDN (one abuser blocks everyone). Only honoured when the site
+ * opts in via the `studentup_trusted_proxy` filter / SU_TRUSTED_PROXY const —
+ * never blindly, because X-Forwarded-For is attacker-controlled otherwise.
+ */
+function studentup_client_ip() {
+	$remote  = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+	$trusted = (bool) apply_filters( 'studentup_trusted_proxy', defined( 'SU_TRUSTED_PROXY' ) && SU_TRUSTED_PROXY );
+	if ( $trusted ) {
+		foreach ( array( 'HTTP_CF_CONNECTING_IP', 'HTTP_X_REAL_IP', 'HTTP_X_FORWARDED_FOR' ) as $h ) {
+			if ( empty( $_SERVER[ $h ] ) ) {
+				continue;
+			}
+			$cand = trim( explode( ',', (string) $_SERVER[ $h ] )[0] );
+			if ( filter_var( $cand, FILTER_VALIDATE_IP ) ) {
+				return $cand;
+			}
+		}
+	}
+	return filter_var( $remote, FILTER_VALIDATE_IP ) ? $remote : '0.0.0.0';
+}

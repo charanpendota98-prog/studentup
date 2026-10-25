@@ -179,7 +179,7 @@ function studentup_quiz_rest_permission( $request ) {
 }
 
 /**
- * REST API callback: accepts 20 daily questions from external bots.
+ * REST API callback: accepts the day's question set (1–20 valid items; replaces that day's slot) from the bot.
  *
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response|WP_Error

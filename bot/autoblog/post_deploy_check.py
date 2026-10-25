@@ -16,6 +16,7 @@ Checks
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from datetime import date, datetime
 from typing import Dict, List
@@ -97,12 +98,12 @@ def run(expected_theme: str = "", notify: bool = True, drafts_slo: int = 2) -> i
     # --- authenticated: drafts today + quiz today -----------------------------
     try:
         wp = WordPressClient()
-        today = date.today()
+        today = clock.today()
         r = wp._request("GET", "posts", params={"status": "draft,publish,pending", "after": f"{today.isoformat()}T00:00:00",
                                                 "per_page": 100, "_fields": "id,title,date,status", "context": "edit"})
         rows = r.json() if r.ok else []
         n_today = len(rows)
-        hour = datetime.now().hour
+        hour = clock.now().hour
         quiz = [x for x in rows if "daily quiz" in str((x.get("title") or {}).get("raw") or (x.get("title") or {}).get("rendered") or "").lower()]
         if hour >= getattr(config, "QUIZ_HOUR", 8) + 1:
             rec("quiz-today", bool(quiz), f"{len(quiz)} quiz post(s) today")

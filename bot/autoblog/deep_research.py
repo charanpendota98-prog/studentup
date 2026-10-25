@@ -33,6 +33,7 @@ with --notebooklm-brief FILE → merged into the deep report.
 from __future__ import annotations
 
 import html as _html
+from . import clock
 import json
 import re
 from datetime import date
@@ -358,7 +359,7 @@ def build_report(topic: str,
     gaps = detect_gaps(matrix)
     report: Dict = {
         "topic": topic,
-        "created": date.today().isoformat(),
+        "created": clock.today().isoformat(),
         "target_year": target_year,
         "sources": [{k: s[k] for k in ("id", "url", "title", "domain", "tier")}
                     for s in norm],
@@ -637,8 +638,10 @@ def gate_post(html: str, report: Dict, live: bool = True) -> Tuple[List[str], Li
                         "fix cheyandi")
     # date consistency inside the final article
     last_dates = set()
-    for m in re.finditer(r"last\s+date[^0-9]{0,60}?(\d{1,2}\s+[A-Za-z]{3,9}"
-                         r"\s+20\d{2}|\d{1,2}[/\-]\d{1,2}[/\-]20\d{2})",
+    # v401d: Telugu posts say "చివరి తేదీ / ఆఖరి తేదీ / దరఖాస్తు గడువు" — the
+    # English-only pattern never saw two conflicting deadlines in a Telugu body.
+    for m in re.finditer(r"(?:last\s+date|చివరి\s*తేదీ|ఆఖరి\s*తేదీ|దరఖాస్తు\s*గడువు|గడువు\s*తేదీ)"
+                         r"[^0-9]{0,60}?(\d{1,2}\s+[A-Za-z]{3,9}\s+20\d{2}|\d{1,2}[/\-]\d{1,2}[/\-]20\d{2})",
                          html, re.I):
         raw = m.group(1)
         norm = _norm_from_raw(raw)
@@ -650,7 +653,7 @@ def gate_post(html: str, report: Dict, live: bool = True) -> Tuple[List[str], Li
                     "matrame undali")
     dated = [v for v in report.get("verified", []) if v["kind"] == "date"]
     if dated:
-        current = date.today().year
+        current = clock.today().year
         if not any(str(current) in v["norm"] for v in dated):
             hard.append("stale dates — sources lo current year ("
                         f"{current}) dates levu; fresh official source ivvandi")

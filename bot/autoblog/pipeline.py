@@ -6,6 +6,7 @@ create_from_source(url): fetch source -> Gemini 100% original rewrite -> publish
 """
 
 import hashlib
+from . import clock
 import json
 import logging
 import re
@@ -46,7 +47,7 @@ def _save_provenance(article: Dict) -> None:
     (path / f"{article.get('slug', 'post')}.json").write_text(
         json.dumps({
             "title": article.get("title", ""),
-            "created": date.today().isoformat(),
+            "created": clock.today().isoformat(),
             "notebooklm_claims": article.get("_notebooklm_claims", 0),
             "sources": records,
             "official_link_audit": article.get("_official_link_audit", {}),
@@ -63,7 +64,7 @@ def _source_identity_meta(article: Dict) -> Dict[str, str]:
     primary = str(article.get("source_url") or (urls[0] if urls else "")).strip()
     if not primary and not urls:
         return {}
-    out = {"studentup_source_checked": date.today().isoformat()}
+    out = {"studentup_source_checked": clock.today().isoformat()}
     if primary:
         out["studentup_source_url"] = primary
     if urls:
@@ -790,7 +791,7 @@ def _hygiene(article: Dict) -> Dict:
         seen.add(low)
         tags.append(t)
     if not tags:
-        tags = [article.get("category", "Students"), str(date.today().year)]
+        tags = [article.get("category", "Students"), str(clock.today().year)]
     article["tags"] = tags[:8]
     # v87: focus_keyword empty (LLM omit) → title nunchi derive
     # (lekapothe 41-score draft + rm100 kw-fixers anni skip!)
@@ -1108,7 +1109,7 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                              "title": f"{article['category']} – Latest Articles"})
         if len(internal) < 2:
             internal.append({"link": f"{config.WP_SITE}/", "title": "studentup.in – Home"})
-    today_str = (day or date.today()).isoformat()
+    today_str = (day or clock.today()).isoformat()
     if is_quiz:
         from . import quiz_engine as _qe
         article["_link"] = ""   # real link publish tarvata telustundi; share bar
@@ -1382,7 +1383,7 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     media_id = None
     if config.IMAGE_ENABLED:
         fk = article.get("focus_keyword") or article["banner_text"]
-        year = article.get("year", date.today().year)
+        year = article.get("year", clock.today().year)
         if image_gen.generate_featured_image(article["banner_text"], article["category"], image_path):
             article["_image_path"] = str(image_path)
             alt_text = seo.image_alt(fk, article.get("category", ""), year)
@@ -1529,7 +1530,7 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
     gate = ({"score": 0, "passed": 0, "total": 0, "critical_fails": [], "block": False,
              "cert_id": "mock", "rows": [], "words": 0, "rankmath": 0,
              "title": article.get("title", ""), "slug": article.get("slug", ""),
-             "date": date.today().isoformat()}
+             "date": clock.today().isoformat()}
             if article.get("_mock") else
             post_gate.run(article, final_html, media_id=media_id, image_path=image_path))
     article["_gate"] = gate
@@ -1563,6 +1564,23 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                            getattr(config, "DEFAULT_POST_STATUS", "draft")).lower()
     stage_for_seo = requested_status == "publish"
     _duplicate_title_guard(article, wp)
+    # v401d (audit A-3): answer-box fields must not carry dates/counts the
+    # sources never stated.
+    try:
+        _removed = validator.ground_summary_fields(article, list(article.get("_source_texts") or []))
+        if _removed:
+            log.warning("SUMMARY GROUNDING: dropped %d unsupported snippet(s): %s",
+                        len(_removed), " | ".join(_removed[:3]))
+            article.setdefault("_review_notes", []).append(f"summary-grounding:{len(_removed)}")
+    except Exception:  # noqa: BLE001
+        log.debug("summary grounding skip", exc_info=True)
+    # v401d: prompt-injection guard hits → review note so the approver sees it.
+    try:
+        _inj = gemini_client.injection_events()
+        if _inj:
+            article.setdefault("_review_notes", []).append("prompt-injection-guard:" + "; ".join(_inj)[:160])
+    except Exception:  # noqa: BLE001
+        pass
     # v401: the body fingerprint is remembered only AFTER WordPress accepted the
     # draft (below). Remembering it here meant a story skipped by a later gate
     # (empty body / foreign script / stale / geo) poisoned the next, correct
@@ -1578,9 +1596,25 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             log.info("v398 clean_body: %s", _lf_rep)
     except Exception:  # noqa: BLE001 — cleaner fail publish aapadu
         log.exception("v398 clean_body skip (publish safe)")
+    # v402: structured-data gate — broken JSON-LD blocks are removed (Search
+    # Console errors cost rich-result eligibility); review tier annotated.
+    try:
+        from . import schema_gate as _sg, review_tier as _rt
+        final_html, _sg_problems, _sg_valid = _sg.validate_html(final_html)
+        if _sg_problems:
+            log.warning("SCHEMA GATE: %s", " | ".join(_sg_problems[:3]))
+            article.setdefault("_review_notes", []).append("schema-removed:" + "; ".join(_sg_problems)[:160])
+        article["_schema_valid_blocks"] = _sg_valid
+        _rt.annotate(article)
+    except Exception:  # noqa: BLE001
+        log.debug("schema gate / review tier skip", exc_info=True)
     # v398: nothing to publish — an (almost) empty Gemini body must not become
     # a draft made only of house chrome (facts table + schema).
-    _body_words = len([w for w in re.findall(r"[^\s<>]+", re.sub(r"<[^>]+>", " ", str(article.get("content_html") or "")))
+    # v401d: measure what WordPress will actually receive (after the cleaners),
+    # not the raw model output — a body collapsed by the repeat-sentence
+    # cleaner slipped past this gate at 36 words.
+    _final_plain = re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", str(final_html or article.get("content_html") or ""), flags=re.S | re.I)
+    _body_words = len([w for w in re.findall(r"[^\s<>]+", re.sub(r"<[^>]+>", " ", _final_plain))
                        if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)])
     if (_body_words < 120 and not article.get("_mock") and not article.get("_refresh_of")
             and article.get("article_type") != "quiz"):
@@ -1596,6 +1630,11 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             raise RuntimeError(f"SKIP-FOREIGN-TITLE: non-Telugu Indic script in title — {_post_title[:60]}")
         if "foreign-script-body" in _dflags and not article.get("_mock"):
             raise RuntimeError(f"SKIP-FOREIGN-BODY: non-Telugu Indic script in body — {_post_title[:60]}")
+        # v401d (audit A-2): Telugu-first is a hard rule, not a prompt wish. An
+        # English-majority body (< 30 % Telugu words) is skipped at draft time.
+        if "english-body" in _dflags and not article.get("_mock") and not article.get("_refresh_of") \
+                and getattr(config, "TELUGU_BODY_HARD_GATE", True):
+            raise RuntimeError(f"SKIP-ENGLISH-BODY: body is not Telugu-first — {_post_title[:60]}")
         # v401: a notice whose year is already over (live 24-Oct: "SBI SCO …
         # Result 2025" with a 1-April-2025 result date published in Oct 2026)
         # is not news for anyone — hard skip, not a REVIEW label.
@@ -1608,7 +1647,7 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                     _hard = True
                 else:
                     try:
-                        _hard = _hard or _d.fromisoformat(f.split(":", 1)[1]) < _d.today() - _td(days=120)
+                        _hard = _hard or _d.fromisoformat(f.split(":", 1)[1]) < clock.today() - _td(days=120)
                     except Exception:  # noqa: BLE001
                         pass
             if _hard:
@@ -1777,7 +1816,7 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
                       article["category"], result["link"], result["status"],
                       qa_score=(article.get("_qa") or {}).get("score"),
                       orig_score=article.get("_orig"), wp_id=result.get("id"))
-    state.bump_today_count(config.STATE_PATH, day or date.today())
+    state.bump_today_count(config.STATE_PATH, day or clock.today())
     if article.get("source_url"):
         state.mark_source_done(config.STATE_PATH, article["source_url"], result.get("id"))
     try:
@@ -2285,6 +2324,15 @@ def _strict_source_preflight(article: Dict, *, allow_mock: bool = False) -> Dict
         if text:
             source_texts.append(text)
     fact_flags = validator.fact_guard(article.get("content_html", ""), source_texts)
+    # v402: value-level CONFLICTS (draft says 25 Nov, source says 30 Nov; 686 vs
+    # 668 posts) from factcheck — fact_guard only knows "not in source".
+    try:
+        from . import factcheck as _fc
+        _fcr = _fc.check(article.get("content_html", ""), "\n".join(source_texts))
+        for row in _fcr.get("conflicts", [])[:6]:
+            fact_flags.append(f"CONFLICT {row.get('kind')}: draft {row.get('claimed')} ≠ source ({row.get('note', '')[:60]})")
+    except Exception:  # noqa: BLE001
+        log.debug("factcheck conflict pass skipped", exc_info=True)
     article["_source_fact_flags"] = fact_flags
     ledger = _ev.build_ledger(article, article.get("content_html", ""), deep_sources)
     article["_editorial_value"] = ledger
@@ -2474,7 +2522,7 @@ def create_from_source(url: str, mock: bool = False, category: str = "",
     if target_year is None:
         from .research_brief import target_year_from_text
         target_year = target_year_from_text(f"{src.title} {url} {notebooklm_brief[:4000]}")
-    generation_year = target_year or date.today().year
+    generation_year = target_year or clock.today().year
     if target_year:
         log.info("Target-year mode enabled: %d — other-year claims require verification", target_year)
 
@@ -2667,10 +2715,20 @@ def create_from_source(url: str, mock: bool = False, category: str = "",
     # swapped-name/only-date-changed pages site-wide signal ni charchestayi.
     # Mana published posts tho ee level dup ante SKIP (AdSense + ranking both).
     try:
-        ratio, match = validator.near_duplicate(
-            article["title"], article["content_html"],
-            state.load_fingerprints(config.STATE_PATH),
-            config.DUP_JACCARD_SKIP)
+        # v402: compare against the SITE-WIDE corpus (REST-synced fingerprints,
+        # no 120-post cap, includes manual/pre-bot posts), not only local ones.
+        from . import similarity_check as _sim
+        try:
+            if not mock:
+                _sim.sync(WordPressClient())  # no-op when synced < SIMILARITY_SYNC_HOURS ago
+        except Exception:  # noqa: BLE001 — sync failure falls back to local store
+            log.debug("similarity sync skip", exc_info=True)
+        ratio, match, _match_id = _sim.best_match(article["title"], article["content_html"])
+        if _match_id:
+            match = f"{match} (post {_match_id})"
+        article["_similarity"] = {"ratio": round(ratio, 3), "match": match}
+        if ratio >= 0.40:
+            article.setdefault("_review_notes", []).append(f"similar-post:{ratio:.0%} {match}"[:120])
         if ratio >= config.DUP_JACCARD_SKIP and not _gate_soft_fail(
                 article, "NEAR-DUP", f"{ratio:.0%} overlap with '{match}' — merge/update instead?"):
             raise RuntimeError(
@@ -2854,7 +2912,7 @@ def update_post(post_id: int, new_source_urls=None, mock: bool = False) -> Dict:
         except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
             log.debug("update_post skip: %s", exc)
         article = gemini_client.generate_update(
-            title, existing_text, fk, extras, date.today().year,
+            title, existing_text, fk, extras, clock.today().year,
         )
 
     # identity preserve — URL marakudadu
@@ -2926,12 +2984,12 @@ def update_post(post_id: int, new_source_urls=None, mock: bool = False) -> Dict:
         quick_answer=article.get("quick_answer", ""),
         faq=article.get("faq", []),
         # Google freshness rule: original datePublished preserve, dateModified new
-        date_str=(post.get("date") or date.today().isoformat())[:10],
+        date_str=(post.get("date") or clock.today().isoformat())[:10],
         # v101: nijamaina change unte matrame kotha dateModified — lekapothe
         # original modified date ne uncham (fake freshness Google ki vaddu).
-        date_modified=(date.today().isoformat() if _fresh.get("bump_date", True)
+        date_modified=(clock.today().isoformat() if _fresh.get("bump_date", True)
                        else (post.get("modified") or post.get("date")
-                             or date.today().isoformat())[:10]),
+                             or clock.today().isoformat())[:10]),
         slug=slug,
         title=title,
         description=article["meta_description"],
@@ -3155,12 +3213,12 @@ def create_listicle(topic: str = "", mock: bool = False) -> Dict:
 
     if mock:
         article = topic_engine.mock_listicle(idea,
-                                             state.today_count(config.STATE_PATH, date.today()))
+                                             state.today_count(config.STATE_PATH, clock.today()))
     else:
         if not config.ai_configured():
             raise ValueError("AI provider key ledu — listicle generate avvaledu")
         recent = state.recent_titles(config.STATE_PATH, limit=30)
-        article = gemini_client.generate_listicle(idea, recent, date.today().year)
+        article = gemini_client.generate_listicle(idea, recent, clock.today().year)
 
     from .main import _safe_slug
     # Keep the offline/mock path side-effect-compatible with the other test
@@ -3188,7 +3246,7 @@ def create_quiz(topic: str = "", level: int = 0, questions: int = 0,
     """
     from . import quiz_engine
 
-    now_day = date.today()
+    now_day = clock.today()
     if topic:
         # manual topic (Telugu ok) — level default 2, questions default
         topic_en = topic.strip()

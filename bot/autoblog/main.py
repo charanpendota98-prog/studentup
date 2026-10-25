@@ -10,6 +10,7 @@ Usage (see run.py):
 """
 
 import argparse
+from . import clock
 import json
 import os
 import logging
@@ -1505,7 +1506,7 @@ def daily_run(send: bool = True, whatsapp: bool = True, telegram: bool = True,
         print("\n[3/5] DAILY ENGAGE — skip (DAILY_ENGAGE=0)")
 
     # v224: money autopilot — vaaram ki okasari (Sunday) taane run avutundi.
-    if datetime.now().weekday() == 6 and str(
+    if clock.now().weekday() == 6 and str(
             getattr(config, "MONEY_AUTOPILOT", "1")) not in ("0", "false", "False", ""):
         try:
             print("\n[3.5/5] MONEY AUTOPILOT (weekly — revenue gaps + auto link fixes)")
@@ -1643,6 +1644,19 @@ def drain_source_queue(limit: int) -> int:
     if made:
         state.meta_set(config.STATE_PATH, day_key, str(done_today + made))
     return made
+
+
+def _acquire_run_lock(name: str):
+    """Exclusive non-blocking flock in BASE_DIR; returns the open handle (keep
+    it referenced for the life of the run) or None when another run holds it."""
+    import fcntl
+
+    try:
+        fh = open(config.BASE_DIR / name, "w")  # noqa: SIM115
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return fh
+    except OSError:
+        return None
 
 
 def fast_drain() -> int:
@@ -2380,6 +2394,24 @@ def main() -> int:
     parser.add_argument("--quiz-push-dry", action="store_true", help="v286: --quiz-push text matrame print (send cheyyadu)")
     parser.add_argument("--daily-quiz", action="store_true",
                         help="v148: prepare today's quiz as a WordPress DRAFT (never publishes)")
+    parser.add_argument("--daily-ca", action="store_true",
+                        help="v402: today's Telugu current-affairs post (points + MCQs) as a WordPress DRAFT (never publishes)")
+    parser.add_argument("--daily-ca-dry", action="store_true", help="v402: --daily-ca plan only (no WordPress write)")
+    parser.add_argument("--mock-test", nargs="?", const="", default=None, metavar="EXAM",
+                        help="v402: full-length mock test DRAFT for EXAM (default: weekly rotation)")
+    parser.add_argument("--mock-test-dry", action="store_true", help="v402: --mock-test plan only")
+    parser.add_argument("--mock-test-list", action="store_true", help="v402: list exam blueprints")
+    parser.add_argument("--study-plan", default=None, metavar="EXAM", help="v402: N-day Telugu study plan DRAFT for EXAM")
+    parser.add_argument("--study-plan-days", type=int, default=90)
+    parser.add_argument("--study-plan-dry", action="store_true")
+    parser.add_argument("--plan-report", action="store_true", help="v402: today's category quota vs done")
+    parser.add_argument("--build-bank", default=None, metavar="EXAM", help="v402: build question bank for EXAM or 'General'")
+    parser.add_argument("--bank-n", type=int, default=100, help="questions per section target")
+    parser.add_argument("--bank-stats", action="store_true")
+    parser.add_argument("--bank-export", default="", metavar="FILE")
+    parser.add_argument("--bank-import", default="", metavar="FILE")
+    parser.add_argument("--sync-fingerprints", action="store_true",
+                        help="v402: fingerprint all published posts via REST for the site-wide similarity gate")
     parser.add_argument("--import-quiz", default="", metavar="FILE",
                         help="v200: intake daily 20 exam-wise questions (JSON/list) from external bot into quiz bank")
     parser.add_argument("--export-quiz-channel", default="", choices=["telegram", "whatsapp"],
@@ -2913,6 +2945,39 @@ def main() -> int:
         from . import daily_quiz as _dq
 
         return _dq.run_cli(dry=args.daily_quiz_dry, notify=args.notify)
+    if args.daily_ca or args.daily_ca_dry:
+        from . import current_affairs as _ca
+
+        return _ca.run_cli(dry=args.daily_ca_dry, notify=args.notify)
+    if args.mock_test_list:
+        from . import mock_test as _mt
+
+        for name, bp in _mt.BLUEPRINTS.items():
+            print(f"{name:30s} {sum(s[2] for s in bp['sections']):4d} Q  {bp['minutes']:3d} min  {bp['slug']}")
+        return 0
+    if args.mock_test is not None or args.mock_test_dry:
+        from . import mock_test as _mt
+
+        return _mt.run_cli(args.mock_test or "", dry=args.mock_test_dry, notify=args.notify)
+    if args.study_plan:
+        from . import study_plans as _sp
+
+        return _sp.run_cli(args.study_plan, days=args.study_plan_days, dry=args.study_plan_dry)
+    if args.build_bank or args.bank_stats or args.bank_export or args.bank_import:
+        from . import quiz_bank as _qb
+
+        return _qb.run_cli(args.build_bank or "", args.bank_n, args.bank_export, args.bank_import, args.bank_stats)
+    if args.sync_fingerprints:
+        from . import similarity_check as _sim, wordpress_client as _wpc
+
+        rep = _sim.sync(_wpc.WordPressClient(), force=True)
+        print(f"similarity index: {rep} · {_sim.stats()}")
+        return 0
+    if args.plan_report:
+        from . import content_planner as _cp
+
+        print(_cp.format_report())
+        return 0
 
     _setup_logging()
 
@@ -3481,6 +3546,15 @@ def main() -> int:
     if args.radar:
         return radar_run(process_posts=not args.dry_run)
     rc = 5
+    # v401d (audit PR-3): the hourly run had no single-instance lock; a slow hour
+    # (Gemini retries) overlapped the next cron tick → duplicate drafts / "-2"
+    # slugs. Same flock pattern as --fast-drain; --mock/--dry-run never block.
+    _run_lock = None
+    if not (args.mock or args.dry_run):
+        _run_lock = _acquire_run_lock("state.hourly.lock")
+        if _run_lock is None:
+            log.warning("run: previous hourly run still active — skip (lock busy)")
+            return 0
     try:
         src = args.add_source or args.url
         listicle_arg = args.listicle or ""

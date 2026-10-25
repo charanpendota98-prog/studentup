@@ -35,6 +35,7 @@ CLI:
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 from datetime import date, timedelta
 from pathlib import Path
@@ -84,7 +85,7 @@ def load(path: Optional[Path] = None) -> Dict:
 
 def save(data: Dict, path: Optional[Path] = None) -> Path:
     p = _path(path)
-    data["updated"] = date.today().isoformat()
+    data["updated"] = clock.today().isoformat()
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     return p
@@ -108,8 +109,8 @@ def add(name: str, ttype: str = "", city: str = "", contact: str = "",
     row = {"name": name.strip(), "type": (ttype or "").strip().lower(),
            "city": (city or "").strip(), "contact": (contact or "").strip(),
            "asset": (asset or "").strip(), "stage": "asset_ready" if asset else "idea",
-           "created": date.today().isoformat(),
-           "next_followup": date.today().isoformat(), "notes": ""}
+           "created": clock.today().isoformat(),
+           "next_followup": clock.today().isoformat(), "notes": ""}
     data["targets"].append(row)
     data["activity"].append({"date": row["created"], "name": row["name"],
                              "stage": row["stage"], "note": "added"})
@@ -138,9 +139,9 @@ def update(name: str, stage: str = "", note: str = "", followup: str = "",
         date.fromisoformat(followup)
         row["next_followup"] = followup
     elif stage in ("outreach", "mentioned"):
-        row["next_followup"] = (date.today() +
+        row["next_followup"] = (clock.today() +
                                 timedelta(days=config.BACKLINK_FOLLOWUP_DAYS)).isoformat()
-    data["activity"].append({"date": date.today().isoformat(), "name": row["name"],
+    data["activity"].append({"date": clock.today().isoformat(), "name": row["name"],
                              "stage": row["stage"], "note": note or stage or "update"})
     data["activity"] = data["activity"][-500:]
     save(data, path)
@@ -211,7 +212,7 @@ def targets() -> Dict[str, List[str]]:
 
 def today_plan(limit: int = 3, path: Optional[Path] = None) -> Dict:
     data = load(path)
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     fresh = [r for r in data["targets"] if r.get("stage") in ("idea", "asset_ready")]
     fresh.sort(key=lambda r: r.get("created", ""))
     followups = [r for r in data["targets"]

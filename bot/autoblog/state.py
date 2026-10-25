@@ -44,6 +44,9 @@ def init(db_path: Path) -> None:
             );
             CREATE UNIQUE INDEX IF NOT EXISTS idx_posts_title_norm
                 ON posts(title_norm);
+            CREATE INDEX IF NOT EXISTS idx_posts_wp_id ON posts(wp_id);
+            CREATE INDEX IF NOT EXISTS idx_posts_status_created ON posts(status, created_at);
+            CREATE INDEX IF NOT EXISTS idx_posts_category_created ON posts(category, created_at);
 
             CREATE TABLE IF NOT EXISTS meta (
                 key TEXT PRIMARY KEY,

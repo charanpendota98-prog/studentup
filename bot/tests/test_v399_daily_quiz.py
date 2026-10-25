@@ -43,11 +43,8 @@ def test_quiz_draft_created_on_consecutive_days(fake_wp, monkeypatch):
     monkeypatch.setattr(quiz_engine, "pick_daily_topic", lambda d: topic)
     tomorrow = date.today() + timedelta(days=1)
 
-    class _D(date):
-        @classmethod
-        def today(cls):
-            return tomorrow
-    monkeypatch.setattr(pipeline, "date", _D)
+    from autoblog import clock
+    monkeypatch.setattr(clock, "today", lambda: tomorrow)   # v401d: one clock for the bot
     fake_wp.created = None
     r2 = pipeline.create_quiz()
     assert r2.get("id") and fake_wp.created is not None

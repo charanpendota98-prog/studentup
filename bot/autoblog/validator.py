@@ -523,9 +523,55 @@ def fact_guard(article_html: str, source_texts: list) -> list:
     src_nums = set(re.findall(r"\d[\d,]{1,7}", " ".join(source_texts)))
     src_nums_nocomma = {n.replace(",", "") for n in src_nums}
     for m in re.finditer(
-            r"([\d,]{2,8})\s*(?:posts|vacanc|position|upadhi|అవకాశ)",
+            r"([\d,]{2,8})\s*(?:posts|vacanc|position|upadhi|seats?|అవకాశ|ఉద్యోగ|పోస్టు|ఖాళీ|సీట్)",
             art_text, flags=re.I):
         n = m.group(1).replace(",", "")
         if n not in src_nums_nocomma and not any(n in x for x in src_nums):
             bad.append(f"{m.group(1)} count source lo verify kaledu")
     return bad[:8]
+
+
+def ground_summary_fields(article: dict, source_texts: list) -> list:
+    """v401d (audit A-3): quick_answer / meta_description / FAQ answers are what
+    Google shows in the answer box. They were generated in the same call as the
+    body but never checked against the source. Any sentence carrying a date or
+    vacancy count that the sources do not contain is removed; an emptied
+    quick_answer is dropped (body still has the facts card). Returns the list
+    of removed snippets for logging / REVIEW flags.
+    """
+    if not source_texts:
+        return []
+    removed: list = []
+
+    def _clean(text: str) -> str:
+        text = str(text or "")
+        if not text.strip():
+            return text
+        parts = re.split(r"(?<=[.!?।])\s+", text.strip())
+        keep = []
+        for sent in parts:
+            if sent and fact_guard(sent, source_texts):
+                removed.append(sent[:80])
+                continue
+            keep.append(sent)
+        return " ".join(keep).strip()
+
+    for key in ("quick_answer", "meta_description"):
+        if article.get(key):
+            article[key] = _clean(article[key])
+    faq = article.get("faq")
+    if isinstance(faq, list):
+        kept = []
+        for item in faq:
+            if isinstance(item, dict):
+                ans = _clean(item.get("a") or item.get("answer") or "")
+                if not ans:
+                    removed.append(str(item.get("q") or item.get("question") or "faq")[:80])
+                    continue
+                if "a" in item:
+                    item["a"] = ans
+                else:
+                    item["answer"] = ans
+            kept.append(item)
+        article["faq"] = kept
+    return removed

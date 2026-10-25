@@ -24,6 +24,7 @@ CLI:
 from __future__ import annotations
 
 import csv
+from . import clock
 import json
 import logging
 import re
@@ -156,7 +157,7 @@ def write_queue(analysis: Dict, path: Optional[Path] = None) -> Path:
                 existing[norm_term(row.get("term", ""))] = row
         except (OSError, ValueError):
             existing = {}
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = clock.now().strftime("%Y-%m-%d")
     for item in analysis["gaps"] + analysis["weak"]:
         key = norm_term(item["term"])
         row = existing.get(key)
@@ -170,7 +171,7 @@ def write_queue(analysis: Dict, path: Optional[Path] = None) -> Path:
                              "first_seen": today, "last_seen": today, "status": "new"}
     path.parent.mkdir(parents=True, exist_ok=True)
     queue = sorted(existing.values(), key=lambda r: (-int(r.get("count", 0)), r["term"]))
-    path.write_text(json.dumps({"updated": datetime.now().isoformat(timespec="seconds"),
+    path.write_text(json.dumps({"updated": clock.now().isoformat(timespec="seconds"),
                                 "queue": queue}, ensure_ascii=False, indent=1),
                     encoding="utf-8")
     return path

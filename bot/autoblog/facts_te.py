@@ -16,6 +16,7 @@ wrong one. This module:
 from __future__ import annotations
 
 import re
+from . import clock
 from datetime import date
 from typing import Dict, List, Optional
 
@@ -158,7 +159,7 @@ def reconcile(article: Dict) -> Dict:
     # v398: a body date in the past (stale 2025 repost) or absurdly far away
     # must never become the countdown deadline (owner: no fake countdown).
     if body_last and not struct_last:
-        _today = date.today()
+        _today = clock.today()
         if body_last < _today or (body_last - _today).days > 400:
             rep["conflicts"].append(f"last date in body not usable: {body_last.isoformat()}")
             body_last = None

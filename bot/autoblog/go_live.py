@@ -25,6 +25,7 @@ Ee command technical setup ni mattrame 100% ki teesukelutundi.
 from __future__ import annotations
 
 import io
+from . import clock
 import logging
 from contextlib import redirect_stdout
 from datetime import datetime
@@ -225,7 +226,7 @@ OWNER_TODO: List[str] = owner_todo()
 
 
 def run_cli(apply: bool = False) -> int:
-    started = datetime.now()
+    started = clock.now()
     print("=" * 74)
     print(f"  🚀 GO LIVE — {'APPLY mode (nijamga setup chestunna)' if apply else 'PREVIEW mode (em marchadu)'}")
     print("=" * 74)
@@ -245,7 +246,7 @@ def run_cli(apply: bool = False) -> int:
     bad = sum(1 for r in rows if r["status"] == FAIL)
     print("-" * 74)
     print(f"  {ok} ok · {warn} warn · {bad} blocker · {len(rows)} steps "
-          f"({(datetime.now() - started).total_seconds():.1f}s)")
+          f"({(clock.now() - started).total_seconds():.1f}s)")
     if not apply:
         print("  ℹ️  Ivi apply cheyyadaniki: python run.py --go-live --apply")
     print()

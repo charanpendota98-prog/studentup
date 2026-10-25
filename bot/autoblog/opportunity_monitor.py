@@ -9,6 +9,7 @@ wrong and an official site can temporarily rate-limit a request.
 from __future__ import annotations
 
 import html
+from . import clock
 import json
 import logging
 from datetime import date, datetime
@@ -33,7 +34,7 @@ def _today() -> date:
 
         return datetime.now(ZoneInfo(config.TIMEZONE)).date()
     except Exception:
-        return date.today()
+        return clock.today()
 
 
 def _load(path: Path) -> Dict:
@@ -249,7 +250,7 @@ def scan(
     queue = sorted(queue, key=lambda item: str(item.get("detected", "")), reverse=True)[:1000]
     state.update({
         "version": 1,
-        "checked": datetime.now().astimezone().isoformat(),
+        "checked": clock.now().astimezone().isoformat(),
         "entries": entries,
         "review_queue": queue,
     })

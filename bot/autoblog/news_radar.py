@@ -424,7 +424,16 @@ def _watch_site(url: str) -> int:
     """RSS feed (items) or HTML page (article-ish links) -> URL queue."""
     from urllib.parse import urlparse
 
-    text = _fetch_text(url)
+    # v401d (audit P-1): conditional GET — unchanged page ⇒ nothing to queue.
+    try:
+        from . import http_cache as _hc
+        text, changed = _hc.fetch(url, timeout=int(getattr(config, "WATCH_FETCH_TIMEOUT", 20)),
+                                  headers={"User-Agent": UA})
+        if not changed:
+            log.debug("watch: unchanged (304/hash) — %s", url)
+            return 0
+    except Exception:  # noqa: BLE001 — cache layer failure must not stop the sweep
+        text = _fetch_text(url)
     host = urlparse(url).netloc
     if "<item>" in text.lower():
         queued = 0

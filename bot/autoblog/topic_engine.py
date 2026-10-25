@@ -212,6 +212,17 @@ def pick_category(db_path: Path, month: int = None) -> str:
     """Pick next category weighted towards least-used + seasonal ones."""
     import datetime as _dt
 
+    # v402: the composite daily planner decides first — the category furthest
+    # behind its quota (with yesterday's shortfall carried over). Only when
+    # every quota is met does the old weighted-random pick run.
+    try:
+        from . import content_planner
+        if getattr(config, "DAILY_PLANNER_ENABLED", True):
+            behind = content_planner.next_category()
+            if behind and behind in config.CATEGORIES:
+                return behind
+    except Exception:  # noqa: BLE001 — planner failure must never stop drafting
+        pass
     month = month or _dt.date.today().month
     try:
         conn = sqlite3.connect(str(db_path))
@@ -271,6 +282,10 @@ TREND_EDU_PATTERNS = [
     "current affairs", "skill development", "employment exchange", "career",
     "ఉద్యోగాలు", "ఫలితాలు", "నోటిఫికేషన్", "స్కాలర్‌షిప్", "హాల్‌టికెట్",
     "పథకం", "రైతు", "మహిళ", "ప్రస్తుత వ్యవహారాలు",
+    # v402: private / software / walk-in leads (geo_gate still limits to TS/AP)
+    "walk-in", "walkin", "walk in", "hiring", "openings", "fresher", "freshers",
+    "off campus", "off-campus", "internship", "trainee", "developer", "engineer",
+    "analyst", "software", "it jobs", "drive", "placement", "వాక్-ఇన్", "ఇంటర్న్‌షిప్", "ఫ్రెషర్స్",
 ]
 
 

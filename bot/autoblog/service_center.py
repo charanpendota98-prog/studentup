@@ -11,6 +11,7 @@ OTP, UPI PIN, passwords, or bank credentials.
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import html
 import json
 import os
@@ -210,7 +211,7 @@ def create_case(client_name: str, phone: str, service_slug: str,
     with sqlite3.connect(path) as db:
         db.execute("PRAGMA foreign_keys=ON")
         for _ in range(5):
-            case_id = "SU-" + datetime.now().strftime("%Y%m%d") + "-" + secrets.token_hex(3).upper()
+            case_id = "SU-" + clock.now().strftime("%Y%m%d") + "-" + secrets.token_hex(3).upper()
             if not _case_exists(db, case_id):
                 break
         db.execute("INSERT INTO cases VALUES (?,?,?,?,?,?,?,?,?)",

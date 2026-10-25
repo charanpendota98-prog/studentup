@@ -17,6 +17,7 @@ from datetime import date, datetime, timezone
 from typing import Optional
 
 from . import config
+from . import clock
 
 QUOTES = [
     "Small steps every day → big results.",
@@ -77,7 +78,7 @@ def quote_of_day(day: Optional[date] = None) -> str:
 
 
 def whatsapp_teaser(day: Optional[date] = None, topic: str = "", questions: int = 0) -> str:
-    d = day or date.today()
+    d = day or clock.today()
     head = "🎯 *StudentUp Daily Quiz* · " + d.strftime("%d %b")
     if topic:
         head += " · " + topic
@@ -92,7 +93,7 @@ def whatsapp_teaser(day: Optional[date] = None, topic: str = "", questions: int 
 
 
 def wrap_broadcast(text: str, channel: str = "whatsapp", day: Optional[date] = None) -> str:
-    d = day or date.today()
+    d = day or clock.today()
     if channel.lower() == "telegram":
         head = "🎯 <b>StudentUp Daily Quiz</b> · " + d.strftime("%d %b") + "\n💡 <i>" + quote_of_day(d) + "</i>\n\n"
         foot = "\n\n▶ Play & share your score: " + quiz_link() + "\n#StudentUp studentup.in"
@@ -105,7 +106,7 @@ def wrap_broadcast(text: str, channel: str = "whatsapp", day: Optional[date] = N
 def telegram_push_html(day: Optional[date] = None, topic: str = "", questions: int = 0) -> str:
     """Daily 'play today's quiz' push for the Telegram channel (HTML)."""
     import html as _h
-    d = day or date.today()
+    d = day or clock.today()
     head = "🎯 <b>StudentUp Daily Quiz</b> · " + d.strftime("%d %b")
     if topic:
         head += " · " + _h.escape(topic)

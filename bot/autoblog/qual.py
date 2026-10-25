@@ -16,6 +16,7 @@ chestundi (double safety) — kaani bot value strong (article structure telusu).
 from __future__ import annotations
 
 import re
+from . import clock
 from datetime import date, datetime
 from typing import Dict, List, Optional
 
@@ -144,7 +145,7 @@ def last_date_from_text(html: str, today=None) -> str:
     text = re.sub(r"\s+", " ", text)
     if not text:
         return ""
-    today = today or datetime.now().date()
+    today = today or clock.now().date()
     best = ""
     for m in _DATE_ANY.finditer(text):
         # keyword right BEFORE ("చివరి తేదీ: 15-11-2026", "Last date 30 Nov") or
@@ -232,7 +233,7 @@ def describe(article: dict, today: Optional[date] = None) -> str:
     if end:
         try:
             left = (datetime.strptime(end, "%Y-%m-%d").date()
-                    - (today or date.today())).days
+                    - (today or clock.today())).days
             parts.append(f"closes {end} ({left} రోజులు)")
         except ValueError:
             parts.append("closes " + end)

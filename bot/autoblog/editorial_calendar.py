@@ -30,6 +30,7 @@ CLI:
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 import re
 from collections import Counter
@@ -217,7 +218,7 @@ def collect(titles: List[str], use_universe: bool = True) -> List[Dict]:
 def plan(days: int = 90, per_day: int = 3, use_universe: bool = True,
          start: Optional[date] = None) -> Dict:
     """Next N days ki balanced slots (category/cluster caps + refresh slot)."""
-    today = start or date.today()
+    today = start or clock.today()
     try:
         titles = state.recent_titles(config.STATE_PATH, limit=1000)
     except Exception as exc:  # noqa: BLE001

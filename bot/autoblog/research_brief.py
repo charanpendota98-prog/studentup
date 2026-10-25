@@ -10,6 +10,7 @@ It deliberately stores public source URLs/text only. Do not put passwords,
 OTPs, private documents or bank/identity data into this bundle.
 """
 import logging
+from . import clock
 import hashlib
 
 log = logging.getLogger("autoblog.research_brief")
@@ -211,7 +212,7 @@ def notebooklm_prompt(topic: str, articles: Sequence[sources.SourceArticle],
     year_policy = (
         f"""\n## Zero-confusion target-year policy — {target_year}
 This assignment is specifically for {target_year}. Use {target_year} information
-only when the source actually supports it. A {date.today().year} or older page
+only when the source actually supports it. A {clock.today().year} or older page
 cannot establish a {target_year} deadline, fee, vacancy, eligibility rule or
 schedule unless the source explicitly says it continues into {target_year}.
 Classify each source as target-year, other-year, or evergreen. Never silently
@@ -319,7 +320,7 @@ def write_bundle(topic: str, articles: Sequence[sources.SourceArticle],
     output_dir = output_dir or getattr(config, "RESEARCH_BRIEF_DIR", config.OUTPUT_DIR / "research")
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    stem = f"{_slug(topic)}-{date.today().isoformat()}"
+    stem = f"{_slug(topic)}-{clock.today().isoformat()}"
     bundle_path = output_dir / f"{stem}-sources.md"
     prompt_path = output_dir / f"{stem}-notebooklm-prompt.md"
     manifest_path = output_dir / f"{stem}-manifest.json"
@@ -328,7 +329,7 @@ def write_bundle(topic: str, articles: Sequence[sources.SourceArticle],
     manifest = {
         "topic": topic,
         "target_year": target_year,
-        "created": date.today().isoformat(),
+        "created": clock.today().isoformat(),
         "sources": [
             {"id": f"S{i}", "url": item.url, "title": item.title,
              "domain": urlparse(item.url).netloc.replace("www.", ""),
@@ -339,7 +340,7 @@ def write_bundle(topic: str, articles: Sequence[sources.SourceArticle],
              # later be audited against the exact text imported today.
              "captured_sha256": hashlib.sha256((item.text or "").encode("utf-8")).hexdigest(),
              "word_count": len((item.text or "").split()),
-             "captured_at": date.today().isoformat()}
+             "captured_at": clock.today().isoformat()}
             for i, item in enumerate(articles, 1)
         ],
         "bundle": str(bundle_path),

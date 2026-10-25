@@ -80,7 +80,11 @@ AUTOMATION_DRAFT_ONLY = _get("AUTOMATION_DRAFT_ONLY", "1") not in ("0", "false",
 
 # --- Notifications -------------------------------------------------------
 TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = _get("TELEGRAM_CHAT_ID", "")  # empty = /start tho auto-register
+TELEGRAM_CHAT_ID = _get("TELEGRAM_CHAT_ID", "")  # empty = /start <TELEGRAM_SETUP_TOKEN> required (v401d)
+# v401d (audit S-1): ownership is never granted to "whoever messages first".
+# With TELEGRAM_CHAT_ID empty, the owner must send `/start <token>` where
+# token == TELEGRAM_SETUP_TOKEN; anything else is ignored.
+TELEGRAM_SETUP_TOKEN = _get("TELEGRAM_SETUP_TOKEN", "")
 # Publish ayyaka auto-post to mi Telegram CHANNEL (optional — channel chat id,
 # example -1001234... ; channel lo bot admin ga add cheyandi)
 TELEGRAM_CHANNEL_CHAT_ID = _get("TELEGRAM_CHANNEL_CHAT_ID", "")
@@ -247,7 +251,7 @@ FAST_WATCH_MINUTES = int(_get("FAST_WATCH_MINUTES", "30"))
 # v381: direct watch list is ~65 URLs; each sweep scans a rotating slice so a
 # slow .gov.in page never blocks the 10-minute fast lane. Full list covered
 # every ~4 sweeps (~2 hours).
-WATCH_PER_SWEEP = int(_get("WATCH_PER_SWEEP", "18"))
+WATCH_PER_SWEEP = int(_get("WATCH_PER_SWEEP", "24"))  # v402: 83 URLs, conditional GET makes unchanged pages ~free
 # v383: stale source gate — expired events never become drafts.
 STALE_GATE_ENABLED = _get("STALE_GATE_ENABLED", "1") not in ("0", "false", "no")
 SOURCE_MAX_AGE_DAYS = int(_get("SOURCE_MAX_AGE_DAYS", "21"))      # news desks
@@ -264,6 +268,9 @@ BREAKING_DRAFTS_PER_DAY = int(_get("BREAKING_DRAFTS_PER_DAY", "12"))
 BREAKING_ENABLED = _get("BREAKING_ENABLED", "1") not in ("0", "false", "no")
 BREAKING_MAX = int(_get("BREAKING_MAX", "8"))
 BREAKING_KEEP_HOURS = float(_get("BREAKING_KEEP_HOURS", "18"))
+# v402: source timestamp older than this is not "breaking" (0 = off); lane URLs expire after TTL.
+BREAKING_MAX_AGE_HOURS = float(_get("BREAKING_MAX_AGE_HOURS", "6"))
+BREAKING_QUEUE_TTL_HOURS = float(_get("BREAKING_QUEUE_TTL_HOURS", "24"))
 
 # v60: SITE GUARDIAN — roju okkasari system motham check + Telegram alert
 GUARDIAN_ENABLED = _get("GUARDIAN_ENABLED", "1") not in ("0", "false", "no")
@@ -345,6 +352,32 @@ OFFICIAL_WATCH_DEFAULT = [
     "https://www.aiimsexams.ac.in/",
     "https://www.ncs.gov.in/",                        # National Career Service
     "https://www.employmentnews.gov.in/",
+    # --- v402 results / hall tickets (per-exam portals, not only boards) ---
+    "https://www.tspsc.gov.in/results",               # TSPSC results listing
+    "https://www.tspsc.gov.in/halltickets",           # TSPSC hall tickets listing
+    "https://psc.ap.gov.in/Results",                  # APPSC results
+    "https://results.cgg.gov.in/",                    # TS results portal (DSC/TET/CETs)
+    "https://cets.apsche.ap.gov.in/",                 # AP CETs (EAPCET/ICET/ECET/PGECET)
+    "https://www.manabadi.co.in/",                    # results aggregator (leads only; official link required downstream)
+    "https://www.schools9.com/",                      # results aggregator (leads only)
+    # --- v402 private / software / walk-in (geo_gate keeps Hyderabad/TS/AP only) ---
+    "https://www.freshersworld.com/jobs/jobsearch/walkin-jobs-in-hyderabad",
+    "https://www.freshersworld.com/jobs/jobsearch/it-software-jobs-in-hyderabad",
+    "https://www.freshersworld.com/jobs/jobsearch/jobs-in-vijayawada",
+    "https://www.freshersworld.com/jobs/jobsearch/jobs-in-visakhapatnam",
+    "https://internshala.com/internships/internship-in-hyderabad/",
+    "https://internshala.com/jobs/fresher-jobs-in-hyderabad/",
+    "https://task.telangana.gov.in/",                 # TG skill & knowledge — job melas
+    "https://apssdc.in/",                             # AP skill development — job melas
+    "https://www.tcs.com/careers",                    # company careers (best-effort; JS-heavy pages yield few links)
+    "https://www.infosys.com/careers/",
+    "https://careers.wipro.com/",
+    "https://www.hcltech.com/careers",
+    "https://careers.cognizant.com/",
+    "https://careers.capgemini.com/",
+    # --- v402 schemes (TS/AP/Central) ---
+    "https://www.myscheme.gov.in/",
+    "https://pib.gov.in/allRel.aspx",
     # --- education desks with RSS (rewritten in original Telugu, never copied) ---
     "https://www.freejobalert.com/feed/",
     "https://www.sakshieducation.com/rss/latest.xml",
@@ -400,6 +433,11 @@ GEMINI_FALLBACK_MODELS = [
 GEMINI_MAX_RETRIES = int(_get("GEMINI_MAX_RETRIES", "3"))
 # v17.1: Telugu JSON 8192 tokens lo truncate avveti — big cap + env tunable
 GEMINI_MAX_OUTPUT_TOKENS = int(_get("GEMINI_MAX_OUTPUT_TOKENS", "32768"))
+# v401d (audit PR-5): hard daily cap on AI model calls (all providers, all
+# keys). 0 = off. Default 500 ≈ 24 hourly runs × (draft + refine + retries) with
+# generous headroom; crossing it raises GeminiError so the run stops cleanly
+# instead of silently burning quota/money.
+AI_DAILY_CALL_CAP = int(os.getenv("AI_DAILY_CALL_CAP", "500") or 0)
 # v18: Multiple Gemini keys — 429 quota rotation (comma-separated okka line)
 GEMINI_API_KEYS = [
     k.strip() for k in _get("GEMINI_API_KEYS", "").split(",") if k.strip()
@@ -751,6 +789,14 @@ TOP_POST_PLAN_DAYS = int(_get("TOP_POST_PLAN_DAYS", "90"))
 QUIZ_ENABLED = _get("QUIZ_ENABLED", "1") not in ("0", "false", "no")
 QUIZ_SAMPLE_FALLBACK = _get("QUIZ_SAMPLE_FALLBACK", "1") not in ("0", "false", "no")
 QUIZ_CATEGORY = _get("QUIZ_CATEGORY", "Daily Quiz")
+# v402: daily current affairs (Telugu) — category + optional extra RSS feeds
+CA_CATEGORY = _get("CA_CATEGORY", "Current Affairs")
+CA_FEEDS = _get("CA_FEEDS", "")
+# v402: composite daily category quota (planner) — "Category:N,..." ; carry-over of
+# yesterday's shortfall is automatic. DAILY_PLANNER_ENABLED=0 → old weighted pick.
+SIMILARITY_SYNC_HOURS = float(_get("SIMILARITY_SYNC_HOURS", "24"))
+DAILY_QUOTA = _get("DAILY_QUOTA", "")
+DAILY_PLANNER_ENABLED = _get("DAILY_PLANNER_ENABLED", "1") not in ("0", "false", "no")
 QUIZ_HOUR = int(_get("QUIZ_HOUR", "8"))          # morning study time
 QUIZ_QUESTIONS = int(_get("QUIZ_QUESTIONS", "10"))
 QUIZ_SUNDAY_QUESTIONS = int(_get("QUIZ_SUNDAY_QUESTIONS", "20"))  # weekly mega mock
