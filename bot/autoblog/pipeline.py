@@ -1574,6 +1574,13 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             article.setdefault("_review_notes", []).append(f"summary-grounding:{len(_removed)}")
     except Exception:  # noqa: BLE001
         log.debug("summary grounding skip", exc_info=True)
+    # v401d: prompt-injection guard hits → review note so the approver sees it.
+    try:
+        _inj = gemini_client.injection_events()
+        if _inj:
+            article.setdefault("_review_notes", []).append("prompt-injection-guard:" + "; ".join(_inj)[:160])
+    except Exception:  # noqa: BLE001
+        pass
     # v401: the body fingerprint is remembered only AFTER WordPress accepted the
     # draft (below). Remembering it here meant a story skipped by a later gate
     # (empty body / foreign script / stale / geo) poisoned the next, correct
