@@ -349,6 +349,60 @@ OFFICIAL_WATCH_DEFAULT = [
     "https://www.freejobalert.com/feed/",
     "https://www.sakshieducation.com/rss/latest.xml",
     "https://www.jagranjosh.com/rss/josh/government-jobs.xml",
+    # --- v400: PRIVATE / SOFTWARE / WALK-IN JOBS (mission gap — Phase 1) ---
+    # Private sector job aggregators (RSS/feed where available)
+    "https://www.naukri.com/jobfeed-telugu?tag=Private",
+    "https://www.freshersworld.com/rss/jobs",
+    "https://www.glassdoor.in/Job/rss.htm",
+    "https://www.ambitionbox.com/jobs-feed",
+    "https://internshala.com/jobs/feed",
+    "https://www.foundit.in/feed",
+    # Software / IT jobs
+    "https://www.naukri.com/jobfeed-telugu?tag=Software",
+    "https://www.freshersworld.com/rss/software-jobs",
+    "https://www.techgig.com/jobs/feed",
+    "https://careers.tcs.com/",
+    "https://careers.wipro.com/",
+    "https://careers.infosys.com/",
+    "https://careers.hcltech.com/",
+    "https://careers.cognizant.com/",
+    # Walk-in interviews
+    "https://www.walkininterview.com/rss/",
+    "https://www.walkin.in/feed/",
+    # --- v400: HALL TICKETS (mission gap — Phase 1) ---
+    "https://www.tspsc.gov.in/halltickets",
+    "https://tgeu.telangana.gov.in/",
+    "https://bte.telangana.gov.in/",
+    "https://www.manabadi.co.in/rss",
+    "https://www.vidyavision.com/rss",
+    # --- v400: ADMISSIONS (mission gap — Phase 1) ---
+    "https://eapcet.apsche.ap.gov.in/",
+    "https://eamcet.tgpgmce.com/",
+    "https://eamcet.telangana.gov.in/",
+    "https://admissions.telangana.gov.in/",
+    "https://eamcet.ts.nic.in/",
+    "https://eamcet.ap.nic.in/",
+    # --- v400: SCHOLARSHIPS & SCHEMES (mission gap — Phase 1) ---
+    "https://scholarships.telangana.gov.in/",
+    "https://pmschemes.in/",
+    "https://dbt.gov.in/",
+    "https://www.scholarships.gov.in/",
+    "https://www.jnanabhumi.ap.gov.in/",
+    "https://telanganaepass.cgg.gov.in/",
+    # --- v400: EDUCATION NEWS RSS (competitor monitoring — Phase 1) ---
+    "https://www.manabadi.co.in/rss/news",
+    "https://pratibha.eenadu.net/rss",
+    "https://www.careers360.com/rss",
+    "https://www.testbook.com/rss",
+    "https://www.adda247.com/rss",
+    "https://www.shiksha.com/rss",
+    # --- v400: BREAKING NEWS DIRECT RSS (Phase 1) ---
+    "https://www.sakshi.com/rss/latest.xml",
+    "https://eenadu.net/rss/latest.xml",
+    "https://www.ntv.com/rss",
+    "https://www.tv9telugu.com/rss",
+    "https://www.abplive.co/rss",
+    "https://www.news18.com/rss/telugu/",
 ]
 
 

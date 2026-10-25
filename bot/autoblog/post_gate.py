@@ -605,6 +605,17 @@ def run(article: dict, html: str = "", media_id: Optional[int] = None,
     add("facts_clean", "GOOGLE READINESS", "Unverified facts ledu",
         not (article.get("_fact") or []), f"{len(article.get('_fact') or [])} flags",
         "fact guard flags review cheyandi", 3, critical=True)
+    # v401: Telugu script validation gate — owner rule "posts fully Telugu;
+    # English only for standard terms". Count Telugu script chars (U+0C00–0C7F)
+    # vs total letter chars. Reject if Telugu ratio < 60% of non-label text.
+    _plain = validator.strip_tags(html or "")
+    _letters = re.findall(r"[A-Za-zఉ-ఋ]", _plain)
+    _te_count = sum(1 for c in _letters if "ఉ" <= c <= "ఋ")
+    _te_ratio = _te_count / max(1, len(_letters))
+    add("telugu_ratio", "GOOGLE READINESS", "Telugu script ≥60% of letters",
+        _te_ratio >= 0.60, f"{_te_ratio:.0%} ({_te_count}/{len(_letters)} te chars)",
+        "Telugu sentences add cheyandi — English paragraph kaadu", 3,
+        critical=True)
     add("indexnow", "GOOGLE READINESS", "IndexNow submit (publish tarvata)", True,
         "auto (pipeline)", "", 1, scored=False)
 

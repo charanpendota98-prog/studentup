@@ -270,4 +270,9 @@ def polish_and_audit(html: str, focus_keyword: str = "") -> Tuple[str, Dict]:
     polished, removed = tidy(polished)
     report = audit(polished)
     report["removed"] = removed
+    # v400: filler is a HARD BLOCK — not just a flag. If any filler phrase
+    # appears, the draft is rejected. The LLM must regenerate without it.
+    if report.get("filler_hits"):
+        report["BLOCK"] = True
+        report["block_reason"] = f"FILLER-PHRASES {report['filler_hits']}"
     return polished, report

@@ -143,6 +143,33 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
     today = now.date()
     now_hour = now.hour
     state.init(config.STATE_PATH)
+    # v401: flock on the hourly run — prevents overlapping publishes.
+    # (fast-drain lane already had flock; the main hourly run did not.)
+    import fcntl as _fcntl
+    lock_path = config.BASE_DIR / "state.hourly.lock"
+    try:
+        _lock_fh = open(lock_path, "w")  # noqa: SIM115
+        _fcntl.flock(_lock_fh, _fcntl.LOCK_EX | _fcntl.LOCK_NB)
+    except OSError:
+        log.info("hourly run: previous run still active — skip")
+        return 0
+    try:
+        return _run_inner(dry_run, force, mock, category, source_url,
+                          process_queue, update_id, listicle, auto_refresh_n,
+                          quiz, quiz_topic, quiz_level, quiz_questions,
+                          notebooklm_brief_file, target_year, now, today)
+    finally:
+        try:
+            _fcntl.flock(_lock_fh, _fcntl.LOCK_UN)
+            _lock_fh.close()
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def _run_inner(dry_run, force, mock, category, source_url, process_queue,
+               update_id, listicle, auto_refresh_n, quiz, quiz_topic,
+               quiz_level, quiz_questions, notebooklm_brief_file,
+               target_year, now, today) -> int:
     try:  # scheduler heartbeat (watchdog kosam)
         state.meta_set(config.STATE_PATH, "heartbeat", now.isoformat())
     except Exception as exc:  # noqa: BLE001 — best-effort (silent kaadu)
@@ -581,12 +608,21 @@ def run(dry_run: bool, force: bool, mock: bool, category: str = "",
                 _soft_fail("RADAR run failed — regular posting continues")
         # v320: hourly queue drain — verified source links (radar/Telegram
         # retry) become review drafts every active hour, independent of plan.
+        # v401: content planner reports under-quota categories so the drainer
+        # picks matching sources first (composite daily quota guarantee).
         if (config.ACTIVE_HOUR_START <= now_hour <= config.ACTIVE_HOUR_END
                 and not mock and config.gemini_configured()):
             try:
-                drained = drain_source_queue(config.QUEUE_DRAIN_PER_HOUR)
+                from . import content_planner as _cp
+                _cp.log_status()
+                _priority_cats = _cp.prioritize_queue()
+                drained = drain_source_queue(
+                    config.QUEUE_DRAIN_PER_HOUR,
+                    prioritize_categories=_priority_cats or None)
                 if drained:
-                    log.info("Queue drain: %d review draft(s) this hour", drained)
+                    log.info("Queue drain: %d review draft(s) this hour "
+                             "(%d category(ies) prioritized)",
+                             drained, len(_priority_cats or []))
             except Exception:
                 _soft_fail("Queue drain failed — regular posting continues")
         # v338: a slot whose generation crashed (AI quota, WP error…) is
@@ -1610,20 +1646,43 @@ def _breaking_drafts(mock: bool = False) -> int:
         return 0
 
 
-def drain_source_queue(limit: int) -> int:
+def drain_source_queue(limit: int, prioritize_categories: list | None = None) -> int:
     """v320: turn up to ``limit`` pending queue URLs into review drafts now.
-    Daily cap QUEUE_DRAFTS_PER_DAY; failures are classified + cleaned like radar."""
+    Daily cap QUEUE_DRAFTS_PER_DAY; failures are classified + cleaned like radar.
+
+    v401: ``prioritize_categories`` — when the content planner reports
+    under-quota categories, the drainer picks URLs whose source title
+    matches those categories first (via classify_source_category).
+    """
     day_key = f"queue:drafts:{_now().date().isoformat()}"
     done_today = int(state.meta_get(config.STATE_PATH, day_key) or 0)
-    budget = min(limit, max(0, config.QUEUE_DRAFTS_PER_DAY - done_today))
+    budget = min(limit, max(0, config.QUEUE_DRAINS_PER_DAY - done_today))
     made = 0
     while made < budget:
         url = sources.pending_from_queue()
         if not url:
             break
+        # v401: category-prioritized drain — try to pick a URL matching an
+        # under-quota category first. Peek at the top of the queue, classify
+        # its source title, and if it matches a deficit category, drain it
+        # now; otherwise drain whatever is on top.
+        target_category = ""
+        if prioritize_categories:
+            try:
+                from . import pipeline as _pl
+                _probe = _pl.classify_source_category(
+                    url, "", sources.fetch_source(url, fetch=False).title if hasattr(sources, "fetch_source") else "")
+                if _probe in prioritize_categories:
+                    target_category = _probe
+            except Exception:  # noqa: BLE001 — classification is best-effort
+                pass
         completed, failure_type, details = False, "draft_failed", ""
         try:
-            result = pipeline.create_from_source(url, force_draft=True)
+            if target_category:
+                result = pipeline.create_from_source(url, force_draft=True,
+                                                     category=target_category)
+            else:
+                result = pipeline.create_from_source(url, force_draft=True)
             made += 1
             completed = True
             log.info("QUEUE DRAFT ✔ %s", result.get("link"))

@@ -771,6 +771,25 @@ def _hygiene(article: Dict) -> Dict:
         article["meta_description"] = (f"{_fk}: {_tail}అర్హత, ఎంపిక విధానం, దరఖాస్తు విధానం, "
                                        f"ముఖ్యమైన తేదీలు — పూర్తి వివరాలు తెలుగులో StudentUp లో.")[:158]
         log.info("v401 meta description → Telugu template (was English)")
+    # v401: internal label leak prevention — strip ALL internal/automation labels
+    # from body before publish. Live 24-Oct showed "Source-backed draft; verify
+    # the official notice" in a published article — that must never happen.
+    body = str(article.get("content_html") or "")
+    if body:
+        _leak_patterns = (
+            r"Source-backed draft[^<]*",
+            r"verify the official notice[^<]*",
+            r"review[- ]pending[^<]*",
+            r"source-backed[^<]*",
+            r"<b>Source[^<]*</b>",
+            r"<i>Source[^<]*</i>",
+            r"source check[^<]*",
+            r"evidence score[^<]*",
+            r"editorial workflow[^<]*",
+        )
+        for _pat in _leak_patterns:
+            body = re.sub(_pat, "", body, flags=re.IGNORECASE)
+        article["content_html"] = body
     # tags: remove a different canonical category tag (e.g. Central Govt Jobs
     # accidentally returned for a Software Jobs article), then dedupe/cap.
     # Category and tags serve different jobs: keep the selected category tag,
@@ -1087,6 +1106,32 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             log.exception("Top-post hardening skipped (safe)")
         # v18: Rank Math STRICT gate (actual panel checks) — low ante refine round
         article = _rankmath_gate(article, article.get("category") or "")
+
+    # v401: factcheck gate — draft ni official source texts tho cross-check
+    # (dates, amounts, vacancies). CONFLICT ante publish block. NOT_FOUND
+    # ante log + warning, but not block (source lo fact ledu = tappu adaka pothadu,
+    # but aa tappu draft lo already ledu — source missing maatram).
+    try:
+        from . import factcheck as _fc
+        src_texts = article.get("_source_texts") or []
+        if src_texts:
+            combined_source = "\n\n---\n\n".join(str(s) for s in src_texts)
+            fc_result = _fc.check(article.get("content_html", ""), combined_source)
+            if not fc_result.get("publishable", True):
+                conflicts = fc_result.get("conflicts") or []
+                log.error("FACTCHECK BLOCK: %d conflict(s) — %s",
+                          len(conflicts),
+                          "; ".join(str(c.get("claimed", ""))[:40] for c in conflicts[:3]))
+                return {"error": "factcheck_conflict",
+                        "conflicts": conflicts,
+                        "article": article}
+            unverified = fc_result.get("unverified") or []
+            if unverified:
+                log.warning("FACTCHECK: %d unverified item(s) — %s",
+                            len(unverified),
+                            "; ".join(str(u.get("claimed", ""))[:40] for u in unverified[:3]))
+    except Exception:  # noqa: BLE001 — factcheck never blocks on its own exception
+        log.exception("factcheck gate skipped (safe)")
 
     category_id = wp.get_or_create_term(article["category"], "categories")
     tag_ids = [wp.get_or_create_term(t, "tags") for t in article["tags"]]
