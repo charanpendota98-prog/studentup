@@ -2394,6 +2394,9 @@ def main() -> int:
     parser.add_argument("--quiz-push-dry", action="store_true", help="v286: --quiz-push text matrame print (send cheyyadu)")
     parser.add_argument("--daily-quiz", action="store_true",
                         help="v148: prepare today's quiz as a WordPress DRAFT (never publishes)")
+    parser.add_argument("--daily-ca", action="store_true",
+                        help="v402: today's Telugu current-affairs post (points + MCQs) as a WordPress DRAFT (never publishes)")
+    parser.add_argument("--daily-ca-dry", action="store_true", help="v402: --daily-ca plan only (no WordPress write)")
     parser.add_argument("--import-quiz", default="", metavar="FILE",
                         help="v200: intake daily 20 exam-wise questions (JSON/list) from external bot into quiz bank")
     parser.add_argument("--export-quiz-channel", default="", choices=["telegram", "whatsapp"],
@@ -2927,6 +2930,10 @@ def main() -> int:
         from . import daily_quiz as _dq
 
         return _dq.run_cli(dry=args.daily_quiz_dry, notify=args.notify)
+    if args.daily_ca or args.daily_ca_dry:
+        from . import current_affairs as _ca
+
+        return _ca.run_cli(dry=args.daily_ca_dry, notify=args.notify)
 
     _setup_logging()
 

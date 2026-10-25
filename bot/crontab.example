@@ -15,6 +15,8 @@
 */10 * * * * cd /opt/studentup && /opt/studentup/.venv/bin/python run.py --fast-drain >> /opt/studentup/log/fast.log 2>&1
 # v218 daily quiz — roju udayam 7 ki draft (publish eppudu kaadu, draft only):
 0 7 * * * cd /opt/studentup && /opt/studentup/.venv/bin/python run.py --daily-quiz >> /opt/studentup/log/quiz.log 2>&1
+# v402: daily Telugu current affairs (points + MCQs) as a DRAFT — publish from WP after a read
+45 6 * * * cd /opt/studentup && /opt/studentup/.venv/bin/python run.py --daily-ca --notify >> /opt/studentup/log/ca.log 2>&1
 # v220 link queue — limit daatina links ni roju 9 PM ki continue chestundi:
 0 21 * * * cd /opt/studentup && /opt/studentup/.venv/bin/python run.py --links-file /opt/studentup/log/link-queue.txt >> /opt/studentup/log/links-queue.log 2>&1
 # Telegram approvals (✅ Publish / 🗑️ Delete) — prathi 5 nimishalaki:

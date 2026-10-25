@@ -2312,6 +2312,15 @@ def _strict_source_preflight(article: Dict, *, allow_mock: bool = False) -> Dict
         if text:
             source_texts.append(text)
     fact_flags = validator.fact_guard(article.get("content_html", ""), source_texts)
+    # v402: value-level CONFLICTS (draft says 25 Nov, source says 30 Nov; 686 vs
+    # 668 posts) from factcheck — fact_guard only knows "not in source".
+    try:
+        from . import factcheck as _fc
+        _fcr = _fc.check(article.get("content_html", ""), "\n".join(source_texts))
+        for row in _fcr.get("conflicts", [])[:6]:
+            fact_flags.append(f"CONFLICT {row.get('kind')}: draft {row.get('claimed')} ≠ source ({row.get('note', '')[:60]})")
+    except Exception:  # noqa: BLE001
+        log.debug("factcheck conflict pass skipped", exc_info=True)
     article["_source_fact_flags"] = fact_flags
     ledger = _ev.build_ledger(article, article.get("content_html", ""), deep_sources)
     article["_editorial_value"] = ledger

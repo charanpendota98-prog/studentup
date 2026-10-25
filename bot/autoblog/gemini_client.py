@@ -672,6 +672,41 @@ _LEVEL_HINTS = {
 }
 
 
+
+def call_json(prompt: str, validate=None, tag: str = "json") -> Dict:
+    """v402: generic prompt → JSON dict across every provider/key, with the same
+    rotation, dead-key and daily-cap handling as the article path. `validate`
+    returns a list of problems (empty = OK); problems are fed back once per
+    attempt so the model can repair its output."""
+    if not config.gemini_configured():
+        raise GeminiError("No AI provider key configured")
+    last_err: Optional[Exception] = None
+    feedback = ""
+    for attempt in range(1, config.GEMINI_MAX_RETRIES + 1):
+        for provider in _provider_order():
+            for model in _provider_models(provider):
+                model_ref = _model_ref(provider, model)
+                for key in _provider_keys(provider):
+                    try:
+                        raw = _call_model(model_ref, prompt + feedback, key)
+                        data = _parse_json(raw)
+                        problems = list(validate(data) or []) if validate else []
+                        if problems:
+                            feedback = "\n\nPREVIOUS ATTEMPT FAILED VALIDATION — fix: " + "; ".join(problems[:5])
+                            raise GeminiError("VALIDATION: " + "; ".join(problems[:4]))
+                        _bump_provider_key(provider, key)
+                        data["model"] = model
+                        return data
+                    except GeminiError as exc:
+                        last_err = exc
+                        if "daily call cap" in str(exc):
+                            raise
+                        log.warning("%s: %s/%s attempt %d: %s", tag, provider, model, attempt, str(exc)[:160])
+                    except Exception as exc:  # noqa: BLE001
+                        last_err = exc
+                        log.warning("%s: %s/%s attempt %d: %s", tag, provider, model, attempt, str(exc)[:160])
+    raise GeminiError(f"{tag}: all providers failed — {last_err}")
+
 def generate_quiz(topic: str, topic_te: str, level: int, n: int,
                   year: int) -> Dict:
     """Bilingual exam-grade MCQ set. Returns normalized quiz dict.

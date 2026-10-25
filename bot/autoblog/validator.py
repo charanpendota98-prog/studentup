@@ -523,7 +523,7 @@ def fact_guard(article_html: str, source_texts: list) -> list:
     src_nums = set(re.findall(r"\d[\d,]{1,7}", " ".join(source_texts)))
     src_nums_nocomma = {n.replace(",", "") for n in src_nums}
     for m in re.finditer(
-            r"([\d,]{2,8})\s*(?:posts|vacanc|position|upadhi|అవకాశ)",
+            r"([\d,]{2,8})\s*(?:posts|vacanc|position|upadhi|seats?|అవకాశ|ఉద్యోగ|పోస్టు|ఖాళీ|సీట్)",
             art_text, flags=re.I):
         n = m.group(1).replace(",", "")
         if n not in src_nums_nocomma and not any(n in x for x in src_nums):
