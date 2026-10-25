@@ -17,6 +17,7 @@ clickbait ledu.
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 import os
 import re
@@ -423,7 +424,7 @@ def drain_drafts(limit: int = None, mock: bool = False) -> int:
     if not getattr(config, "BREAKING_DRAFTS_ENABLED", True):
         return 0
     limit = limit or getattr(config, "BREAKING_DRAFTS_PER_SWEEP", 3)
-    day_key = f"breaking:drafts:{datetime.now().date().isoformat()}"
+    day_key = f"breaking:drafts:{clock.now().date().isoformat()}"
     done_today = int(state.meta_get(config.STATE_PATH, day_key) or 0)
     budget = min(limit, max(0, getattr(config, "BREAKING_DRAFTS_PER_DAY", 12) - done_today))
     pending = pending_drafts()

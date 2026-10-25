@@ -13,6 +13,7 @@ Roju radar run lo 1 saari (kw:last guard). CLI: run.py --keywords
 """
 
 import logging
+from . import clock
 import re
 from datetime import date
 from typing import Dict, List
@@ -101,7 +102,7 @@ def _norm(text: str) -> str:
 
 def keyword_matrix() -> List[Dict]:
     """Exam × intent matrix → [{kw, title, cat, exam, intent, hot}]."""
-    year = date.today().year
+    year = clock.today().year
     out = []
     for exam, cat in EXAMS:
         for intent, tmpl, _with_year in INTENTS:
@@ -165,7 +166,7 @@ def harvest_suggest(seed: str, lang: str = "te") -> List[str]:
 
 def suggest_seeds() -> List[str]:
     """Daily autocomplete seeds: config override leda top exams × language."""
-    year = date.today().year
+    year = clock.today().year
     extra = [s.strip() for s in
              getattr(config, "KEYWORD_SUGGEST_SEEDS", "").split(",") if s.strip()]
     if extra:
@@ -181,7 +182,7 @@ def daily_keyword_harvest(max_queue: int = 4, force: bool = False) -> Dict:
     queue ayye topics pending_topics() dwara normal pipeline lo generate
     avtayi (trend_topic flow — aa title exact search phrase ga untundi).
     """
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     if not force and state.meta_get(config.STATE_PATH, "kw:last") == today:
         return {"queued": 0, "skipped": "already ran today"}
     queued = 0

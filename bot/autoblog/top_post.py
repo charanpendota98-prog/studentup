@@ -35,6 +35,7 @@ CLI:
 from __future__ import annotations
 
 import csv
+from . import clock
 import hashlib
 import html as _html
 import json
@@ -510,8 +511,8 @@ def _stable_int(seed: str, modulo: int) -> int:
 def target_year(text: str = "") -> int:
     """Keyword lo year unte adhe, lekapote current year (2025/2026 kanna purana kaadu)."""
     years = [int(y) for y in re.findall(r"\b(20[2-9]\d)\b", text or "")]
-    years = [y for y in years if y >= date.today().year - 1]
-    return years[0] if years else date.today().year
+    years = [y for y in years if y >= clock.today().year - 1]
+    return years[0] if years else clock.today().year
 
 
 # ===========================================================================
@@ -779,7 +780,7 @@ def build_plan(days: int = 90, per_day: int = 1,
     """
     days = max(1, min(int(days or 90), 730))
     per_day = max(1, min(int(per_day or 1), 5))
-    start = start or date.today()
+    start = start or clock.today()
     target = days * per_day
 
     cl = clusters()
@@ -2530,7 +2531,7 @@ def create_top_post(keyword: str, mock: bool = False, dry_run: bool = False,
     if mock:
         article = mock_article(bp)
     else:
-        article = gemini_client.generate_top_post(bp, date.today().year)
+        article = gemini_client.generate_top_post(bp, clock.today().year)
     article["focus_keyword"] = article.get("focus_keyword") or bp["keyword"]
     article["slug"] = _seo.optimize_slug(
         _safe_slug(article.get("slug", ""), article["title"]), focus_keyword=bp["keyword"])

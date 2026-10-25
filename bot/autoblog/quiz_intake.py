@@ -15,6 +15,7 @@ normalizes tags, and stores in data/daily_quiz_store.json for theme/bot consumpt
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 from datetime import date
 from pathlib import Path
@@ -123,7 +124,7 @@ def ingest_questions(
     path.parent.mkdir(parents=True, exist_ok=True)
 
     if target_date is None:
-        day_key = date.today().isoformat()
+        day_key = clock.today().isoformat()
     elif isinstance(target_date, str):
         day_key = target_date
     else:
@@ -230,7 +231,7 @@ def get_daily_questions(
         target_date = kwargs.get("day")
 
     if target_date is None:
-        day_key = date.today().isoformat()
+        day_key = clock.today().isoformat()
     elif isinstance(target_date, str):
         day_key = target_date
     else:

@@ -13,6 +13,7 @@ the owner's retention policy.
 from __future__ import annotations
 
 import csv
+from . import clock
 import hashlib
 import json
 import re
@@ -61,7 +62,7 @@ def _week_key(value: object = "") -> str:
     try:
         return datetime.fromisoformat(raw.replace("Z", "+00:00")).date().isocalendar()[:2]
     except (TypeError, ValueError):
-        today = date.today().isocalendar()
+        today = clock.today().isocalendar()
         return (today.year, today.week)
 
 
@@ -192,7 +193,7 @@ def review_manifest(rows: Iterable[Dict], limit: int | None = None) -> Dict:
     """Return a private review manifest suitable for an internal JSON file."""
     selected, rejected = select_weekly(rows, limit=limit)
     return {
-        "generated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "generated_at": clock.now().astimezone().isoformat(timespec="seconds"),
         "policy": "draft-only; max three selected per ISO week; human verification required",
         "selected": [dict(item, editor_brief=build_editor_brief(item)) for item in selected],
         "rejected": rejected,

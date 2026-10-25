@@ -16,6 +16,7 @@ Fri L3 -> Sat L4 -> Sun L4 (20Q Weekly Mega Mock). User can pin QUIZ_LEVEL=1-4.
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import html
 import json
 import logging
@@ -58,7 +59,7 @@ def pick_daily_topic(day: Optional[date] = None) -> Tuple[str, str, int, int]:
     """(topic_en, topic_te, level, n_questions) for the given day."""
     from . import config
 
-    day = day or date.today()
+    day = day or clock.today()
     topic_en, topic_te, level = QUIZ_WEEK[day.weekday()]
     lvl = getattr(config, "QUIZ_LEVEL", "auto")
     if str(lvl).strip() not in ("", "auto"):
@@ -253,7 +254,7 @@ MOCK_BANK = [  # v1.9.140: explanations + word-options Telugu script (owner rule
 def mock_quiz(topic_en: str, topic_te: str, level: int, n: int,
               day: Optional[date] = None) -> Dict:
     """Deterministic offline quiz (--mock / tests kosam; no Gemini needed)."""
-    day = day or date.today()
+    day = day or clock.today()
     seed = int(hashlib.md5(f"{day.isoformat()}{topic_en}".encode()).hexdigest(), 16)
     picks = []
     for i in range(min(n, len(MOCK_BANK))):

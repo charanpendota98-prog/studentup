@@ -33,6 +33,7 @@ with --notebooklm-brief FILE → merged into the deep report.
 from __future__ import annotations
 
 import html as _html
+from . import clock
 import json
 import re
 from datetime import date
@@ -358,7 +359,7 @@ def build_report(topic: str,
     gaps = detect_gaps(matrix)
     report: Dict = {
         "topic": topic,
-        "created": date.today().isoformat(),
+        "created": clock.today().isoformat(),
         "target_year": target_year,
         "sources": [{k: s[k] for k in ("id", "url", "title", "domain", "tier")}
                     for s in norm],
@@ -650,7 +651,7 @@ def gate_post(html: str, report: Dict, live: bool = True) -> Tuple[List[str], Li
                     "matrame undali")
     dated = [v for v in report.get("verified", []) if v["kind"] == "date"]
     if dated:
-        current = date.today().year
+        current = clock.today().year
         if not any(str(current) in v["norm"] for v in dated):
             hard.append("stale dates — sources lo current year ("
                         f"{current}) dates levu; fresh official source ivvandi")

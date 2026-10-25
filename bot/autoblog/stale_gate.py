@@ -24,6 +24,7 @@ No date found anywhere → neutral (other gates decide).
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from datetime import date, datetime
 from typing import List, Optional
@@ -78,7 +79,7 @@ def _mk(y: int, m: int, d: int) -> Optional[date]:
 
 def extract_dates(text: str, today: Optional[date] = None) -> List[date]:
     """All plausible calendar dates in text (year-less → current year)."""
-    today = today or date.today()
+    today = today or clock.today()
     out: List[date] = []
     t = text or ""
     for i, pat in enumerate(_PATTERNS):
@@ -136,7 +137,7 @@ def check(url: str, title: str, text: str, published_date: str = "",
     """Return '' when fresh, else a human reason starting with 'stale'."""
     if not getattr(config, "STALE_GATE_ENABLED", True):
         return ""
-    today = today or date.today()
+    today = today or clock.today()
     max_age = int(getattr(config, "OFFICIAL_MAX_AGE_DAYS", 60)) if _is_official(url) \
         else int(getattr(config, "SOURCE_MAX_AGE_DAYS", 21))
     pub = _parse_published(published_date)

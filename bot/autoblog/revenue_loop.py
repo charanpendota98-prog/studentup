@@ -24,6 +24,7 @@ CLI:
 from __future__ import annotations
 
 import csv
+from . import clock
 import json
 import logging
 import re
@@ -168,7 +169,7 @@ def analyze(rows: List[Dict], min_impressions: int = 50) -> Dict:
     money = [r for r in rows if r["rpm"] >= site_rpm and r["views"] >= min_impressions]
     money.sort(key=lambda r: r["earnings"], reverse=True)
     return {
-        "at": datetime.now().isoformat(timespec="seconds"),
+        "at": clock.now().isoformat(timespec="seconds"),
         "pages": len(rows), "total_views": total_views,
         "total_earnings": round(total_earn, 2), "site_rpm": round(site_rpm, 2),
         "ready": ready, "min_impressions": min_impressions,

@@ -9,6 +9,7 @@ against the previous sync for evidence-based drop alerts.
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 from datetime import date, timedelta
 from pathlib import Path
@@ -62,7 +63,7 @@ def inspect_url(url: str) -> Dict:
     raw = resp.json().get("inspectionResult", {})
     idx = raw.get("indexStatusResult", {})
     return {"version": "v115", "url": url, "site": site,
-            "checked_at": date.today().isoformat(),
+            "checked_at": clock.today().isoformat(),
             "verdict": idx.get("verdict", "UNKNOWN"),
             "coverage_state": idx.get("coverageState", ""),
             "indexing_state": idx.get("indexingState", ""),
@@ -138,7 +139,7 @@ def sync(start: str, end: str) -> Dict:
 
 
 def run_cli(days: int = 28) -> int:
-    end = date.today() - timedelta(days=2)  # GSC final data lag
+    end = clock.today() - timedelta(days=2)  # GSC final data lag
     start = end - timedelta(days=max(7, days) - 1)
     try:
         rep = sync(start.isoformat(), end.isoformat())

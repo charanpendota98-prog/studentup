@@ -2,6 +2,7 @@
 """v108 — featured image originality, naming and licence ledger."""
 from __future__ import annotations
 import hashlib
+from . import clock
 import json
 from datetime import date
 from pathlib import Path
@@ -26,7 +27,7 @@ def record(path: Path, slug: str, alt: str, media_id=None, url: str = "",
     except Exception:  # noqa: BLE001
         pass
     item = {
-        "version": "v108", "checked_at": date.today().isoformat(),
+        "version": "v108", "checked_at": clock.today().isoformat(),
         "slug": slug, "filename": path.name, "sha256": hashlib.sha256(data).hexdigest(),
         "bytes": len(data), "width": width, "height": height,
         "alt": alt, "media_id": media_id, "url": url,

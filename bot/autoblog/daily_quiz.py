@@ -19,6 +19,7 @@ Deliberate rules:
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import json
 import logging
 import re
@@ -102,12 +103,12 @@ def _ai_quiz(topic_en: str, topic_te: str, level: int, n: int,
 
 
 def slug_for(day: Optional[date] = None) -> str:
-    day = day or date.today()
+    day = day or clock.today()
     return f"daily-quiz-{day.isoformat()}"
 
 
 def title_for(day: Optional[date] = None, topic_te: str = "") -> str:
-    day = day or date.today()
+    day = day or clock.today()
     nice = day.strftime("%d %b %Y")
     if topic_te:
         return f"డైలీ క్విజ్ {nice} — {topic_te}"
@@ -126,7 +127,7 @@ def build(day: Optional[date] = None, use_ai: Optional[bool] = None) -> Dict:
       4) Final set ni memory lo raasi pedtam — repo bank nunchi vachhina
          prashnalu kuda malli vente raavu.
     """
-    day = day or date.today()
+    day = day or clock.today()
     topic_en, topic_te, level, n = quiz_engine.pick_daily_topic(day)
     seen = _load_seen()
     source = "bank"
@@ -176,7 +177,7 @@ def build(day: Optional[date] = None, use_ai: Optional[bool] = None) -> Dict:
 
 def run(wp=None, day: Optional[date] = None, dry: bool = False) -> Dict:
     """Create today's quiz as a WordPress draft (or report what would happen)."""
-    day = day or date.today()
+    day = day or clock.today()
     plan = build(day)
     result = {
         "version": "v148",

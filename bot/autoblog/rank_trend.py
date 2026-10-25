@@ -25,6 +25,7 @@ CLI:
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -87,7 +88,7 @@ def _slim(rows: List[Dict]) -> List[Dict]:
 def ingest(rows: List[Dict], day: Optional[str] = None,
            path: Optional[Path] = None) -> Dict:
     """Snapshot add/replace (same date → replace; sort + cap)."""
-    day = day or date.today().isoformat()
+    day = day or clock.today().isoformat()
     data = load_history(path)
     data["snapshots"] = [s for s in data["snapshots"] if s.get("date") != day]
     data["snapshots"].append({"date": day, "rows": _slim(rows)})
@@ -104,7 +105,7 @@ def ingest_csv(csv_path: str, day: Optional[str] = None,
     state.meta_set(config.STATE_PATH, gsc_refresh.KEY,
                    json.dumps({"source": "rank-trend-csv", "rows": rows},
                               ensure_ascii=False))
-    return {"rows": len(rows), "day": day or date.today().isoformat(),
+    return {"rows": len(rows), "day": day or clock.today().isoformat(),
             "history": load_history(path)}
 
 
@@ -188,7 +189,7 @@ def queue_refresh(rep: Dict, path: Optional[Path] = None) -> Optional[Path]:
                 existing[row.get("url", "")] = row
         except (OSError, ValueError):
             existing = {}
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     for m in rep["decaying"]:
         row = existing.get(m["url"]) or {"url": m["url"], "first_seen": today,
                                          "status": "new"}
@@ -200,7 +201,7 @@ def queue_refresh(rep: Dict, path: Optional[Path] = None) -> Optional[Path]:
         existing[m["url"]] = row
     queue = sorted(existing.values(), key=lambda r: int(r.get("clicks_delta", 0)))
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({"updated": datetime.now().isoformat(timespec="seconds"),
+    path.write_text(json.dumps({"updated": clock.now().isoformat(timespec="seconds"),
                                 "window": rep["window"], "queue": queue},
                                ensure_ascii=False, indent=1), encoding="utf-8")
     return path

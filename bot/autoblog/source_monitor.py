@@ -7,6 +7,7 @@ queued for the existing in-place update workflow and human review.
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import json
 import logging
 from datetime import date
@@ -76,7 +77,7 @@ def scan(
             old = state.get(url) or {}
             state[url] = {
                 "fingerprint": current,
-                "checked": date.today().isoformat(),
+                "checked": clock.today().isoformat(),
                 "post_id": row.get("id"),
                 "post_link": row.get("link", ""),
                 "title": row.get("title", ""),

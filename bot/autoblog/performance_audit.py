@@ -7,6 +7,7 @@ No fake PASS when the API is unavailable.
 """
 from __future__ import annotations
 import json
+from . import clock
 from datetime import date
 from pathlib import Path
 from typing import Dict
@@ -44,7 +45,7 @@ def fetch(url: str, strategy: str = "mobile") -> Dict:
                              "display": a.get("displayValue"),
                              "score": a.get("score")}
     result = {"version": "v109", "url": url, "strategy": strategy,
-              "checked_at": date.today().isoformat(),
+              "checked_at": clock.today().isoformat(),
               "scores": {"performance": score("performance"),
                          "accessibility": score("accessibility"),
                          "seo": score("seo")},

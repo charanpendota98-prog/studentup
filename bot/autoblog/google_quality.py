@@ -8,6 +8,7 @@ written. It rewards evidence and task completion, never keyword count.
 from __future__ import annotations
 
 import html as _html
+from . import clock
 import re
 from datetime import date
 from typing import Dict, List, Tuple
@@ -64,7 +65,7 @@ def inject_methodology(html: str, article: Dict) -> str:
         '<p><strong>Why:</strong> AP/TS applicants Official Notification చదివి safeగా '
         'Apply Online చేయడానికి clear, action-ready summary ఇవ్వడం.</p>'
         f'<p><strong>Evidence:</strong> {_html.escape(sources_text)}. '
-        f'Last checked: {date.today().isoformat()}.</p>'
+        f'Last checked: {clock.today().isoformat()}.</p>'
         + (f'<h3>Sources checked</h3><ul>{links}</ul>' if links else '')
         + '</section>'
     )

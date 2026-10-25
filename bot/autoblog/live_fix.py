@@ -17,6 +17,7 @@ Everything here is regex-only, idempotent and never invents content.
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from typing import Dict, List, Tuple
 
@@ -270,7 +271,7 @@ def title_flags(title: str) -> List[str]:
     out: List[str] = []
     from datetime import date as _d
     yrs = [int(y) for y in re.findall(r"\b(20\d{2})\b", title or "")]
-    if yrs and max(yrs) < _d.today().year:
+    if yrs and max(yrs) < clock.today().year:
         out.append(f"stale-year:{max(yrs)}")
     low = [w.lower() for w in re.findall(r"[A-Za-z0-9]+", title or "")]
     bigrams = [" ".join(low[i:i + 2]) for i in range(len(low) - 1)]
@@ -327,7 +328,7 @@ def draft_flags(title: str, html: str) -> List[str]:
     plain = re.sub(r"<script.*?</script>|<style.*?</style>", "", html or "", flags=re.S)
     plain = re.sub(r"<[^>]+>", " ", plain)
     words = [w for w in re.findall(r"[^\s<>]+", plain) if re.search(r"[A-Za-z\u0c00-\u0c7f]", w)]
-    if len(words) >= 40:
+    if len(words) >= 25:
         tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
         if tel / len(words) < 0.30:
             flags.append("english-body")
@@ -353,7 +354,7 @@ def draft_flags(title: str, html: str) -> List[str]:
                            " ", plain, flags=re.I))
     if ds:
         from datetime import date as _d, timedelta as _td
-        if max(ds) < _d.today() - _td(days=3):
+        if max(ds) < clock.today() - _td(days=3):
             flags.append(f"past-dates:{max(ds).isoformat()}")
     flags.extend(consistency_flags(title, plain))
     return flags

@@ -10,6 +10,7 @@ Usage (see run.py):
 """
 
 import argparse
+from . import clock
 import json
 import os
 import logging
@@ -1505,7 +1506,7 @@ def daily_run(send: bool = True, whatsapp: bool = True, telegram: bool = True,
         print("\n[3/5] DAILY ENGAGE — skip (DAILY_ENGAGE=0)")
 
     # v224: money autopilot — vaaram ki okasari (Sunday) taane run avutundi.
-    if datetime.now().weekday() == 6 and str(
+    if clock.now().weekday() == 6 and str(
             getattr(config, "MONEY_AUTOPILOT", "1")) not in ("0", "false", "False", ""):
         try:
             print("\n[3.5/5] MONEY AUTOPILOT (weekly — revenue gaps + auto link fixes)")

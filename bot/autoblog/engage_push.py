@@ -22,6 +22,7 @@ Run:
 from __future__ import annotations
 
 import logging
+from . import clock
 from datetime import date
 from typing import Dict, Optional
 
@@ -57,7 +58,7 @@ POLL_BANK = [
 
 def poll_for(day: Optional[date] = None) -> Dict:
     """Today's poll payload (deterministic rotation — same as theme bank)."""
-    day = day or date.today()
+    day = day or clock.today()
     idx = (day.timetuple().tm_yday + day.year) % len(POLL_BANK)
     q, opts, note = POLL_BANK[idx]
     return {
@@ -103,7 +104,7 @@ def push_quiz(day: Optional[date] = None, publish: bool = False,
     """
     from . import daily_quiz
 
-    day = day or date.today()
+    day = day or clock.today()
     wp = client or WordPressClient()
     report = daily_quiz.run(wp=wp, dry=False, day=day)
     action = report.get("action")

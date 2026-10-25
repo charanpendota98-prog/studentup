@@ -219,3 +219,46 @@ def test_telegram_first_claimer_refused_without_token(monkeypatch, tmp_path):
     assert state.meta_get(config.STATE_PATH, approval_bot.CHAT_KEY) in (None, "")
     bot.on_message({"chat": {"id": 777}, "text": "/start s3cret-token"})
     assert state.meta_get(config.STATE_PATH, approval_bot.CHAT_KEY) == "777"
+
+
+def test_clock_is_ist_regardless_of_server_tz(monkeypatch):
+    import os, time
+    from datetime import datetime, timezone, timedelta
+    from autoblog import clock
+    ist = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
+    assert abs((clock.now() - ist.replace(tzinfo=None)).total_seconds()) < 5
+    assert clock.today() == ist.date()
+    assert clock.utcnow().tzinfo is None
+
+
+def test_ground_summary_fields_drops_unsupported_dates_and_counts():
+    from autoblog import validator
+    src = ["APPSC Group 2 notification: 686 posts. Apply from 10 November 2026 to 30 November 2026."]
+    art = {"quick_answer": "APPSC Group 2 ద్వారా 686 పోస్టులు. చివరి తేదీ 30 November 2026. పరీక్ష 15 January 2027 న జరుగుతుంది.",
+           "meta_description": "686 పోస్టులు, చివరి తేదీ 30 November 2026.",
+           "faq": [{"q": "ఎన్ని పోస్టులు?", "a": "686 పోస్టులు."}, {"q": "పరీక్ష ఎప్పుడు?", "a": "15 January 2027."}]}
+    removed = validator.ground_summary_fields(art, src)
+    assert removed
+    assert "2027" not in art["quick_answer"] and "686" in art["quick_answer"]
+    assert art["meta_description"].startswith("686")
+    assert len(art["faq"]) == 1
+    # no sources → untouched
+    art2 = {"quick_answer": "x 15 January 2027"}
+    assert validator.ground_summary_fields(art2, []) == [] and art2["quick_answer"] == "x 15 January 2027"
+
+
+def test_english_body_is_hard_skip(monkeypatch, tmp_path):
+    import pytest
+    from autoblog import pipeline
+    import tests.test_v398_end_to_end as e2e
+    fake = e2e.FakeWP()
+    monkeypatch.setattr(pipeline, "WordPressClient", lambda *a, **k: fake)
+    monkeypatch.setattr(pipeline.config, "IMAGE_ENABLED", False, raising=False)
+    monkeypatch.setattr(pipeline.config, "STATE_PATH", tmp_path / "s.db", raising=False)
+    art = e2e._results_article()
+    art["title"] = "TGPSC Group 2 Results 2026 Out"
+    art["focus_keyword"] = "TGPSC Group 2 Results 2026"
+    body = " ".join(f"Sentence number {i} explains the Telangana result process for candidates in detail." for i in range(40))
+    art["content_html"] = "<h2>Details</h2><p>" + body + "</p>"
+    with pytest.raises(RuntimeError, match="SKIP-ENGLISH-BODY|SKIP-EMPTY-BODY"):
+        pipeline.publish_article(art)

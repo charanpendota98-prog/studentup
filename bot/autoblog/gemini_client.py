@@ -7,6 +7,7 @@ same JSON parser, retry/key rotation, and downstream evidence gates.
 """
 
 import json
+from . import clock
 import logging
 import re
 import time
@@ -921,7 +922,7 @@ def _usable_keys() -> List[str]:
 
     from . import state
 
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     out = []
     for k in keys:
         kh = hashlib.sha1(k.encode()).hexdigest()[:8]
@@ -948,7 +949,7 @@ def _bump_key(key: str) -> None:
     if not key:
         return
     kh = hashlib.sha1(key.encode()).hexdigest()[:8]
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     try:
         n = int(state.meta_get(config.STATE_PATH, f"gemkey:cnt:{kh}:{today}") or 0)
         state.meta_set(config.STATE_PATH, f"gemkey:cnt:{kh}:{today}", str(n + 1))
@@ -965,7 +966,7 @@ def _mark_key_dead(key: str, reason: str) -> None:
     if not key:
         return
     kh = hashlib.sha1(key.encode()).hexdigest()[:8]
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     try:
         state.meta_set(config.STATE_PATH, f"gemkey:dead:{kh}:{today}",
                        reason[:80])
@@ -989,7 +990,7 @@ def _usable_external_keys(provider: str) -> List[Optional[str]]:
 
     from . import state
 
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     out = []
     for key in keys:
         tag = _external_key_tag(provider, key)
@@ -1015,7 +1016,7 @@ def _bump_external_key(provider: str, key: str) -> None:
 
     tag = _external_key_tag(provider, key)
     try:
-        name = f"aikey:cnt:{tag}:{date.today().isoformat()}"
+        name = f"aikey:cnt:{tag}:{clock.today().isoformat()}"
         count = int(state.meta_get(config.STATE_PATH, name) or 0)
         state.meta_set(config.STATE_PATH, name, str(count + 1))
     except Exception as exc:  # best-effort usage accounting
@@ -1033,7 +1034,7 @@ def _mark_external_key_dead(provider: str, key: str, reason: str) -> None:
     try:
         state.meta_set(
             config.STATE_PATH,
-            f"aikey:dead:{tag}:{date.today().isoformat()}",
+            f"aikey:dead:{tag}:{clock.today().isoformat()}",
             reason[:80],
         )
     except Exception as exc:  # best-effort cooldown

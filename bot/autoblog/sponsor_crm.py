@@ -24,6 +24,7 @@ CLI:
 from __future__ import annotations
 
 import json
+from . import clock
 import logging
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -76,7 +77,7 @@ def load(path: Optional[Path] = None) -> Dict:
 
 def save(data: Dict, path: Optional[Path] = None) -> Path:
     p = _path(path)
-    data["updated"] = datetime.now().isoformat(timespec="seconds")
+    data["updated"] = clock.now().isoformat(timespec="seconds")
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     return p
@@ -101,10 +102,10 @@ def add(name: str, ptype: str = "", city: str = "", contact: str = "",
     row = {"name": name.strip(), "type": (ptype or "").strip().lower(),
            "city": (city or "").strip(), "contact": (contact or "").strip(),
            "stage": "new", "value": int(value or 0),
-           "next_followup": date.today().isoformat(), "notes": "",
-           "created": date.today().isoformat()}
+           "next_followup": clock.today().isoformat(), "notes": "",
+           "created": clock.today().isoformat()}
     data["prospects"].append(row)
-    data["activity"].append({"date": date.today().isoformat(), "name": row["name"],
+    data["activity"].append({"date": clock.today().isoformat(), "name": row["name"],
                              "stage": "new", "note": "added"})
     save(data, path)
     return row
@@ -128,11 +129,11 @@ def update(name: str, stage: str = "", note: str = "", followup: str = "",
         date.fromisoformat(followup)          # validate
         row["next_followup"] = followup
     elif stage in ("contacted", "replied", "negotiating"):
-        row["next_followup"] = (date.today() +
+        row["next_followup"] = (clock.today() +
                                 timedelta(days=config.SPONSOR_FOLLOWUP_STALE_DAYS)).isoformat()
     if value is not None:
         row["value"] = int(value)
-    data["activity"].append({"date": date.today().isoformat(), "name": row["name"],
+    data["activity"].append({"date": clock.today().isoformat(), "name": row["name"],
                              "stage": row["stage"], "note": note or stage or "update"})
     data["activity"] = data["activity"][-500:]
     save(data, path)
@@ -143,7 +144,7 @@ def today_plan(limit: Optional[int] = None, path: Optional[Path] = None) -> Dict
     """Roju cheyyalsina sales pani: kotha outreach N + overdue follow-ups."""
     limit = limit or config.SPONSOR_OUTREACH_PER_DAY
     data = load(path)
-    today = date.today().isoformat()
+    today = clock.today().isoformat()
     fresh = [r for r in data["prospects"] if r.get("stage") == "new"]
     fresh.sort(key=lambda r: r.get("created", ""))
     followups = [r for r in data["prospects"]

@@ -10,6 +10,7 @@ empty shelves.
 from __future__ import annotations
 
 import logging
+from . import clock
 import re
 from datetime import date
 
@@ -60,7 +61,7 @@ def build_hub_html(exam: str, posts: list, year: int,
         f"<h2>More Exam Hubs ({year})</h2>"
         f"<ul>{cross}</ul>"
         f"<p style=\"font-size:13px;color:#57616B;\">\U0001f504 Last updated: "
-        f"{date.today().isoformat()} \\u00b7 Correction undo? "
+        f"{clock.today().isoformat()} \\u00b7 Correction undo? "
         f"<a href=\"mailto:{config.SUPPORT_EMAIL}\">{config.SUPPORT_EMAIL}</a>"
         " — 24h fix.</p>"
     )
@@ -74,7 +75,7 @@ def _short(title: str, words: int = 8) -> str:
 def rebuild_hubs(dry_run: bool = False) -> list:
     """Create/update one hub page per exam with >=2 matching posts."""
     wp = WordPressClient()
-    year = date.today().year
+    year = clock.today().year
     out = []
     for exam in config.HUB_EXAMS:
         posts = wp.search_posts(exam, per_page=12) or []

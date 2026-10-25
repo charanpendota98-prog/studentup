@@ -187,7 +187,7 @@ def _results_article():
             '<h2>TSPSC Group 4 Results 2026 ఎలా చూడాలి?</h2><ol><li>tspsc.gov.in వెబ్‌సైట్ ఓపెన్ చేయండి.</li>'
             '<li>Result PDF download చేయండి.</li></ol>'
             '<h2>Cut Off Marks</h2><table><tr><td>Category</td><td>OC</td></tr></table>'
-            '<p>' + 'అభ్యర్థులు తమ హాల్ టికెట్ నంబర్ మరియు పుట్టిన తేదీ ఉపయోగించి ఫలితాలు చూసుకోవచ్చు. ' * 12 + '</p>'
+            '<p>' + ' '.join(f'అభ్యర్థులు తమ హాల్ టికెట్ నంబర్ మరియు పుట్టిన తేదీ ఉపయోగించి {i}వ దశ ఫలితాలు చూసుకోవచ్చు.' for i in range(1, 25)) + '</p>'
             '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
             '<h2>Frequently Asked Questions</h2><h3>Results ఎప్పుడు?</h3><p>ఈ రోజు.</p>'
             '<p>మరిన్ని వివరాల కోసం మా YouTube ఛానల్ చూడండి: <a href="https://youtube.com/watch?v=abc">video</a>. '

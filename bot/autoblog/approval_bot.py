@@ -16,6 +16,7 @@ Commands:
 """
 
 import hmac
+from . import clock
 import json
 import logging
 import re
@@ -699,7 +700,7 @@ class ApprovalBot:
         age_h = (datetime.now(last.tzinfo) - last).total_seconds() / 3600
         if age_h < config.WATCHDOG_HOURS:
             return
-        today_key = f"watchdog:{datetime.now().date().isoformat()}"
+        today_key = f"watchdog:{clock.now().date().isoformat()}"
         if state.meta_get(config.STATE_PATH, today_key):
             return  # roju okke alert
         chat = self.registered_chat()

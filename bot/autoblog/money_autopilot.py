@@ -24,6 +24,7 @@ Nijam (overclaim ledu):
 from __future__ import annotations
 
 import csv
+from . import clock
 import io
 import logging
 from contextlib import redirect_stdout
@@ -53,7 +54,7 @@ def fetch_rows(days: int = DEFAULT_DAYS, row_limit: int = 5000) -> List[Dict]:
     site = gsc_api._site()  # noqa: SLF001
     if not site:
         raise RuntimeError("GSC_SITE_URL / WP_SITE ledu")
-    end = date.today() - timedelta(days=2)  # GSC final-data lag
+    end = clock.today() - timedelta(days=2)  # GSC final-data lag
     start = end - timedelta(days=max(7, days) - 1)
     resp = requests.post(
         gsc_api.ENDPOINT.format(site=requests.utils.quote(site, safe="")),
@@ -150,7 +151,7 @@ def _capture(fn, *a, **kw):
 def run(apply: bool = False, days: int = DEFAULT_DAYS,
         csv_path: str = "") -> Dict[str, object]:
     """Full revenue loop. apply=True → safe fixes nijamga apply avutai."""
-    started = datetime.now()
+    started = clock.now()
     report: Dict[str, object] = {"steps": [], "apply": apply, "days": days}
 
     def step(name: str, status: str, detail: str, log_text: str = "") -> None:
@@ -262,7 +263,7 @@ def run(apply: bool = False, days: int = DEFAULT_DAYS,
              "AdSense CSV ledu — .env REVENUE_CSV=/path/adsense.csv pedithe idi kooda automatic")
 
     report["source"] = source
-    report["seconds"] = round((datetime.now() - started).total_seconds(), 1)
+    report["seconds"] = round((clock.now() - started).total_seconds(), 1)
     return report
 
 
@@ -295,7 +296,7 @@ def write_report(report: Dict) -> Optional[Path]:
         out.parent.mkdir(parents=True, exist_ok=True)
         rupees = report.get("rupees") or {}
         lines = [
-            f"# Money autopilot — {datetime.now():%Y-%m-%d %H:%M}",
+            f"# Money autopilot — {clock.now():%Y-%m-%d %H:%M}",
             f"\nMode: {'APPLY' if report.get('apply') else 'PREVIEW'} · "
             f"source: {report.get('source') or 'n/a'} · {report.get('seconds')}s",
             f"\n**Estimated upside:** ~{report.get('extra_clicks', 0)} extra clicks/month "

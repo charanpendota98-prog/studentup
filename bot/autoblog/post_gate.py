@@ -22,6 +22,7 @@ Run proof: python run.py --pin-check
 from __future__ import annotations
 
 import hashlib
+from . import clock
 import json
 import logging
 import re
@@ -405,7 +406,7 @@ def run(article: dict, html: str = "", media_id: Optional[int] = None,
     add("readability", "SEMANTIC", "Avg sentence ≤24 words (చదవడానికి easy)",
         avg_sent and avg_sent <= 24, f"avg {avg_sent:.1f} words",
         "pedda vakyalu rendu ga cheyandi", 2)
-    year = str(date.today().year)
+    year = str(clock.today().year)
     add("freshness_words", "SEMANTIC", "Current year content lo (fresh signal)",
         year in plain, f"{year}", "year/prathi తేదీ update cheyandi", 1)
     add("quick_answer", "SEMANTIC", "Quick answer / summary block",
@@ -614,9 +615,9 @@ def run(article: dict, html: str = "", media_id: Optional[int] = None,
     score = round(100 * wok / tw)
     crit = [r["id"] for r in rows if r["critical"] and not r["ok"]]
     cert_id = hashlib.sha1(
-        f"{slug}|{title}|{date.today().isoformat()}".encode("utf-8")).hexdigest()[:10]
+        f"{slug}|{title}|{clock.today().isoformat()}".encode("utf-8")).hexdigest()[:10]
     return {
-        "cert_id": cert_id, "date": date.today().isoformat(), "title": title,
+        "cert_id": cert_id, "date": clock.today().isoformat(), "title": title,
         "slug": slug, "score": score, "passed": len([r for r in rows if r["ok"]]),
         "total": len(rows), "critical_fails": crit,
         "block": bool(crit) and bool(getattr(config, "PIN_GATE_BLOCK", True)),
@@ -776,13 +777,13 @@ def self_test() -> Dict:
     from . import rm100, seo
 
     art = rm100.sample_article()
-    art["date_published"] = date.today().isoformat()
+    art["date_published"] = clock.today().isoformat()
     art["secondary_keywords"] = ["tspsc group 2 syllabus", "group 2 hall ticket",
                                  "tspsc group 2 eligibility"]
     # seo.jobposting_obj ki kavalsinavi: org_name + future apply_end + 100+ ch description
     art["recruitment"] = {
         "org_name": "TSPSC", "org_url": "https://www.tspsc.gov.in/",
-        "apply_end": (date.today() + timedelta(days=1)).isoformat(),
+        "apply_end": (clock.today() + timedelta(days=1)).isoformat(),
         "location": "Hyderabad, Telangana",
     }
     art["_media_alt"] = f"{art['focus_keyword']} – Government Jobs 2026 | studentup.in"

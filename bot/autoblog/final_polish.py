@@ -24,6 +24,7 @@ fields, meta) code lo pass ayyela chustunnam — adi matrame nijam.
 from __future__ import annotations
 
 import copy
+from . import clock
 import logging
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -306,7 +307,7 @@ def recheck_drafts(limit: int = 10, apply: bool = False, notify: bool = True) ->
         rows.append(row)
     try:
         state.meta_set(config.STATE_PATH, "polish:last",
-                       f"{datetime.now().isoformat(timespec='minutes')}|{len(rows)}")
+                       f"{clock.now().isoformat(timespec='minutes')}|{len(rows)}")
     except Exception:  # noqa: BLE001
         pass
     if notify and rows:
