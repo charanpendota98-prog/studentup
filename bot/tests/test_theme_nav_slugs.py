@@ -95,3 +95,15 @@ def test_alias_family_key_helper_exists():
     src = _php("functions.php")
     assert "function studentup_alias_family_key" in src
     assert "studentup_alias_family_key( $slug )" in _block(src, "studentup_used_term")
+
+
+def test_home_sections_use_alias_map_keys():
+    """Audit FE-4: home sections must use alias-map keys, not seed slugs."""
+    src = _php("inc/home-sections.php")
+    m = re.search(r"\$slugs\s*=\s*array\((.*?)\);", src, re.S)
+    assert m
+    slugs = re.findall(r"'([a-z0-9-]+)'", m.group(1))
+    aliases = _php("functions.php")
+    keys = set(re.findall(r"^\s*'([a-z0-9-]+)'\s*=>\s*array\(", _block(aliases, "studentup_cat_aliases"), re.M))
+    for s in slugs:
+        assert s in keys, f"home-sections slug '{s}' is not an alias-map key"

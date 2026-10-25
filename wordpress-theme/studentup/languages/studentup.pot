@@ -117,8 +117,8 @@ msgstr ""
 msgid "Added"
 msgstr ""
 
-#: inc/ads.php:487
-#: inc/ads.php:488
+#: inc/ads.php:498
+#: inc/ads.php:499
 msgid "Advertisement"
 msgstr ""
 
@@ -1967,7 +1967,7 @@ msgstr ""
 msgid "Sources verified:"
 msgstr ""
 
-#: inc/ads.php:148
+#: inc/ads.php:158
 msgid "Sponsored college partner content"
 msgstr ""
 
@@ -2055,7 +2055,7 @@ msgstr ""
 msgid "StudentUp search and quick links"
 msgstr ""
 
-#: inc/ads.php:314
+#: inc/ads.php:325
 msgid "StudentUp section"
 msgstr ""
 

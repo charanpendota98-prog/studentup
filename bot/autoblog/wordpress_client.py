@@ -450,7 +450,18 @@ class WordPressClient:
         """term_type: 'categories' or 'tags'. Returns WP term id."""
         cached = state.get_term_id(config.STATE_PATH, name, term_type)
         if cached:
-            return cached
+            # v401d (audit D-2): a renamed/merged/deleted category must not keep
+            # receiving posts through a stale cached id. One cheap GET verifies
+            # the id still exists AND still carries this name; otherwise we
+            # fall through to the search/create path below and re-cache.
+            try:
+                chk = self._request("GET", f"{term_type}/{int(cached)}", params={"_fields": "id,name,slug"})
+                if chk.status_code == 200 and str(chk.json().get("name", "")).strip().lower() == name.strip().lower():
+                    return cached
+                log.warning("term cache stale for %s '%s' (id %s, HTTP %s) — refreshing",
+                            term_type, name, cached, chk.status_code)
+            except Exception:  # noqa: BLE001 — network blip: trust the cache
+                return cached
 
         resp = self._request("GET", term_type, params={"search": name, "per_page": 100})
         if resp.status_code == 200:

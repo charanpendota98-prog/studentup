@@ -32,6 +32,16 @@ function studentup_adsense_client() {
 }
 
 /**
+ * 1.9.178 (audit S-5): AdSense slot ids are numeric. A pasted "123 456" or
+ * "<slot>" silently rendered a broken unit — now it renders nothing and the
+ * settings page warns (see studentup_adsense_slot_warning()).
+ */
+function studentup_valid_slot( $slot ) {
+	$slot = trim( (string) $slot );
+	return preg_match( '/^\d{6,20}$/', $slot ) ? $slot : '';
+}
+
+/**
  * AdSense unit (responsive). Approval tarvata matrame output — lekapote khali.
  *
  * @param string $slot slot name.
@@ -267,6 +277,7 @@ function studentup_ad( $place = 'mid' ) {
 		$su_variant = '';
 	}
 	unset( $su_variant );
+	$slot = studentup_valid_slot( $slot );
 	$sizes  = array( 'leaderboard' => 110, 'in-feed' => 160, 'mid' => 250,
 		'sidebar' => 250, 'below-content' => 280, 'anchor' => 60 );
 	$height = isset( $sizes[ $place ] ) ? $sizes[ $place ] : 250;
@@ -479,7 +490,7 @@ function studentup_ad_multiplex() {
 		return;
 	}
 	$client = studentup_adsense_client();
-	$slot   = (string) get_option( 'studentup_adsense_slot_multiplex', '' );
+	$slot   = studentup_valid_slot( get_option( 'studentup_adsense_slot_multiplex', '' ) );
 	if ( ! $client || ! $slot || ! studentup_consent_ok() ) {
 		return;
 	}
@@ -516,7 +527,7 @@ function studentup_ad_available( $place ) {
 	if ( function_exists( 'studentup_slot_for' ) ) {
 		list( $slot ) = studentup_slot_for( $slot_key );
 	} else {
-		$slot = (string) get_option( 'studentup_adsense_slot_' . $slot_key, '' );
+		$slot = studentup_valid_slot( get_option( 'studentup_adsense_slot_' . $slot_key, '' ) );
 	}
 	if ( studentup_adsense_client() && $slot && studentup_consent_ok() ) {
 		return true;

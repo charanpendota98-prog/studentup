@@ -1,4 +1,5 @@
 <?php
+// TEST ONLY — php-wasm rig config with dummy credentials. NEVER deploy. Copy to wordpress/wp-config.php for the local rig.
 define( 'DB_NAME', 'wp' ); define( 'DB_USER', 'wp' ); define( 'DB_PASSWORD', 'wp' ); define( 'DB_HOST', 'localhost' );
 define( 'DB_CHARSET', 'utf8' ); define( 'DB_COLLATE', '' );
 define( 'AUTH_KEY', 'a' ); define( 'SECURE_AUTH_KEY', 'b' ); define( 'LOGGED_IN_KEY', 'c' ); define( 'NONCE_KEY', 'd' );

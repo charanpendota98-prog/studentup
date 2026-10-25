@@ -11,3 +11,6 @@ bot/state.db*
 bot/output/
 bot/log/
 Automation_*.zip
+
+# generated rig screenshots (audit FE-1) — regenerate with tools/rig/shot.mjs
+tools/rig/shots/
