@@ -37,6 +37,7 @@ sudo systemctl restart studentup-approval.service
 - [ ] WP Admin → Settings → StudentUp: save once as admin → OK; as *editor* account the `theme-data`/options POST returns 403 (B-2).
 - [ ] `GET /wp-json/studentup/v1/options` anonymous → no `*_key`/token-like fields.
 - [ ] Trigger two overlapping bot runs: `run.py & run.py` → second exits immediately with `run lock held` (PR-3).
+- [ ] `bash deploy/restore.sh` (dry run) prints `integrity: ok` for last night's state.db backup (PR-4).
 - [ ] `tail -n 50 ~/studentup-bot/log/cron.log` — timestamps in IST (F-4) and no `SKIP-ENGLISH-BODY` storms (A-2 should skip only truly English drafts).
 - [ ] Lighthouse mobile on home ≥ 90 performance, 0 a11y errors on images/links.
 

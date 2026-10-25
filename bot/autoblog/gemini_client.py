@@ -1115,8 +1115,36 @@ def _remember_retired(model: str, replacement: str) -> None:
         pass
 
 
+
+def _budget_tick() -> None:
+    """v401d (audit PR-5): count every model call per IST day; stop at the cap."""
+    cap = int(getattr(config, "AI_DAILY_CALL_CAP", 0) or 0)
+    if cap <= 0:
+        return
+    try:
+        from . import clock, state
+        key = f"ai:calls:{clock.today().isoformat()}"
+        n = int(state.meta_get(config.STATE_PATH, key) or 0) + 1
+        state.meta_set(config.STATE_PATH, key, str(n))
+    except Exception:  # noqa: BLE001 — never let accounting break drafting
+        return
+    if n == int(cap * 0.8):
+        log.warning("AI budget: %d/%d calls used today (80%%)", n, cap)
+    if n > cap:
+        raise GeminiError(f"AI daily call cap reached ({cap}) — raise AI_DAILY_CALL_CAP or wait for tomorrow")
+
+
+def ai_calls_today() -> int:
+    try:
+        from . import clock, state
+        return int(state.meta_get(config.STATE_PATH, f"ai:calls:{clock.today().isoformat()}") or 0)
+    except Exception:  # noqa: BLE001
+        return 0
+
+
 def _call_model(model: str, prompt: str, key: Optional[str] = None,
                 _hop: int = 0) -> str:
+    _budget_tick()
     provider, actual_model = _split_model_ref(model)
     if provider != "gemini":
         return _call_compatible_model(provider, actual_model, prompt, key)

@@ -276,3 +276,17 @@ def test_prompt_injection_lines_are_stripped_and_fenced():
     assert out.startswith("<<<UNTRUSTED_PRIMARY_TEXT") and out.rstrip().endswith("<<<END_PRIMARY_TEXT>>>")
     assert any("PRIMARY" in e for e in gc.injection_events())
     assert gc.injection_events() == []
+
+
+def test_ai_daily_call_cap_stops_runaway_spend(monkeypatch, tmp_path):
+    from autoblog import config, gemini_client as gc, state
+    monkeypatch.setattr(config, "STATE_PATH", tmp_path / "s.db", raising=False)
+    state.init(config.STATE_PATH)
+    monkeypatch.setattr(config, "AI_DAILY_CALL_CAP", 3, raising=False)
+    for _ in range(3):
+        gc._budget_tick()
+    assert gc.ai_calls_today() == 3
+    with pytest.raises(gc.GeminiError, match="daily call cap"):
+        gc._budget_tick()
+    monkeypatch.setattr(config, "AI_DAILY_CALL_CAP", 0, raising=False)
+    gc._budget_tick()  # cap off → never raises

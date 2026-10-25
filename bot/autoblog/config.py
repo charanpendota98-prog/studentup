@@ -404,6 +404,11 @@ GEMINI_FALLBACK_MODELS = [
 GEMINI_MAX_RETRIES = int(_get("GEMINI_MAX_RETRIES", "3"))
 # v17.1: Telugu JSON 8192 tokens lo truncate avveti — big cap + env tunable
 GEMINI_MAX_OUTPUT_TOKENS = int(_get("GEMINI_MAX_OUTPUT_TOKENS", "32768"))
+# v401d (audit PR-5): hard daily cap on AI model calls (all providers, all
+# keys). 0 = off. Default 500 ≈ 24 hourly runs × (draft + refine + retries) with
+# generous headroom; crossing it raises GeminiError so the run stops cleanly
+# instead of silently burning quota/money.
+AI_DAILY_CALL_CAP = int(os.getenv("AI_DAILY_CALL_CAP", "500") or 0)
 # v18: Multiple Gemini keys — 429 quota rotation (comma-separated okka line)
 GEMINI_API_KEYS = [
     k.strip() for k in _get("GEMINI_API_KEYS", "").split(",") if k.strip()
