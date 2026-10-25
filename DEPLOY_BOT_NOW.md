@@ -388,3 +388,4 @@ New (all draft-only, nothing auto-publishes):
 - `mock_test.py` — full-length mock test drafts from exam blueprints (`run.py --mock-test-list`, `--mock-test "TSPSC Group 2"`, weekly cron Sunday 05:30 in crontab.example; category "Mock Tests", env `MOCK_CATEGORY`).
 - `study_plans.py` — `run.py --study-plan "APPSC Group 2" --study-plan-days 90` (category Exam Tips; dates are stripped, evergreen).
 Verify on server: `.venv/bin/python run.py --mock-test-dry` → should print `action : dry-run` with a key, `blocked` without.
+- `similarity_check.py` (Phase 2.2) — near-dup gate now compares against ALL published posts (REST-synced fingerprints, auto-refresh every 24h, no 120-post cap). First time on server: `.venv/bin/python run.py --sync-fingerprints`.

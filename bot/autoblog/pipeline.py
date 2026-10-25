@@ -2715,10 +2715,20 @@ def create_from_source(url: str, mock: bool = False, category: str = "",
     # swapped-name/only-date-changed pages site-wide signal ni charchestayi.
     # Mana published posts tho ee level dup ante SKIP (AdSense + ranking both).
     try:
-        ratio, match = validator.near_duplicate(
-            article["title"], article["content_html"],
-            state.load_fingerprints(config.STATE_PATH),
-            config.DUP_JACCARD_SKIP)
+        # v402: compare against the SITE-WIDE corpus (REST-synced fingerprints,
+        # no 120-post cap, includes manual/pre-bot posts), not only local ones.
+        from . import similarity_check as _sim
+        try:
+            if not mock:
+                _sim.sync(WordPressClient())  # no-op when synced < SIMILARITY_SYNC_HOURS ago
+        except Exception:  # noqa: BLE001 — sync failure falls back to local store
+            log.debug("similarity sync skip", exc_info=True)
+        ratio, match, _match_id = _sim.best_match(article["title"], article["content_html"])
+        if _match_id:
+            match = f"{match} (post {_match_id})"
+        article["_similarity"] = {"ratio": round(ratio, 3), "match": match}
+        if ratio >= 0.40:
+            article.setdefault("_review_notes", []).append(f"similar-post:{ratio:.0%} {match}"[:120])
         if ratio >= config.DUP_JACCARD_SKIP and not _gate_soft_fail(
                 article, "NEAR-DUP", f"{ratio:.0%} overlap with '{match}' — merge/update instead?"):
             raise RuntimeError(

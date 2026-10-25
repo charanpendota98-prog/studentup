@@ -791,6 +791,7 @@ CA_CATEGORY = _get("CA_CATEGORY", "Current Affairs")
 CA_FEEDS = _get("CA_FEEDS", "")
 # v402: composite daily category quota (planner) — "Category:N,..." ; carry-over of
 # yesterday's shortfall is automatic. DAILY_PLANNER_ENABLED=0 → old weighted pick.
+SIMILARITY_SYNC_HOURS = float(_get("SIMILARITY_SYNC_HOURS", "24"))
 DAILY_QUOTA = _get("DAILY_QUOTA", "")
 DAILY_PLANNER_ENABLED = _get("DAILY_PLANNER_ENABLED", "1") not in ("0", "false", "no")
 QUIZ_HOUR = int(_get("QUIZ_HOUR", "8"))          # morning study time

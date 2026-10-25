@@ -2405,6 +2405,8 @@ def main() -> int:
     parser.add_argument("--study-plan-days", type=int, default=90)
     parser.add_argument("--study-plan-dry", action="store_true")
     parser.add_argument("--plan-report", action="store_true", help="v402: today's category quota vs done")
+    parser.add_argument("--sync-fingerprints", action="store_true",
+                        help="v402: fingerprint all published posts via REST for the site-wide similarity gate")
     parser.add_argument("--import-quiz", default="", metavar="FILE",
                         help="v200: intake daily 20 exam-wise questions (JSON/list) from external bot into quiz bank")
     parser.add_argument("--export-quiz-channel", default="", choices=["telegram", "whatsapp"],
@@ -2956,6 +2958,12 @@ def main() -> int:
         from . import study_plans as _sp
 
         return _sp.run_cli(args.study_plan, days=args.study_plan_days, dry=args.study_plan_dry)
+    if args.sync_fingerprints:
+        from . import similarity_check as _sim, wordpress_client as _wpc
+
+        rep = _sim.sync(_wpc.WordPressClient(), force=True)
+        print(f"similarity index: {rep} · {_sim.stats()}")
+        return 0
     if args.plan_report:
         from . import content_planner as _cp
 
