@@ -115,8 +115,20 @@ def _remember(exam_slug: str, hashes: List[str]) -> None:
 def generate_section(exam: str, sec: tuple, seen: Dict[str, str], recent_texts: List[str]) -> List[Dict]:
     from . import gemini_client
     name, name_te, n, level = sec
-    batches = max(1, -(-n // BATCH))
     out: List[Dict] = []
+    # v402: draw from the persistent bank first (reviewed items), then generate the rest
+    try:
+        from . import quiz_bank
+        for q in quiz_bank.draw(exam, name, n, exclude=list(seen.keys()), seed=hash((exam, name, clock.today()))):
+            h = _norm_q(q["q"])
+            if h in seen:
+                continue
+            seen[h] = clock.today().toordinal()
+            recent_texts.append(q["q"])
+            out.append({k: q[k] for k in ("q", "qt", "options", "a", "x") if k in q})
+    except Exception:  # noqa: BLE001
+        log.debug("mock bank draw skip", exc_info=True)
+    batches = max(1, -(-(n - len(out)) // BATCH))
     for b in range(1, batches + 1):
         want = min(BATCH, n - len(out))
         if want <= 0:

@@ -389,3 +389,5 @@ New (all draft-only, nothing auto-publishes):
 - `study_plans.py` — `run.py --study-plan "APPSC Group 2" --study-plan-days 90` (category Exam Tips; dates are stripped, evergreen).
 Verify on server: `.venv/bin/python run.py --mock-test-dry` → should print `action : dry-run` with a key, `blocked` without.
 - `similarity_check.py` (Phase 2.2) — near-dup gate now compares against ALL published posts (REST-synced fingerprints, auto-refresh every 24h, no 120-post cap). First time on server: `.venv/bin/python run.py --sync-fingerprints`.
+- v402d: `quiz_bank.py` (persistent generated banks; `--build-bank General|"TSPSC Group 2"`, `--bank-stats`, `--bank-export f.json` → review → `--bank-import`), daily quiz + mocks draw from it; HowTo JSON-LD for posts with a real apply-steps list; breaking lane ignores items older than `BREAKING_MAX_AGE_HOURS=6` and expires queued URLs after `BREAKING_QUEUE_TTL_HOURS=24`.
+  First run on server: `.venv/bin/python run.py --build-bank General --bank-n 100` (uses AI quota; ~50 calls).

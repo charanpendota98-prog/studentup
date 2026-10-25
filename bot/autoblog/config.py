@@ -268,6 +268,9 @@ BREAKING_DRAFTS_PER_DAY = int(_get("BREAKING_DRAFTS_PER_DAY", "12"))
 BREAKING_ENABLED = _get("BREAKING_ENABLED", "1") not in ("0", "false", "no")
 BREAKING_MAX = int(_get("BREAKING_MAX", "8"))
 BREAKING_KEEP_HOURS = float(_get("BREAKING_KEEP_HOURS", "18"))
+# v402: source timestamp older than this is not "breaking" (0 = off); lane URLs expire after TTL.
+BREAKING_MAX_AGE_HOURS = float(_get("BREAKING_MAX_AGE_HOURS", "6"))
+BREAKING_QUEUE_TTL_HOURS = float(_get("BREAKING_QUEUE_TTL_HOURS", "24"))
 
 # v60: SITE GUARDIAN — roju okkasari system motham check + Telegram alert
 GUARDIAN_ENABLED = _get("GUARDIAN_ENABLED", "1") not in ("0", "false", "no")

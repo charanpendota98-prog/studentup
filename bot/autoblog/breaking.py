@@ -125,9 +125,12 @@ def _parse_pub(text: str) -> Optional[str]:
     try:
         dt = parsedate_to_datetime(text)
     except (TypeError, ValueError):
-        return None
+        dt = None
     if dt is None:
-        return None
+        try:  # v402: ISO-8601 (our own feed items / Atom <updated>)
+            dt = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return None
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     return _iso(dt)
@@ -247,6 +250,10 @@ def build_items(raw: List[dict], limit: int = None) -> List[dict]:
             continue
         tag = classify_tag(title, it.get("category_hint") or "")
         when = _parse_pub(it.get("pub") or it.get("time") or "") or _iso(_now())
+        # v402: "breaking" means recent. Items whose source timestamp is older
+        # than BREAKING_MAX_AGE_HOURS are normal radar material, not breaking.
+        if _too_old(when):
+            continue
         source = (it.get("source_name") or it.get("source") or "రాడార్"
                   ).strip()
         item = {"title": title, "link": link, "tag": tag, "source": source,
@@ -368,7 +375,21 @@ _TAG_TE = {"jobs": "ఉద్యోగాలు", "job": "ఉద్యోగా�
            "result": "ఫలితాలు", "results": "ఫలితాలు", "admission": "అడ్మిషన్లు",
            "admissions": "అడ్మిషన్లు", "scholarship": "స్కాలర్‌షిప్‌లు",
            "current": "కరెంట్ అఫైర్స్", "news": "వార్తలు"}
+def _too_old(when_iso: str, max_hours: float = None) -> bool:
+    max_hours = float(max_hours if max_hours is not None else getattr(config, "BREAKING_MAX_AGE_HOURS", 6) or 0)
+    if max_hours <= 0 or not when_iso:
+        return False
+    try:
+        dt = datetime.fromisoformat(str(when_iso).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=IST)
+    except ValueError:
+        return False
+    return (_now() - dt) > timedelta(hours=max_hours)
+
+
 _DRAFTQ_KEY = "breaking:draftq"
+_DRAFTQ_TS_KEY = "breaking:draftq:ts"
 
 
 def pending_drafts() -> List[str]:
@@ -406,8 +427,42 @@ def enqueue_drafts(urls: List[str]) -> int:
         added += 1
     if added:
         _save_pending(cur)
+        _touch_queue_ts(cur)
         log.info("breaking draft lane: +%d URL(s) queued (%d pending)", added, len(cur))
     return added
+
+
+def _touch_queue_ts(urls: List[str]) -> None:
+    """v402: remember when each URL entered the lane so stale ones expire."""
+    from . import state
+
+    try:
+        ts = json.loads(state.meta_get(config.STATE_PATH, _DRAFTQ_TS_KEY) or "{}")
+    except Exception:  # noqa: BLE001
+        ts = {}
+    now = _iso(_now())
+    ts = {u: ts.get(u, now) for u in urls}
+    state.meta_set(config.STATE_PATH, _DRAFTQ_TS_KEY, json.dumps(ts, ensure_ascii=False))
+
+
+def expire_queue(max_hours: float = None) -> int:
+    """Drop lane URLs older than BREAKING_QUEUE_TTL_HOURS (default 24) — a
+    breaking item drafted a day late is worse than no draft."""
+    from . import state
+
+    max_hours = float(max_hours if max_hours is not None else getattr(config, "BREAKING_QUEUE_TTL_HOURS", 24))
+    try:
+        ts = json.loads(state.meta_get(config.STATE_PATH, _DRAFTQ_TS_KEY) or "{}")
+    except Exception:  # noqa: BLE001
+        ts = {}
+    cur = pending_drafts()
+    keep = [u for u in cur if not _too_old(ts.get(u, ""), max_hours)]
+    dropped = len(cur) - len(keep)
+    if dropped:
+        _save_pending(keep)
+        _touch_queue_ts(keep)
+        log.info("breaking draft lane: %d stale URL(s) expired", dropped)
+    return dropped
 
 
 def drain_drafts(limit: int = None, mock: bool = False) -> int:
@@ -427,6 +482,7 @@ def drain_drafts(limit: int = None, mock: bool = False) -> int:
     day_key = f"breaking:drafts:{clock.now().date().isoformat()}"
     done_today = int(state.meta_get(config.STATE_PATH, day_key) or 0)
     budget = min(limit, max(0, getattr(config, "BREAKING_DRAFTS_PER_DAY", 12) - done_today))
+    expire_queue()
     pending = pending_drafts()
     if not pending or budget <= 0:
         return 0

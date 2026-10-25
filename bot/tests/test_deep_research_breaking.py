@@ -35,9 +35,10 @@ def test_source_tier_prefers_official():
 
 def test_breaking_items_dedupe_and_cap(monkeypatch):
     raw = []
+    pub = breaking._iso(breaking._now())  # v402: items older than BREAKING_MAX_AGE_HOURS are not breaking
     for i in range(12):
         raw.append({"title": f"Board {i} Group {i} Notification 2026 విడుదల", "link": f"https://board{i}.gov.in/n{i}",
-                    "pub": "2026-10-25T10:00:00+05:30", "verified": True, "source_verified": True})
+                    "pub": pub, "verified": True, "source_verified": True})
     raw.append(dict(raw[0]))                              # exact duplicate
     raw.append({"title": "", "link": "https://x.in/", "verified": True, "source_verified": True})   # no title → drop
     raw.append({"title": "Unverified lead that must never reach the feed 2026", "link": "https://y.in/1", "verified": True})

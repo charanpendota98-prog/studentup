@@ -54,3 +54,5 @@
 
 # v402: full-length mock test draft (weekly rotation across TSPSC/APPSC/SSC/RRB/Police/IBPS) — Sunday 05:30
 30 5 * * 0  cd $HOME/studentup-bot && .venv/bin/python run.py --mock-test --notify >> logs/mock.log 2>&1
+# v402: top up question banks (daily quiz + mocks draw from these) — 1st of month 04:30; owner review via --bank-export
+30 4 1 * *  cd $HOME/studentup-bot && .venv/bin/python run.py --build-bank General --bank-n 150 >> logs/bank.log 2>&1

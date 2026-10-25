@@ -77,6 +77,10 @@ def _check(obj: Dict) -> List[str]:
         parts = obj.get("hasPart") or []
         if not parts:
             p.append("Quiz.hasPart empty")
+    if "HowTo" in types:
+        steps = obj.get("step") or []
+        if not obj.get("name") or len(steps) < 2 or any(not (st or {}).get("text") for st in steps):
+            p.append("HowTo needs name + ≥2 steps with text")
     if any(x in types for x in ("Article", "NewsArticle", "BlogPosting")):
         h = str(obj.get("headline") or "")
         if not h:

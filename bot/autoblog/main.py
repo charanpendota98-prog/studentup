@@ -2405,6 +2405,11 @@ def main() -> int:
     parser.add_argument("--study-plan-days", type=int, default=90)
     parser.add_argument("--study-plan-dry", action="store_true")
     parser.add_argument("--plan-report", action="store_true", help="v402: today's category quota vs done")
+    parser.add_argument("--build-bank", default=None, metavar="EXAM", help="v402: build question bank for EXAM or 'General'")
+    parser.add_argument("--bank-n", type=int, default=100, help="questions per section target")
+    parser.add_argument("--bank-stats", action="store_true")
+    parser.add_argument("--bank-export", default="", metavar="FILE")
+    parser.add_argument("--bank-import", default="", metavar="FILE")
     parser.add_argument("--sync-fingerprints", action="store_true",
                         help="v402: fingerprint all published posts via REST for the site-wide similarity gate")
     parser.add_argument("--import-quiz", default="", metavar="FILE",
@@ -2958,6 +2963,10 @@ def main() -> int:
         from . import study_plans as _sp
 
         return _sp.run_cli(args.study_plan, days=args.study_plan_days, dry=args.study_plan_dry)
+    if args.build_bank or args.bank_stats or args.bank_export or args.bank_import:
+        from . import quiz_bank as _qb
+
+        return _qb.run_cli(args.build_bank or "", args.bank_n, args.bank_export, args.bank_import, args.bank_stats)
     if args.sync_fingerprints:
         from . import similarity_check as _sim, wordpress_client as _wpc
 
