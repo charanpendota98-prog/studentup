@@ -350,6 +350,12 @@ function studentup_register_rest() {
 				}
 				// v64: website options (socials · adsense · flags) — same allowlist tho
 				$opts = $req->get_param( 'options' );
+				// 1.9.178 (audit B-2): site options (security flags, AdSense, HSTS)
+				// need manage_options — edit_posts callers may push breaking/house ads only.
+				if ( is_array( $opts ) && ! current_user_can( 'manage_options' ) ) {
+					$done[] = 'options:forbidden';
+					$opts   = null;
+				}
 				if ( is_array( $opts ) && function_exists( 'studentup_option_fields' ) ) {
 					$allowed = array();
 					foreach ( studentup_option_fields() as $tab ) {

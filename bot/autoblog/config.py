@@ -80,7 +80,11 @@ AUTOMATION_DRAFT_ONLY = _get("AUTOMATION_DRAFT_ONLY", "1") not in ("0", "false",
 
 # --- Notifications -------------------------------------------------------
 TELEGRAM_BOT_TOKEN = _get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = _get("TELEGRAM_CHAT_ID", "")  # empty = /start tho auto-register
+TELEGRAM_CHAT_ID = _get("TELEGRAM_CHAT_ID", "")  # empty = /start <TELEGRAM_SETUP_TOKEN> required (v401d)
+# v401d (audit S-1): ownership is never granted to "whoever messages first".
+# With TELEGRAM_CHAT_ID empty, the owner must send `/start <token>` where
+# token == TELEGRAM_SETUP_TOKEN; anything else is ignored.
+TELEGRAM_SETUP_TOKEN = _get("TELEGRAM_SETUP_TOKEN", "")
 # Publish ayyaka auto-post to mi Telegram CHANNEL (optional — channel chat id,
 # example -1001234... ; channel lo bot admin ga add cheyandi)
 TELEGRAM_CHANNEL_CHAT_ID = _get("TELEGRAM_CHANNEL_CHAT_ID", "")

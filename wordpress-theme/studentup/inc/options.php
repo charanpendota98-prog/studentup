@@ -258,12 +258,31 @@ function studentup_sanitize_option( $value ) {
 				'JSON tappu undi — aa field save cheyyaledu.', 'error' );
 			return '';
 		}
-		return wp_json_encode( $decoded, JSON_UNESCAPED_UNICODE );
+		// 1.9.178 (audit F-6): JSON option payloads are rendered by front-end JS
+		// (quiz store "why"/answers, house ads). Strip tags from every string
+		// leaf so an admin paste can never become stored XSS for readers.
+		return wp_json_encode( studentup_sanitize_json_leaves( $decoded ), JSON_UNESCAPED_UNICODE );
 	}
 	if ( is_string( $value ) ) {
 		return wp_kses_post( $value );
 	}
 	return $value;
+}
+
+function studentup_sanitize_json_leaves( $node ) {
+	if ( is_array( $node ) ) {
+		foreach ( $node as $k => $v ) {
+			$node[ $k ] = studentup_sanitize_json_leaves( $v );
+		}
+		return $node;
+	}
+	if ( is_string( $node ) ) {
+		if ( preg_match( '#^https?://#i', $node ) ) {
+			return esc_url_raw( $node );
+		}
+		return sanitize_text_field( $node );
+	}
+	return $node;
 }
 
 /**
@@ -379,7 +398,7 @@ function studentup_rest_get_options() {
 		array(
 			'site'        => home_url( '/' ),
 			'theme'       => 'studentup',
-			'version'     => defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
+			'version'     => current_user_can( 'edit_posts' ) && defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
 			'socials'     => array(
 				'whatsapp'  => studentup_opt( 'social_whatsapp', '9182739312' ),
 				'telegram'  => studentup_opt( 'social_telegram', 'studentup_in' ),

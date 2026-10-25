@@ -445,12 +445,14 @@ add_action(
 					return new WP_REST_Response(
 						array(
 							'theme'      => 'studentup',
-							'version'    => defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
+							// 1.9.178 (audit B-1): exact version / stack details only for
+							// authenticated editors (the bot). Public gets the contract only.
+							'version'    => current_user_can( 'edit_posts' ) && defined( 'STUDENTUP_VERSION' ) ? STUDENTUP_VERSION : '',
 							'contract'   => defined( 'STUDENTUP_CONTRACT' ) ? STUDENTUP_CONTRACT : 0,
 							'seo_bridge' => true,
-							'rankmath'   => defined( 'RANK_MATH_VERSION' ) || class_exists( 'RankMath' ),
-							'adsense'    => (bool) get_option( 'studentup_adsense_client', '' ),
-							'posts'      => (int) wp_count_posts()->publish,
+							'rankmath'   => current_user_can( 'edit_posts' ) ? ( defined( 'RANK_MATH_VERSION' ) || class_exists( 'RankMath' ) ) : null,
+							'adsense'    => current_user_can( 'edit_posts' ) ? (bool) get_option( 'studentup_adsense_client', '' ) : null,
+							'posts'      => current_user_can( 'edit_posts' ) ? (int) wp_count_posts()->publish : null,
 						),
 						200
 					);

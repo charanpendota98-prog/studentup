@@ -115,5 +115,11 @@ def push(payload: Optional[Dict[str, object]] = None, dry_run: bool = False,
         data = resp.json()
     except ValueError:
         data = {}
+    updated = data.get("updated", [])
+    if "options:forbidden" in updated:
+        # theme 1.9.178+: site options need manage_options; breaking/house ads
+        # still saved. Say it plainly instead of a silent partial push.
+        log.warning("theme-data: options NOT saved — WP user lacks manage_options "
+                    "(push breaking/house ads with this user; set site options from WP Admin)")
     return {"ok": bool(data.get("ok", True)), "sent": empty,
-            "updated": data.get("updated", []), "url": url}
+            "updated": updated, "url": url}

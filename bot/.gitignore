@@ -5,6 +5,7 @@
 state.db
 state.db.lock
 state.fastlane.lock
+state.hourly.lock
 state.db.bak*
 log/
 output/

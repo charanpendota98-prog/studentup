@@ -1645,6 +1645,19 @@ def drain_source_queue(limit: int) -> int:
     return made
 
 
+def _acquire_run_lock(name: str):
+    """Exclusive non-blocking flock in BASE_DIR; returns the open handle (keep
+    it referenced for the life of the run) or None when another run holds it."""
+    import fcntl
+
+    try:
+        fh = open(config.BASE_DIR / name, "w")  # noqa: SIM115
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return fh
+    except OSError:
+        return None
+
+
 def fast_drain() -> int:
     """v375 FAST LANE — run every 10 minutes from cron (`--fast-drain`).
 
@@ -3481,6 +3494,15 @@ def main() -> int:
     if args.radar:
         return radar_run(process_posts=not args.dry_run)
     rc = 5
+    # v401d (audit PR-3): the hourly run had no single-instance lock; a slow hour
+    # (Gemini retries) overlapped the next cron tick → duplicate drafts / "-2"
+    # slugs. Same flock pattern as --fast-drain; --mock/--dry-run never block.
+    _run_lock = None
+    if not (args.mock or args.dry_run):
+        _run_lock = _acquire_run_lock("state.hourly.lock")
+        if _run_lock is None:
+            log.warning("run: previous hourly run still active — skip (lock busy)")
+            return 0
     try:
         src = args.add_source or args.url
         listicle_arg = args.listicle or ""

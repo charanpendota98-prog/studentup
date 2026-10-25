@@ -181,10 +181,30 @@ function studentup_cat_aliases() {
  * @param string $slug theme slug (studentup_most_used).
  * @return WP_Term|null
  */
+/**
+ * 1.9.178 (audit F-1): resolve ANY alias candidate ("central", "walkin") to
+ * its family key so callers that pass a short slug still get the whole family
+ * instead of a silent miss (mobile drawer lost 4 of 11 rows on a fresh install).
+ */
+function studentup_alias_family_key( $slug ) {
+	$slug = (string) $slug;
+	$map  = studentup_cat_aliases();
+	if ( isset( $map[ $slug ] ) ) {
+		return $slug;
+	}
+	foreach ( $map as $key => $cands ) {
+		if ( in_array( $slug, (array) $cands, true ) ) {
+			return $key;
+		}
+	}
+	return $slug;
+}
+
 function studentup_used_term( $slug ) {
 	$map    = studentup_cat_aliases();
 	$tried  = array();
-	$cands  = isset( $map[ $slug ] ) ? $map[ $slug ] : array( $slug );
+	$family = studentup_alias_family_key( $slug );
+	$cands  = isset( $map[ $family ] ) ? array_merge( array( $slug ), $map[ $family ] ) : array( $slug );
 	foreach ( $cands as $cand ) {
 		if ( isset( $tried[ $cand ] ) ) {
 			continue;

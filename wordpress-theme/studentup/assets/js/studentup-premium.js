@@ -1,3 +1,5 @@
+/* 1.9.178 audit F-6: quiz strings from the option store are escaped before innerHTML */
+function escQ(x){return String(x==null?"":x).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 /* StudentUp v123 premium layer — daily quiz, instant alerts (push-style),
    bottom nav search, hot-jobs rail. No dependencies, no jQuery. */
 (function () {
@@ -66,7 +68,7 @@
             paint();
             var why = document.createElement("p");
             why.className = "su-q-why " + (right ? "good" : "miss");
-            why.innerHTML = (right ? I.check + " Correct — " : I.close + " Answer: " + item.a[item.c] + " — ") + item.why;
+            why.innerHTML = (right ? I.check + " Correct — " : I.close + " Answer: " + escQ(item.a[item.c]) + " — ") + escQ(item.why);
             wrap.appendChild(why);
             try { localStorage.setItem(key, String(score)); } catch (e) {}
             if (done === data.length) {

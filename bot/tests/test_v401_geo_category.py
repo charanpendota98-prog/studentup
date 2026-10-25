@@ -190,3 +190,32 @@ def test_link_official_mentions_once_outside_anchors():
     assert out.count('href="https://sbi.co.in/careers"') == 1
     assert out.startswith('<ol><li><a href="https://sbi.co.in/careers"')
     assert pipeline.link_official_mentions(html, "https://freejobalert.com/") == html
+
+
+def test_hourly_run_lock_is_exclusive(tmp_path, monkeypatch):
+    from autoblog import main as m
+    monkeypatch.setattr(m.config, "BASE_DIR", tmp_path, raising=False)
+    first = m._acquire_run_lock("state.hourly.lock")
+    assert first is not None
+    assert m._acquire_run_lock("state.hourly.lock") is None   # second holder refused
+    first.close()
+    assert m._acquire_run_lock("state.hourly.lock") is not None
+
+
+def test_telegram_first_claimer_refused_without_token(monkeypatch, tmp_path):
+    from autoblog import approval_bot, state, config
+    monkeypatch.setattr(config, "STATE_PATH", tmp_path / "s.db", raising=False)
+    monkeypatch.setattr(config, "TELEGRAM_CHAT_ID", "", raising=False)
+    monkeypatch.setattr(config, "TELEGRAM_ADMIN_IDS", [], raising=False)
+    monkeypatch.setattr(config, "TELEGRAM_SETUP_TOKEN", "s3cret-token", raising=False)
+    state.init(config.STATE_PATH)
+    bot = approval_bot.ApprovalBot.__new__(approval_bot.ApprovalBot)
+    sent = []
+    bot.tg = lambda method, payload: sent.append((method, payload)) or {"ok": True}
+    bot.on_message({"chat": {"id": 999}, "text": "/start"})
+    assert state.meta_get(config.STATE_PATH, approval_bot.CHAT_KEY) in (None, "")
+    assert not sent  # stranger gets no reply at all
+    bot.on_message({"chat": {"id": 999}, "text": "/start wrong"})
+    assert state.meta_get(config.STATE_PATH, approval_bot.CHAT_KEY) in (None, "")
+    bot.on_message({"chat": {"id": 777}, "text": "/start s3cret-token"})
+    assert state.meta_get(config.STATE_PATH, approval_bot.CHAT_KEY) == "777"
