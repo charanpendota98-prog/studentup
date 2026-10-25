@@ -296,6 +296,14 @@ def title_flags(title: str) -> List[str]:
                               r"తెలంగాణ|ఆంధ్ర|all india|india post|ssc|upsc|rrb|railway|ibps|"
                               r"sbi|army|navy|air force|isro|drdo|central", low_t)):
         out.append("other-state")
+    else:
+        try:
+            from . import geo_gate as _geo
+            _r, _why = _geo.classify(title or "")
+            if _r == "other":
+                out.append(f"other-state:{_why}")
+        except Exception:  # noqa: BLE001
+            pass
     return out
 
 
@@ -323,6 +331,16 @@ def draft_flags(title: str, html: str) -> List[str]:
         tel = sum(1 for w in words if re.search(r"[\u0c00-\u0c7f]", w))
         if tel / len(words) < 0.30:
             flags.append("english-body")
+    # v401: non-Telugu Indic script in the BODY (live 24-Oct: Kannada phrases
+    # copied verbatim into a KSLU result post) — ≥ 12 foreign letters = hard skip.
+    if len(FOREIGN_SCRIPT_RE.findall(plain)) >= 12:
+        flags.append("foreign-script-body")
+    try:
+        from . import geo_gate as _geo
+        if _geo.classify(title, plain[:600])[0] == "other" and "other-state" not in flags:
+            flags.append("other-state")
+    except Exception:  # noqa: BLE001
+        pass
     # v399: every full date in the body is already in the past (live 22-Oct:
     # a walk-in "ఫిబ్రవరి 11, 2026" published in October) → old notification.
     # ignore the house "last updated"/"published" stamps — they are always today.
@@ -475,6 +493,23 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
                     changes["seo_title"] = 1
         except Exception:  # noqa: BLE001
             log.debug("mid power title fix skip", exc_info=True)
+        # v401c: no official-link meta → Important Links box never renders. Take
+        # the first OFFICIAL host already linked in the body (live: SBI SCO post
+        # linked sbi.co.in yet showed "Official Website" without a URL).
+        if not any(str(meta.get(k) or "").strip() for k in ("studentup_org_url", "studentup_apply_url")):
+            try:
+                from . import sources as _src
+                from urllib.parse import urlparse as _up
+                for href in re.findall(r'href="(https?://[^"]+)"', new_html):
+                    if _src.is_valid_source_url(href) and _src.is_official_domain(href):
+                        pu = _up(href)
+                        extra_meta["studentup_org_url"] = f"{pu.scheme}://{pu.netloc}/"
+                        if re.search(r"apply|register|online|recruit|career", href, re.I) and not href.lower().endswith(".pdf"):
+                            extra_meta["studentup_apply_url"] = href
+                        changes["official_link_meta"] = 1
+                        break
+            except Exception:  # noqa: BLE001
+                log.debug("official link meta skip", exc_info=True)
         if not str(meta.get("studentup_last_date") or "").strip():
             try:
                 from . import qual as _q
@@ -489,7 +524,7 @@ def fix_recent(limit: int = 20, apply: bool = False) -> List[Dict]:
         new_title = title
         try:
             from .pipeline import clean_title_text
-            cand = clean_title_text(title)
+            cand = clean_title_text(re.sub(r"^\s*REVIEW:\s*(?:duplicate\?\s*)?", "", title))
             if cand and cand != title and len(cand) >= 20:
                 new_title = cand
                 changes["title"] = 1

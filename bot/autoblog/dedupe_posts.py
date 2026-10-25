@@ -129,7 +129,26 @@ def run(apply: bool = False, days: int = 90, notify: bool = True) -> int:
         for p in tidy:
             want = tidy_slug(str(p["slug"]))
             if not apply:
-                lines.append(f"  /{p['slug']}/ → /{want}/ ?")
+                # v401 ROOT-CAUSE probe: who owns the base slug? (draft / trash /
+                # page / attachment) — tells us WHY every new post gets "-2".
+                owner = ""
+                try:
+                    rr = wp._request("GET", "posts", params={"slug": want, "status": "any", "context": "edit",
+                                                             "_fields": "id,status,title,date"})
+                    rows = rr.json() if rr.ok else []
+                    if rows:
+                        owner = "  ← base slug owned by #{} [{}] {}".format(
+                            rows[0].get("id"), rows[0].get("status"),
+                            str((rows[0].get("title") or {}).get("raw") or "")[:40])
+                    else:
+                        rp = wp._request("GET", "pages", params={"slug": want, "status": "any", "_fields": "id,status"})
+                        if rp.ok and rp.json():
+                            owner = f"  ← base slug is a PAGE #{rp.json()[0].get('id')}"
+                        else:
+                            owner = "  ← base slug FREE now (collision partner trashed/renamed since)"
+                except Exception:  # noqa: BLE001
+                    owner = ""
+                lines.append(f"  /{p['slug']}/ → /{want}/ ?{owner}")
                 continue
             try:
                 r = wp._request("POST", f"posts/{p['id']}", json={"slug": want})

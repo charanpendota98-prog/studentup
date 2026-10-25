@@ -231,6 +231,21 @@ def _queue_url(url: str, title: str = "") -> bool:
 
     if not _src.is_valid_source_url(url):
         return False
+    # v401: other-state headlines never enter the queue (title + URL slug are
+    # enough evidence: "bihar-stet-admit-card-2026", "haryana-police-spo").
+    if getattr(config, "GEO_GATE", True) and title:
+        try:
+            from . import geo_gate as _geo
+            _region, _why = _geo.classify(title, "", url)
+            if _region == "other":
+                try:
+                    state.record_radar_event(config.STATE_PATH, "geo_skip", url, title,
+                                             f"other-state: {_why}")
+                except Exception:  # noqa: BLE001
+                    pass
+                return False
+        except Exception:  # noqa: BLE001
+            pass
     try:
         if state.source_done(config.STATE_PATH, url):
             try:

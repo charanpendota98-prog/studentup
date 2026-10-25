@@ -96,7 +96,7 @@ def test_past_dates_ignores_house_stamp():
 def test_glued_power_word_removed_from_h1():
     from autoblog.pipeline import clean_title_text
     assert clean_title_text("APPSC Group 2 Notification 2026 686 పోస్టులు Official వివరాలు") == \
-        "APPSC Group 2 Notification 2026 686 పోస్టులు వివరాలు"
+        "APPSC Group 2 Notification 2026: 686 పోస్టులు వివరాలు"
     assert clean_title_text("SSC CGL 2026 Official Notification") == "SSC CGL 2026 Official Notification"
 
 

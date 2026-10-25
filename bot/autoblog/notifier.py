@@ -872,8 +872,7 @@ def notify_new_post(article: dict, result: dict) -> None:
             pass
     rec = article.get("recruitment") or {}
     if rec.get("apply_end"):
-        qa_bits.append("📌 Google Jobs schema + deadline countdown ON "
-                       "(closes {})".format(rec["apply_end"]))
+        qa_bits.append("📌 Deadline countdown ON (closes {}) · JobPosting schema only if theme job-gate passes".format(rec["apply_end"]))
     if article.get("_fact"):
         qa_bits.append("⚠️ Fact flags: <b>{}</b> unverified — review "
                        "mundu check: {}".format(

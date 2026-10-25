@@ -15,6 +15,7 @@ brand pill + year chip — Adda247/Sakshi thumbnail style, mana own rendering.
 
 import logging
 import random
+import re
 from datetime import date
 from pathlib import Path
 from typing import Optional
@@ -129,6 +130,37 @@ _TE_MATRAS = {"ా": "aa", "ి": "i", "ీ": "ee", "ు": "u", "ూ": "oo",
 _TE_DIGITS = {"౦": "0", "౧": "1", "౨": "2", "౩": "3", "౪": "4",
               "౫": "5", "౬": "6", "౭": "7", "౮": "8", "౯": "9"}
 _TE_VIRAMA = "్"
+
+
+# v401: thumbnails read as English, never as transliterated Telugu ("500
+# postulu" on live cards looked broken). Common notice words map to their
+# English equivalents; any other Telugu word is dropped from the banner.
+_TE_BANNER_WORDS = [
+    ("చివరి తేదీ", "Last Date"), ("ఆఖరి తేదీ", "Last Date"), ("హాల్ టికెట్", "Hall Ticket"),
+    ("అడ్మిట్ కార్డ్", "Admit Card"), ("ఎంపిక జాబితా", "Select List"), ("మెరిట్ జాబితా", "Merit List"),
+    ("పోస్టులకు", "Posts"), ("పోస్టుల", "Posts"), ("పోస్టులు", "Posts"), ("పోస్టు", "Post"),
+    ("ఖాళీలు", "Vacancies"), ("ఉద్యోగాలు", "Jobs"), ("ఉద్యోగాల", "Jobs"), ("నోటిఫికేషన్", "Notification"),
+    ("ఫలితాలు", "Results"), ("ఫలితం", "Result"), ("విడుదల", "Out"), ("దరఖాస్తు", "Apply"),
+    ("పరీక్ష తేదీ", "Exam Date"), ("పరీక్ష", "Exam"), ("వివరాలు", "Details"), ("పూర్తి", "Full"),
+    ("అర్హత", "Eligibility"), ("జీతం", "Salary"), ("సిలబస్", "Syllabus"), ("ప్రవేశాలు", "Admissions"),
+    ("స్కాలర్‌షిప్", "Scholarship"), ("వాక్-ఇన్", "Walk-in"), ("తెలంగాణ", "Telangana"), ("ఆంధ్రప్రదేశ్", "AP"),
+    ("జిల్లా", "District"), ("భర్తీ", "Recruitment"), ("నియామకాలు", "Recruitment"), ("వైద్యుల", "Doctor"),
+    ("ఉపాధ్యాయ", "Teacher"), ("టీచర్", "Teacher"), ("పోలీస్", "Police"), ("కానిస్టేబుల్", "Constable"),
+    ("బ్యాంక్", "Bank"), ("రైల్వే", "Railway"), ("ఇంటర్వ్యూ", "Interview"), ("కౌన్సెలింగ్", "Counselling"),
+    ("హైదరాబాద్", "Hyderabad"), ("విశాఖపట్నం", "Visakhapatnam"), ("విజయవాడ", "Vijayawada"),
+]
+
+
+def banner_english(text: str) -> str:
+    """Telugu banner → English banner (known words translated, rest dropped)."""
+    t = text or ""
+    for te, en in _TE_BANNER_WORDS:
+        t = t.replace(te, " " + en + " ")
+    t = re.sub(r"[\u0c00-\u0c7f\u200c\u200d]+", " ", t)      # leftover Telugu → out
+    t = re.sub(r"\s*([:–—-])\s*(?=[:–—-])", "", t)             # ": –" doubles
+    t = re.sub(r"\s+([,:;])", r"\1", t)
+    t = re.sub(r"\s{2,}", " ", t).strip(" :–—-,·")
+    return t or telugu_to_latin(text)
 
 
 def telugu_to_latin(text: str) -> str:
@@ -331,9 +363,9 @@ def _draw_layout(img: Image.Image, draw: ImageDraw.ImageDraw, w: int, h: int,
     year = str(date.today().year)
     label_font = _load_font(int(h * 0.044))
     brand_font = _load_font(int(h * 0.036))
-    label = telugu_to_latin(_pill_label(category, banner_text))
+    label = banner_english(_pill_label(category, banner_text))
     brand = config.SITE_BRAND
-    text = telugu_to_latin(banner_text[:64])
+    text = banner_english(banner_text)[:64]
     base_size = int(h * 0.098)
 
     if variant == "center":

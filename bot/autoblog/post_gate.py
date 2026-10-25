@@ -113,6 +113,14 @@ def run(article: dict, html: str = "", media_id: Optional[int] = None,
     # ------------------------------------------------------------ CONTENT
     rm = article.get("_rm") or {}
     min_words = int(getattr(config, "RM_MIN_WORDS", 600))
+    # v401: owner rule "no padding to reach word count" — the useful length of
+    # a notice depends on what it is. 600 stays for guides/listicles only.
+    _t = str(article.get("title") or "").lower()
+    if re.search(r"admit card|hall ticket|city intimation|exam city|exam date|result|answer key|merit list|"
+                 r"select list|cut ?off|హాల్ టికెట్|ఫలిత|పరీక్ష తేదీ", _t):
+        min_words = min(min_words, 300)
+    elif re.search(r"recruitment|notification|vacanc|walk-?in|పోస్టుల|ఉద్యోగ|నోటిఫికేషన్", _t):
+        min_words = min(min_words, 420)
     # v135: "useful" ante length matrame kaadu — repeated filler ("word word
     # word ...") length target ni cheat cheyyagaladu. Unique-word ratio tho
     # thin-but-long content ni pattukuntam (nijamaina article ~0.3+ untundi).
