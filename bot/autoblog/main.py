@@ -2397,6 +2397,14 @@ def main() -> int:
     parser.add_argument("--daily-ca", action="store_true",
                         help="v402: today's Telugu current-affairs post (points + MCQs) as a WordPress DRAFT (never publishes)")
     parser.add_argument("--daily-ca-dry", action="store_true", help="v402: --daily-ca plan only (no WordPress write)")
+    parser.add_argument("--mock-test", nargs="?", const="", default=None, metavar="EXAM",
+                        help="v402: full-length mock test DRAFT for EXAM (default: weekly rotation)")
+    parser.add_argument("--mock-test-dry", action="store_true", help="v402: --mock-test plan only")
+    parser.add_argument("--mock-test-list", action="store_true", help="v402: list exam blueprints")
+    parser.add_argument("--study-plan", default=None, metavar="EXAM", help="v402: N-day Telugu study plan DRAFT for EXAM")
+    parser.add_argument("--study-plan-days", type=int, default=90)
+    parser.add_argument("--study-plan-dry", action="store_true")
+    parser.add_argument("--plan-report", action="store_true", help="v402: today's category quota vs done")
     parser.add_argument("--import-quiz", default="", metavar="FILE",
                         help="v200: intake daily 20 exam-wise questions (JSON/list) from external bot into quiz bank")
     parser.add_argument("--export-quiz-channel", default="", choices=["telegram", "whatsapp"],
@@ -2934,6 +2942,25 @@ def main() -> int:
         from . import current_affairs as _ca
 
         return _ca.run_cli(dry=args.daily_ca_dry, notify=args.notify)
+    if args.mock_test_list:
+        from . import mock_test as _mt
+
+        for name, bp in _mt.BLUEPRINTS.items():
+            print(f"{name:30s} {sum(s[2] for s in bp['sections']):4d} Q  {bp['minutes']:3d} min  {bp['slug']}")
+        return 0
+    if args.mock_test is not None or args.mock_test_dry:
+        from . import mock_test as _mt
+
+        return _mt.run_cli(args.mock_test or "", dry=args.mock_test_dry, notify=args.notify)
+    if args.study_plan:
+        from . import study_plans as _sp
+
+        return _sp.run_cli(args.study_plan, days=args.study_plan_days, dry=args.study_plan_dry)
+    if args.plan_report:
+        from . import content_planner as _cp
+
+        print(_cp.format_report())
+        return 0
 
     _setup_logging()
 

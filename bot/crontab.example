@@ -51,3 +51,6 @@
 # lock (state.hourly.lock / state.fastdrain.lock) inside run.py, so an
 # overlapping cron tick exits immediately instead of double-drafting. No
 # external flock(1) wrapper is required; keep it if you already have one.
+
+# v402: full-length mock test draft (weekly rotation across TSPSC/APPSC/SSC/RRB/Police/IBPS) — Sunday 05:30
+30 5 * * 0  cd $HOME/studentup-bot && .venv/bin/python run.py --mock-test --notify >> logs/mock.log 2>&1

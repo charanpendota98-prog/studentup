@@ -379,3 +379,12 @@ python run.py --go-live --apply  # నిజంగా setup
 Report: `output/go-live-report.md`. పూర్తి వరుస కోసం `SETUP_PERFECT.md`.
 
 | Round 12 (24-Oct, bot v401c + theme **1.9.177**) | 1. **Hard-skip bug**: the `except Exception` around draft flags swallowed every hard skip (foreign script / other-state / stale) since v399 — now `RuntimeError` propagates (regression test). 2. Stale notices (last-year title, dates >120 days old) = hard skip, not REVIEW. 3. Body fingerprint remembered only after WP accepted the draft (a skipped story no longer poisons the retry with SKIP-DUPLICATE-BODY). 4. `--fix-live` strips `REVIEW:` from already-published H1s. 5. Official hosts on .co.in/.com (sbi.co.in, banks, PSUs, NTA/NBEMS, SCCL, RTC, DISCOMs…) recognised in bot `OFFICIAL_HOSTS` and theme filter → "Official Notification / Official Website" links render (fixes SBI SCO post, no re-publish needed). 6. Thumbnails: Telugu words → English ("500 Posts"), never transliterated ("postulu"). 7. `--review-today [HOURS]` pin-to-pin audit of the day's drafts/published posts. 8. Category geo/kind pass: hall ticket/result/exam kinds win, state jobs never under Central, TS↔AP by title evidence. 9. Publish tap blocks last-year notices; geo check reads body too. 10. Official-link meta falls back to any official host the article carries (+ `--fix-live` backfills it on live posts) and the bare "Official Website" step text gets the link. 11. Title "2026 686 పోస్టులు" → "2026: 686 పోస్టులు". |
+
+## v402b — planner / review tier / schema gate / mock tests / study plans
+New (all draft-only, nothing auto-publishes):
+- `content_planner.py` — daily category quota with carry-over; `pick_category` asks it first. `run.py --plan-report`. Env `DAILY_QUOTA="TS Govt Jobs:3,..."`, `DAILY_PLANNER_ENABLED=0` to disable.
+- `review_tier.py` — every draft's Telegram card shows 🔴HIGH/🟡MEDIUM/🟢LOW + auto-check notes (grounding, injection guard, schema removals).
+- `schema_gate.py` — invalid JSON-LD blocks are removed before the draft is written (logged + noted).
+- `mock_test.py` — full-length mock test drafts from exam blueprints (`run.py --mock-test-list`, `--mock-test "TSPSC Group 2"`, weekly cron Sunday 05:30 in crontab.example; category "Mock Tests", env `MOCK_CATEGORY`).
+- `study_plans.py` — `run.py --study-plan "APPSC Group 2" --study-plan-days 90` (category Exam Tips; dates are stripped, evergreen).
+Verify on server: `.venv/bin/python run.py --mock-test-dry` → should print `action : dry-run` with a key, `blocked` without.

@@ -1596,6 +1596,18 @@ def publish_article(article: Dict, day: Optional[date] = None) -> Dict:
             log.info("v398 clean_body: %s", _lf_rep)
     except Exception:  # noqa: BLE001 — cleaner fail publish aapadu
         log.exception("v398 clean_body skip (publish safe)")
+    # v402: structured-data gate — broken JSON-LD blocks are removed (Search
+    # Console errors cost rich-result eligibility); review tier annotated.
+    try:
+        from . import schema_gate as _sg, review_tier as _rt
+        final_html, _sg_problems, _sg_valid = _sg.validate_html(final_html)
+        if _sg_problems:
+            log.warning("SCHEMA GATE: %s", " | ".join(_sg_problems[:3]))
+            article.setdefault("_review_notes", []).append("schema-removed:" + "; ".join(_sg_problems)[:160])
+        article["_schema_valid_blocks"] = _sg_valid
+        _rt.annotate(article)
+    except Exception:  # noqa: BLE001
+        log.debug("schema gate / review tier skip", exc_info=True)
     # v398: nothing to publish — an (almost) empty Gemini body must not become
     # a draft made only of house chrome (facts table + schema).
     # v401d: measure what WordPress will actually receive (after the cleaners),

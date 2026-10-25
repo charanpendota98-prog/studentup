@@ -789,6 +789,10 @@ QUIZ_CATEGORY = _get("QUIZ_CATEGORY", "Daily Quiz")
 # v402: daily current affairs (Telugu) — category + optional extra RSS feeds
 CA_CATEGORY = _get("CA_CATEGORY", "Current Affairs")
 CA_FEEDS = _get("CA_FEEDS", "")
+# v402: composite daily category quota (planner) — "Category:N,..." ; carry-over of
+# yesterday's shortfall is automatic. DAILY_PLANNER_ENABLED=0 → old weighted pick.
+DAILY_QUOTA = _get("DAILY_QUOTA", "")
+DAILY_PLANNER_ENABLED = _get("DAILY_PLANNER_ENABLED", "1") not in ("0", "false", "no")
 QUIZ_HOUR = int(_get("QUIZ_HOUR", "8"))          # morning study time
 QUIZ_QUESTIONS = int(_get("QUIZ_QUESTIONS", "10"))
 QUIZ_SUNDAY_QUESTIONS = int(_get("QUIZ_SUNDAY_QUESTIONS", "20"))  # weekly mega mock
