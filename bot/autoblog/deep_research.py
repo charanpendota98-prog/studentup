@@ -638,8 +638,10 @@ def gate_post(html: str, report: Dict, live: bool = True) -> Tuple[List[str], Li
                         "fix cheyandi")
     # date consistency inside the final article
     last_dates = set()
-    for m in re.finditer(r"last\s+date[^0-9]{0,60}?(\d{1,2}\s+[A-Za-z]{3,9}"
-                         r"\s+20\d{2}|\d{1,2}[/\-]\d{1,2}[/\-]20\d{2})",
+    # v401d: Telugu posts say "చివరి తేదీ / ఆఖరి తేదీ / దరఖాస్తు గడువు" — the
+    # English-only pattern never saw two conflicting deadlines in a Telugu body.
+    for m in re.finditer(r"(?:last\s+date|చివరి\s*తేదీ|ఆఖరి\s*తేదీ|దరఖాస్తు\s*గడువు|గడువు\s*తేదీ)"
+                         r"[^0-9]{0,60}?(\d{1,2}\s+[A-Za-z]{3,9}\s+20\d{2}|\d{1,2}[/\-]\d{1,2}[/\-]20\d{2})",
                          html, re.I):
         raw = m.group(1)
         norm = _norm_from_raw(raw)
