@@ -44,7 +44,7 @@ function studentup_doubts_enabled() {
  * Asker identity — IP + UA hash matrame (personal data store cheyyam).
  */
 function studentup_doubt_fingerprint() {
-	$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+	$ip = studentup_client_ip();
 	$ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
 	return substr( wp_hash( $ip . '|' . $ua ), 0, 24 );
 }
@@ -186,7 +186,7 @@ function studentup_doubt_post_handler() {
 	}
 	// v1.9.173: per-IP rate limit — 5 questions / 10 min (nonce + honeypot alone
 	// do not stop a scripted flood of pending comments).
-	$ip_key = 'su_doubt_rl_' . md5( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$ip_key = 'su_doubt_rl_' . md5( studentup_client_ip() );
 	$hits   = (int) get_transient( $ip_key );
 	if ( $hits >= 5 ) {
 		wp_safe_redirect( add_query_arg( 'su_doubt', 'err', get_permalink( $post_id ) ) . '#su-doubts' );

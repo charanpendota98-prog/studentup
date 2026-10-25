@@ -35,7 +35,7 @@ function studentup_sponsor_partner_box() {
 		<div class="su-sponsor-kicker"><?php echo esc_html( 'SPONSORED' . ( $partner['name'] ? ' · ' . $partner['name'] : '' ) ); ?></div>
 		<div class="su-sponsor-card">
 			<?php if ( $partner['image'] ) : ?>
-				<img class="su-sponsor-img" src="<?php echo esc_url( $partner['image'] ); ?>" alt="" loading="lazy" decoding="async" width="56" height="56">
+				<img class="su-sponsor-img" src="<?php echo esc_url( $partner['image'] ); ?>" alt="<?php echo esc_attr( $partner['name'] ? $partner['name'] : '' ); ?>" loading="lazy" decoding="async" width="56" height="56">
 			<?php else : ?>
 				<div class="su-sponsor-icon" aria-hidden="true"><?php echo studentup_ui_icon( 'school', 24 ); // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG ?></div>
 			<?php endif; ?>

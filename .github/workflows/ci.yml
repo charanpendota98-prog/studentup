@@ -42,3 +42,41 @@ jobs:
         working-directory: /tmp/bot
         env: { STATE_PATH: /tmp/ci-state.db, OUTPUT_DIR: /tmp/ci-out, RADAR_ENABLED: '0' }
         run: python run.py --mock --force 2>&1 | grep -q "DRY-RUN saved"
+
+  source-tests:
+    name: Repo source · bot + theme contract tests (nav slugs, REST permissions, XSS, publish gate, clock, deep research)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Install
+        run: pip install -q -r bot/requirements.txt pytest
+      - name: Full test suite against repo sources (theme present → contract tests run, not skipped)
+        working-directory: bot
+        env: { STATE_PATH: /tmp/ci-src-state.db, OUTPUT_DIR: /tmp/ci-src-out, RADAR_ENABLED: '0', TZ: America/Los_Angeles }
+        run: |
+          python -m pytest -q tests
+          # the theme tests must actually have run (not module-skipped)
+          python -m pytest -q tests/test_theme_nav_slugs.py tests/test_theme_security_contracts.py -rs 2>&1 | tee /tmp/theme.txt
+          ! grep -q "skipped" /tmp/theme.txt
+      - name: Theme version parity (style.css ↔ functions.php ↔ readme.txt ↔ shipped zip)
+        run: |
+          V=$(sed -n "s/.*define( 'STUDENTUP_VERSION', '\([0-9.]*\)'.*/\1/p" wordpress-theme/studentup/functions.php)
+          grep -q "^Version: $V$" wordpress-theme/studentup/style.css
+          grep -q "^Stable tag: $V$" wordpress-theme/studentup/readme.txt
+          test -f "studentup-theme-$V.zip"
+
+  a11y:
+    name: Theme · static a11y contract (alt text, aria-current, labelled controls)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Images carry alt (decorative ones are explicitly aria-hidden/background)
+        run: |
+          cd wordpress-theme/studentup
+          ! grep -rn "<img" --include=*.php . | grep -v "alt=" | grep -v "su-story-bg" | grep -v "su-upnext" | grep -v "^\s*//" | grep -v "// Core builds" | grep .
+      - name: Icon-only buttons have aria-label
+        run: |
+          cd wordpress-theme/studentup
+          ! grep -rn '<button[^>]*class="[^"]*\(-x\|-close\|toggle\)[^"]*"' --include=*.php . | grep -v "aria-label" | grep .

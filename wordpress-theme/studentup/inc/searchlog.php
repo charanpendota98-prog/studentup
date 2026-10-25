@@ -89,7 +89,7 @@ function studentup_searchlog_record( $term, $results = 0 ) {
  * @return bool true = allowed.
  */
 function studentup_searchlog_allowed() {
-	$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	$ip = studentup_client_ip();
 	if ( '' === $ip ) {
 		return true;   // unknown IP — throttle skip (log mattrame chestam)
 	}

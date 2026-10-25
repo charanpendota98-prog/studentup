@@ -393,11 +393,14 @@ function studentup_mega_render( $groups, $home ) {
 				printf( '<p class="su-mega-title">%s</p>', esc_html( studentup_mega_t( (string) $col['title'], 'studentup' ) ) );
 			}
 			echo '<ul class="su-mega-list">';
+			$cur_url = function_exists( 'studentup_current_page_url' ) ? studentup_current_page_url() : '';
 			foreach ( $col['items'] as $it ) {
+				$is_cur = $cur_url && untrailingslashit( (string) $it['url'] ) === $cur_url;
 				printf(
-					'<li class="menu-item" role="none"><a role="menuitem" href="%s"><span class="su-mega-ic">%s</span>'
+					'<li class="menu-item" role="none"><a role="menuitem" href="%s"%s><span class="su-mega-ic">%s</span>'
 					. '<span class="su-mega-t">%s<small>%s</small></span></a></li>',
 					esc_url( (string) $it['url'] ),
+					$is_cur ? ' aria-current="page"' : '', // 1.9.178 (audit U-3)
 					studentup_ui_icon( (string) $it['icon'], 18 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG
 					esc_html( studentup_mega_t( (string) $it['label'], 'studentup' ) ),
 					esc_html( (string) $it['desc'] )

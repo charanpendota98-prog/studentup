@@ -76,7 +76,9 @@ function studentup_publish_gate( $data, $postarr ) {
 	if ( $forced && current_user_can( 'publish_posts' ) ) {
 		return $data;
 	}
-	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	// 1.9.178 (audit F-9): WP-CLI no longer bypasses the gate silently. A CLI
+	// operator who really needs it sets SU_FORCE_PUBLISH=1 (or su_force_publish).
+	if ( defined( 'WP_CLI' ) && WP_CLI && getenv( 'SU_FORCE_PUBLISH' ) ) {
 		return $data;
 	}
 	$reason = studentup_publish_gate_reason( $post_id, $data['post_title'] ?? '' );
@@ -84,6 +86,9 @@ function studentup_publish_gate( $data, $postarr ) {
 		return $data;
 	}
 	$data['post_status'] = 'draft';
+	if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'WP_CLI' ) ) {
+		WP_CLI::warning( 'StudentUp publish gate: kept as draft — ' . wp_strip_all_tags( $reason ) . ' (SU_FORCE_PUBLISH=1 to override)' );
+	}
 	$log   = (array) get_option( 'studentup_publish_gate_log', array() );
 	$log[] = array( 't' => time(), 'id' => $post_id, 'title' => wp_strip_all_tags( (string) ( $data['post_title'] ?? '' ) ), 'reason' => wp_strip_all_tags( $reason ) );
 	update_option( 'studentup_publish_gate_log', array_slice( $log, -50 ), false );

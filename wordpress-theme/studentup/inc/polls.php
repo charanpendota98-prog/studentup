@@ -155,7 +155,7 @@ function studentup_poll_voter() {
 	if ( $cookie && preg_match( '/^[a-f0-9]{20,64}$/', $cookie ) ) {
 		return $cookie;
 	}
-	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0.0.0.0';
+	$ip  = studentup_client_ip();
 	$ua  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 	$raw = $ip . '|' . $ua . '|' . ( function_exists( 'wp_salt' ) ? wp_salt( 'auth' ) : 'su' );
 	return substr( wp_hash( $raw ), 0, 40 );

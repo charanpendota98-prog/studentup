@@ -44,3 +44,8 @@
 # v186 live site audit (weekly): 16 HTTP checks (robots · sitemap · schema · PWA · 404 · caching):
 0 10 * * 1   cd /opt/studentup && /opt/studentup/.venv/bin/python run.py --live-audit --live-notify >> /opt/studentup/log/live-audit.log 2>&1
 
+
+# NOTE (audit PR-3): the hourly run and --fast-drain each take an exclusive
+# lock (state.hourly.lock / state.fastdrain.lock) inside run.py, so an
+# overlapping cron tick exits immediately instead of double-drafting. No
+# external flock(1) wrapper is required; keep it if you already have one.

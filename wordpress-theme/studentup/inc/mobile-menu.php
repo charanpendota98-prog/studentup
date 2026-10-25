@@ -105,16 +105,44 @@ function studentup_mobile_main_menu() {
 	}
 	echo '<div class="mlabel">' . esc_html__( 'Main menu', 'studentup' ) . '</div>';
 	echo '<nav class="su-mmain" aria-label="' . esc_attr__( 'Main menu', 'studentup' ) . '">';
+	$current = studentup_current_page_url();
 	foreach ( $rows as $row ) {
+		$is_cur = $current && untrailingslashit( (string) $row['url'] ) === $current;
 		printf(
-			'<a class="su-mmain-a %1$s" href="%2$s">%3$s<span class="su-mmain-t">%4$s%5$s</span>%6$s</a>',
-			esc_attr( isset( $row['cls'] ) ? $row['cls'] : '' ),
+			'<a class="su-mmain-a %1$s" href="%2$s"%7$s>%3$s<span class="su-mmain-t">%4$s%5$s</span>%6$s</a>',
+			esc_attr( ( isset( $row['cls'] ) ? $row['cls'] : '' ) . ( $is_cur ? ' is-current' : '' ) ),
 			esc_url( $row['url'] ),
 			studentup_ui_icon( $row['icon'], 18 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG.
 			esc_html( ( studentup_nav_english() ? $row['lab'] : translate( $row['lab'], 'studentup' ) ) ),
 			'' , // v268: hints owner ki avasaram ledu — eppudu render cheyyamu
-			studentup_ui_icon( 'chevron', 14 ) // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG.
+			studentup_ui_icon( 'chevron', 14 ), // phpcs:ignore WordPress.Security.EscapeOutput -- trusted SVG.
+			$is_cur ? ' aria-current="page"' : ''
 		);
 	}
 	echo '</nav>';
+}
+
+/**
+ * 1.9.178 (audit U-3): canonical URL of the page being viewed, without
+ * trailing slash, for aria-current="page" on nav links. Empty on search/404.
+ */
+function studentup_current_page_url() {
+	static $url = null;
+	if ( null !== $url ) {
+		return $url;
+	}
+	$url = '';
+	if ( is_front_page() ) {
+		$url = home_url( '/' );
+	} elseif ( is_category() || is_tag() || is_tax() ) {
+		$t = get_queried_object();
+		if ( $t && ! is_wp_error( $t ) ) {
+			$u   = get_term_link( $t );
+			$url = is_wp_error( $u ) ? '' : $u;
+		}
+	} elseif ( is_singular() ) {
+		$url = get_permalink();
+	}
+	$url = $url ? untrailingslashit( (string) $url ) : '';
+	return $url;
 }

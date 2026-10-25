@@ -134,7 +134,7 @@ function studentup_push_subscribe( $req ) {
 	}
 	// v1.9.147 (security review): public endpoint had no rate limit or table cap —
 	// a script could insert unlimited rows (DB bloat + push-fanout cost).
-	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0.0.0.0';
+	$ip  = studentup_client_ip();
 	$rl  = 'su_push_rl_' . substr( wp_hash( $ip ), 0, 24 );
 	$hit = (int) get_transient( $rl );
 	if ( $hit >= 5 ) {
